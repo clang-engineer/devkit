@@ -1,0 +1,23 @@
+# 프로젝트 공통 Makefile 템플릿
+# 프로젝트에 맞게 수정해서 사용
+
+.PHONY: help build run test clean lint
+
+help: ## 도움말 표시
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+build: ## 빌드
+	@echo "TODO: 빌드 명령어"
+
+run: ## 실행
+	@echo "TODO: 실행 명령어"
+
+test: ## 테스트
+	@echo "TODO: 테스트 명령어"
+
+lint: ## 린트
+	@echo "TODO: 린트 명령어"
+
+clean: ## 정리
+	@echo "TODO: 정리 명령어"

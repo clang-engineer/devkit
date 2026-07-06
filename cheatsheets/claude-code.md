@@ -1,0 +1,254 @@
+# Claude Code Cheatsheet
+
+> [Claude Code](https://docs.claude.com/en/docs/claude-code) — Anthropic이 만든 터미널용 코딩 에이전트. `npm i -g @anthropic-ai/claude-code` 후 `claude` 실행.
+
+## 30초만 본다면
+
+| 상황 | 명령 |
+|------|------|
+| 시작 | `claude` |
+| 한 줄 요청만 처리 | `claude "git status 정리해줘"` |
+| 어제 작업 이어서 | `claude -c` |
+| 토큰이 너무 늘었을 때 | 대화 중 `/compact` |
+| 권한 모드 전환 (plan/accept 등) | `Shift+Tab` (모드 순환) |
+| 작업 중단 | `Esc` (또는 `Ctrl+C`) |
+| 파일 첨부 | 프롬프트에 `@경로` 입력 (Tab 자동완성) |
+| 셸 명령 직접 실행 | 프롬프트에 `!ls` |
+| 작업 비용 확인 | `/cost` |
+
+## 처음 설정할 때
+
+1. `claude` 실행 → `/login`으로 계정 연결
+2. `/init`을 프로젝트 루트에서 실행 → `CLAUDE.md` 생성 (프로젝트 컨벤션을 적어두면 매 세션이 좋아짐)
+3. 권한 프롬프트가 귀찮으면 `/permissions`로 자주 쓰는 도구 허용
+
+## 기본 내장 명령어
+
+| 명령어 | 설명 |
+|--------|------|
+| `/help` | 도움말 표시 |
+| `/clear` | 대화 초기화 |
+| `/compact` | 컨텍스트 압축 (토큰 절약) |
+| `/config` | 설정 열기/변경 |
+| `/cost` | 토큰 사용량/비용 확인 |
+| `/usage` | 플랜 사용량·한도 확인 |
+| `/context` | 컨텍스트에 무엇이 차 있는지 확인 |
+| `/doctor` | 설치 상태 진단 |
+| `/init` | CLAUDE.md 프로젝트 설정 파일 생성 |
+| `/login` | 계정 로그인 |
+| `/logout` | 계정 로그아웃 |
+| `/mcp` | MCP 서버 상태 확인 |
+| `/memory` | 메모리 파일 편집 |
+| `/model` | 사용할 모델 변경 |
+| `/permissions` | 도구 권한 설정 |
+| `/review` | PR 코드 리뷰 |
+| `/code-review` | 현재 diff 리뷰 (`ultra`로 멀티 에이전트 클라우드 리뷰) |
+| `/security-review` | 보안 관점 리뷰 |
+| `/status` | 버전·모델·계정·연결 상태 (Settings) |
+| `/resume` | 이전 세션 이어가기 |
+| `/rewind` | 체크포인트로 되돌리기 (대화·파일 복원) |
+| `/agents` | 사용자 정의 에이전트 관리 (`.claude/agents/`) |
+| `/hooks` | hooks 설정 관리 (settings.json) |
+| `/workflows` | 워크플로우 진행 상황 보기 (background 멀티에이전트) |
+| `/loop` | 명령을 주기적으로 반복 실행 (`/loop 5m /foo`) |
+| `/schedule` | 크론 스케줄로 원격 에이전트 등록 |
+| `/terminal-setup` | 터미널 환경 설정 |
+| `/vim` | vim 키바인딩 토글 |
+| `/fast` | 빠른 출력 모드 토글 (같은 모델) |
+
+## 실행 옵션
+
+| 명령어 | 설명 |
+|--------|------|
+| `claude` | 대화형 모드 시작 |
+| `claude "prompt"` | 원샷 실행 |
+| `claude -c` | 마지막 대화 이어서 시작 |
+| `claude -r <session>` | 특정 세션 복원 |
+| `claude -p "prompt"` | 파이프 모드 (stdin/stdout) |
+| `echo "code" \| claude -p "review"` | 파이프 입력 |
+| `claude --model <model>` | 모델 지정 실행 |
+| `claude config` | CLI에서 설정 관리 |
+
+## 설정 파일
+
+| 파일 | 위치 | 용도 |
+|------|------|------|
+| `CLAUDE.md` | 프로젝트 루트 | 프로젝트별 지침/컨텍스트 |
+| `~/.claude/settings.json` | 홈 디렉토리 | 전역 설정 |
+| `.claude/settings.json` | 프로젝트 | 프로젝트별 설정 |
+| `~/.claude/keybindings.json` | 홈 디렉토리 | 키바인딩 커스터마이징 |
+
+## 권한 모드
+
+| 모드 | 설명 |
+|------|------|
+| `--allowedTools` | 특정 도구만 자동 허용 |
+| `--dangerously-skip-permissions` | 모든 권한 체크 스킵 (주의) |
+| `/permissions` | 대화 중 권한 설정 변경 |
+
+## 키보드 단축키
+
+| 단축키 | 설명 |
+|--------|------|
+| `Enter` | 메시지 전송 |
+| `Shift+Enter` | 줄바꿈 |
+| `Ctrl+C` | 현재 작업 중단 |
+| `Ctrl+D` | 대화 종료 |
+| `Escape` | 실행 취소 / 입력 초기화 |
+| `Tab` | 파일 경로 자동완성 |
+
+## MCP (Model Context Protocol)
+
+| 명령어 | 설명 |
+|--------|------|
+| `/mcp` | 연결된 MCP 서버 상태 확인 |
+| `claude mcp add <name> <command>` | MCP 서버 추가 |
+| `claude mcp remove <name>` | MCP 서버 제거 |
+| `claude mcp list` | 등록된 MCP 서버 목록 |
+
+## Custom Agents
+
+프로젝트나 역할별 전용 에이전트를 만들어 도구/모델/시스템 프롬프트를 제한할 수 있다.
+
+| 위치 | 범위 |
+|------|------|
+| `~/.claude/agents/*.md` | 전역 에이전트 |
+| `.claude/agents/*.md` | 프로젝트 에이전트 |
+
+```markdown
+---
+name: sql-reviewer
+model: sonnet
+tools: ["Read", "Grep", "Glob"]
+---
+SQL 쿼리 리뷰 전문 에이전트. 성능, 인덱스 활용, N+1 문제를 중심으로 리뷰한다.
+```
+
+관리: 대화 중 `/agents`로 생성·편집. Claude가 관련 작업에 자동 위임하거나 프롬프트에서 직접 지정해 호출한다.
+
+## Project-level CLAUDE.md
+
+프로젝트 루트에 `CLAUDE.md`를 두면 해당 프로젝트에서만 적용되는 지침을 설정할 수 있다.
+글로벌 `~/.claude/CLAUDE.md`와 별개로, 프로젝트별 컨벤션/아키텍처를 기술하면 컨텍스트 품질이 올라간다.
+
+```
+project-root/
+├── CLAUDE.md              # 프로젝트 지침
+├── .claude/
+│   ├── settings.json      # 프로젝트 설정 (팀 공유, git commit)
+│   ├── settings.local.json # 개인 설정 (git ignore)
+│   └── agents/            # 프로젝트 전용 에이전트
+```
+
+## Worktree (병렬 작업)
+
+`--worktree` 플래그로 격리된 git worktree에서 작업. 메인 브랜치를 건드리지 않고 병렬로 작업 가능.
+
+```bash
+claude --worktree    # 별도 worktree에서 세션 시작
+```
+
+subagent에도 `isolation: "worktree"` 옵션으로 격리 실행 가능.
+
+## Schedule (Remote Triggers)
+
+크론 스케줄로 Claude를 자동 실행. `/schedule` 명령으로 관리.
+
+```bash
+/schedule create --cron "0 9 * * 1-5" --prompt "PR 현황 정리해서 docs/daily에 저장"
+/schedule list
+/schedule delete <id>
+```
+
+## 권한 모드 (Shift+Tab 순환)
+
+`Shift+Tab`은 단일 토글이 아니라 **권한 모드를 순환**한다:
+
+```
+default → acceptEdits → plan [→ auto] [→ bypassPermissions]
+```
+
+(대괄호 모드는 계정/설정에서 활성화된 경우만 노출.)
+
+- `default` — 매번 권한 확인
+- `acceptEdits` — 파일 편집 자동 수락
+- `plan` — 읽기만, 변경 전 플랜 수립
+- `auto` — Claude가 권한을 자동 판단 (아래 `autoMode` 규칙 기반)
+- `bypassPermissions` — 모든 체크 스킵 (주의)
+
+`auto` 모드 규칙은 `settings.json`의 `autoMode`로 커스텀:
+
+```json
+{
+  "autoMode": {
+    "environment": [],
+    "allow": ["빌드·테스트 실행"],
+    "soft_deny": ["$defaults", "terraform apply 금지"],
+    "hard_deny": ["프로덕션 DB 수정"]
+  }
+}
+```
+
+- 도구 패턴 문자열(`Bash(npm run test:*)`)이 아니라 **사람이 읽는 설명**으로 기술
+- `"$defaults"` = 내장 기본 규칙 포함
+- `hard_deny` = 항상 차단. 도구 단위 정밀 허용/거부는 별도 `permissions.allow`/`deny` 키
+
+## 유용한 팁
+
+| 팁 | 설명 |
+|----|------|
+| `@파일명` | 프롬프트에서 파일 직접 참조 (자동완성 지원) |
+| `!명령어` | 프롬프트에서 셸 명령 직접 실행 |
+| `#` | 프롬프트 시작 시 코멘트 (Claude에게 전달 안 됨) |
+| `/compact` | 컨텍스트 길어지면 압축해서 토큰 절약 |
+| `Ctrl+R` | 이전 프롬프트 검색 |
+| `Ctrl+O` | 전체 트랜스크립트 보기 |
+| `Ctrl+J` | 프롬프트에서 줄바꿈 (Enter 대신) |
+| 이미지 드래그앤드롭 | 스크린샷/이미지를 프롬프트에 바로 첨부 |
+| `claude -c` | 마지막 세션 이어서 작업 |
+| Plan 모드 | 복잡한 작업 전 구조화된 플랜 수립 후 승인 |
+
+## 영속 데이터 위치 (`~/.claude/`)
+
+| 경로 | 내용 |
+|------|------|
+| `~/.claude/plans/` | ExitPlanMode 결과 (`{slug}.md`, auto-named) |
+| `~/.claude/projects/{slug}/*.jsonl` | 프로젝트별 대화 세션 |
+| `~/.claude/projects/{slug}/memory/` | 자동 메모리 (`MEMORY.md` + 개별 파일) |
+| `~/.claude/sessions/` | 글로벌 세션 메타 |
+| `~/.claude/commands/` | 사용자 정의 슬래시 명령 (`/to-*` 등) |
+| `~/.claude/agents/` | 사용자 정의 에이전트 |
+| `~/.claude/shell-snapshots/` | Bash 도구 셸 상태 스냅샷 |
+| `~/.claude/file-history/` | 편집된 파일 히스토리 |
+
+## additionalDirectories — 다중 프로젝트 접근
+
+여러 디렉토리를 권한 프롬프트 없이 오갈 때 `~/.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/path/to/blog",
+      "/path/to/toolbox",
+      "/path/to/dotfiles"
+    ]
+  }
+}
+```
+
+- 파일 접근 권한만 부여. 해당 디렉토리의 `.claude/` 설정(hooks 등)은 로드되지 않음
+- 설정 로드까지 필요하면 세션별 `--add-dir` 플래그
+- JSON은 환경변수 확장 미지원. 머신별 경로가 다르면 setup 스크립트로 치환
+
+## Hooks 이벤트 종류
+
+| 이벤트 | 시점 |
+|--------|------|
+| `PreToolUse` | 도구 실행 전 (차단 가능) |
+| `PostToolUse` | 도구 실행 후 |
+| `Stop` | Claude 응답 완료 시 |
+| `Notification` | 알림 발생 시 |
+| `SessionStart` | 세션 시작 시 |
+| `PreCompact` / `PostCompact` | 컨텍스트 압축 전후 |
+| `UserPromptSubmit` | 사용자 입력 제출 시 |

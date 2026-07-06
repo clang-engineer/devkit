@@ -1,0 +1,71 @@
+intro: 자주 쓰지만 매번 검색하게 되는 명령어/문법 모음.
+
+groups:
+  - title: 에디터 & TUI
+    items:
+      - {file: vim.md, desc: Vim 모드별 명령어}
+      - {file: lazyvim.md, desc: LazyVim 키맵}
+      - {file: lazygit.md, desc: LazyGit TUI 단축키}
+      - {file: tmux.md, desc: Tmux 세션/윈도우/패널}
+
+  - title: 모던 CLI 도구 (grep/find/cat/ls 대체)
+    items:
+      - {file: rg.md, desc: "ripgrep — 텍스트 검색 (`grep` 대체)"}
+      - {file: fzf.md, desc: "fzf — 퍼지 파인더 (Ctrl+R/T, 파이프 조합)"}
+      - {file: jq.md, desc: "jq — JSON 파이프라인 가공"}
+      - {file: modern-cli.md, desc: "bat / eza / fd / tree / zoxide / delta / tldr 통합"}
+
+  - title: 텍스트 처리
+    items:
+      - {file: sed-awk.md, desc: "sed (치환·삽입·삭제) + awk (필드·집계·보고서)"}
+      - {file: regex.md, desc: "정규표현식 문법 + 도구별 플레이버(BRE/ERE/PCRE) 차이"}
+      - {file: compression.md, desc: "tar / gzip / zip / xz / bzip2 / 7z"}
+
+  - title: 셸
+    items:
+      - {file: shell.md, desc: "Bash `set` 옵션, `&`/`&&`/`;`/`\\|\\|`, job 관리"}
+      - {file: zsh.md, desc: "Zsh 단축키, glob, alias"}
+      - {file: powershell.md, desc: "PowerShell — Bash와 다른 점 위주 (PS 5.1 vs 7, 서비스 관리 sc/nssm 포함)"}
+
+  - title: 시스템 & 서버
+    items:
+      - {file: linux-process.md, desc: "프로세스 찾기·종료 (`pgrep`/`pkill`/`lsof`/`kill` 시그널)"}
+      - {file: linux.md, desc: "Linux 디렉터리 구조 + 자원 모니터링 + 네트워크"}
+      - {file: ssh.md, desc: "ssh-agent/ssh-add, ~/.ssh/config, scp/rsync"}
+      - {file: systemd.md, desc: "systemd 서비스 관리 + journalctl 로그"}
+      - {file: nginx.md, desc: "Nginx 설정/명령어"}
+      - {file: openssl.md, desc: "인증서/암호화"}
+      - {file: rocky-linux.md, desc: "Rocky Linux (firewalld, SELinux, certbot)"}
+
+  - title: macOS
+    items:
+      - {file: macos-admin.md, desc: "macOS troubleshoot (LaunchDaemons, Secure Input 등)"}
+      - {file: aerospace.md, desc: "macOS 타일링 WM"}
+
+  - title: 데이터
+    items:
+      - {file: sql-snippets.md, desc: "PostgreSQL 운영 패턴 (`information_schema` ALTER 자동 생성 등)"}
+      - {file: elasticsearch.md, desc: "Elasticsearch 쿼리/관리"}
+      - {file: kibana.md, desc: "KQL, Dev Tools, Discover, 운영 진단"}
+
+  - title: 컨테이너 & 빌드
+    items:
+      - {file: kubectl.md, desc: "Kubernetes CLI — get/logs/exec/port-forward/apply/rollout"}
+      - {file: docker.md, desc: "Docker / Compose 명령어 + 오프라인 바이너리 설치"}
+      - {file: make.md, desc: "Makefile — 자동변수, 패턴 룰, .PHONY, 함수"}
+
+  - title: Git & 버전 관리
+    items:
+      - {file: git.md, desc: "Git 명령어 (브랜치, stash, rebase, tag 등)"}
+      - {file: gh.md, desc: "GitHub CLI — PR/이슈/Actions/API"}
+      - {file: code-review-glossary.md, desc: "리뷰 약어/용어 (LGTM, PTAL, nit:, Draft PR 등)"}
+    note: "> `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합."
+
+  - title: 개발 도구
+    items:
+      - {file: curl.md, desc: "curl HTTP 요청"}
+      - {file: claude-code.md, desc: "Claude Code CLI"}
+
+  - title: 언어
+    items:
+      - {file: c-cpp.md, desc: "C/C++ 스니펫 + Google C++ Style + GDB 디버거"}
