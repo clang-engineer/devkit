@@ -54,6 +54,7 @@
 |------|------|
 | [macos-admin.md](macos-admin.md) | macOS troubleshoot (LaunchDaemons, Secure Input 등) |
 | [aerospace.md](aerospace.md) | macOS 타일링 WM |
+| [hammerspoon.md](hammerspoon.md) | macOS 자동화/윈도우 관리 (Lua) |
 
 ## 데이터
 

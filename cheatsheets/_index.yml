@@ -41,6 +41,7 @@ groups:
     items:
       - {file: macos-admin.md, desc: "macOS troubleshoot (LaunchDaemons, Secure Input 등)"}
       - {file: aerospace.md, desc: "macOS 타일링 WM"}
+      - {file: hammerspoon.md, desc: "macOS 자동화/윈도우 관리 (Lua)"}
 
   - title: 데이터
     items:
