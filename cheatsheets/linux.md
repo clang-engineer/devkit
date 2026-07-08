@@ -222,3 +222,44 @@ dig example.com +dnssec
 | 이어받기 | `-C -` 옵션 | 기본 지원 |
 | POST | `-X POST -d "data"` | 제한적 |
 | 백그라운드 | 직접 설정 | `-b` 옵션 |
+
+---
+
+## sudo 권한 부여
+
+두 갈래 — 관리 그룹에 넣거나, sudoers에 직접 규칙을 쓴다.
+
+### 그룹에 추가 (간단, 사실상 root 전권)
+
+배포판 기본 sudoers에 "특정 그룹 = 모든 명령" 규칙이 들어 있어 그룹만 넣으면 열린다.
+
+```bash
+sudo usermod -aG sudo username    # Debian/Ubuntu
+sudo usermod -aG wheel username   # RHEL/CentOS/Rocky/Alma
+```
+
+- `-a`(append) 빼면 기존 그룹이 날아가니 항상 `-aG`.
+- 반영은 **재로그인** 후.
+
+### sudoers 직접 명시 (최소 권한)
+
+편집은 반드시 `visudo` — 저장 시 문법 검사로 잠김 사고를 막는다.
+
+```bash
+sudo visudo
+sudo visudo -f /etc/sudoers.d/username   # sudoers.d에 두면 관리·롤백 쉬움
+```
+
+```
+username    ALL=(ALL:ALL) ALL                      # 전체 권한
+username    ALL=(ALL:ALL) NOPASSWD: ALL             # 비밀번호 없이
+username    ALL=(ALL) /usr/bin/systemctl restart nginx   # 특정 명령만
+```
+
+- `sudoers.d` 파일은 권한 `0440`, 파일명에 `.`이나 `~`가 들어가면 무시된다.
+
+### 확인
+
+```bash
+sudo -l -U username    # 해당 사용자의 실제 권한 출력
+```

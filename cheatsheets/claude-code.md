@@ -241,6 +241,44 @@ default → acceptEdits → plan [→ auto] [→ bypassPermissions]
 - 설정 로드까지 필요하면 세션별 `--add-dir` 플래그
 - JSON은 환경변수 확장 미지원. 머신별 경로가 다르면 setup 스크립트로 치환
 
+## 작업 디렉토리 이동 — `/cd` vs `/add-dir`
+
+세션 시작 후 디렉토리를 다루는 두 방식. `/add-dir`는 경계만 넓히고, `/cd`는 root 자체를 옮긴다.
+
+| 목적 | 명령 |
+|---|---|
+| 다른 트리 파일 **접근만** 추가 (root 유지) | `/add-dir /path` 또는 `claude --add-dir /path` |
+| root(cwd) 자체를 이동 | `/cd /path` |
+
+- `/add-dir`로 넣은 건 세션 도중 **제거 불가** (`/remove-dir` 없음). 재시작하면 사라짐. 영구 추가는 `settings.json`의 `permissions.additionalDirectories`.
+- 상위 디렉토리를 add-dir해야 실제 확장. cwd 자기 자신/하위는 no-op (이미 경계 안).
+- `/cd`는 **v2.1.169+** 필요. 대화·prompt cache 유지한 채 이동, 세션이 새 디렉토리 스토리지로 재배치됨. 처음 가는 곳이면 trust 프롬프트.
+
+## 키바인딩 커스터마이즈 (`~/.claude/keybindings.json`)
+
+```json
+{
+  "$schema": "https://www.schemastore.org/claude-code-keybindings.json",
+  "bindings": [
+    { "context": "Chat", "bindings": { "escape": null } }
+  ]
+}
+```
+
+- `null` = 기본 바인딩 해제. 사용자 바인딩은 기본값에 **additive** (옮기려면 old를 `null` + new 추가).
+- chord는 공백 구분: `ctrl+k ctrl+s` (키 사이 1초 타임아웃).
+- **적용은 재시작 필요** (시작 시 1회 로드). `/doctor`가 유효성 검사.
+- 바인딩은 정해진 `namespace:action`만 가능 — 임의 텍스트 삽입/자동 제출은 불가.
+
+| action | 기본 키 | context |
+|---|---|---|
+| `chat:cancel` | `escape` | Chat |
+| `app:interrupt` | `ctrl+c` | Global |
+| `history:previous` | `up` | Chat |
+| `history:search` | `ctrl+r` | Global |
+
+> 함정: ESC를 chord 접두키(`"escape escape"`)로 만들면 화살표·Alt 등 escape 시퀀스가 전부 타임아웃 대기에 걸려 입력이 먹통 → 더블-ESC는 사실상 불가.
+
 ## Hooks 이벤트 종류
 
 | 이벤트 | 시점 |

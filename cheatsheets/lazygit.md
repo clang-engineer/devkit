@@ -101,6 +101,20 @@ LazyVim에서: `<leader>gg` (cwd) / `<leader>gG` (root dir)
 | `R` | 이름 변경 |
 | `P` / `p` | Push / Pull (전역 키) |
 
+### Branches 패널 내부 탭 (Local / Remotes / Tags)
+
+Branches 패널(3번)은 안에 탭 3개를 가진다. Local Branches는 **로컬만** 보여준다 (의도된 분리).
+
+| 키 | 동작 |
+|----|------|
+| `Tab` | 패널 내 탭 순환 (Local ↔ Remotes ↔ Tags) — **remote 브랜치는 여기 있다** |
+| `[` `]` | 패널 간 이동 (탭 전환 아님) |
+
+remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` → 브랜치 목록 → `Space`(로컬 tracking 브랜치 생성).
+목록에 새 브랜치가 없으면 `f`(선택 fetch) / `F`(fetch all)로 갱신.
+
+> "remote 탭이 안 보인다"는 십중팔구 `]`만 누르고 패널 내 `Tab`을 안 눌러서다.
+
 ### Commits 패널
 
 | 키 | 동작 |
