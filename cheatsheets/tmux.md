@@ -67,6 +67,34 @@ Session → Window → Pane
 | `Prefix l` | 마지막 윈도우로 이동 |
 | `Prefix i` | 윈도우 정보 표시 |
 
+## 윈도우 상태 flag (status line)
+
+status line에서 윈도우 이름/번호 뒤에 자동으로 붙는 한 글자 표식. "지금 이 윈도우가 어떤 상태인지"를 한눈에 알려준다.
+
+### 사용자가 직접 만드는 flag
+
+| flag | 의미 | 생기는 조작 |
+|------|------|------------|
+| `Z` | pane **zoom** 됨 (한 pane만 윈도우 꽉 채움) | `Prefix z` — 분할 유지한 채 임시 확대, 다시 `Prefix z`로 복귀 |
+| `M` | **marked pane** 포함 | `Prefix m` (마킹) / `Prefix M` (전체 해제). swap-pane·join-pane의 기준점 |
+
+### tmux가 자동으로 띄우는 flag (알림성)
+
+| flag | 의미 | 켜는 옵션 |
+|------|------|----------|
+| `#` | **activity** — 안 보는 윈도우에서 출력 발생 | `setw -g monitor-activity on` |
+| `~` | **silence** — 일정 시간 조용함 (작업 끝/멈춤 신호) | `setw -g monitor-silence <초>` |
+| `!` | **bell** — 프로그램이 bell(`\a`) 울림 | 기본 동작 |
+
+### 위치 표시 flag
+
+| flag | 의미 |
+|------|------|
+| `*` | 현재(active) 윈도우 |
+| `-` | 직전(last) 윈도우 — `Prefix l`로 이 둘 사이 토글 |
+
+> 실전 빈도: `Z`(집중용 확대)와 `#`/`~`(백그라운드 작업 알림)가 가장 자주 뜬다. 의도치 않게 한 pane만 크게 보이면 `Z` flag를 확인하고 `Prefix z`로 복귀.
+
 ## 패널 관리
 
 | 명령어 | 설명 |
