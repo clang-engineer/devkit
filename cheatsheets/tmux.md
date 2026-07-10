@@ -78,6 +78,20 @@ status line에서 윈도우 이름/번호 뒤에 자동으로 붙는 한 글자 
 | `Z` | pane **zoom** 됨 (한 pane만 윈도우 꽉 채움) | `Prefix z` — 분할 유지한 채 임시 확대, 다시 `Prefix z`로 복귀 |
 | `M` | **marked pane** 포함 | `Prefix m` (마킹) / `Prefix M` (전체 해제). swap-pane·join-pane의 기준점 |
 
+marked pane은 "찜해둔 pane"이라 `-s`(source)를 생략해도 그게 자동으로 잡힌다. 커서를 옮겨다니며 조작할 때 편하다.
+
+```bash
+# swap: 두 pane 위치 교환
+#   1. A pane에서  Prefix m       → A에 M flag
+#   2. B pane으로 커서 이동
+#   3. B pane에서  :swap-pane     → A ↔ B 교환 (-s 없이 marked가 source)
+
+# join: marked pane을 다른 윈도우로 끌어오기
+#   1. 가져올 pane에서  Prefix m
+#   2. 붙일 윈도우/pane으로 이동
+#   3. :join-pane -h            → marked pane이 현재 자리 옆에 좌우 split
+```
+
 ### tmux가 자동으로 띄우는 flag (알림성)
 
 | flag | 의미 | 켜는 옵션 |
