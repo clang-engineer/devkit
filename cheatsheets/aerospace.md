@@ -43,7 +43,8 @@ brew install --cask nikitabobko/tap/aerospace
 |---|---|
 | `Alt + /` | 타일 레이아웃 토글 (수평/수직) |
 | `Alt + ,` | 아코디언 레이아웃 토글 |
-| `Alt + Shift + Space` | 플로팅 ↔ 타일 토글 |
+
+> 플로팅↔타일 토글은 메인 모드에 기본 단축키가 없다. 서비스 모드(`Alt + Shift + ;`)의 `F`로 전환한다.
 
 ## 창 크기 조절
 
