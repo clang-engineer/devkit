@@ -7,6 +7,7 @@ groups:
       - {file: lazyvim.md, desc: LazyVim 키맵}
       - {file: lazygit.md, desc: LazyGit TUI 단축키}
       - {file: tmux.md, desc: Tmux 세션/윈도우/패널}
+      - {file: smug.md, desc: "smug — 선언형 YAML로 tmux 세션 부팅"}
       - {file: ghostty.md, desc: Ghostty 터미널 탭/분할/키맵}
 
   - title: 모던 CLI 도구 (grep/find/cat/ls 대체)
