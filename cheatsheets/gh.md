@@ -60,6 +60,8 @@ gh repo set-default                      # 현재 디렉터리 기본 리포 설
 gh pr create                             # 인터랙티브
 gh pr create --fill                      # 커밋 메시지로 자동 채움
 gh pr create --title "..." --body "..."  # 비대화형
+gh pr create --repo up/repo --base main --head myuser:branch  # 내 fork → upstream 로 PR
+gh pr comment 123 --repo owner/repo --body-file f.md          # PR에 코멘트
 gh pr list                               # 열린 PR
 gh pr list --state all --author "@me"
 gh pr view 123                           # PR 상세
