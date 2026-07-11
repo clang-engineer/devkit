@@ -436,3 +436,20 @@ set -g @agent-sidebar-default-agent 'claude'   # 스폰 기본 에이전트 (cla
 - **토글 키(`@sidebar_key`/`@sidebar_key_all`)는 끄기 불가 — 리바인드만 가능.** 빈 값은 기본(`e`/`E`)으로 복원됨. 기본 `prefix E`(select-layout -E)를 지키려면 `@sidebar_key_all`을 빈 다른 키로 옮길 것.
 
 > 함정: Claude Code에서 permission 승인 직후 다음 훅 발화 전까지 상태가 `waiting`으로 남음 — Claude Code 훅 시스템의 문서화된 한계(플러그인 버그 아님).
+
+## 발견성 메뉴 (`jaclu/tmux-menus`)
+
+tmux **내장 기능**(세션/윈도우/패널 관리)을 팝업 메뉴로 발견·실행. 제로config로 바로 작동.
+which-key처럼 "내 키맵을 미러링"하는 게 아니라 기성 관리 메뉴다. 순수 셸(의존성 0), tmux 3.0+ 네이티브 `display-menu`.
+
+```tmux
+set -g @plugin 'jaclu/tmux-menus'
+set -g @menus_trigger '\'          # 메뉴 열기 (기본 prefix + \)
+set -g @menus_without_prefix 'No'  # Yes면 prefix 없이 트리거
+```
+
+- 트리거: 기본 **`prefix + \`**. `@menus_trigger`로 변경.
+- 커스텀 항목: `custom_items/`에 `templates/custom_item_template.sh` 복사 → `menu_key`/`menu_name` 설정 →
+  플러그인이 자동 감지해 Main 메뉴에 "Custom items"로 주입. 항목은 셸 DSL(`priority type key "label" action`). YAML 아님.
+- tmux <3.0에서만 `whiptail`/`dialog` 폴백(macOS는 `brew install newt`) — 모던 tmux면 불필요.
+- 순수 셸이라 chezmoi apply + TPM clone만으로 끝(바이너리 wizard·별도 연동 없음).
