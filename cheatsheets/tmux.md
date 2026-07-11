@@ -384,3 +384,53 @@ set -g @plugin 'tmux-plugins/tmux-continuum'
 
 # Prefix + I 로 플러그인 설치
 ```
+
+## AI 에이전트 사이드바 (`hiroppy/tmux-agent-sidebar`)
+
+전 세션·윈도우의 AI 에이전트(Claude Code/Codex 등)를 **별도 세로 패널**에서 실시간 모니터.
+상태는 폴링·출력 파싱이 아니라 **Claude Code 훅**으로 직접 받아 정확. 요구: tmux 3.0+, TPM.
+
+```bash
+set -g @plugin 'hiroppy/tmux-agent-sidebar'
+# Prefix + I → 첫 실행 시 install wizard에서 "pre-built binary" 선택 (Rust/cargo 불필요)
+# Claude Code 연동: Claude Code 안에서
+#   /plugin marketplace add ~/.tmux/plugins/tmux-agent-sidebar
+#   /plugin install tmux-agent-sidebar@hiroppy
+```
+
+전역 키 (사이드바 열기/닫기 = toggle):
+
+| 키 | 동작 | 설정 변수(기본) |
+|---|---|---|
+| `Prefix e` | 사이드바 토글 — **현재 윈도우만** | `@sidebar_key` (`e`) |
+| `Prefix E` | 사이드바 토글 — **모든 윈도우** | `@sidebar_key_all` (`E`) |
+
+사이드바 패널 안 로컬 키 (prefix 없이, 포커스 있을 때만 → 전역 키맵과 안 겹침):
+
+| 키 | 동작 |
+|---|---|
+| `j` / `k` | 목록 위/아래 |
+| `h` / `l`, `Tab` | 상태 필터 순환 (all/running/waiting…) |
+| `r` | repo 필터 |
+| `Enter` | 선택 에이전트 패널로 점프 |
+| `Shift+Tab` | Activity ↔ Git 탭 전환 |
+| `n` / `x` | worktree+에이전트 스폰 / 스폰 패널 제거 |
+| `Esc` | 뒤로 / 닫기 |
+
+주요 옵션 (`set -g`, 플러그인 로드 전):
+
+```tmux
+set -g @sidebar_key 'e'                 # 현재-윈도우 토글 키
+set -g @sidebar_key_all 'E'             # 전체-윈도우 토글 키
+set -g @sidebar_width '15%'             # 사이드바 너비
+set -g @sidebar_position 'left'         # left | right
+set -g @sidebar_auto_create 'on'        # 새 윈도우 생성 시 사이드바 자동 (off로 끄기)
+set -g @sidebar_notifications 'on'      # 데스크톱 알림
+set -g @sidebar_notifications_events 'stop,notification'  # 알림 이벤트 선택
+set -g @agent-sidebar-default-agent 'claude'   # 스폰 기본 에이전트 (claude|codex)
+```
+
+- `@sidebar_auto_create`는 **새 윈도우 생성 시(after-new-window)에만** 자동으로 붙음 — 윈도우 *전환* 시엔 안 붙음. `E`(전체토글)는 "지금 열린 모든 윈도우에 한 방에 깔기"용.
+- **토글 키(`@sidebar_key`/`@sidebar_key_all`)는 끄기 불가 — 리바인드만 가능.** 빈 값은 기본(`e`/`E`)으로 복원됨. 기본 `prefix E`(select-layout -E)를 지키려면 `@sidebar_key_all`을 빈 다른 키로 옮길 것.
+
+> 함정: Claude Code에서 permission 승인 직후 다음 훅 발화 전까지 상태가 `waiting`으로 남음 — Claude Code 훅 시스템의 문서화된 한계(플러그인 버그 아님).
