@@ -453,3 +453,37 @@ set -g @menus_without_prefix 'No'  # Yes면 prefix 없이 트리거
   플러그인이 자동 감지해 Main 메뉴에 "Custom items"로 주입. 항목은 셸 DSL(`priority type key "label" action`). YAML 아님.
 - tmux <3.0에서만 `whiptail`/`dialog` 폴백(macOS는 `brew install newt`) — 모던 tmux면 불필요.
 - 순수 셸이라 chezmoi apply + TPM clone만으로 끝(바이너리 wizard·별도 연동 없음).
+
+## 훅 (hooks)
+
+특정 이벤트에 명령을 자동 실행. 플러그인이 tmux에 기능을 얹는 주된 수단.
+
+```tmux
+set-hook -g  <event> '<command>'   # -g  서버 전역(모든 세션·윈도우)
+set-hook -ga <event> '<command>'   # -a  기존 훅에 append(안 쓰면 교체)
+set-hook -gu <event>               # -u  unset — 인덱스 없으면 그 이벤트 훅 전부 삭제
+set-hook -t <session> <event> ...  # -t  특정 세션에만
+show-hooks -g                      # 전역 훅 전부 나열
+show-hooks -g <event>              # 그 이벤트 훅만 (인덱스 포함: event[0], event[1] ...)
+```
+
+**흔한 이벤트**
+
+| 이벤트 | 언제 |
+|--------|------|
+| `after-new-window` | 새 윈도우 생성 후 |
+| `after-select-pane` / `after-select-window` | 포커스 이동 후 |
+| `pane-exited` | 패널 안 **프로세스가 exit**할 때 (kill-pane엔 **안** 뜸) |
+| `window-layout-changed` | 패널 add/remove/resize 등 레이아웃 변경 (kill-pane 포함 **모든** 패널 제거에 발화) |
+| `client-attached` / `client-detached` | 클라이언트 attach/detach |
+
+**훅 안에서의 대상**: 이벤트가 난 윈도우/패널은 `#{hook_window}` / `#{hook_pane}`.
+`#{window_id}` / `#{pane_id}`는 훅 컨텍스트에선 "현재 클라이언트가 보는 것"으로 풀려 이벤트
+대상과 다를 수 있다.
+
+**내 훅만 안전하게 제거**(리로드 시 중복 방지). `-gu`는 통째로 지우므로, 남과 공유하는
+이벤트면 인덱스로 골라 제거:
+
+```bash
+tmux show-hooks -g <event> | awk '/내마커문자열/ { print $1 }' | xargs -rn1 tmux set-hook -gu
+```
