@@ -61,7 +61,6 @@ groups:
     items:
       - {file: git.md, desc: "Git 명령어 (브랜치, stash, rebase, tag 등)"}
       - {file: gh.md, desc: "GitHub CLI — PR/이슈/Actions/API"}
-      - {file: code-review-glossary.md, desc: "리뷰 약어/용어 (LGTM, PTAL, nit:, Draft PR 등)"}
     note: "> `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합."
 
   - title: 개발 도구

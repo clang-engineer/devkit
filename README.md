@@ -26,7 +26,7 @@ Quick command/syntax references. Full index with descriptions:
 
 **Containers & build** · [kubectl](cheatsheets/kubectl.md) · [docker](cheatsheets/docker.md) · [make](cheatsheets/make.md)
 
-**Git & version control** · [git](cheatsheets/git.md) · [gh](cheatsheets/gh.md) · [review glossary](cheatsheets/code-review-glossary.md)
+**Git & version control** · [git](cheatsheets/git.md) · [gh](cheatsheets/gh.md)
 
 **Dev tools** · [curl](cheatsheets/curl.md) · [claude-code](cheatsheets/claude-code.md)
 
