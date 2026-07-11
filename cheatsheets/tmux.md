@@ -430,6 +430,8 @@ set -g @sidebar_notifications_events 'stop,notification'  # 알림 이벤트 선
 set -g @agent-sidebar-default-agent 'claude'   # 스폰 기본 에이전트 (claude|codex)
 ```
 
+- **하단 Activity/Git 패널은 목록에서 선택된(focused) pane *하나* 기준** — `j`/`k`로 선택을 옮기면 두 탭 내용도 그 pane으로 같이 바뀐다(전체 종합 아님). Activity=그 pane의 tool-call 히스토리, Git=그 pane cwd의 branch·diff·PR. 반대로 상단 목록은 전 세션·윈도우 전체.
+- `e`(현재 윈도우) vs `E`(전체 윈도우) 차이는 체감상 **다른 윈도우로 이동했을 때 사이드바가 따라오느냐** — `E`=따라옴, `e`=안 따라옴. **단일 윈도우만 열려 있으면 둘이 똑같아 보인다**(윈도우 2개 이상에서만 차이).
 - `@sidebar_auto_create`는 **새 윈도우 생성 시(after-new-window)에만** 자동으로 붙음 — 윈도우 *전환* 시엔 안 붙음. `E`(전체토글)는 "지금 열린 모든 윈도우에 한 방에 깔기"용.
 - **토글 키(`@sidebar_key`/`@sidebar_key_all`)는 끄기 불가 — 리바인드만 가능.** 빈 값은 기본(`e`/`E`)으로 복원됨. 기본 `prefix E`(select-layout -E)를 지키려면 `@sidebar_key_all`을 빈 다른 키로 옮길 것.
 
