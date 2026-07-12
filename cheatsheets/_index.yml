@@ -61,6 +61,7 @@ groups:
     items:
       - {file: git.md, desc: "Git 명령어 (브랜치, stash, rebase, tag 등)"}
       - {file: gh.md, desc: "GitHub CLI — PR/이슈/Actions/API"}
+      - {file: chezmoi.md, desc: "chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿)"}
     note: "> `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합."
 
   - title: 개발 도구

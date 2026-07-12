@@ -79,6 +79,7 @@
 |------|------|
 | [git.md](git.md) | Git 명령어 (브랜치, stash, rebase, tag 등) |
 | [gh.md](gh.md) | GitHub CLI — PR/이슈/Actions/API |
+| [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿) |
 
 > `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합.
 
