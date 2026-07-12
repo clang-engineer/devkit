@@ -73,7 +73,30 @@
 ghostty +list-keybinds     # 현재 유효 키맵 전부 (커스텀 반영)
 ghostty +list-actions      # 바인딩 가능한 액션 목록
 ghostty +show-config       # 병합된 설정 덤프
-ghostty +list-themes       # 내장 테마
+ghostty +list-themes       # 테마 목록 ((resources)=내장 / (user)=커스텀)
 ```
 
 > 설정 파일: `~/.config/ghostty/config`. `keybind = super+d=new_split:right` 형식으로 재정의, `keybind = super+d=unbind`로 해제.
+
+## 테마
+
+```sh
+ghostty +list-themes       # (resources)=번들 내장 / (user)=~/.config/ghostty/themes/ 커스텀
+```
+
+```conf
+# ~/.config/ghostty/config
+theme = cyberdream         # 내장 이름 또는 user 테마 이름
+```
+
+커스텀 테마는 `~/.config/ghostty/themes/<name>` 파일로 넣으면 `(user)`로 잡힌다:
+
+```conf
+# ~/.config/ghostty/themes/<name>
+palette = 0=#16181a        # ANSI 0~15
+palette = 15=#ffffff
+background = #16181a
+foreground = #ffffff
+```
+
+> 내장 테마(`(resources)`)는 `mbadolato/iTerm2-Color-Schemes`에서 온다. 거기 없는 테마는 위처럼 `themes/`에 직접 넣어야 이름으로 선언 가능. 리로드: `⌘ ⇧ ,`.
