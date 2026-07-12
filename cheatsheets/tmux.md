@@ -334,6 +334,8 @@ bind | split-window -h
 bind - split-window -v
 
 # Vi 모드 활성화
+#   ($EDITOR/$VISUAL에 "vi"가 있으면 tmux가 자동으로 vi로 잡음 — nvim도 "vi" 포함.
+#    즉 $EDITOR=nvim이면 이 줄은 중복. 명시는 env 비의존 보험용.)
 setw -g mode-keys vi
 
 # 마우스 지원
