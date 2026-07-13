@@ -200,6 +200,32 @@ move-window -s 3 -t 1    # 윈도우를 특정 인덱스로 이동
 
 > 세션은 순서를 직접 변경하는 명령이 없다. 이름 기반 정렬(`-O name`)로 제어.
 
+## 세션 점프: `s` vs `w` vs sesh(`T`)
+
+셋 다 "다른 세션/윈도우로 이동"이라 헷갈리지만, 갈리는 축은 **① 이미 떠 있는 것만 고르나 ② 없으면 새로 만드나** 와 **점프 깊이**다.
+
+| 키 | 정체 | 대상 범위 | 새 세션 생성 | UI |
+|----|------|-----------|:---:|----|
+| `Prefix s` | tmux 기본 | **살아있는 세션**만 | ❌ | choose-tree (내장) |
+| `Prefix w` | tmux 기본 | 세션 + 그 안 **윈도우**까지 펼침 | ❌ | choose-tree (내장) |
+| `Prefix T` | 커스텀 ([sesh](https://github.com/joshmedeski/sesh)) | 세션 + **zoxide 디렉토리 · 설정 · fd 검색** | ✅ | fzf 팝업 |
+
+- **`s` / `w` 는 전환기.** 지금 tmux에 이미 떠 있는 것 중에서만 고른다. 차이는 깊이 — `s`는 세션 레벨, `w`는 모든 세션의 윈도우를 트리로 펼쳐 특정 윈도우로 정밀 점프(`s`의 상위호환이지만 목록이 길다).
+- **sesh(`T`)는 생성기 겸 전환기.** `sesh`(session의 축약, `joshmedeski/sesh`)는 아직 세션이 아닌 **디렉토리(zoxide)** 를 골라 그 자리에서 새 세션을 만든다. "그 프로젝트 폴더 세션, 있으면 가고 없으면 만들어줘"가 한 방. 실질적으로 `s`를 대체해서 `w`만 윈도우 트리 훑기 용으로 남는다.
+
+```bash
+# .tmux.conf — sesh 피커를 Prefix T에 바인딩 (fzf 팝업 + 소스 전환)
+bind-key T run-shell "sesh connect \"\$(
+  sesh list --icons | fzf-tmux -p 80%,70% --no-sort --ansi \
+    --bind 'ctrl-a:reload(sesh list --icons)' \
+    --bind 'ctrl-t:reload(sesh list -t --icons)' \
+    --bind 'ctrl-x:reload(sesh list -z --icons)' \
+    --bind 'ctrl-f:reload(fd -H -d 2 -t d . ~)' \
+    --bind 'ctrl-d:execute(tmux kill-session -t {2..})+reload(sesh list --icons)'
+)\""
+# 팝업 안: ^a 전체  ^t tmux세션  ^x zoxide  ^g 설정  ^f fd검색  ^d kill
+```
+
 ## 패널/윈도우 세션 간 이동
 
 | 명령어 | 설명 |
@@ -455,6 +481,56 @@ set -g @menus_without_prefix 'No'  # Yes면 prefix 없이 트리거
   플러그인이 자동 감지해 Main 메뉴에 "Custom items"로 주입. 항목은 셸 DSL(`priority type key "label" action`). YAML 아님.
 - tmux <3.0에서만 `whiptail`/`dialog` 폴백(macOS는 `brew install newt`) — 모던 tmux면 불필요.
 - 순수 셸이라 chezmoi apply + TPM clone만으로 끝(바이너리 wizard·별도 연동 없음).
+
+## Oh my tmux! (OMT, `gpakosz/.tmux`)
+
+인기 tmux 설정 프레임워크. `.tmux.conf.local`만 편집. 편의를 위해 **stock prefix 키맵 일부를 재배치**한다.
+
+### OMT가 바꾼 stock 키
+
+| 키 | stock | OMT | 의도 |
+|---|---|---|---|
+| `l` | last-window | select-pane 오른쪽 | vim `hjkl` 패널 |
+| `L` | switch-client -l | resize-pane 오른쪽 | `HJKL` 리사이즈 |
+| `p` | 이전 창 | paste-buffer | `p`=paste 니모닉 |
+| `m` | select-pane -m (마크) | 마우스 토글 | 마우스 우선 |
+| `-` | delete-buffer | split-window | 니모닉 split (`-`/`_`) |
+| `<` `>` | pane 메뉴 | swap-pane | 패널 순서 이동 |
+| `r` | refresh-client | 설정 리로드 | 편의 |
+| `n` | 다음 창 | (언바운드) | 창 이동은 `C-h`/`C-l`로 |
+
+> 마크(`prefix m`)는 마우스 토글에 덮여 **pane 우클릭 메뉴에만** 남음(대체 키 없음).
+> `"`/`%` split, `c` 새 창, `s`/`w` 트리 등 나머지 stock 키는 유지.
+
+**stock 키맵 그대로 쓰기** (SSH·이식성 우선):
+
+```conf
+# .tmux.conf.local — OMT가 stock 키맵을 건드리지 않고 확장만 추가
+tmux_conf_preserve_stock_bindings=true
+```
+
+> 함정: vim-tmux-navigator가 `prefix C-l`(clear-screen)을 재매핑해 OMT의 `prefix C-l = next-window`를 밟음 → **`C-h`는 되는데 `C-l`만 안 먹는 비대칭**이 증상. `set -g @vim_navigator_prefix_mapping_clear_screen ''`로 복구.
+
+### 상태줄 색을 터미널 ANSI 팔레트에 위임
+
+tmux 상태줄 색 지정은 두 방식이고 이게 핵심 갈림:
+
+- **hex (`#ffff00`)** = 절대값. 터미널 테마가 바뀌어도 그 색 그대로.
+- **`colour0~15`** = 터미널의 16색 ANSI 팔레트 참조. 터미널 테마를 바꾸면 tmux 상태줄도 따라감.
+
+OMT는 hex 블록(활성) + ansi 블록(주석)을 **둘 다 스톡 제공**. ansi 블록으로 스위치하면 위임이 켜진다:
+
+```conf
+# .tmux.conf.local — hex 블록 주석 처리, ansi 블록 주석 해제
+tmux_conf_theme_colour_1="colour0"    # 터미널 배경색을 따름
+tmux_conf_theme_colour_4="colour14"   # 터미널 bright cyan
+tmux_conf_theme_colour_16="colour1"   # 터미널 red
+# ...colour_1~17 전부 colourN 참조
+```
+
+→ 터미널 테마 한 줄(예: Ghostty `theme = cyberdream`)이 tmux 상태줄까지 재테마.
+
+> catppuccin/tmux·dracula/tmux 같은 standalone 테마 플러그인은 OMT와 **같은 status 옵션을 덮어써** 레이아웃이 뭉개짐 → either/or. ansi 위임은 그리는 주체가 OMT 하나뿐이라 충돌 없음.
 
 ## 훅 (hooks)
 
