@@ -118,9 +118,10 @@ ps aux                                 # 전체 프로세스
 ps aux | grep <name>                   # 특정 프로세스
 top                                    # 실시간 모니터
 htop                                   # 향상 버전
-kill <pid>
-kill -9 <pid>                          # 강제
 ```
+
+> 프로세스 찾기·종료(`pgrep`/`pkill`/`lsof`/시그널 표, TERM→대기→KILL 관행)는
+> [linux-process.md](linux-process.md)에서 전담. `kill -9`을 처음부터 쓰지 않는 이유도 거기.
 
 ### 종합 모니터링 도구
 
@@ -132,6 +133,9 @@ kill -9 <pid>                          # 강제
 | `Netdata` | 웹 기반 실시간 대시보드 |
 
 ### 로그 파일
+
+> 아래는 **RHEL 계열**(Rocky/CentOS/RHEL) 경로. Debian/Ubuntu는 다르다 —
+> `messages`→`syslog`, `secure`→`auth.log`, `maillog`→`mail.log`, cron은 syslog로.
 
 | 경로 | 설명 | 확인 |
 |------|------|------|

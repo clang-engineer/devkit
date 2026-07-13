@@ -111,6 +111,7 @@ server.forward-headers-strategy=native   # native=톰캣 RemoteIpValve, framewor
 ```
 ```xml
 <!-- 순수 톰캣 server.xml -->
+<!-- internalProxies는 실제 프록시 IP 대역에 맞춰 조정 (아래는 10.0.0.x + 로컬 예시) -->
 <Valve className="org.apache.catalina.valves.RemoteIpValve"
        remoteIpHeader="X-Forwarded-For" protocolHeader="X-Forwarded-Proto"
        internalProxies="10\.0\.0\.\d+|127\.0\.0\.1" />

@@ -31,7 +31,7 @@ gh auth setup-git              # git credential helper에 gh 토큰 등록
 
 ### 기본 scope 한계
 
-`gh auth login` 후 받는 기본 token: `admin:public_key, gist, read:org, repo`. 다음은 기본에 **없음**:
+`gh auth login` 후 받는 기본 token은 대략 `repo, read:org, gist` 수준(인증 흐름·버전에 따라 `admin:public_key` 등이 더 붙기도 함). 정확한 값은 `gh auth status`로 확인. 다음은 기본에 **없음**:
 
 | 기능 | 필요한 scope | 추가 명령 |
 |---|---|---|

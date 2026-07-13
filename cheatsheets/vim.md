@@ -145,7 +145,7 @@ iabbr <expr> __branch trim(system("git rev-parse --abbrev-ref HEAD"))
 | `Ctrl+r` | Redo |
 | `.` | 마지막 변경 반복 |
 | `Ctrl+a` / `Ctrl+x` | 커서 아래(뒤) 숫자 증가 / 감소 (`10Ctrl+a` = +10) |
-| `J` | 다음 줄을 현재 줄 뒤에 붙임 (공백 1개) |
+| `J` | 다음 줄을 현재 줄 뒤에 붙임 (보통 공백 1개, 문장 끝 뒤 2개·`)` 앞 0개) |
 | `gJ` | 공백 없이 줄 붙이기 |
 | `~` | 대소문자 토글 |
 | `g~{motion}` | 영역 대소문자 토글 |

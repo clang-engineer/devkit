@@ -97,10 +97,8 @@ Add-Content file.txt "x"               # append
 | 옵션 | 설명 |
 |---|---|
 | `-Wait` | 파일 변화 실시간 감지 (tail -f) |
-| `-Tail <n>` | 끝에서 n줄 |
-| `-Head <n>` (alias `-First`) | 시작에서 n줄 |
-| `-Last <n>` | 끝에서 n줄 (`-Tail` 동의어) |
-| `-TotalCount <n>` | 처음 n줄만 (`-Wait` 와 호환 X) |
+| `-Tail <n>` | 끝에서 n줄 (= `tail -n`) |
+| `-TotalCount <n>` | 처음 n줄만 (= `head -n`, `-Wait` 와 호환 X) |
 | `-Encoding <name>` | UTF8/ASCII/Unicode 등 명시 |
 | `-Delimiter <s>` | 줄바꿈이 아닌 다른 구분자로 split |
 | `-Raw` | 줄 분할 없이 한 덩어리 문자열로 반환 (정규식·`Select-String` 에 유리) |

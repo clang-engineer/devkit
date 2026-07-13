@@ -47,9 +47,9 @@
 | `git add <file>` | 파일 스테이징 |
 | `git add .` | 모든 변경사항 스테이징 |
 | `git commit -m "msg"` | 커밋 |
-| `git commit -am "msg"` | add + commit (수정된 파일만) |
+| `git commit -am "msg"` | add + commit (이미 추적 중인 수정 파일만, 신규 파일 제외) |
 | `git commit --amend` | 마지막 커밋 수정 |
-| `git commit --amend --no-edit` | 파일 추가 (메시지 유지) |
+| `git commit --amend --no-edit` | 스테이징분을 이전 커밋에 합침 (메시지 유지) |
 
 ## 원격 동기화
 
@@ -254,8 +254,6 @@ git config --global commit.template ~/.gitmessage
 # <type>: subject (50자 이내, 명령문, 마침표 X)
 
 # Body — 무엇/왜 (72자 폭)
-
-# Co-authored-by: name <user@users.noreply.github.com>
 ```
 
 ## 자주 쓰는 패턴

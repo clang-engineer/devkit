@@ -130,9 +130,12 @@ string s = ss.str();
 ### 설치
 
 ```sh
-brew install gdb        # macOS
+brew install gdb        # macOS — Apple Silicon에선 사실상 불가, lldb 사용 권장
 sudo apt install gdb    # Ubuntu/Debian
 ```
+
+> macOS(특히 Apple Silicon)에선 `gdb` 대신 Xcode에 포함된 `lldb`가 사실상 표준.
+> 명령 대응은 대체로 비슷하다(`b`/`r`/`n`/`s`/`p`/`bt`).
 
 ### 사전 준비
 

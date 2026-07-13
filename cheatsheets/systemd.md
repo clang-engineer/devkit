@@ -77,14 +77,14 @@ WantedBy=multi-user.target
 # 시스템 서비스
 systemctl stop <service>
 systemctl disable <service>
-rm /etc/systemd/system/<service>
+rm /etc/systemd/system/<service>.service
 systemctl daemon-reload
 systemctl reset-failed
 
 # 사용자 서비스
 systemctl --user stop <service>
 systemctl --user disable <service>
-rm ~/.config/systemd/user/<service>
+rm ~/.config/systemd/user/<service>.service
 systemctl --user daemon-reload
 systemctl --user reset-failed
 ```

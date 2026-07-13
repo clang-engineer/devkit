@@ -64,7 +64,7 @@
 | `claude "prompt"` | 원샷 실행 |
 | `claude -c` | 마지막 대화 이어서 시작 |
 | `claude -r <session>` | 특정 세션 복원 |
-| `claude -p "prompt"` | 파이프 모드 (stdin/stdout) |
+| `claude -p "prompt"` | 비대화형 print 모드 (스크립트·파이프용) |
 | `echo "code" \| claude -p "review"` | 파이프 입력 |
 | `claude --model <model>` | 모델 지정 실행 |
 | `claude config` | CLI에서 설정 관리 |

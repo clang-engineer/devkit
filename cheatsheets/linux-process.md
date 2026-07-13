@@ -80,7 +80,7 @@ kill $(pidof nginx)            # 스크립트 친화적 (공백 구분 한 줄)
 ```
 
 - 부분 일치 안 됨 (정확한 실행파일명만)
-- macOS 기본 없음 → `brew install pidof` 또는 `pgrep -x` 사용
+- macOS 기본 없음 → `pgrep -x <name>` 사용 (Homebrew에 `pidof` 코어 포뮬러 없음)
 
 ## `killall` — 이름으로 일괄 종료
 

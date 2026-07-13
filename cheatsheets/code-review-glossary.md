@@ -100,5 +100,5 @@
 ## 참고
 
 - [GitHub Glossary](https://docs.github.com/en/get-started/learning-about-github/github-glossary)
-- [GitLab Glossary](https://docs.gitlab.com/ee/user/profile/notifications.html)
+- [GitLab Documentation Word List](https://docs.gitlab.com/development/documentation/styleguide/word_list/)
 - [Conventional Commits](https://www.conventionalcommits.org/)

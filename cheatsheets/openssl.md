@@ -70,8 +70,8 @@ openssl verify -CAfile ca.crt certificate.crt        # CA로 인증서 검증
 ## 원격 서버 인증서 확인
 
 ```sh
-openssl s_client -connect example.com:443 </dev/null 2>/dev/null | openssl x509 -text -noout
-openssl s_client -connect example.com:443 </dev/null 2>/dev/null | openssl x509 -dates -noout
+openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -text -noout
+openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -dates -noout
 ```
 
 ## 포맷 변환

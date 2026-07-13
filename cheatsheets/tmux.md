@@ -56,7 +56,7 @@ Session → Window → Pane
 |--------|------|
 | `Prefix c` | 새 윈도우 생성 |
 | `Prefix ,` | 윈도우 이름 변경 |
-| `Prefix .` | 윈도우 순서 이동 |
+| `Prefix .` | 윈도우를 지정한 인덱스로 이동 (프롬프트 입력) |
 | `Prefix n` | 다음 윈도우 |
 | `Prefix p` | 이전 윈도우 |
 | `Prefix 0-9` | 번호로 윈도우 이동 |
@@ -281,6 +281,8 @@ bind-key T run-shell "sesh connect \"\$(
 
 > `join-pane -t 1`처럼 `-t`만 쓰면 source가 암묵적으로 잡혀서 의도와 다르게 동작할 수 있음. 보통 `-s`를 명시.
 
+> **"pane 병합"의 실체**: pane은 각각 독립된 셸/PTY라 **두 pane을 하나의 pane으로 융합하는 건 불가능**. "병합"은 곧 `join-pane`으로 **한 번에 하나씩 이동**시켜 한 윈도우에 모으는 것. 분할된 윈도우(pane 2개)를 통째로 옮기려면 명령을 **반복**해야 함(`-s 2` → `-s 2` …). source 윈도우의 pane이 다 빠지면 그 윈도우는 자동으로 닫힘. 단순히 분할을 없애려는 거면 병합이 아니라 `Prefix x`로 한쪽 pane을 닫는 것.
+
 ### 세션 간 이동 예시
 
 ```bash
@@ -331,7 +333,7 @@ bind m if-shell 'tmux list-windows | grep -qw _stash' 'join-pane -s _stash' 'bre
 
 ### 세션 + 윈도우 빠르게 시작
 ```bash
-# 새 세션 "work" 만들고 3개 윈도우 준비
+# 새 세션 "work" 만들고 3개 윈도우 준비 (selectw -t 0은 base-index 0=기본값 기준)
 tmux new -s work \; neww \; neww \; selectw -t 0
 ```
 
@@ -510,7 +512,7 @@ set -g @menus_without_prefix 'No'  # Yes면 prefix 없이 트리거
 | `p` | 이전 창 | paste-buffer | `p`=paste 니모닉 |
 | `m` | select-pane -m (마크) | 마우스 토글 | 마우스 우선 |
 | `-` | delete-buffer | split-window | 니모닉 split (`-`/`_`) |
-| `<` `>` | pane 메뉴 | swap-pane | 패널 순서 이동 |
+| `<` `>` | `<` 창 메뉴 / `>` 패널 메뉴 | swap-pane | 패널 순서 이동 |
 | `r` | refresh-client | 설정 리로드 | 편의 |
 | `n` | 다음 창 | (언바운드) | 창 이동은 `C-h`/`C-l`로 |
 

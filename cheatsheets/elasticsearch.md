@@ -87,7 +87,7 @@ GET INDEX/_count
 }
 ```
 
-> `_search`는 기본 10,000까지만 count (`"relation": "gte"`). 정확한 전체 수는 `_count` 사용.
+> `_search`의 `hits.total.value`는 기본 10,000에서 상한(그 이상이면 `"relation": "gte"`). 정확한 전체 수는 `_count` 사용.
 > `_search`에서 정확한 수가 필요하면 `"track_total_hits": true` 추가 (느림).
 
 ## 문서 조회

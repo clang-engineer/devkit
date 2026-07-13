@@ -118,7 +118,7 @@ LIMIT 20;
 ## 슬로우 쿼리 통계 (`pg_stat_statements`)
 
 ```sql
--- 활성화 확인
+-- 활성화 확인 (없으면 postgresql.conf에 추가 후 서버 재시작 필요 — CREATE EXTENSION만으론 안 됨)
 SHOW shared_preload_libraries;  -- pg_stat_statements 포함되어야 함
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
