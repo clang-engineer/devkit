@@ -100,3 +100,5 @@ foreground = #ffffff
 ```
 
 > 내장 테마(`(resources)`)는 `mbadolato/iTerm2-Color-Schemes`에서 온다. 거기 없는 테마는 위처럼 `themes/`에 직접 넣어야 이름으로 선언 가능. 리로드: `⌘ ⇧ ,`.
+
+> **색이 안 바뀔 때:** ① `+show-config`/`+list-themes`로 파일 유효성 먼저 증명 → ② 유효하면 `⌘ ⇧ ,` 리로드(Ghostty는 시작 시 1회만 읽음, 자동 감지 X) → ③ 그래도면 tmux가 자체 팔레트로 덮는 것일 수 있으니 tmux 밖 새 창(`⌘ N`)에서 확인. 진단 상세: vault `note-ghostty-config-not-applying`.

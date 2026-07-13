@@ -588,6 +588,35 @@ vim.o.exrc = true
 
 소유자/권한이 본인이어야 함 (`vim.secure`는 타 사용자 소유 거부). 심볼릭 링크면 실제 파일도 동일 조건.
 
+### lazy.nvim 플러그인 스펙 — 초기화 훅
+
+플러그인 spec의 세 가지 setup 훅. `opts`는 `config`의 가장 흔한 패턴(`require(main).setup(opts)`)을 자동화한 sugar.
+
+| 훅 | 시점/역할 | 형태 |
+|---|---|---|
+| `init` | 플러그인 로드 **전** 실행 (주로 vimscript 전역변수 세팅) | `init = function() vim.g.xxx = 1 end` |
+| `opts` | 데이터만 선언 → lazy가 `require(main).setup(opts)` 대행 | `opts = { ... }` |
+| `config` | setup 호출을 직접 작성 (키맵·autocmd 등 추가 로직 가능) | `config = function() require("mod").setup({...}) end` |
+
+```lua
+{ "author/plugin", opts = { foo = true } }                                        -- 선언형
+{ "author/plugin", config = function() require("mod").setup({ foo = true }) end }  -- 명령형
+{ "rose-pine/neovim", name = "rose-pine", main = "no-cut", opts = {} }             -- main/name 명시
+```
+
+> `main`은 setup할 모듈명, `name`은 플러그인 식별자·설치 디렉토리명. 둘 다 repo 마지막 세그먼트에서 추론되므로 repo명이 모듈명·식별자와 어긋나면 명시 필요 (예: `rose-pine/neovim` → 식별자가 `neovim`으로 잡힘).
+
+### 블랙홀 레지스터 `"_` (삭제 ≠ 잘라내기)
+
+Vim은 삭제(`d`/`x`/`c`)도 무명 레지스터(`"`)에 넣어 yank한 내용을 덮어쓴다. `"_` 프리픽스로 지우면 아무 레지스터에도 안 들어감.
+
+```vim
+"_d    " 지운 내용이 어디에도 안 들어감 (yank 보존)
+"_diw  " 단어 삭제하되 클립보드 유지
+```
+
+> nvim-nocut는 이 프리픽스를 `d`/`x`/`c`에 자동 매핑. `:verbose nmap c`로 `"_c` 매핑 확인.
+
 ### 비활성 Extras (필요 시 활성화 고려)
 
 | Extra | 용도 |

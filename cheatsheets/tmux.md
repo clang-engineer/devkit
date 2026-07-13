@@ -299,6 +299,21 @@ tmux move-window -t 0-default:
 
 > **주의**: `join-pane`에서 윈도우 **이름**이 아닌 **번호**를 사용. 현재 윈도우를 source로 지정하면 에러.
 
+### pane 하나만 잠깐 숨기기 (stash 토글)
+
+pane 3개 중 하나만 치워 "2개만 보기". zoom은 하나만 **최대화**라 안 됨. `break-pane -d`로 숨은 window에 stash했다가 `join-pane`으로 복귀하는 원키 토글:
+
+```tmux
+# prefix + m: _stash window 존재 여부로 stash ↔ 복귀 판정
+bind m if-shell 'tmux list-windows | grep -qw _stash' 'join-pane -s _stash' 'break-pane -dn _stash'
+```
+
+- `break-pane -dn _stash`: 활성 pane을 백그라운드(`-d`) 숨은 `_stash` window(`-n`)로 빼둠 → 남은 pane 자동 리플로우.
+- `join-pane -s _stash`: 현재 window로 끌어옴 (`_stash`가 비면 tmux가 자동으로 닫음).
+- **존재 여부**로 판정하므로 아무 작업 window에서나 눌러 복귀 pane을 지금 window로 가져올 수 있다. 제약: 동시에 하나만 stash 가능.
+
+> 함정: `if-shell`은 셸에 넘기기 **전** 명령의 tmux 포맷(`#{...}`·`#W`)을 먼저 치환한다. `list-windows -F '#W'`의 `#W`가 현재 window 이름으로 선치환돼 grep이 오염됨 → `#` 없는 기본 `list-windows` 출력으로 grep. 리로드 후 `bind` 줄을 지워도 `tmux unbind m` 전엔 실행 중 서버에 남는다.
+
 ## 기타
 
 | 명령어 | 설명 |

@@ -62,6 +62,7 @@
 | 파일 | 설명 |
 |------|------|
 | [sql-snippets.md](sql-snippets.md) | PostgreSQL 운영 패턴 (`information_schema` ALTER 자동 생성 등) |
+| [vertica.md](vertica.md) | Vertica — 계정 만료 해제(chage) + v_catalog/v_monitor 용량·이력 조회 |
 | [elasticsearch.md](elasticsearch.md) | Elasticsearch 쿼리/관리 |
 | [kibana.md](kibana.md) | KQL, Dev Tools, Discover, 운영 진단 |
 
@@ -79,6 +80,7 @@
 |------|------|
 | [git.md](git.md) | Git 명령어 (브랜치, stash, rebase, tag 등) |
 | [gh.md](gh.md) | GitHub CLI — PR/이슈/Actions/API |
+| [code-review-glossary.md](code-review-glossary.md) | 리뷰 약어/용어 (LGTM, PTAL, nit:, Draft PR 등) |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿) |
 
 > `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합.

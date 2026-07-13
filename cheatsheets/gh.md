@@ -123,6 +123,30 @@ gh api graphql -f query='query { viewer { login } }'
 gh api --paginate repos/owner/repo/issues
 ```
 
+### repo 모멘텀 실측 (스타 말고 flow)
+
+스타는 누적(stock)·후행 지표라 저무는 프로젝트도 높게 나온다. 실제 기세는 **flow**(커밋·릴리스 속도), 지속가능성은 **버스 팩터**(1위 기여자 점유율)로 본다.
+
+```zsh
+repos=(tmuxinator/tmuxinator tmux-python/tmuxp ivaaaan/smug joshmedeski/sesh)  # zsh는 배열이어야 함(unquoted $var 안 쪼갬)
+D90=$(date -v-90d +%Y-%m-%d); D365=$(date -v-365d +%Y-%m-%d)                    # macOS(BSD date). GNU면 date -d '90 days ago'
+for repo in $repos; do
+  j=$(gh api "repos/$repo")
+  stars=$(echo "$j" | jq .stargazers_count)
+  # flow: 최근 커밋 수 (검색 API, total_count)
+  c90=$(gh api -X GET search/commits -f q="repo:$repo committer-date:>=$D90" --jq .total_count)
+  c365=$(gh api -X GET search/commits -f q="repo:$repo committer-date:>=$D365" --jq .total_count)
+  # flow: 최근 1년 릴리스 수
+  rel=$(gh api "repos/$repo/releases?per_page=100" --jq "[.[]|select(.published_at>=\"${D365}T00:00:00Z\")]|length")
+  # 버스 팩터: 기여자 수 + 1위 기여자 커밋 점유율(%)
+  con=$(gh api "repos/$repo/contributors?per_page=100" --jq 'length')
+  top=$(gh api "repos/$repo/contributors?per_page=100" --jq '(([.[].contributions]|add) as $s|(.[0].contributions/$s*100|floor))')
+  printf '%-24s ★%-6s c90=%-4s c365=%-4s rel=%-3s contrib=%-4s top=%s%%\n' "$repo" "$stars" "$c90" "$c365" "$rel" "$con" "$top"
+done
+```
+
+> 함정: `for repo in $repos`는 **zsh에서만** 안 쪼개짐 → 배열(`repos=(...)`) 또는 `${=repos}`. `search/commits`는 분당 ~30회 rate limit. `contributors?per_page=100`은 100명에서 잘림(그 이상은 "≥100").
+
 ## 활용 시나리오
 
 ### PR 빠른 리뷰

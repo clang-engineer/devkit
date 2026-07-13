@@ -48,6 +48,7 @@ groups:
   - title: 데이터
     items:
       - {file: sql-snippets.md, desc: "PostgreSQL 운영 패턴 (`information_schema` ALTER 자동 생성 등)"}
+      - {file: vertica.md, desc: "Vertica — 계정 만료 해제(chage) + v_catalog/v_monitor 용량·이력 조회"}
       - {file: elasticsearch.md, desc: "Elasticsearch 쿼리/관리"}
       - {file: kibana.md, desc: "KQL, Dev Tools, Discover, 운영 진단"}
 
@@ -61,6 +62,7 @@ groups:
     items:
       - {file: git.md, desc: "Git 명령어 (브랜치, stash, rebase, tag 등)"}
       - {file: gh.md, desc: "GitHub CLI — PR/이슈/Actions/API"}
+      - {file: code-review-glossary.md, desc: "리뷰 약어/용어 (LGTM, PTAL, nit:, Draft PR 등)"}
       - {file: chezmoi.md, desc: "chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿)"}
     note: "> `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합."
 
