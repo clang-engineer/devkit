@@ -55,14 +55,17 @@ brew install --cask nikitabobko/tap/aerospace
 
 ## 서비스 모드
 
-`Alt + Shift + ;` 로 서비스 모드 진입 후:
+저빈도·위험(되돌리기 번거로운) 동작을 메인 키맵에서 격리한 서브모드. `Alt + Shift + ;` 로 진입하며, 각 키는 동작 후 **자동으로 메인 모드로 복귀**한다. 키는 **소문자 그대로**(Shift 불필요) 누른다.
 
-| 키 | 설명 |
-|---|---|
-| `Esc` | 설정 리로드 + 메인 모드 복귀 |
-| `R` | 레이아웃 초기화 (flatten) |
-| `F` | 플로팅/타일링 토글 |
-| `Backspace` | 현재 창 제외 모두 닫기 |
+| 키 | 명령 | 설명 |
+|---|---|---|
+| `esc` | `reload-config` | 설정 리로드 + 메인 모드 복귀 |
+| `r` | `flatten-workspace-tree` | 레이아웃 초기화 (분할 트리 평탄화) |
+| `f` | `layout floating tiling` | 플로팅↔타일링 토글 |
+| `backspace` | `close-all-windows-but-current` | 현재 창 제외 모두 닫기 |
+| `alt-shift-h/j/k/l` | `join-with left/down/up/right` | 인접 창과 컨테이너로 묶기 |
+
+> **바인딩은 병합이 아니라 대체다.** `[mode.main.binding]`을 하나라도 정의하면 나머지 기본 바인딩은 폴백되지 않고 **빈 테이블로 사라진다**(다른 설정 키는 기본값 폴백되는 것과 반대). 서비스 모드도 `[mode.service.binding]`을 직접 안 적으면 통째로 못 쓴다 → 원하는 stock 키는 config에 명시적으로 나열해야 한다.
 
 ## CLI 명령어
 
