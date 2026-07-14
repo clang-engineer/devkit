@@ -76,6 +76,23 @@ aerospace move-node-to-workspace 2  # 현재 창을 workspace 2로 이동
 aerospace workspace 3          # workspace 3으로 전환
 ```
 
+## 자동 창 배치 (on-window-detected)
+
+앱이 뜰 때 워크스페이스 이동·레이아웃을 자동 적용한다. `if`는 **테이블**이어야 한다.
+
+```toml
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'          # bundle ID (aerospace list-apps 로 확인)
+run = ['move-node-to-workspace 1', 'layout floating']
+
+[[on-window-detected]]
+# if 생략 = 모든 창 매칭. 첫 매칭에서 멈추므로 catch-all은 맨 끝에.
+run = ['layout floating']
+```
+
+- catch-all은 `if = 'true'` 같은 문자열이 아니라 **`if` 생략**으로 쓴다.
+- 한 줄이라도 파싱 실패하면 config 전체가 거부되고 옛 설정이 유지된다 → `aerospace reload-config`로 검증.
+
 ## yabai vs Aerospace 비교
 
 | 항목 | yabai | Aerospace |
