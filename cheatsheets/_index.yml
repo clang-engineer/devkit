@@ -70,6 +70,7 @@ groups:
     items:
       - {file: curl.md, desc: "curl HTTP 요청"}
       - {file: claude-code.md, desc: "Claude Code CLI"}
+      - {file: opencode.md, desc: "opencode — provider-agnostic 터미널 AI 코딩 에이전트 (인증·모델 선택)"}
 
   - title: 언어
     items:
