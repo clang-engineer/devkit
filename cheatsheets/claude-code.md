@@ -269,6 +269,7 @@ default → acceptEdits → plan [→ auto] [→ bypassPermissions]
 - chord는 공백 구분: `ctrl+k ctrl+s` (키 사이 1초 타임아웃).
 - **적용은 재시작 필요** (시작 시 1회 로드). `/doctor`가 유효성 검사.
 - 바인딩은 정해진 `namespace:action`만 가능 — 임의 텍스트 삽입/자동 제출은 불가.
+- **예약 키(재바인딩·해제 불가)**: `ctrl+c`(인터럽트/종료), `ctrl+d`(종료), `ctrl+m`(터미널에서 Enter와 동일) 하드코딩. macOS 시스템 키(`cmd+c/v/x/q/w/tab/space`)도 불가.
 
 | action | 기본 키 | context |
 |---|---|---|
