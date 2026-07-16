@@ -322,7 +322,7 @@ iabbr <expr> __branch trim(system("git rev-parse --abbrev-ref HEAD"))
 :set foldlevelstart=99     " 파일 열자마자 펼친 상태
 ```
 
-Neovim + treesitter: `foldmethod=expr` + `foldexpr=nvim_treesitter#foldexpr()`.
+Neovim + treesitter: `foldmethod=expr` + `foldexpr=v:lua.vim.treesitter.foldexpr()` (구 `nvim_treesitter#foldexpr()`는 deprecated).
 
 ## 저장 & 종료
 

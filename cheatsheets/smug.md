@@ -9,7 +9,7 @@ config 파일명 = 세션 이름. config는 `~/.config/smug/<이름>.yml`.
 |------|------|
 | `smug start <이름>` | 세션 생성 + attach (이미 있으면 그 세션으로 attach) |
 | `smug start <이름> --detach` | 세션만 만들고 attach 안 함 (검증용) |
-| `smug start <이름> -w win1,win2` | 특정 윈도우만 시작 |
+| `smug start <이름> -w win1 -w win2` | 특정 윈도우만 시작 (`-w` 반복, 콤마 분리 안 됨) |
 | `smug start <이름> --attach` | tmux 안에서 그 세션으로 클라이언트 전환(switch-client) — `-a` help는 "**Force** switch" |
 | `smug stop <이름>` | 세션 종료 |
 | `smug list` | `~/.config/smug/`의 config 목록 |

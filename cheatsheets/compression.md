@@ -13,7 +13,7 @@
 | zip 만들기 (재귀) | `zip -r out.zip dir/` |
 | zip 풀기 | `unzip in.zip` (`-d /target` 옵션) |
 | 한 파일 압축 (gzip) | `gzip -k file` (`-k` 원본 유지) |
-| gz 내용 보기 | `zcat file.gz` / `zless file.gz` / `zgrep "x" file.gz` |
+| gz 내용 보기 | `gzcat file.gz` / `zless file.gz` / `zgrep "x" file.gz` |
 | 최고 압축률 | `tar -cJf out.tar.xz dir/` (xz) |
 | 외부 호환 (Windows) | `zip` |
 
@@ -70,7 +70,7 @@ tar -xzvf archive.tar.gz
 ```bash
 gzip -k file.txt           # 압축, 원본 유지 (-k 없으면 원본 삭제)
 gunzip file.txt.gz         # 해제
-zcat file.gz               # 안 풀고 내용 보기 (zless / zgrep 도 동일 계열)
+gzcat file.gz              # 안 풀고 내용 보기 (GNU/Linux는 zcat. macOS zcat은 .Z용이라 실패. zless/zgrep 동일 계열)
 ```
 
 ## zip / unzip

@@ -85,7 +85,8 @@ upstream backend_app {
     keepalive 32;
 }
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2 on;                       # nginx 1.25.1+ (구 `listen ... http2`는 deprecated)
     server_name app.example.com;
     location / {
         proxy_pass http://backend_app;
@@ -163,7 +164,8 @@ spring.servlet.multipart.max-request-size=100MB
 
 ```nginx
 server {
-    listen 443 ssl http2;
+    listen 443 ssl;
+    http2 on;                       # nginx 1.25.1+ (구 `listen ... http2`는 deprecated)
     server_tokens off;
     server_name app.example.com;
     ssl_certificate     /data/ssl/example.com.crt;

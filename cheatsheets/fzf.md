@@ -46,7 +46,7 @@ eval "$(fzf --bash)"            # bash
 |----|------|
 | `Ctrl+J` / `Ctrl+K` | 아래/위 이동 |
 | `Tab` / `Shift+Tab` | 멀티 선택 (`--multi`) |
-| `Ctrl+/` | 미리보기 토글 |
+| `Ctrl+/` | 프리뷰 줄바꿈 토글 (`toggle-wrap-word`; 프리뷰 자체 토글은 기본 미바인딩 → `--bind ctrl-/:toggle-preview`) |
 | `Enter` | 확정 |
 | `Esc` / `Ctrl+C` | 취소 |
 

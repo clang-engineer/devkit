@@ -402,5 +402,5 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ## 참고
 
 - `man bash`, `help <builtin>` (예: `help if`)
-- [Bash Hackers Wiki](https://wiki.bash-hackers.org/) — 깊은 레퍼런스
+- [Bash Hackers Wiki (미러)](https://flokoe.github.io/bash-hackers-wiki/) — 깊은 레퍼런스 (원본 wiki.bash-hackers.org는 오프라인)
 - [ShellCheck](https://www.shellcheck.net/) — 스크립트 정적 분석 (필수)

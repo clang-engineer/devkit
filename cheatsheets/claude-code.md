@@ -101,15 +101,18 @@ claude --worktree    # 별도 worktree에서 세션 시작
 
 subagent에도 `isolation: "worktree"` 옵션으로 격리 실행 가능.
 
-## Schedule (Remote Triggers)
+## Schedule (Routines)
 
-크론 스케줄로 Claude를 자동 실행. `/schedule` 명령으로 관리.
+크론 스케줄로 Claude를 자동 실행하는 클라우드 루틴. `/schedule`은 **대화형** — 플래그가 아니라 자연어로 만든다.
 
-```bash
-/schedule create --cron "0 9 * * 1-5" --prompt "PR 현황 정리해서 docs/daily에 저장"
-/schedule list
-/schedule delete <id>
+```text
+/schedule 매일 오전 9시 PR 현황 정리해서 docs/daily에 저장   # 대화형 생성 (후속 질문으로 상세 확정)
+/schedule list      # 루틴 목록
+/schedule update    # 기존 루틴 수정 (크론 간격도 자연어로)
+/schedule run       # 즉시 실행
 ```
+
+> 로컬(비클라우드) 반복 실행은 `/loop`.
 
 ## 권한 모드 (Shift+Tab 순환)
 
