@@ -94,9 +94,4 @@
 | [curl.md](curl.md) | curl HTTP 요청 |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
 | [opencode.md](opencode.md) | opencode — provider-agnostic 터미널 AI 코딩 에이전트 (인증·모델 선택) |
-
-## 언어
-
-| 파일 | 설명 |
-|------|------|
-| [c-cpp.md](c-cpp.md) | C/C++ 스니펫 + Google C++ Style + GDB 디버거 |
+| [gdb.md](gdb.md) | GDB — GNU 디버거 (중단점·스택·변수·메모리 조사) |

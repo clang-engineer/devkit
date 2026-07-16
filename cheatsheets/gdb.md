@@ -1,117 +1,8 @@
-# C / C++ Cheatsheet
+# GDB Cheatsheet
 
-> C/C++ 자주 다시 찾는 스니펫 + GDB 디버거. 한 곳에 모아둠.
+> GNU 디버거. C/C++ 중단점·스택·변수 조사·메모리 검사. `-g`로 컴파일된 바이너리가 전제.
 
-## C++ 문자열 분리 (split by delimiter)
-
-### `string::find` 기반 (구분자 문자열)
-
-```cpp
-#include <vector>
-#include <string>
-using namespace std;
-
-vector<string> split(string input, string delimiter) {
-    vector<string> vec;
-    size_t pos = 0;
-    string token;
-    while ((pos = input.find(delimiter)) != string::npos) {
-        token = input.substr(0, pos);
-        vec.push_back(token);
-        input.erase(0, pos + delimiter.length());
-    }
-    vec.push_back(input);
-    return vec;
-}
-```
-
-### `stringstream` 기반 (구분자가 char 한 글자)
-
-```cpp
-#include <vector>
-#include <string>
-#include <sstream>
-using namespace std;
-
-vector<string> split(const string& str, char delimiter) {
-    vector<string> vec;
-    string token;
-    stringstream ss(str);
-    while (getline(ss, token, delimiter)) {
-        vec.push_back(token);
-    }
-    return vec;
-}
-```
-
-## 타입 변환
-
-### `char` ↔ `int`
-
-```cpp
-char c = '1';
-int i = (int)c;        // 형 변환 (ASCII 49)
-int i = c - '0';       // '0' 빼서 숫자값 (1)
-
-int n = 1;
-char c = (char)n;      // ASCII 1 (제어 문자)
-char c = n + '0';      // 숫자 문자 '1'
-```
-
-### `string` ↔ `int`
-
-```cpp
-string s = "123";
-int i = stoi(s);              // C++11
-int i = atoi(s.c_str());      // C-style
-
-int i = 123;
-string s = to_string(i);
-
-stringstream ss;
-ss << i;
-string s = ss.str();
-```
-
-### ASCII 기준값
-
-| 숫자 | 문자 |
-|---|---|
-| 65 | `A` |
-| 97 | `a` |
-| 48 | `0` |
-
-## Google C++ Style Guide 요약
-
-### Naming
-
-| 대상 | 컨벤션 |
-|---|---|
-| 클래스, 함수 | `CamelCase` |
-| 변수 (로컬/일반) | `snake_case` |
-| 클래스 데이터 멤버 | `snake_case_` (뒤에 `_`) |
-| 상수 | `kCamelCase` (앞에 `k`) |
-| enum 값 | `kEnumName` 권장 (`ENUM_NAME`도 허용) |
-
-### 구조
-
-- 모든 코드는 namespace 안에. 헤더에 `using namespace` 금지.
-- `struct`는 POD(Plain Old Data) 컨테이너용, **로직 들어가면 `class`**.
-- 상속보다 **구성(composition) 우선**, 상속은 명확한 is-a 관계에서만.
-- out parameter(포인터로 결과 받기) 지양, **결과를 반환**하는 함수.
-
-### 도구
-
-- `clang-format` — GoogleStyle 프리셋
-- `gtest` — `<gtest/gtest.h>`
-
----
-
-## GDB — GNU 디버거
-
-> C/C++ 중단점·스택·변수 조사·메모리 검사. `-g`로 컴파일된 바이너리가 전제.
-
-### 30초만 본다면
+## 30초만 본다면
 
 | 상황 | 명령 |
 |---|---|
@@ -127,7 +18,7 @@ string s = ss.str();
 | 현재 위치 코드 | `list` (`l`) |
 | 종료 | `quit` (`q`) |
 
-### 설치
+## 설치
 
 ```sh
 brew install gdb        # macOS — Apple Silicon에선 사실상 불가, lldb 사용 권장
@@ -137,7 +28,7 @@ sudo apt install gdb    # Ubuntu/Debian
 > macOS(특히 Apple Silicon)에선 `gdb` 대신 Xcode에 포함된 `lldb`가 사실상 표준.
 > 명령 대응은 대체로 비슷하다(`b`/`r`/`n`/`s`/`p`/`bt`).
 
-### 사전 준비
+## 사전 준비
 
 컴파일 시 `-g` 옵션으로 디버그 정보 포함:
 
@@ -146,14 +37,14 @@ gcc -g test.c -o test
 g++ -g main.cpp -o main
 ```
 
-### 실행
+## 실행
 
 ```sh
 gdb <프로그램명>
 gdb --args <프로그램명> <arg1> <arg2>    # 인자 전달
 ```
 
-### 중단점 (Breakpoint)
+## 중단점 (Breakpoint)
 
 ```sh
 break <함수이름>
@@ -164,7 +55,7 @@ info break                    # 중단점 목록 (약어: i b)
 
 > 삭제·활성/비활성(`delete`/`clear`/`enable`/`disable`)은 `help breakpoints` 참고.
 
-### 실행 제어
+## 실행 제어
 
 | 명령어 | 설명 |
 |--------|------|
@@ -176,7 +67,7 @@ info break                    # 중단점 목록 (약어: i b)
 | `return` | 현재 함수를 실행하지 않고 빠져나감 |
 | `return <값>` | 지정한 값을 리턴하며 빠져나감 |
 
-### Call Stack
+## Call Stack
 
 ```sh
 backtrace              # 콜 스택 확인 (약어: bt)
@@ -186,7 +77,7 @@ frame <N>              # N번 프레임으로 이동
 up / down              # 프레임 이동
 ```
 
-### 값 출력 / 변경
+## 값 출력 / 변경
 
 ```sh
 print <변수>            # 변수 값 출력 (약어: p)
@@ -201,7 +92,7 @@ info display           # display 목록
 undisplay <번호>        # display 해제
 ```
 
-### 기타
+## 기타
 
 핵심 밖의 명령은 `man gdb` 또는 gdb 안에서 `help <cmd>`로:
 
@@ -211,5 +102,4 @@ undisplay <번호>        # display 해제
 
 ## 참고
 
-- [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html)
 - `man gdb`, `gdb` 안에서 `help <topic>`
