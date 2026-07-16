@@ -85,16 +85,6 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d'
 ```
 
-## 활용 시나리오
-
-git 브랜치 골라 체크아웃하는 함수 (원격 브랜치 포함):
-
-```bash
-gco() {
-  git checkout "$(git branch --all | grep -v HEAD | fzf | tr -d ' *' | sed 's|remotes/origin/||')"
-}
-```
-
 ## 더 보기
 
 - `man fzf`, `fzf --help`
