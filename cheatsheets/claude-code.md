@@ -22,52 +22,12 @@
 2. `/init`을 프로젝트 루트에서 실행 → `CLAUDE.md` 생성 (프로젝트 컨벤션을 적어두면 매 세션이 좋아짐)
 3. 권한 프롬프트가 귀찮으면 `/permissions`로 자주 쓰는 도구 허용
 
-## 기본 내장 명령어
+## 명령어·실행 옵션 → `/help`, `claude --help`
 
-| 명령어 | 설명 |
-|--------|------|
-| `/help` | 도움말 표시 |
-| `/clear` | 대화 초기화 |
-| `/compact` | 컨텍스트 압축 (토큰 절약) |
-| `/config` | 설정 열기/변경 |
-| `/cost` | 토큰 사용량/비용 확인 |
-| `/usage` | 플랜 사용량·한도 확인 |
-| `/context` | 컨텍스트에 무엇이 차 있는지 확인 |
-| `/doctor` | 설치 상태 진단 |
-| `/init` | CLAUDE.md 프로젝트 설정 파일 생성 |
-| `/login` | 계정 로그인 |
-| `/logout` | 계정 로그아웃 |
-| `/mcp` | MCP 서버 상태 확인 |
-| `/memory` | 메모리 파일 편집 |
-| `/model` | 사용할 모델 변경 |
-| `/permissions` | 도구 권한 설정 |
-| `/review` | PR 코드 리뷰 |
-| `/code-review` | 현재 diff 리뷰 (`ultra`로 멀티 에이전트 클라우드 리뷰) |
-| `/security-review` | 보안 관점 리뷰 |
-| `/status` | 버전·모델·계정·연결 상태 (Settings) |
-| `/resume` | 이전 세션 이어가기 |
-| `/rewind` | 체크포인트로 되돌리기 (대화·파일 복원) |
-| `/agents` | 사용자 정의 에이전트 관리 (`.claude/agents/`) |
-| `/hooks` | hooks 설정 관리 (settings.json) |
-| `/workflows` | 워크플로우 진행 상황 보기 (background 멀티에이전트) |
-| `/loop` | 명령을 주기적으로 반복 실행 (`/loop 5m /foo`) |
-| `/schedule` | 크론 스케줄로 원격 에이전트 등록 |
-| `/terminal-setup` | 터미널 환경 설정 |
-| `/vim` | vim 키바인딩 토글 |
-| `/fast` | 빠른 출력 모드 토글 (같은 모델) |
+전체 슬래시 명령은 `/help`, CLI 플래그는 `claude --help`가 즉시 반환한다. 아래는 그중 놓치기 쉬운 것만:
 
-## 실행 옵션
-
-| 명령어 | 설명 |
-|--------|------|
-| `claude` | 대화형 모드 시작 |
-| `claude "prompt"` | 원샷 실행 |
-| `claude -c` | 마지막 대화 이어서 시작 |
-| `claude -r <session>` | 특정 세션 복원 |
-| `claude -p "prompt"` | 비대화형 print 모드 (스크립트·파이프용) |
-| `echo "code" \| claude -p "review"` | 파이프 입력 |
-| `claude --model <model>` | 모델 지정 실행 |
-| `claude config` | CLI에서 설정 관리 |
+- `/rewind` — 체크포인트로 대화·파일 복원 / `/context` — 컨텍스트에 뭐가 차 있는지 / `/fast` — 같은 모델 빠른 출력 토글
+- `claude -c` 마지막 대화 이어서 / `claude -p "..."` 비대화형 print 모드(스크립트·파이프) / `claude -r <session>` 특정 세션 복원
 
 ## 설정 파일
 
@@ -86,25 +46,16 @@
 | `--dangerously-skip-permissions` | 모든 권한 체크 스킵 (주의) |
 | `/permissions` | 대화 중 권한 설정 변경 |
 
-## 키보드 단축키
+## Esc / Esc Esc (헷갈리는 것만)
 
-| 단축키 | 설명 |
-|--------|------|
-| `Enter` | 메시지 전송 |
-| `Shift+Enter` | 줄바꿈 |
-| `Ctrl+C` | 현재 작업 중단 |
-| `Ctrl+D` | 대화 종료 |
-| `Escape` | 실행 취소 / 입력 초기화 |
-| `Tab` | 파일 경로 자동완성 |
+기본 단축키(`Enter` 전송, `Tab` 자동완성 등)는 `/help`. 비자명한 것:
+
+- `Esc` — 실행 중이면 Claude 인터럽트(작업 보존), 다이얼로그 열려있으면 그 창 닫기
+- `Esc Esc` — 입력창에 글 있으면 지우되 히스토리 저장(`↑`로 복구), 비어있으면 rewind 메뉴
 
 ## MCP (Model Context Protocol)
 
-| 명령어 | 설명 |
-|--------|------|
-| `/mcp` | 연결된 MCP 서버 상태 확인 |
-| `claude mcp add <name> <command>` | MCP 서버 추가 |
-| `claude mcp remove <name>` | MCP 서버 제거 |
-| `claude mcp list` | 등록된 MCP 서버 목록 |
+`/mcp`로 서버 상태 확인. 추가·제거·목록은 `claude mcp add/remove/list` → `claude mcp --help`.
 
 ## Custom Agents
 
@@ -165,10 +116,10 @@ subagent에도 `isolation: "worktree"` 옵션으로 격리 실행 가능.
 `Shift+Tab`은 단일 토글이 아니라 **권한 모드를 순환**한다:
 
 ```
-default → acceptEdits → plan [→ auto] [→ bypassPermissions]
+default → acceptEdits → plan [→ bypassPermissions → auto]
 ```
 
-(대괄호 모드는 계정/설정에서 활성화된 경우만 노출.)
+(기본 3개는 항상 노출. `bypassPermissions`는 `--dangerously-skip-permissions` 등으로 시작한 경우, `auto`는 계정이 auto 모드 요건을 충족한 경우만 순환에 추가되며 이 순서로 붙는다.)
 
 - `default` — 매번 권한 확인
 - `acceptEdits` — 파일 편집 자동 수락
@@ -216,7 +167,7 @@ default → acceptEdits → plan [→ auto] [→ bypassPermissions]
 | `~/.claude/projects/{slug}/*.jsonl` | 프로젝트별 대화 세션 |
 | `~/.claude/projects/{slug}/memory/` | 자동 메모리 (`MEMORY.md` + 개별 파일) |
 | `~/.claude/sessions/` | 글로벌 세션 메타 |
-| `~/.claude/commands/` | 사용자 정의 슬래시 명령 (`/to-*` 등) |
+| `~/.claude/commands/` | 사용자 정의 슬래시 명령 |
 | `~/.claude/agents/` | 사용자 정의 에이전트 |
 | `~/.claude/shell-snapshots/` | Bash 도구 셸 상태 스냅샷 |
 | `~/.claude/file-history/` | 편집된 파일 히스토리 |

@@ -29,18 +29,14 @@ diskutil apfs list | grep "Capacity"  # APFS 실제 사용량 (df보다 정확)
 
 ```sh
 # 패키지 매니저 캐시
-brew cleanup --prune=all              # Homebrew (~3.8GB)
-yarn cache clean                      # Yarn (~1.4GB)
-npm cache clean --force               # npm (~2.2GB)
+brew cleanup --prune=all              # Homebrew
+yarn cache clean                      # Yarn
+npm cache clean --force               # npm
 
 # IDE / 개발 도구 캐시
-rm -rf ~/Library/Caches/JetBrains     # JetBrains (~3.4GB, 재시작 시 재생성)
-rm -rf ~/Library/Caches/jdtls         # Java LSP (~1.1GB)
-rm -rf ~/Library/Logs/JetBrains       # JetBrains 로그 (~223MB)
-rm -rf ~/.gradle/caches               # Gradle (~5GB, 빌드 시 재다운로드)
-
-# 앱 임시 파일
-rm -rf ~/Library/Containers/com.microsoft.Outlook/Data/tmp  # Outlook 임시 (~7GB)
+rm -rf ~/Library/Caches/JetBrains     # JetBrains (재시작 시 재생성)
+rm -rf ~/Library/Logs/JetBrains       # JetBrains 로그
+rm -rf ~/.gradle/caches               # Gradle (빌드 시 재다운로드)
 ```
 
 ### 참고
@@ -48,27 +44,9 @@ rm -rf ~/Library/Containers/com.microsoft.Outlook/Data/tmp  # Outlook 임시 (~7
 - `df -h /`는 APFS에서 System 볼륨만 표시할 수 있음 → `diskutil apfs list`가 정확
 - Docker는 데몬 실행 상태에서만 `docker system prune -a` 가능
 
-## Raycast Quicklink (URL 런처)
-
-자주 쓰는 URL(SharePoint, OneNote 등)을 이름으로 검색해 바로 여는 방법.
-
-```sh
-brew install --cask raycast
-```
-
-`⌥ Space` → "Create Quicklink" → Name과 URL 입력. 이후 이름만 치면 바로 열린다.
-
-### Spotlight 대체하려면
-
-Raycast 설정(`⌘ ,`) → General → Hotkey를 `⌘ Space`로 변경하고, 시스템 설정 → 키보드 단축키 → Spotlight에서 기존 단축키 해제.
-
-> Spotlight의 `.webloc` 방식은 인덱싱이 불안정해서 비추천.
-
 ## Homebrew & Java 심볼릭 링크
 
-`brew cleanup` 후 `java_home`이 엉뚱한 버전 반환 / `jenv local` 실패. 별도 글: [brew cleanup 후 java_home이 엉뚱한 버전을 반환할 때](https://clang-engineer.github.io/posts/homebrew-cleanup-java-symlink-broken/)
-
-핵심 한 줄:
+`brew cleanup` 후 `java_home`이 엉뚱한 버전 반환 / `jenv local` 실패 시, JDK 심볼릭 링크를 복구한다.
 
 ```sh
 sudo ln -sfn /opt/homebrew/Cellar/openjdk@21/<버전>/libexec/openjdk.jdk \
@@ -137,9 +115,7 @@ sudo launchctl print system/com.example.my-script
 
 ## Secure Input 문제 (AeroSpace 등)
 
-AeroSpace 단축키 갑자기 먹통 → Secure Input 의심. 별도 글: [AeroSpace 단축키가 갑자기 안 될 때 — macOS Secure Input](https://clang-engineer.github.io/posts/aerospace-secure-input-hotkey-blocked/)
-
-핵심 한 줄:
+단축키가 갑자기 먹통이 되면(AeroSpace 등 핫키 도구) Secure Input을 의심한다. 어떤 프로세스가 Secure Input을 잡고 있는지 확인:
 
 ```sh
 ioreg -l -w 0 | grep SecureInput && ps -p <PID> -o comm=

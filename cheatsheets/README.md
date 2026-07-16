@@ -48,7 +48,7 @@
 | [systemd.md](systemd.md) | systemd 서비스 관리 + journalctl 로그 |
 | [nginx.md](nginx.md) | Nginx 설정/명령어 |
 | [openssl.md](openssl.md) | 인증서/암호화 |
-| [rocky-linux.md](rocky-linux.md) | Rocky Linux (firewalld, SELinux, certbot) |
+| [rocky-linux.md](rocky-linux.md) | Rocky Linux (firewalld, SELinux) |
 
 ## macOS
 
@@ -90,8 +90,10 @@
 
 | 파일 | 설명 |
 |------|------|
+| [mise.md](mise.md) | mise — 다언어 런타임 버전 관리 (rbenv/jenv/pyenv/nvm 통합, config+activate) |
 | [curl.md](curl.md) | curl HTTP 요청 |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
+| [opencode.md](opencode.md) | opencode — provider-agnostic 터미널 AI 코딩 에이전트 (인증·모델 선택) |
 
 ## 언어
 

@@ -157,20 +157,12 @@ gdb --args <프로그램명> <arg1> <arg2>    # 인자 전달
 
 ```sh
 break <함수이름>
-break <라인번호>
 break <파일이름:라인번호>
-break <파일이름:함수이름>
 break <...> if <condition>    # 조건부 중단점
-
 info break                    # 중단점 목록 (약어: i b)
-clear <함수이름>               # 특정 중단점 삭제
-clear <라인번호>
-delete                        # 모든 중단점 삭제
-delete <번호>                  # 번호로 삭제
-
-enable <번호>
-disable <번호>
 ```
+
+> 삭제·활성/비활성(`delete`/`clear`/`enable`/`disable`)은 `help breakpoints` 참고.
 
 ### 실행 제어
 
@@ -209,33 +201,13 @@ info display           # display 목록
 undisplay <번호>        # display 해제
 ```
 
-### 소스 코드
+### 기타
 
-```sh
-list                   # 현재 위치 소스 출력 (약어: l)
-list <라인번호>
-list <함수이름>
-list <시작>,<끝>
-set listsize <N>       # 출력 라인 수 설정
-```
+핵심 밖의 명령은 `man gdb` 또는 gdb 안에서 `help <cmd>`로:
 
-### 메모리 / 레지스터
-
-```sh
-x/<N><fmt><size> <주소>   # 메모리 검사 (예: x/16xb $rsp)
-info registers            # 레지스터 확인 (약어: i r)
-info locals               # 지역변수 확인
-info args                 # 함수 인자 확인
-```
-
-### 워치포인트
-
-```sh
-watch <변수>              # 변수 값 변경 시 중단
-rwatch <변수>             # 변수 읽기 시 중단
-awatch <변수>             # 읽기/쓰기 시 중단
-info watchpoints          # 워치포인트 목록
-```
+- 소스 출력 `list` / `set listsize` → `help list`
+- 메모리·레지스터 `x/<fmt>` / `info registers` / `info locals`·`args` → `help x`, `help info`
+- 워치포인트 `watch` / `rwatch` / `awatch` → `help watch`
 
 ## 참고
 

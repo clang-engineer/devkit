@@ -61,7 +61,7 @@ curl -X GET "http://HOST:9200/INDEX/_count" \
   -d '{
     "query": {
       "range": {
-        "lsh_dtm": {
+        "@timestamp": {
           "gte": "2026-03-01T00:00:00",
           "lte": "2026-03-01T23:59:59"
         }
@@ -78,7 +78,7 @@ GET INDEX/_count
 {
   "query": {
     "range": {
-      "lsh_dtm": {
+      "@timestamp": {
         "gte": "2026-03-01T00:00:00",
         "lte": "2026-03-01T23:59:59"
       }
@@ -101,7 +101,7 @@ curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
   -d '{
     "query": {
       "range": {
-        "lsh_dtm": {
+        "@timestamp": {
           "gte": "2026-03-01T00:00:00",
           "lte": "2026-03-01T23:59:59"
         }
@@ -120,7 +120,7 @@ GET INDEX/_search
 {
   "query": {
     "range": {
-      "lsh_dtm": {
+      "@timestamp": {
         "gte": "2026-03-01T00:00:00",
         "lte": "2026-03-01T23:59:59"
       }
@@ -142,7 +142,7 @@ GET INDEX/_search?size=5
 curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
   -H 'Content-Type: application/json' \
   -d '{
-    "query": { "match": { "exrs_cnte": "mild as" } }
+    "query": { "match": { "content": "quick brown" } }
   }'
 ```
 
@@ -150,12 +150,12 @@ curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
 # Dev Tools
 GET INDEX/_search
 {
-  "query": { "match": { "exrs_cnte": "mild as" } }
+  "query": { "match": { "content": "quick brown" } }
 }
 
 GET INDEX/_count
 {
-  "query": { "match": { "exrs_cnte": "mild as" } }
+  "query": { "match": { "content": "quick brown" } }
 }
 ```
 
@@ -168,7 +168,7 @@ GET INDEX/_count
 curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
   -H 'Content-Type: application/json' \
   -d '{
-    "query": { "match_phrase": { "exrs_cnte": "Mild As" } }
+    "query": { "match_phrase": { "content": "Quick Brown" } }
   }'
 ```
 
@@ -176,17 +176,17 @@ curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
 # Dev Tools
 GET INDEX/_search
 {
-  "query": { "match_phrase": { "exrs_cnte": "Mild As" } }
+  "query": { "match_phrase": { "content": "Quick Brown" } }
 }
 ```
 
 ### match vs match_phrase 비교
 
-| 쿼리 | `"mild as"` 입력 시 매칭 | 용도 |
+| 쿼리 | `"quick brown"` 입력 시 매칭 | 용도 |
 |------|--------------------------|------|
-| `match` | "mild" 또는 "as" 포함하면 매칭 (OR) | 넓은 검색 |
-| `match` + `"operator": "and"` | "mild"과 "as" 모두 포함 (순서 무관) | 교집합 검색 |
-| `match_phrase` | "mild as" 구문 그대로 매칭 (순서 일치) | 정확한 문구 검색 |
+| `match` | "quick" 또는 "brown" 포함하면 매칭 (OR) | 넓은 검색 |
+| `match` + `"operator": "and"` | "quick"과 "brown" 모두 포함 (순서 무관) | 교집합 검색 |
+| `match_phrase` | "quick brown" 구문 그대로 매칭 (순서 일치) | 정확한 문구 검색 |
 
 ### bool 쿼리 (복합 조건)
 
@@ -198,10 +198,10 @@ curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
     "query": {
       "bool": {
         "must": [
-          { "match_phrase": { "exrs_cnte": "Mild As" } }
+          { "match_phrase": { "content": "Quick Brown" } }
         ],
         "filter": [
-          { "range": { "lsh_dtm": { "gte": "2024-01-01", "lte": "2024-12-31" } } }
+          { "range": { "@timestamp": { "gte": "2024-01-01", "lte": "2024-12-31" } } }
         ]
       }
     }
@@ -215,10 +215,10 @@ GET INDEX/_search
   "query": {
     "bool": {
       "must": [
-        { "match_phrase": { "exrs_cnte": "Mild As" } }
+        { "match_phrase": { "content": "Quick Brown" } }
       ],
       "filter": [
-        { "range": { "lsh_dtm": { "gte": "2024-01-01", "lte": "2024-12-31" } } }
+        { "range": { "@timestamp": { "gte": "2024-01-01", "lte": "2024-12-31" } } }
       ]
     }
   }
@@ -259,7 +259,7 @@ curl -X GET "http://HOST:9200/INDEX/_count"
 
 curl -X GET "http://HOST:9200/INDEX/_count" \
   -H 'Content-Type: application/json' \
-  -d '{"query":{"range":{"lsh_dtm":{"gte":"2026-03-01T00:00:00","lte":"2026-03-01T23:59:59"}}}}'
+  -d '{"query":{"range":{"@timestamp":{"gte":"2026-03-01T00:00:00","lte":"2026-03-01T23:59:59"}}}}'
 ```
 
 ```text
@@ -267,7 +267,7 @@ curl -X GET "http://HOST:9200/INDEX/_count" \
 GET INDEX/_count
 
 GET INDEX/_count
-{ "query": { "range": { "lsh_dtm": { "gte": "2026-03-01T00:00:00", "lte": "2026-03-01T23:59:59" } } } }
+{ "query": { "range": { "@timestamp": { "gte": "2026-03-01T00:00:00", "lte": "2026-03-01T23:59:59" } } } }
 ```
 
 ## Delete by Query
@@ -279,7 +279,7 @@ curl -X POST "http://HOST:9200/INDEX/_delete_by_query?refresh=true&conflicts=pro
   -d '{
     "query": {
       "range": {
-        "lsh_dtm": {
+        "@timestamp": {
           "gte": "2026-03-01T00:00:00",
           "lte": "2026-03-01T23:59:59"
         }
@@ -294,7 +294,7 @@ POST INDEX/_delete_by_query?refresh=true&conflicts=proceed
 {
   "query": {
     "range": {
-      "lsh_dtm": {
+      "@timestamp": {
         "gte": "2026-03-01T00:00:00",
         "lte": "2026-03-01T23:59:59"
       }
@@ -383,26 +383,3 @@ Dev Tools에서는 `GET` 붙이고 그대로 실행.
 > curl로는 `curl http://HOST:9200/_cat/health?v` 형태. `?format=json` 붙이면 JSON 출력.
 
 > 샤드가 yellow/red면 `GET _cluster/allocation/explain`으로 미할당 원인을, `GET _cat/recovery?v&active_only=true`로 복구 진행을 본다.
-
-## Logstash JDBC tracking column 주의점
-
-`use_column_value => true`로 tracking column 사용 시, **ORDER BY 없이 적재하면 `last_run` 파일에 마지막 row의 값이 저장**된다. DB 반환 순서가 비결정적이므로 `MAX(tracking_column)`이 아닌 엉뚱한 값이 기록될 수 있다.
-
-### 증상
-
-- 초기적재에서 성능을 위해 ORDER BY와 paging 제거
-- 적재는 정상 완료되었지만 `last_run`에 과거 날짜가 기록됨
-
-### 해결
-
-적재 후 수동으로 실제 MAX 값을 써넣는다:
-
-```bash
-# KST → UTC 변환 필요 (jdbc_default_timezone: Asia/Seoul)
-echo "--- !ruby/object:DateTime '2026-04-09 02:23:32.000000000 Z'" \
-  > /tmp/logstash-data/.logstash_jdbc_last_run_INDEX_NAME
-```
-
-### 근본 대책
-
-초기적재 스크립트에서 적재 완료 후 `SELECT MAX(tracking_column)`로 `last_run` 파일을 자동 갱신하는 로직 추가.

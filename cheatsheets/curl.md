@@ -106,10 +106,10 @@ curl -b 'session=abc123' URL
 curl -k URL                                # 인증서 검증 무시 (테스트만)
 curl --cacert ca.pem URL                   # CA 인증서 지정
 curl --cert client.pem --key client.key URL    # 클라이언트 인증
-curl --resolve api.example.com:443:127.0.0.1 https://api.example.com    # DNS 우회 (롤아웃 전 검증)
 curl --http2 URL                           # HTTP/2 강제
-curl --http3 URL                           # HTTP/3 (QUIC, curl 빌드 의존)
 ```
+
+고급: `--resolve`(DNS 우회, 롤아웃 전 검증)·`--http3`(QUIC, 빌드 의존) 등 → `man curl`
 
 ## 타임아웃 / 재시도
 

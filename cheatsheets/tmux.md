@@ -200,31 +200,17 @@ move-window -s 3 -t 1    # 윈도우를 특정 인덱스로 이동
 
 > 세션은 순서를 직접 변경하는 명령이 없다. 이름 기반 정렬(`-O name`)로 제어.
 
-## 세션 점프: `s` vs `w` vs sesh(`T`)
+## 세션 점프: `s` vs `w`
 
-셋 다 "다른 세션/윈도우로 이동"이라 헷갈리지만, 갈리는 축은 **① 이미 떠 있는 것만 고르나 ② 없으면 새로 만드나** 와 **점프 깊이**다.
+둘 다 "다른 세션/윈도우로 이동"이라 헷갈리지만, 갈리는 축은 **점프 깊이**다.
 
-| 키 | 정체 | 대상 범위 | 새 세션 생성 | UI |
-|----|------|-----------|:---:|----|
-| `Prefix s` | tmux 기본 | **살아있는 세션**만 | ❌ | choose-tree (내장) |
-| `Prefix w` | tmux 기본 | 세션 + 그 안 **윈도우**까지 펼침 | ❌ | choose-tree (내장) |
-| `Prefix T` | 커스텀 ([sesh](https://github.com/joshmedeski/sesh)) | 세션 + **zoxide 디렉토리 · 설정 · fd 검색** | ✅ | fzf 팝업 |
+| 키 | 대상 범위 | 새 세션 생성 | UI |
+|----|-----------|:---:|----|
+| `Prefix s` | **살아있는 세션**만 | ❌ | choose-tree (내장) |
+| `Prefix w` | 세션 + 그 안 **윈도우**까지 펼침 | ❌ | choose-tree (내장) |
 
-- **`s` / `w` 는 전환기.** 지금 tmux에 이미 떠 있는 것 중에서만 고른다. 차이는 깊이 — `s`는 세션 레벨, `w`는 모든 세션의 윈도우를 트리로 펼쳐 특정 윈도우로 정밀 점프(`s`의 상위호환이지만 목록이 길다).
-- **sesh(`T`)는 생성기 겸 전환기.** `sesh`(session의 축약, `joshmedeski/sesh`)는 아직 세션이 아닌 **디렉토리(zoxide)** 를 골라 그 자리에서 새 세션을 만든다. "그 프로젝트 폴더 세션, 있으면 가고 없으면 만들어줘"가 한 방. 실질적으로 `s`를 대체해서 `w`만 윈도우 트리 훑기 용으로 남는다.
-
-```bash
-# .tmux.conf — sesh 피커를 Prefix T에 바인딩 (fzf 팝업 + 소스 전환)
-bind-key T run-shell "sesh connect \"\$(
-  sesh list --icons | fzf-tmux -p 80%,70% --no-sort --ansi \
-    --bind 'ctrl-a:reload(sesh list --icons)' \
-    --bind 'ctrl-t:reload(sesh list -t --icons)' \
-    --bind 'ctrl-x:reload(sesh list -z --icons)' \
-    --bind 'ctrl-f:reload(fd -H -d 2 -t d . ~)' \
-    --bind 'ctrl-d:execute(tmux kill-session -t {2..})+reload(sesh list --icons)'
-)\""
-# 팝업 안: ^a 전체  ^t tmux세션  ^x zoxide  ^g 설정  ^f fd검색  ^d kill
-```
+- **둘 다 전환기.** 지금 tmux에 이미 떠 있는 것 중에서만 고른다. 차이는 깊이 — `s`는 세션 레벨, `w`는 모든 세션의 윈도우를 트리로 펼쳐 특정 윈도우로 정밀 점프(`s`의 상위호환이지만 목록이 길다).
+- **stock 범위 밖**: 아직 세션이 아닌 디렉토리(zoxide 등)를 골라 그 자리에서 세션을 새로 만드는 "생성기 겸 전환기"는 tmux 기본에 없다 — [sesh](https://github.com/joshmedeski/sesh)(session의 축약) 같은 서드파티 fzf 피커가 그 역할.
 
 ## 패널/윈도우 세션 간 이동
 
@@ -260,6 +246,8 @@ bind-key T run-shell "sesh connect \"\$(
 | `mysess:` | 세션 자체 | 뒤가 빈 형태 |
 
 > 단일 숫자 `2`는 명령어에 따라 페인/윈도우/세션 중 어디로 해석될지 모호함(`select-pane` vs `select-window`). 의도를 명확히 하려면 `.`이나 `:`을 붙여 레벨을 명시.
+
+> **index vs id**: 위 `window.pane` 번호(`pane_index`)는 **위치 기반이라 페인 추가/삭제 시 재정렬**된다. 반면 `pane_id`(`%0`, `%12` — `$TMUX_PANE`에 들어있는 값)는 페인 생존 동안 **불변**. 스크립트로 특정 페인을 조준할 땐 index가 아니라 `%id`로 쏴야 중간에 안 엉킨다. 매핑은 `tmux list-panes -F '#{pane_id} #{window_index}.#{pane_index}'`.
 
 ### join-pane 옵션
 
@@ -301,20 +289,30 @@ tmux move-window -t 0-default:
 
 > **주의**: `join-pane`에서 윈도우 **이름**이 아닌 **번호**를 사용. 현재 윈도우를 source로 지정하면 에러.
 
-### pane 하나만 잠깐 숨기기 (stash 토글)
+## 순정 기본값 검증 (config 지워도 되나?)
 
-pane 3개 중 하나만 치워 "2개만 보기". zoom은 하나만 **최대화**라 안 됨. `break-pane -d`로 숨은 window에 stash했다가 `join-pane`으로 복귀하는 원키 토글:
+"이 `bind`/`set` 줄이 tmux stock 기본값과 같아서 지워도 폴백되나?"를 판정할 때, **실행 중 서버에 물어보면 오염된 답**이 나온다. `source-file`은 파일에서 지운 바인딩을 running 서버에서 걷어내지 않아 유령이 남는다 → `list-keys`에 옛 커스텀이 섞여 오판.
 
-```tmux
-# prefix + m: _stash window 존재 여부로 stash ↔ 복귀 판정
-bind m if-shell 'tmux list-windows | grep -qw _stash' 'join-pane -s _stash' 'break-pane -dn _stash'
+방탄은 **격리 소켓 + config 무효화 + 세션 유지를 단일 호출**로:
+
+```sh
+# 순정 바인딩 조회 (별도 소켓 + 세션 유지로 자동 재기동 틈 차단)
+tmux -L iso_$$ -f /dev/null new-session -d \; list-keys -T copy-mode-vi \; kill-server
+
+# 순정 옵션값 조회
+tmux -L iso_$$ -f /dev/null new-session -d \; show -gv <option> \; kill-server
 ```
 
-- `break-pane -dn _stash`: 활성 pane을 백그라운드(`-d`) 숨은 `_stash` window(`-n`)로 빼둠 → 남은 pane 자동 리플로우.
-- `join-pane -s _stash`: 현재 window로 끌어옴 (`_stash`가 비면 tmux가 자동으로 닫음).
-- **존재 여부**로 판정하므로 아무 작업 window에서나 눌러 복귀 pane을 지금 window로 가져올 수 있다. 제약: 동시에 하나만 stash 가능.
+| 조각 | 이유 |
+|------|------|
+| `-L iso_$$` | 기본 소켓의 running(오염) 서버와 격리. `$$`로 소켓명 충돌 회피 |
+| `-f /dev/null` | config 완전 무효화 → 순정 기본값만 남김 |
+| `new-session -d` | 세션을 만들어 서버 유지. 세션 없으면 후속 `list-keys`가 서버를 **자동 재기동하며 실 `~/.tmux.conf`를 로드**해 오염됨 |
+| `\; list-keys` | **같은 호출 안**에서 조회 → 방금 만든 순정 서버임이 보장 |
 
-> 함정: `if-shell`은 셸에 넘기기 **전** 명령의 tmux 포맷(`#{...}`·`#W`)을 먼저 치환한다. `list-windows -F '#W'`의 `#W`가 현재 window 이름으로 선치환돼 grep이 오염됨 → `#` 없는 기본 `list-windows` 출력으로 grep. 리로드 후 `bind` 줄을 지워도 `tmux unbind m` 전엔 실행 중 서버에 남는다.
+> 함정: `-f /dev/null`을 앞 명령에만 붙이고 후속 조회엔 안 붙이면, 자동 재기동 때 실 config가 로드된다. 반드시 **단일 호출**로.
+
+> 두 키맵 diff 시: `list-keys` 출력을 `awk -v k="$key" '$1==k'`로 대조하면 **특수문자 키가 오판**된다. tmux가 `"`·`%`·`{`를 `\"`·`\%`로 이스케이프 출력하는데 awk `-v`가 그 이스케이프를 다시 처리해 매칭이 깨짐(알파벳 키는 멀쩡). 회피: `key<TAB>cmd` 파일 둘을 만들어 `join`으로 **리터럴 비교**.
 
 ## 기타
 
@@ -429,58 +427,6 @@ set -g @plugin 'tmux-plugins/tmux-continuum'
 
 # Prefix + I 로 플러그인 설치
 ```
-
-## AI 에이전트 사이드바 (`hiroppy/tmux-agent-sidebar`)
-
-전 세션·윈도우의 AI 에이전트(Claude Code/Codex 등)를 **별도 세로 패널**에서 실시간 모니터.
-상태는 폴링·출력 파싱이 아니라 **Claude Code 훅**으로 직접 받아 정확. 요구: tmux 3.0+, TPM.
-
-```bash
-set -g @plugin 'hiroppy/tmux-agent-sidebar'
-# Prefix + I → 첫 실행 시 install wizard에서 "pre-built binary" 선택 (Rust/cargo 불필요)
-# Claude Code 연동: Claude Code 안에서
-#   /plugin marketplace add ~/.tmux/plugins/tmux-agent-sidebar
-#   /plugin install tmux-agent-sidebar@hiroppy
-```
-
-전역 키 (사이드바 열기/닫기 = toggle):
-
-| 키 | 동작 | 설정 변수(기본) |
-|---|---|---|
-| `Prefix e` | 사이드바 토글 — **현재 윈도우만** | `@sidebar_key` (`e`) |
-| `Prefix E` | 사이드바 토글 — **모든 윈도우** | `@sidebar_key_all` (`E`) |
-
-사이드바 패널 안 로컬 키 (prefix 없이, 포커스 있을 때만 → 전역 키맵과 안 겹침):
-
-| 키 | 동작 |
-|---|---|
-| `j` / `k` | 목록 위/아래 |
-| `h` / `l`, `Tab` | 상태 필터 순환 (all/running/waiting…) |
-| `r` | repo 필터 |
-| `Enter` | 선택 에이전트 패널로 점프 |
-| `Shift+Tab` | Activity ↔ Git 탭 전환 |
-| `n` / `x` | worktree+에이전트 스폰 / 스폰 패널 제거 |
-| `Esc` | 뒤로 / 닫기 |
-
-주요 옵션 (`set -g`, 플러그인 로드 전):
-
-```tmux
-set -g @sidebar_key 'e'                 # 현재-윈도우 토글 키
-set -g @sidebar_key_all 'E'             # 전체-윈도우 토글 키
-set -g @sidebar_width '15%'             # 사이드바 너비
-set -g @sidebar_position 'left'         # left | right
-set -g @sidebar_auto_create 'on'        # 새 윈도우 생성 시 사이드바 자동 (off로 끄기)
-set -g @sidebar_notifications 'on'      # 데스크톱 알림
-set -g @sidebar_notifications_events 'stop,notification'  # 알림 이벤트 선택
-set -g @agent-sidebar-default-agent 'claude'   # 스폰 기본 에이전트 (claude|codex)
-```
-
-- **하단 Activity/Git 패널은 목록에서 선택된(focused) pane *하나* 기준** — `j`/`k`로 선택을 옮기면 두 탭 내용도 그 pane으로 같이 바뀐다(전체 종합 아님). Activity=그 pane의 tool-call 히스토리, Git=그 pane cwd의 branch·diff·PR. 반대로 상단 목록은 전 세션·윈도우 전체.
-- `e`(현재 윈도우) vs `E`(전체 윈도우) 차이는 체감상 **다른 윈도우로 이동했을 때 사이드바가 따라오느냐** — `E`=따라옴, `e`=안 따라옴. **단일 윈도우만 열려 있으면 둘이 똑같아 보인다**(윈도우 2개 이상에서만 차이).
-- `@sidebar_auto_create`는 **새 윈도우 생성 시(after-new-window)에만** 자동으로 붙음 — 윈도우 *전환* 시엔 안 붙음. `E`(전체토글)는 "지금 열린 모든 윈도우에 한 방에 깔기"용.
-- **토글 키(`@sidebar_key`/`@sidebar_key_all`)는 끄기 불가 — 리바인드만 가능.** 빈 값은 기본(`e`/`E`)으로 복원됨. 기본 `prefix E`(select-layout -E)를 지키려면 `@sidebar_key_all`을 빈 다른 키로 옮길 것.
-
-> 함정: Claude Code에서 permission 승인 직후 다음 훅 발화 전까지 상태가 `waiting`으로 남음 — Claude Code 훅 시스템의 문서화된 한계(플러그인 버그 아님).
 
 ## 발견성 메뉴 (`jaclu/tmux-menus`)
 

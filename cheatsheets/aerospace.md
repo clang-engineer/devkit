@@ -79,22 +79,19 @@ aerospace move-node-to-workspace 2  # 현재 창을 workspace 2로 이동
 aerospace workspace 3          # workspace 3으로 전환
 ```
 
+### 특정 창 지정 · 포맷 출력
+
+포커스와 무관하게 **특정 창**을 옮기거나, 스크립트용으로 필드를 뽑을 때.
+
+| 플래그 | 설명 |
+|---|---|
+| `move-node-to-workspace --window-id <id> <ws>` | 포커스된 창이 아니라 지정한 `window-id`를 이동 |
+| `move-node-to-workspace --fail-if-noop <ws>` | 이미 그 워크스페이스면 아무 동작 안 함 (불필요한 포커스 변화 방지) |
+| `list-windows --all --format '%{window-id}\|%{app-bundle-id}'` | 창 목록을 커스텀 포맷으로. `%{...}` 플레이스홀더로 필드 선택 |
+
 ## 자동 창 배치 (on-window-detected)
 
-앱이 뜰 때 워크스페이스 이동·레이아웃을 자동 적용한다. `if`는 **테이블**이어야 한다.
-
-```toml
-[[on-window-detected]]
-if.app-id = 'com.google.Chrome'          # bundle ID (aerospace list-apps 로 확인)
-run = ['move-node-to-workspace 1', 'layout floating']
-
-[[on-window-detected]]
-# if 생략 = 모든 창 매칭. 첫 매칭에서 멈추므로 catch-all은 맨 끝에.
-run = ['layout floating']
-```
-
-- catch-all은 `if = 'true'` 같은 문자열이 아니라 **`if` 생략**으로 쓴다.
-- 한 줄이라도 파싱 실패하면 config 전체가 거부되고 옛 설정이 유지된다 → `aerospace reload-config`로 검증.
+`[[on-window-detected]]` 블록으로 앱이 뜰 때 워크스페이스 이동·레이아웃을 자동 적용할 수 있다. `if`는 문자열이 아니라 **테이블**(`if.app-id = '...'`)이고, `if` 생략은 "모든 창 매칭"(catch-all)이다. 규칙은 위에서부터 검사해 첫 매칭에서 멈춘다. 앱별 배치 규칙 작성은 공식 config 문서 참조.
 
 ## yabai vs Aerospace 비교
 

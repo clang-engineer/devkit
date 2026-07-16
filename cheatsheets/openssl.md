@@ -16,15 +16,9 @@
 | PEM → PKCS12 (.p12) | `openssl pkcs12 -export -out cert.p12 -inkey key.pem -in cert.pem` |
 | 키·인증서 매치 확인 | 두 modulus 비교: `openssl rsa -in key.pem -modulus -noout` vs `openssl x509 -in cert.pem -modulus -noout` |
 
-## 인증서 발행 절차
-
-1. 개인키 생성
-2. CSR(Certificate Signing Request) 생성
-3. CSR을 CA에 전송
-4. CA에서 인증서 발급
-5. 인증서 설치
-
 ## 자체 서명 인증서 발급
+
+한 줄 발급은 위 표 참고. 아래는 개인키 → CSR → 서명을 단계별로 나눌 때(CA 제출용 CSR 포함).
 
 ### 1. 개인키 생성
 
@@ -46,43 +40,25 @@ openssl req -new -key private.key -out request.csr \
   -subj "/C=KR/ST=Seoul/L=Gangnam/O=MyCompany/OU=Dev/CN=example.com"
 ```
 
-### 3. 인증서 생성
+### 3. 인증서 생성 (CSR 자체 서명)
 
 ```sh
 openssl x509 -req -days 365 -in request.csr -signkey private.key -out certificate.crt
 ```
 
-### 한 줄로 자체 서명 인증서 생성 (키 + 인증서)
+## 인증서 검증
 
 ```sh
-openssl req -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 365 -nodes \
-  -subj "/CN=localhost"
+openssl verify -CAfile ca.crt certificate.crt   # CA로 인증서 검증
 ```
 
-## 인증서 확인
-
-```sh
-openssl x509 -in certificate.crt -text -noout      # 인증서 상세 정보
-openssl x509 -in certificate.crt -dates -noout      # 유효 기간만 확인
-openssl verify -CAfile ca.crt certificate.crt        # CA로 인증서 검증
-```
-
-## 원격 서버 인증서 확인
-
-```sh
-openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -text -noout
-openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -dates -noout
-```
+상세·유효기간·원격 서버 확인은 위 표 참고.
 
 ## 포맷 변환
 
-```sh
-# PEM → DER
-openssl x509 -in cert.pem -outform DER -out cert.der
+표에 없는 역방향만. (PEM → DER, PEM → PKCS12는 위 표 참고)
 
+```sh
 # DER → PEM
 openssl x509 -in cert.der -inform DER -outform PEM -out cert.pem
-
-# PEM → PKCS12
-openssl pkcs12 -export -out cert.p12 -inkey key.pem -in cert.pem
 ```

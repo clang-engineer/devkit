@@ -1,6 +1,6 @@
 # chezmoi Cheatsheet
 
-여러 머신에 dotfiles를 관리·배포하는 Go 단일 바이너리. 핵심 모델은 **3-상태**:
+여러 머신에 dotfiles를 관리·배포하는 Go 단일 바이너리 (`chezmoi` = 프랑스어 "chez moi", 내 집에 → dotfiles를 홈 `~`에 깐다). 핵심 모델은 **3-상태**:
 
 - **source state** — git으로 추적하는 dotfiles 원본. 기본 `~/.local/share/chezmoi`.
 - **target state** — source에 템플릿/스크립트를 적용해 계산한 "이래야 한다"는 상태.

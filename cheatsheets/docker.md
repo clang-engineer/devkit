@@ -37,13 +37,12 @@ docker rm -f $(docker ps -aq)      # 전부 강제 삭제
 | `-it` | interactive + tty (쉘 진입 시 필수) |
 | `--name <n>` | 컨테이너 이름 |
 | `-p host:cont` | 포트 매핑 (`-p 8080:80`) |
-| `-v host:cont[:ro]` | bind mount (절대경로) |
-| `-v vol:cont` | named volume 마운트 |
+| `-v host:cont[:ro]` / `-v vol:cont` | bind mount (절대경로) / named volume |
 | `-e KEY=VAL` / `--env-file .env` | 환경변수 |
 | `--rm` | 종료 시 자동 삭제 |
 | `--network <net>` | 네트워크 지정 |
-| `--restart unless-stopped` | 재시작 정책 (`no`/`on-failure`/`always`/`unless-stopped`) |
-| `-u <uid>` / `-w <path>` | 실행 사용자 / 작업 디렉토리 |
+
+> 기타(`--restart`, `-u`, `-w`, `--memory`, `--cpus`, `--health-*` …) → `docker run --help`.
 
 ## 디버깅 & 모니터링
 
@@ -91,10 +90,8 @@ docker volume rm <name>
 docker volume prune              # 미사용 정리
 ```
 
-| 종류 | 사용 | 특징 |
-|---|---|---|
-| **bind mount** | `-v $(pwd):/app` | 호스트 경로 직접. 권한/SELinux 이슈 가능 |
-| **named volume** | `-v mydata:/app` | docker가 관리. 호스트 OS 독립, 백업·이전 용이 |
+- **bind mount** (`-v $(pwd):/app`): 호스트 경로 직접. 권한/SELinux 이슈 가능.
+- **named volume** (`-v mydata:/app`): docker가 관리. 호스트 OS 독립, 백업·이전 용이.
 
 ## 네트워크
 
@@ -107,28 +104,21 @@ docker network disconnect <net> <c>
 docker network prune
 ```
 
-| 드라이버 | 용도 |
-|---|---|
-| `bridge` (기본) | 컨테이너 간 격리된 가상 네트워크 |
-| `host` | 호스트 네트워크 공유 (포트 매핑 불필요) |
-| `none` | 네트워크 없음 |
+- 드라이버는 대부분 기본 `bridge`(컨테이너 간 격리 가상망). 포트 매핑 없이 호스트망을 그대로 쓰려면 네트워크 생성이 아니라 실행 시 `docker run --network host`. 나머지 드라이버(`none`·overlay·macvlan …)는 `docker network create --driver <name>` → `docker network create --help`.
 
 ## Docker Compose
 
 ```bash
 docker compose up -d                  # 백그라운드 실행
 docker compose up --build             # 이미지 재빌드 후 실행
-docker compose up --force-recreate    # 컨테이너 재생성
-docker compose down                   # 중지 + 삭제
-docker compose down -v                # 볼륨까지 삭제
+docker compose down                   # 중지 + 삭제 (볼륨까지: -v)
 docker compose ps                     # 상태 확인
 docker compose logs -f [<service>]
+docker compose build [<service>]      # 이미지만 빌드
 docker compose exec <service> bash
-docker compose restart [<service>]
-docker compose pull                   # 이미지 갱신
-docker compose run --rm <s> <cmd>     # 일회성 실행
-docker compose config                 # 최종 병합된 설정 출력
 ```
+
+> 기타(`restart`·`pull`·`run --rm`·`config`·`--force-recreate` …) → `docker compose --help`.
 
 > `docker-compose`(하이픈) v1은 deprecated. `docker compose`(공백) v2 사용.
 
@@ -154,25 +144,6 @@ docker run --rm -it alpine sh
 docker run --rm -it -v $(pwd):/work -w /work alpine sh
 ```
 
-## 폐쇄망(오프라인) 바이너리 설치
+## 폐쇄망(air-gapped) 이미지 이전
 
-패키지 매니저 없이 정적 바이너리로 설치. 공식: [Docker — Binaries](https://docs.docker.com/engine/install/binaries/).
-
-```sh
-# 1) 바이너리 tarball 다운로드 (인터넷 PC 에서)
-#    https://download.docker.com/linux/static/stable/<arch>/
-
-# 2) 폐쇄망 PC 로 옮긴 뒤 압축 해제
-tar xzvf docker-<version>.tgz
-
-# 3) /usr/bin 으로 복사 (전역 실행)
-sudo cp docker/* /usr/bin/
-
-# 4) 데몬 실행
-sudo dockerd &
-
-# 5) 동작 확인
-sudo docker run hello-world
-```
-
-systemd 운영용으로 `/etc/systemd/system/docker.service` 작성하면 부팅 자동 실행 가능.
+인터넷 PC에서 `docker save <image> -o img.tar` → 파일 옮긴 뒤 폐쇄망에서 `docker load -i img.tar`. Engine 자체를 오프라인 설치할 땐 정적 바이너리 tar(`download.docker.com/linux/static/`) → 공식 [Docker — Binaries](https://docs.docker.com/engine/install/binaries/).

@@ -37,7 +37,7 @@ groups:
       - {file: systemd.md, desc: "systemd 서비스 관리 + journalctl 로그"}
       - {file: nginx.md, desc: "Nginx 설정/명령어"}
       - {file: openssl.md, desc: "인증서/암호화"}
-      - {file: rocky-linux.md, desc: "Rocky Linux (firewalld, SELinux, certbot)"}
+      - {file: rocky-linux.md, desc: "Rocky Linux (firewalld, SELinux)"}
 
   - title: macOS
     items:
@@ -68,6 +68,7 @@ groups:
 
   - title: 개발 도구
     items:
+      - {file: mise.md, desc: "mise — 다언어 런타임 버전 관리 (rbenv/jenv/pyenv/nvm 통합, config+activate)"}
       - {file: curl.md, desc: "curl HTTP 요청"}
       - {file: claude-code.md, desc: "Claude Code CLI"}
       - {file: opencode.md, desc: "opencode — provider-agnostic 터미널 AI 코딩 에이전트 (인증·모델 선택)"}

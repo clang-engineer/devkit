@@ -68,66 +68,27 @@ tar -xzvf archive.tar.gz
 ## gzip / gunzip
 
 ```bash
-# 압축 (원본 삭제됨)
-gzip file.txt              # → file.txt.gz
-
-# 원본 유지
-gzip -k file.txt
-
-# 해제 (원본 삭제됨)
-gunzip file.txt.gz         # → file.txt
-
-# 원본 유지하며 해제
-gzip -dk file.txt.gz
-
-# 압축률 지정 (1=빠름, 9=최대압축)
-gzip -9 file.txt
-
-# 압축 안 풀고 내용 확인
-zcat file.gz
-zless file.gz
-zgrep "pattern" file.gz
+gzip -k file.txt           # 압축, 원본 유지 (-k 없으면 원본 삭제)
+gunzip file.txt.gz         # 해제
+zcat file.gz               # 안 풀고 내용 보기 (zless / zgrep 도 동일 계열)
 ```
 
 ## zip / unzip
 
 ```bash
-# 압축
-zip archive.zip file1 file2
-zip -r archive.zip dir/           # 디렉토리 재귀
-
-# 해제
-unzip archive.zip
-unzip archive.zip -d /target/dir/
-
-# 내용 확인 (해제 없이)
-unzip -l archive.zip
-
-# 특정 파일만 해제
-unzip archive.zip path/to/file
-
-# 비밀번호 설정
-zip -e archive.zip file1 file2
-
-# 기존 zip에 파일 추가
-zip archive.zip newfile.txt
+zip -r archive.zip dir/    # 압축 (디렉토리는 -r 재귀)
+unzip archive.zip          # 해제 (-d /target 으로 대상 지정)
+unzip -l archive.zip       # 안 풀고 목록 보기
 ```
 
-## 기타
+## xz / bzip2 / 7z
+
+`-d` 로 해제, 압축률·속도 트레이드오프는 아래 [형식별 비교](#형식별-비교) 표 참조. 나머지 옵션은 각 도구 `--help`.
 
 ```bash
-# xz
-xz file.txt               # 압축 (원본 삭제)
-xz -dk file.txt.xz        # 해제 (원본 유지)
-
-# bzip2
-bzip2 file.txt             # 압축 (원본 삭제)
-bzip2 -dk file.txt.bz2    # 해제 (원본 유지)
-
-# 7z (p7zip)
-7z a archive.7z dir/       # 압축
-7z x archive.7z            # 해제
-7z l archive.7z            # 목록 확인
+xz -dk file.txt.xz         # xz  해제 (원본 유지)
+bzip2 -dk file.txt.bz2     # bzip2 해제 (원본 유지)
+7z x archive.7z            # 7z  해제 (압축 a, 목록 l)
 ```
 
 ## 형식별 비교

@@ -98,30 +98,13 @@ export FZF_ALT_C_COMMAND='fd --type d'
 
 ## 활용 시나리오
 
-### git 브랜치 함수
+git 브랜치 골라 체크아웃하는 함수 (원격 브랜치 포함):
 
 ```bash
 gco() {
   git checkout "$(git branch --all | grep -v HEAD | fzf | tr -d ' *' | sed 's|remotes/origin/||')"
 }
 ```
-
-### 디렉터리 점프 (zoxide와 조합)
-
-`zi <쿼리>` — zoxide의 fzf 통합 (zoxide가 fzf를 호출)
-
-### 매치 결과를 nvim quickfix로
-
-```bash
-nvim -q <(rg --vimgrep "TODO" | fzf -m)
-```
-
-## LazyVim에서
-
-LazyVim은 [snacks.picker](https://github.com/folke/snacks.nvim) 또는 Telescope를 쓰며,
-fuzzy 매칭에 fzf 알고리즘을 사용한다 (Telescope의 경우 `telescope-fzf-native`).
-
-즉 **셸 fzf와 LazyVim picker 둘 다 같은 fuzzy 감각**으로 쓸 수 있다.
 
 ## 더 보기
 

@@ -128,15 +128,9 @@ GET _cat/aliases?v
 
 ## Data Views (구 Index Patterns)
 
-7.x까지는 "Index Pattern", 8.x부터 "Data View"로 명칭 변경.
+7.x까지는 "Index Pattern", 8.x부터 "Data View"로 명칭 변경. 와일드카드(`logs-*`)로 여러 인덱스를 하나로 묶고 시간 필드(`@timestamp`)를 지정하는 Discover/시각화의 데이터 소스 단위. Stack Management → Data Views에서 생성/관리.
 
-| 위치 | 설명 |
-|------|------|
-| Management → Stack Management → Data Views | 데이터 뷰 관리 |
-| `logs-*`, `metrics-*` | 와일드카드로 여러 인덱스 묶기 |
-| Time field | `@timestamp` 등 시간 필드 지정 (Discover/시각화 시간 필터 기준) |
-| Scripted field | 런타임 계산 필드 (Painless 스크립트) |
-| Runtime field | 8.x 권장 방식, 매핑 변경 없이 즉석 필드 |
+> 매핑 변경 없이 즉석 필드가 필요하면 Runtime field (8.x 권장, 구 Scripted field 대체).
 
 ## 시간 필터
 
@@ -155,40 +149,26 @@ now-1h, now-7d/d (오늘 시작), now/w (이번주 시작)
 
 ## 필터 vs 검색바
 
-| 구분 | 적용 위치 | 비고 |
-|------|-----------|------|
-| 검색바 KQL | 현재 화면 전체 | 저장 시 saved search/대시보드에 포함 |
-| Add filter | 필드 단위 UI 필터 | Pin, Disable, Invert 가능 |
-| Pinned filter | 모든 앱에서 유지 | Discover ↔ Dashboard 이동 시 살아있음 |
-| Disabled filter | 일시적으로 비활성 | 삭제하지 않고 토글 |
+> 검색바 KQL과 Add filter는 둘 다 검색을 좁히지만, **Pinned filter는 앱 간(Discover ↔ Dashboard) 이동에도 살아남는다** — 여러 화면에 공통으로 걸고 싶으면 KQL이 아니라 필터를 Pin 한다.
 
 ## 대시보드 단축키 / 팁
 
 | 동작 | 설명 |
 |------|------|
 | 패널 우상단 `...` → Inspect | 해당 패널의 ES 요청 보기 |
-| 패널 드래그 코너 | 크기 조정 |
-| `Edit` → `Options` → `Use margins` | 패널 간격 조정 |
-| `Settings` → `Sync color across panels` | 동일 카테고리 색상 통일 |
 | URL `embed=true` | 헤더/사이드바 없는 임베드 뷰 |
 
 ## 자주 쓰는 URL 패턴
 
 ```text
-# Discover (특정 data view + 시간)
+# Discover (특정 data view + 시간 + 쿼리)
 /app/discover#/?_g=(time:(from:now-24h,to:now))&_a=(index:'logs-*',query:(language:kuery,query:'status:500'))
-
-# Dev Tools 직접 이동
-/app/dev_tools#/console
-
-# Stack Management → Data Views
-/app/management/kibana/dataViews
 
 # 대시보드 임베드
 /app/dashboards#/view/<DASHBOARD_ID>?embed=true&_g=(time:(from:now-1h,to:now))
 ```
 
-> `_g`는 globally shared state (시간/refresh), `_a`는 app state (쿼리/필터/컬럼).
+> `_g`는 globally shared state (시간/refresh), `_a`는 app state (쿼리/필터/컬럼). 링크 공유 시 `_g`만 넘기면 상대는 같은 시간창으로, `_a`까지 넘기면 쿼리/컬럼까지 재현된다.
 
 ## 운영 진단 빠른 경로
 
