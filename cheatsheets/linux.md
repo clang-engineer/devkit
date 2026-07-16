@@ -48,9 +48,6 @@
 | 경로 | 설명 |
 |------|------|
 | `/etc/opt` | `/opt` 패키지 설정 |
-| `/etc/sgml` | SGML 관련 설정 |
-| `/etc/X11` | X 윈도우 시스템 설정 |
-| `/etc/xml` | XML 관련 설정 |
 | `/etc/systemd` | systemd 설정 |
 
 ### `/usr` 하위
@@ -58,13 +55,9 @@
 | 경로 | 설명 |
 |------|------|
 | `/usr/bin` | 비필수 실행 파일 |
-| `/usr/include` | C/C++ 헤더 |
 | `/usr/lib` | `/usr/bin`, `/usr/sbin`용 라이브러리 |
-| `/usr/libexec` | 다른 프로그램이 실행하는 바이너리 |
 | `/usr/local` | 호스트 특화 프로그램 |
 | `/usr/sbin` | 비필수 시스템 바이너리 |
-| `/usr/share` | 아키텍처 독립 공유 데이터 |
-| `/usr/src` | 소스 코드 (커널 포함) |
 
 ### `/var` 하위
 
@@ -72,12 +65,8 @@
 |------|------|
 | `/var/cache` | 응용 프로그램 캐시 |
 | `/var/lib` | 응용 프로그램 영구 데이터 (DB 등) |
-| `/var/lock` | 리소스 사용 추적 파일 |
 | `/var/log` | 로그 파일 |
-| `/var/mail` | 사용자 메일박스 |
-| `/var/opt` | `/opt` 패키지 가변 데이터 |
 | `/var/run` | 부팅 이후 시스템 정보 (FHS 3.0에서 `/run`으로 대체) |
-| `/var/spool` | 인쇄/메일 대기열 |
 | `/var/tmp` | 재부팅 후에도 유지되는 임시 파일 |
 
 > [Filesystem Hierarchy Standard](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard)

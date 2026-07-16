@@ -20,26 +20,15 @@
 
 ```bash
 brew install fzf                # macOS
-scoop install fzf               # Windows
 ```
 
 ## 셸 통합 (가장 큰 가치)
-
-### Bash / Zsh
 
 `~/.zshrc` 또는 `~/.bashrc`:
 
 ```bash
 eval "$(fzf --zsh)"             # zsh
 eval "$(fzf --bash)"            # bash
-```
-
-### PowerShell (`$PROFILE`)
-
-```powershell
-Install-Module PSFzf -Scope CurrentUser
-Import-Module PSFzf
-Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 ```
 
 ## 셸 단축키 (통합 후)

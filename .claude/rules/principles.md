@@ -1,8 +1,8 @@
 # Engineering Principles
 
-프로젝트 어디서든 통하는 공통 원칙. 원본은 `dotfiles/scripts/claude-rules/principles.md`
-한 곳이며, `sync.sh`가 각 repo의 `.claude/rules/`로 배포한다. **이 파일을 직접 고치지 말고
-원본을 고친 뒤 sync 할 것.**
+프로젝트 어디서든 통하는 공통 원칙. 원본은 `secrets/claude/principles.md` 한 곳이며,
+`sync.sh`가 각 repo의 `.claude/rules/`로 배포한다. **이 파일을 직접 고치지 말고 원본을
+고친 뒤 sync 할 것.**
 
 ## 최우선 원칙: 가독성
 - 코드는 작성하는 시간보다 읽는 시간이 압도적으로 길다. 모든 선택에서 가독성을 최우선으로 한다.

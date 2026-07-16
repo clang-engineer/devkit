@@ -137,11 +137,6 @@ hash -r       # 동치
 export EDITOR=nvim
 export PATH=$HOME/.local/bin:$PATH
 export LESS='-R'
-
-# 프롬프트 정보 표시 (vcs)
-autoload -Uz vcs_info
-precmd() { vcs_info }
-PROMPT='%~ ${vcs_info_msg_0_} $ '
 ```
 
 > 실전에서는 `starship` 같은 외부 프롬프트를 쓰는 게 표준. `eval "$(starship init zsh)"`.

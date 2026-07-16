@@ -74,7 +74,6 @@ docker tag <src> <dst>                     # 태그 추가
 docker history <image>                     # 레이어 별 크기/명령
 docker save <image> -o file.tar            # 이미지 → tar
 docker load -i file.tar                    # tar → 이미지
-docker commit <c> <image>                  # 컨테이너 → 이미지
 docker rmi [-f] <image>
 docker image prune       # dangling (태그 없는) 만 정리
 docker image prune -a    # 미참조 이미지까지 정리
@@ -146,4 +145,4 @@ docker run --rm -it -v $(pwd):/work -w /work alpine sh
 
 ## 폐쇄망(air-gapped) 이미지 이전
 
-인터넷 PC에서 `docker save <image> -o img.tar` → 파일 옮긴 뒤 폐쇄망에서 `docker load -i img.tar`. Engine 자체를 오프라인 설치할 땐 정적 바이너리 tar(`download.docker.com/linux/static/`) → 공식 [Docker — Binaries](https://docs.docker.com/engine/install/binaries/).
+인터넷 PC에서 이미지를 `docker save`로 tar 저장(문법은 [이미지](#이미지) 섹션) → 파일 옮긴 뒤 폐쇄망에서 `docker load`. Engine 자체를 오프라인 설치할 땐 정적 바이너리 tar(`download.docker.com/linux/static/`) → 공식 [Docker — Binaries](https://docs.docker.com/engine/install/binaries/).

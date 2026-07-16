@@ -70,11 +70,7 @@
 | **DRY / KISS / YAGNI / SOLID** | 코딩 원칙 약어. 컨텍스트 봐서. |
 | **postmortem** | 사후 분석 문서. 보통 장애 후. |
 | **RCA** | Root Cause Analysis — 근본 원인 분석. |
-| **EOD / EOW** | End Of Day / Week — "오늘/이번주 안에". |
-| **ETA** | Estimated Time of Arrival — 완료 예상. |
-| **FYI** | For Your Information — 참고용. |
 | **IIRC / AFAIK / TIL** | If I Recall / As Far As I Know / Today I Learned. |
-| **OOO / PTO** | Out Of Office / Paid Time Off — 부재중. |
 
 ## GitHub/GitLab 고유 기능 용어
 

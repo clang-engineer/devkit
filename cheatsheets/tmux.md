@@ -269,7 +269,8 @@ move-window -s 3 -t 1    # 윈도우를 특정 인덱스로 이동
 
 > `join-pane -t 1`처럼 `-t`만 쓰면 source가 암묵적으로 잡혀서 의도와 다르게 동작할 수 있음. 보통 `-s`를 명시.
 
-> **"pane 병합"의 실체**: pane은 각각 독립된 셸/PTY라 **두 pane을 하나의 pane으로 융합하는 건 불가능**. "병합"은 곧 `join-pane`으로 **한 번에 하나씩 이동**시켜 한 윈도우에 모으는 것. 분할된 윈도우(pane 2개)를 통째로 옮기려면 명령을 **반복**해야 함(`-s 2` → `-s 2` …). source 윈도우의 pane이 다 빠지면 그 윈도우는 자동으로 닫힘. 단순히 분할을 없애려는 거면 병합이 아니라 `Prefix x`로 한쪽 pane을 닫는 것.
+> pane은 독립 셸/PTY라 두 pane 융합은 불가 — "병합"은 `join-pane`으로 하나씩 모으는 것.
+> 원리 상세: blog "tmux엔 왜 pane '병합(merge)'이 없을까 — pane은 살아있는 프로세스다".
 
 ### 세션 간 이동 예시
 
@@ -291,28 +292,14 @@ tmux move-window -t 0-default:
 
 ## 순정 기본값 검증 (config 지워도 되나?)
 
-"이 `bind`/`set` 줄이 tmux stock 기본값과 같아서 지워도 폴백되나?"를 판정할 때, **실행 중 서버에 물어보면 오염된 답**이 나온다. `source-file`은 파일에서 지운 바인딩을 running 서버에서 걷어내지 않아 유령이 남는다 → `list-keys`에 옛 커스텀이 섞여 오판.
-
-방탄은 **격리 소켓 + config 무효화 + 세션 유지를 단일 호출**로:
+"이 `bind`/`set` 줄이 tmux stock 기본값이라 지워도 폴백되나?" 판정은 격리 소켓 단일 호출로:
 
 ```sh
-# 순정 바인딩 조회 (별도 소켓 + 세션 유지로 자동 재기동 틈 차단)
 tmux -L iso_$$ -f /dev/null new-session -d \; list-keys -T copy-mode-vi \; kill-server
-
-# 순정 옵션값 조회
 tmux -L iso_$$ -f /dev/null new-session -d \; show -gv <option> \; kill-server
 ```
 
-| 조각 | 이유 |
-|------|------|
-| `-L iso_$$` | 기본 소켓의 running(오염) 서버와 격리. `$$`로 소켓명 충돌 회피 |
-| `-f /dev/null` | config 완전 무효화 → 순정 기본값만 남김 |
-| `new-session -d` | 세션을 만들어 서버 유지. 세션 없으면 후속 `list-keys`가 서버를 **자동 재기동하며 실 `~/.tmux.conf`를 로드**해 오염됨 |
-| `\; list-keys` | **같은 호출 안**에서 조회 → 방금 만든 순정 서버임이 보장 |
-
-> 함정: `-f /dev/null`을 앞 명령에만 붙이고 후속 조회엔 안 붙이면, 자동 재기동 때 실 config가 로드된다. 반드시 **단일 호출**로.
-
-> 두 키맵 diff 시: `list-keys` 출력을 `awk -v k="$key" '$1==k'`로 대조하면 **특수문자 키가 오판**된다. tmux가 `"`·`%`·`{`를 `\"`·`\%`로 이스케이프 출력하는데 awk `-v`가 그 이스케이프를 다시 처리해 매칭이 깨짐(알파벳 키는 멀쩡). 회피: `key<TAB>cmd` 파일 둘을 만들어 `join`으로 **리터럴 비교**.
+> 왜 단일 호출인지·running 서버 오염 함정·키맵 diff 시 awk `-v` 이스케이프 함정 상세: vault `flow-tmux-default-verify`.
 
 ## 기타
 
@@ -476,24 +463,9 @@ tmux_conf_preserve_stock_bindings=true
 
 ### 상태줄 색을 터미널 ANSI 팔레트에 위임
 
-tmux 상태줄 색 지정은 두 방식이고 이게 핵심 갈림:
+OMT 상태줄을 hex 절대색 대신 `colour0~15`(ANSI 팔레트 참조) 블록으로 스위치하면, 터미널 테마 한 줄이 tmux 상태줄까지 재테마.
 
-- **hex (`#ffff00`)** = 절대값. 터미널 테마가 바뀌어도 그 색 그대로.
-- **`colour0~15`** = 터미널의 16색 ANSI 팔레트 참조. 터미널 테마를 바꾸면 tmux 상태줄도 따라감.
-
-OMT는 hex 블록(활성) + ansi 블록(주석)을 **둘 다 스톡 제공**. ansi 블록으로 스위치하면 위임이 켜진다:
-
-```conf
-# .tmux.conf.local — hex 블록 주석 처리, ansi 블록 주석 해제
-tmux_conf_theme_colour_1="colour0"    # 터미널 배경색을 따름
-tmux_conf_theme_colour_4="colour14"   # 터미널 bright cyan
-tmux_conf_theme_colour_16="colour1"   # 터미널 red
-# ...colour_1~17 전부 colourN 참조
-```
-
-→ 터미널 테마 한 줄(예: Ghostty `theme = cyberdream`)이 tmux 상태줄까지 재테마.
-
-> catppuccin/tmux·dracula/tmux 같은 standalone 테마 플러그인은 OMT와 **같은 status 옵션을 덮어써** 레이아웃이 뭉개짐 → either/or. ansi 위임은 그리는 주체가 OMT 하나뿐이라 충돌 없음.
+> hex vs colourN 원리·standalone 테마 플러그인 충돌 상세: blog "Oh My Tmux! — 완성형 tmux config 배포판", vault `note-terminal-theme-ansi-delegation`.
 
 ## 훅 (hooks)
 
@@ -519,12 +491,6 @@ show-hooks -g <event>              # 그 이벤트 훅만 (인덱스 포함: eve
 | `client-attached` / `client-detached` | 클라이언트 attach/detach |
 
 **훅 안에서의 대상**: 이벤트가 난 윈도우/패널은 `#{hook_window}` / `#{hook_pane}`.
-`#{window_id}` / `#{pane_id}`는 훅 컨텍스트에선 "현재 클라이언트가 보는 것"으로 풀려 이벤트
-대상과 다를 수 있다.
+`#{window_id}` / `#{pane_id}`는 훅 컨텍스트에선 "현재 클라이언트가 보는 것"으로 풀려 이벤트 대상과 다를 수 있다.
 
-**내 훅만 안전하게 제거**(리로드 시 중복 방지). `-gu`는 통째로 지우므로, 남과 공유하는
-이벤트면 인덱스로 골라 제거:
-
-```bash
-tmux show-hooks -g <event> | awk '/내마커문자열/ { print $1 }' | xargs -rn1 tmux set-hook -gu
-```
+> `#{window_id}` 함정·`pane-exited`가 kill-pane를 안 잡는 함정·내 훅만 골라 제거하는 법 상세: blog "tmux 훅의 두 함정 — #{window_id}와 pane-exited가 안 잡는 kill-pane".
