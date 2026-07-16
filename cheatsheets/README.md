@@ -48,7 +48,7 @@
 | [systemd.md](systemd.md) | systemd 서비스 관리 + journalctl 로그 |
 | [nginx.md](nginx.md) | Nginx 설정/명령어 |
 | [openssl.md](openssl.md) | 인증서/암호화 |
-| [rocky-linux.md](rocky-linux.md) | Rocky Linux (firewalld, SELinux) |
+| [rocky-linux.md](rocky-linux.md) | Rocky Linux / RHEL 계열 (dnf, firewalld, SELinux) |
 
 ## macOS
 

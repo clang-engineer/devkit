@@ -37,7 +37,7 @@ groups:
       - {file: systemd.md, desc: "systemd 서비스 관리 + journalctl 로그"}
       - {file: nginx.md, desc: "Nginx 설정/명령어"}
       - {file: openssl.md, desc: "인증서/암호화"}
-      - {file: rocky-linux.md, desc: "Rocky Linux (firewalld, SELinux)"}
+      - {file: rocky-linux.md, desc: "Rocky Linux / RHEL 계열 (dnf, firewalld, SELinux)"}
 
   - title: macOS
     items:
