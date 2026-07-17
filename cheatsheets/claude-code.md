@@ -29,6 +29,37 @@
 - `/rewind` — 체크포인트로 대화·파일 복원 / `/context` — 컨텍스트에 뭐가 차 있는지 / `/fast` — 같은 모델 빠른 출력 토글
 - `claude -c` 마지막 대화 이어서 / `claude -p "..."` 비대화형 print 모드(스크립트·파이프) / `claude -r <session>` 특정 세션 복원
 
+## 내장 스킬 명령 (깊이 있는 것만)
+
+`/help`가 한 줄로만 요약해서 실물을 과소평가하기 쉬운 **Claude 제공 스킬**들. (`blog`·`notes`처럼 사용자가 만든 커스텀 스킬은 여기 대상 아님 — 그건 `~/.claude/commands/`에 사는 내 것.)
+
+### 코드 리뷰·품질 — 무엇을 찾느냐로 갈린다
+
+| 명령 | 찾는 것 | 대상 |
+|------|--------|------|
+| `/code-review [effort] [경로]` | **버그** + 재사용·단순화·효율 | 현재 워킹 diff (또는 경로) |
+| `/simplify` | 품질만 (재사용·단순화·효율·altitude) — **버그는 안 봄** | 변경된 코드 |
+| `/security-review` | 보안 취약점 | 현재 브랜치 pending 변경 |
+| `/review <PR#>` | 종합 리뷰 | **GitHub PR** (로컬 diff는 `/code-review`) |
+
+`/code-review` 상세 (헷갈리기 쉬운 레인):
+- **effort**: `low`/`medium`(적고 확신 높은 것만) → `high`/`max`(넓게, 불확실한 것도). 생략하면 기본값.
+- 기본은 **inline** — Claude가 이 대화 안에서 직접 훑어 findings 보고.
+- `--comment` findings를 PR 인라인 코멘트로 게시 / `--fix` 워킹트리에 바로 적용.
+- `/code-review ultra` — 클라우드 **대규모 멀티에이전트** 리뷰(현재 브랜치). `ultra <PR#>`로 GitHub PR. **과금·사용자 직접 트리거 전용**(Claude가 대신 못 켬). `/ultrareview`는 폐기된 별칭.
+
+### 실행·검증 — 테스트 말고 "진짜 앱을 돌려서"
+
+- `/run` — 이 프로젝트 앱을 띄워 변경이 실제로 도는지 확인. 프로젝트 스킬 우선, 없으면 타입별(CLI·서버·TUI·Electron 등) 폴백.
+- `/verify` — 변경이 의도대로 동작하는지 앱을 돌려 **행동으로** 검증. "PR 검증"·"fix 진짜 되나"·푸시 전 로컬 확인용.
+
+### 리서치·설정
+
+- `/deep-research <질문>` — fan-out 웹서치 → 소스 fetch → adversarial 검증 → 인용 리포트. 질문이 두루뭉술하면 먼저 2~3개 좁히는 질문을 던진다.
+- `/update-config` — `settings.json`/hooks 변경. **"앞으로 X할 때마다" 류 자동화는 memory가 아니라 hook**이라 이걸로 건다.
+- `/fewer-permission-prompts` — 트랜스크립트를 훑어 자주 뜨는 read-only 호출을 프로젝트 allowlist에 추가.
+- `/keybindings-help` — `~/.claude/keybindings.json` 커스터마이즈 (아래 키바인딩 섹션 참조).
+
 ## 설정 파일
 
 | 파일 | 위치 | 용도 |
