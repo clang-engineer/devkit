@@ -197,3 +197,30 @@ vim.o.exrc = true
 - 헬프 창 내부: `<C-]>` 태그 점프 / `<C-o>`·`<C-t>` 뒤로 / `:q` 닫기.
 - picker 지름길: `<leader>sh`(Help Pages), `<leader>sk`(Key Maps), `<leader>sm`(Man Pages).
 - `:Lazy`에서 플러그인 위 `<CR>` → 렌더된 README + help 태그 링크 (vimdoc 없는 플러그인 폴백).
+
+### VSCode 스니펫 추가 (blink.cmp 자동 로드)
+
+LazyVim 기본 보완 엔진은 [blink.cmp](https://github.com/Saghen/blink.cmp). 그 스니펫 소스가 시작 시 `~/.config/nvim/snippets/`를 **규약으로 자동 스캔**한다 — Lua 배선 0. VSCode 스니펫 포맷(`package.json` + 언어별 `.json`) 그대로 놓으면 끝.
+
+```
+~/.config/nvim/snippets/
+├── package.json    # 어떤 .json을 어떤 언어에 물릴지 등록
+└── cpp.json        # 언어별 스니펫 정의
+```
+
+```jsonc
+// package.json — contributes.snippets 배열에 언어별 파일 등록
+{ "contributes": { "snippets": [ { "language": "cpp", "path": "./cpp.json" } ] } }
+
+// cpp.json — "이름": { prefix, body, description }
+{ "for loop": {
+  "prefix": "fori",
+  "description": "인덱스 for",
+  "body": [ "for (int ${1:i} = 0; $1 < ${2:n}; $1++) {", "\t$0", "}" ]
+} }
+```
+
+- **body 문법**: `$1`,`$2` = Tab 정지점(같은 번호는 동시 편집) / `${1:default}` = 기본값 있는 placeholder / `$0` = 최종 커서 / `\t` = 리터럴 들여쓰기 탭.
+- **쓰는 법**: 해당 언어 파일에서 insert 모드로 `prefix` 입력 → blink 완성 메뉴에서 확정 → body 펼침, `Tab`으로 정지점 이동.
+- **반영**: 스니펫 캐시하므로 편집 후 **nvim 재시작**. 새 언어는 `<lang>.json` 추가 + `package.json`에 한 줄 등록.
+- blink의 스캔 경로는 `search_paths` 기본값이 `stdpath("config")/snippets` — 즉 위 규약은 blink stock 동작이지 LazyVim이 따로 얹은 게 아니다.
