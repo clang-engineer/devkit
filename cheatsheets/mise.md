@@ -63,6 +63,24 @@ run = "npm run build"
 
 → 글로벌은 기본값, 프로젝트 디렉토리에 파일을 두면 cd 하는 순간 그 디렉토리에서만 덮어쓴다 (`nvm use` 수동 호출 불필요).
 
+## Apple Silicon에서 레거시 x64 Node 설치
+
+Node 14처럼 공식 ARM64 바이너리가 없는 버전은 native ARM64 mise가 소스 빌드를 시도한다. Rosetta에서 쓸 별도 x64 mise를 설치하면 기존 x64 바이너리를 바로 받을 수 있다.
+
+```sh
+curl -fsSL https://mise.run \
+  | MISE_INSTALL_PATH="$HOME/.local/bin/mise-x64" MISE_INSTALL_ARCH=x64 sh
+
+# 현재 mise.toml/.mise.toml의 Node 버전을 x64로 설치
+"$HOME/.local/bin/mise-x64" install
+
+# 셸 PATH 갱신을 기다리지 않고 프로젝트 버전으로 실행
+mise exec -- node --version
+mise exec -- npm ci
+```
+
+ARM64 `mise` 바이너리를 `arch -x86_64 mise ...`로 감싸는 방식은 실행 파일 자체의 아키텍처가 달라 실패한다. 공식 권장 방식은 x64 mise를 별도로 두는 것이다.
+
 ## 함정
 
 - **activate 없으면 아무 일도 안 일어난다.** config는 데이터일 뿐. `eval "$(mise activate zsh)"`가 엔진.

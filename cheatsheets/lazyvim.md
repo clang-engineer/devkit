@@ -71,6 +71,18 @@
 | `gK` | n | 시그니처 도움말 |
 | `<C-o>` / `<C-i>` | n | 점프 목록 뒤로 / 앞으로 (`gd` 후 복귀) |
 
+### LSP 상태·재시작 (Neovim 0.12+)
+
+Neovim 0.12는 내장 `:lsp` 명령을 제공한다. 이때 `nvim-lspconfig`는 예전 alias인 `:LspInfo`를 등록하지 않으므로 다음 명령을 쓴다.
+
+```vim
+:checkhealth vim.lsp   " 활성 client, attached buffer, root directory 확인
+:lsp restart           " 현재 LSP client 재시작
+:lsp restart vue_ls    " 특정 client만 재시작
+```
+
+`attached`는 서버와 버퍼가 연결됐다는 뜻이다. `gd` 실패가 곧 attach 실패는 아니며, 동적으로 생성된 심볼은 연결이 정상이어도 정의가 없을 수 있다.
+
 ### 진단·hunk·todo 이동 (`]`/`[` 짝)
 
 | 키 | 설명 | 출처 |
