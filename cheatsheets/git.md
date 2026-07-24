@@ -177,6 +177,25 @@ git restore --source=HEAD~3 path/to/file.txt
 | `git submodule update --remote` | Submodule 업데이트 |
 | `git submodule foreach git pull` | 모든 submodule pull |
 
+## Worktree
+
+하나의 `.git`(히스토리·오브젝트)를 공유하면서 워킹 트리를 여러 폴더로 분리 — 세션마다 다른 브랜치를 물리적으로 격리해 작업. 규칙과 원리는 [[note-git-worktree-브랜치-격리-원리]] 참고.
+
+| 명령어 | 설명 |
+|--------|------|
+| `git worktree add ../dir -b <branch>` | 새 브랜치 만들며 새 워크트리 생성·체크아웃 |
+| `git worktree add ../dir -b <branch> <base>` | 특정 base(예: `origin/main`)에서 새 브랜치 생성 |
+| `git worktree add ../dir <branch>` | 기존 브랜치를 새 워크트리에 체크아웃 |
+| `git worktree add ../feat-x` | 경로만 주면 폴더명으로 브랜치 자동 생성 |
+| `git worktree add --detach ../dir <commit>` | 브랜치 없이 특정 커밋만 detached로 확인 |
+| `git worktree list` | 워크트리 목록 (경로·커밋·브랜치) |
+| `git worktree remove ../dir` | 워크트리 삭제 (미커밋 변경 있으면 거부, `--force`로 강제) |
+| `git worktree prune` | 폴더를 수동 삭제한 워크트리 등록정보 정리 |
+
+- 같은 브랜치는 동시에 한 워크트리에서만 체크아웃 가능 (안전장치).
+- 경로는 레포 바깥(`../`)에 두는 게 깔끔.
+- 워크트리를 지워도 브랜치는 남음 → `git branch -d <branch>` 별도.
+
 ## 설정
 
 | 명령어 | 설명 |

@@ -58,6 +58,39 @@ Copilot 유료 구독(Pro/Pro+/Business/Enterprise)으로 opencode 인증 가능
 - base 모델(Business에선 GPT-5.3-Codex)은 프리미엄 요청 안 씀. premium 모델(Opus·Gemini 등)은 배수만큼 소모.
   → 과금·라우팅 개념은 vault note `note-opencode-copilot-모델-라우팅` 참고.
 
+## MCP 서버
+
+**MCP(Model Context Protocol)** 는 모델과 외부 도구를 연결하는 프로토콜. 글로벌 config의 `mcp`에 local 또는 remote 서버를 등록한다.
+
+```jsonc
+{
+  "mcp": {
+    "local-server": {
+      "type": "local",
+      "command": ["{env:HOME}/.local/bin/my-mcp-server"],
+      "enabled": true
+    },
+    "remote-server": {
+      "type": "remote",
+      "url": "https://mcp.example.com/mcp",
+      "enabled": true
+    }
+  }
+}
+```
+
+| 명령 | 설명 |
+|------|------|
+| `opencode mcp list` | 서버별 연결 상태 확인 |
+| `opencode mcp auth <name>` | OAuth 인증 시작 |
+| `opencode mcp logout <name>` | 저장된 OAuth 인증 제거 |
+| `opencode mcp debug <name>` | 원격 연결·OAuth 진단 |
+
+- local `command`는 문자열이 아니라 배열이다.
+- 설정 문자열에서 `{env:VAR}`로 환경변수를 치환한다. `${VAR}` 형식이 아니다.
+- config는 시작할 때 한 번 읽으므로 변경 후 OpenCode를 재시작한다.
+
 ## 참고 링크
 - [opencode Providers 문서](https://opencode.ai/docs/providers/)
 - [opencode Models 문서](https://opencode.ai/docs/models/)
+- [opencode MCP servers 문서](https://opencode.ai/docs/mcp-servers/)
