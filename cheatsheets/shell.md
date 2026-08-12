@@ -341,6 +341,7 @@ cmd 2>&1 | tee app.log
 | `kill %n` | n번 job 종료 (`%` 없으면 PID — 주의) |
 | `disown %n` | 셸 종료 시 죽지 않게 detach |
 | `nohup cmd &` | hangup 무시 + 백그라운드 |
+| `nohup cmd </dev/null > log 2>&1 &` | tty 입력 분리(백그라운드 정지 방지) + 로그 분리 |
 | `wait` | 모든 백그라운드 job 종료 대기 |
 | `wait $!` | 직전 백그라운드 job 종료 대기 |
 
@@ -375,6 +376,26 @@ nohup ./run.sh > /tmp/job.log 2>&1 & tail -F /tmp/job.log
 ### 함정: `sudo cmd &`
 
 `sudo`를 백그라운드로 보내면 비밀번호 프롬프트가 tty에 못 닿아 `suspended (tty output)`(SIGTTOU)으로 멈춘다. 대부분의 dev 서버는 1024 미만 포트를 안 써 sudo 자체가 불필요.
+
+### `nohup` + 백그라운드 정지(Suspended) 회피
+
+`nohup`이 `SIGHUP`은 막아도, `stdin`이 터미널에 남아 있으면 백그라운드에서 터미널 읽기/출력 시도 시 `SIGTTIN`/`SIGTTOU`로 멈출 수 있다.
+
+```sh
+nohup npm run dev -- --host 0.0.0.0 --port 9000 \
+  </dev/null \
+  >/tmp/rexnova-dev.log 2>&1 &
+tail -f /tmp/rexnova-dev.log
+```
+
+실행 점검:
+
+```sh
+ps -o pid,state,command | rg "npm run dev|node .*vite"
+lsof -nP -iTCP:9000 -sTCP:LISTEN
+```
+
+상태가 `T`면 정지된 상태이므로 `SIGCONT`/재시작 또는 재기동이 필요하다.
 
 ## trap — 종료 시 정리
 

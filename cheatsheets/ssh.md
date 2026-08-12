@@ -114,6 +114,25 @@ git remote set-url origin git@github.com-personal:user/repo.git
 git clone git@github.com-personal:user/repo.git
 ```
 
+### 간접 Git 의존성에서 계정 별칭 강제
+
+`npm install` 같은 도구가 private Git 의존성을 `ssh://git@github.com/example-org/package.git`으로 clone하면 기본 `github.com` 계정이 선택된다. 원본 저장소의 local config는 도구가 임시 디렉터리에서 실행한 clone에 적용되지 않는다.
+
+```sh
+# 일회성: npm의 Git 하위 프로세스에만 URL rewrite 전달
+GIT_CONFIG_COUNT=1 \
+GIT_CONFIG_KEY_0='url.ssh://git@github.com-work/example-org/.insteadOf' \
+GIT_CONFIG_VALUE_0='ssh://git@github.com/example-org/' \
+npm install
+
+# 영구: 해당 조직 URL만 업무 계정 별칭으로 rewrite
+git config --global \
+  url."ssh://git@github.com-work/example-org/".insteadOf \
+  "ssh://git@github.com/example-org/"
+```
+
+`insteadOf`는 문자 그대로 "대신에"라는 뜻으로, 뒤 URL로 시작하는 Git 주소를 앞 URL로 바꾼다. 계정 혼선을 막으려면 `github.com` 전체가 아니라 조직 경로까지 좁힌다.
+
 ## 포트 포워딩 (터널링)
 
 | 옵션 | 의미 | 예 |

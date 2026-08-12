@@ -218,7 +218,8 @@ move-window -s 3 -t 1    # 윈도우를 특정 인덱스로 이동
 |--------|------|
 | `Prefix !` | 현재 패널을 별도 윈도우로 분리 (`break-pane`) |
 | `join-pane -s <src> -t <dst>` | 패널을 다른 윈도우로 합치기 |
-| `move-window -t <session>:` | 현재 윈도우를 다른 세션으로 이동 |
+| `move-window -t <session>:` | 현재 윈도우를 다른 세션의 빈 슬롯으로 이동 |
+| `move-window -s <src> -t <target>` | 특정 창을 특정 세션/위치로 이동 |
 
 ### 타겟 형식 (`-s`, `-t` 공통)
 
@@ -283,6 +284,9 @@ tmux join-pane -s 0-default:1 -t 1-workspace:1 -h
 
 # 현재 윈도우를 다른 세션으로 통째로 이동
 tmux move-window -t 0-default:
+
+# 특정 창을 세션의 지정 위치로 이동
+tmux move-window -s 2 -t 1-workspace:1
 
 # 커스텀 바인딩: Prefix M으로 세션 간 윈도우 이동
 # bind-key M command-prompt -p "move to session:" "move-window -t '%%:'"
