@@ -74,6 +74,7 @@ ghostty +list-keybinds     # 현재 유효 키맵 전부 (커스텀 반영)
 ghostty +list-actions      # 바인딩 가능한 액션 목록
 ghostty +show-config       # 병합된 설정 덤프
 ghostty +list-themes       # 테마 목록 ((resources)=내장 / (user)=커스텀)
+ghostty +list-keybinds --plain | rg -n "alt\\+arrow_left|alt\\+arrow_right"
 ```
 
 > 설정 파일: `~/.config/ghostty/config`. `keybind = super+d=new_split:right` 형식으로 재정의, `keybind = super+d=unbind`로 해제.
@@ -94,6 +95,16 @@ ghostty +show-config | grep <key>   # 병합된 실효값 (어느 파일이 이�
 > `+show-config`는 실행 중인 창의 라이브 상태가 아니라 **디스크 config를 다시 파싱**해 보여준다. 파일이 유효한데도 화면이 그대로면 원인은 파일이 아니라 리로드(창이 옛 설정 사용 중).
 
 > 함정: 한 파일을 고쳤는데 안 먹으면 다른 파일이 같은 키를 덮고 있을 수 있다. 실설정은 한 곳(XDG)으로 통합하는 게 안전.
+
+### 키바인드 충돌 체크
+
+```sh
+ghostty +show-config | rg -n "macos-option-as-alt|theme"
+ghostty +list-keybinds --plain | rg -n "alt\\+arrow_left|alt\\+arrow_right"
+```
+
+- `alt+arrow_left=esc:b`, `alt+arrow_right=esc:f`가 보이면 Option+화살표 단어 이동이 유효.
+- 안 보이면 `~/Library/Application Support/com.mitchellh.ghostty/config` 경로의 충돌 라인을 우선 점검.
 
 **`macos-option-as-alt`** — 기본 꺼짐이라 Option 키가 Alt로 안 가고 macOS 특수문자(´, ¬…)를 낸다. tmux `M-` 바인딩이나 셸 단어 이동(`Alt-b`/`f`/`d`)을 쓰려면 켜야 한다:
 
