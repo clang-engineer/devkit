@@ -132,6 +132,8 @@ remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` �
 | `y` | 커밋 정보 복사 |
 | `Ctrl+S` | 로그 필터 모드 |
 
+> `g` reset은 현재 체크아웃된 브랜치 포인터를 선택 커밋으로 옮긴다. hard 모드를 고르면 미커밋 변경도 제거되므로 실행 전 대상 브랜치와 `git status`를 확인한다. 실수했다면 `git reflog show <branch>`에서 reset 직전 SHA를 찾아 복구한다.
+
 ### Stash 패널
 
 | 키 | 동작 |

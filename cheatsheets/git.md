@@ -76,6 +76,7 @@
 | `git reset --hard HEAD~1` | 커밋 취소 (변경사항 삭제) |
 | `git revert <commit>` | 특정 커밋 되돌리기 (revert 커밋 생성) |
 | `git reflog` | HEAD 이동 기록 — **잃었다고 생각한 커밋 찾는 마지막 수단** |
+| `git reflog show <branch>` | 특정 브랜치의 commit·reset 등 포인터 이동 기록 |
 | `git checkout <reflog-sha>` | reflog에서 본 SHA로 가서 브랜치 다시 만들기 |
 
 ### 위급 복구 시나리오
@@ -87,11 +88,15 @@ git reflog                            # HEAD가 어디 갔는지 시간 역순
 git branch recovered a1b2c3d         # 브랜치로 보존
 git reset --hard recovered           # 또는 현재 브랜치를 거기로
 
-# 2. 브랜치 삭제했는데 복구
+# 2. 브랜치를 실수로 다른 브랜치/커밋에 reset
+git reflog show <branch>              # reset 직전 SHA 확인
+git reset --hard <reset-직전-sha>     # 현재 브랜치 포인터 복구 (작업 트리가 깨끗할 때)
+
+# 3. 브랜치 삭제했는데 복구
 git reflog --all                      # 모든 ref의 reflog
 git checkout -b restored <sha>
 
-# 3. 특정 파일만 N커밋 전 상태로
+# 4. 특정 파일만 N커밋 전 상태로
 git restore --source=HEAD~3 path/to/file.txt
 ```
 
