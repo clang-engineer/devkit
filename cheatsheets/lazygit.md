@@ -16,6 +16,7 @@
 | 멀티라인 (에디터) | `C` (대문자) |
 | amend | `A` |
 | 브랜치 만들기 | `Branches`에서 `n` |
+| 전체 브랜치 관계 보기 | `Status`에서 `a` (`A`는 역순) |
 | 인터랙티브 리베이스 | `Commits`에서 베이스 위에 `e` |
 | squash / fixup / drop / reword | `s` / `f` / `d` / `r` |
 | stash 적용 | `Stash`에서 `Space` |
@@ -166,6 +167,22 @@ remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` �
 
 `C` (대문자) → `$EDITOR`(=nvim) 열림 → 정상 커밋 작성.
 
+### 5. 브랜치 관계 / 병합 여부 진단
+
+| 목적 | 방법 | 해석 |
+|------|------|------|
+| 전체 관계 확인 | Status에서 `a` (`A`는 역순) | 모든 브랜치의 분기·병합 지점을 그래프로 표시 |
+| upstream 관계 | Branches의 `✓`, `↑N`, `↓N` | 해당 브랜치와 원격 upstream의 동기화 상태 |
+| main보다 뒤처진 정도 | `showDivergenceFromBaseBranch: arrowAndNumber` | 가장 가까운 main branch 대비 `↓N` 표시 |
+| 특정 브랜치 로그 | Branches에서 `/` 검색 → `Enter` | 선택한 브랜치의 커밋 표시 |
+| GitHub PR 상태 | Branches의 PR 아이콘 | 보라색은 merged (`gh auth login` 필요) |
+
+커밋 색상은 green = `git.mainBranches` 중 하나에 포함, yellow = 미포함이지만 upstream에 push됨,
+red = 미포함이고 아직 push되지 않음을 뜻한다.
+
+> 커밋 색상과 그래프는 커밋 조상 관계를 보여준다. 따라서 regular merge와 fast-forward는 판별할 수 있지만,
+> 원래 커밋 SHA를 보존하지 않는 squash/rebase merge의 완료 여부는 PR 상태 등으로 확인해야 한다.
+
 ## 설정 (`~/.config/lazygit/config.yml`)
 
 ```yaml
@@ -175,11 +192,16 @@ gui:
   nerdFontsVersion: "3"
   theme:
     activeBorderColor: [cyan, bold]
+  # 브랜치 패널에 가장 가까운 main branch 대비 behind 숫자 표시
+  showDivergenceFromBaseBranch: arrowAndNumber
 git:
   paging:
     colorArg: always
     pager: delta --dark --paging=never
 ```
+
+기본 `git.mainBranches`는 `[master, main]`이다. 프로젝트의 실제 main branch가 다를 때만 변경한다.
+시작 화면을 대시보드 대신 전체 브랜치 그래프로 바꾸려면 `gui.statusPanelView: allBranchesLog`를 추가한다.
 
 LazyVim 통합 설정은 `dotfiles/nvim/lazy/lua/plugins/lazygit.lua` 참고
 (Windows에서 nvim-remote editPreset 비활성화 처리).
