@@ -298,6 +298,85 @@ lazydocker는 lazygit과 비슷한 방식으로 Docker/Compose 리소스를 터�
 Docker GUI가 충분하면 필수는 아니다. tmux 안에서 Docker 작업까지 키보드로
 처리하고 싶을 때 가치가 커진다.
 
+## 추가로 볼 만한 TUI 도구
+
+`lazy*`라는 이름이 붙었다고 같은 프로젝트 계열은 아니다. 공통점은 복잡한 CLI
+작업을 키보드 중심 TUI로 묶어 주는 경우가 많다는 점이다. 아래 도구들은 같은
+맥락에서 추가 후보로 볼 만하다.
+
+### lazyjournal — logs
+
+systemd journal, 파일 로그, Docker/Podman/Compose/Kubernetes 로그를 TUI에서
+탐색하고 필터링하는 도구다. `journalctl`, `docker logs`, `grep`을 오가며 보는
+작업이 많을수록 가치가 커진다.
+
+```text
+Logs -> lazyjournal
+```
+
+서버 운영이나 장애 대응이 잦다면 lazydocker보다 더 자주 쓰게 될 수도 있다.
+
+### k9s — Kubernetes
+
+이름에 `lazy`는 없지만 Kubernetes 영역에서는 lazydocker와 가장 비슷한 포지션의
+대표 TUI다. pod, deployment, service 등 리소스를 탐색하고 logs, exec, describe,
+delete 같은 작업을 키보드 중심으로 처리한다.
+
+```text
+Docker      -> lazydocker
+Kubernetes  -> k9s
+```
+
+Kubernetes를 실제로 자주 다루지 않는다면 선제 설치할 필요는 없다.
+
+### rainfrog — database
+
+터미널에서 DB를 탐색하고 SQL을 실행하는 TUI다. database/table/schema를 보면서
+쿼리할 수 있어 GUI DB client와 raw `psql`/`mysql` 사이에 있는 느낌이다.
+
+```text
+Database -> rainfrog
+```
+
+Neovim의 dadbod workflow가 편하면 겹칠 수 있으므로, DB 작업을 editor 밖에서도
+자주 하는지가 도입 기준이다.
+
+### btop — process/system monitor
+
+CPU, memory, disk, network, process를 한 화면에서 보는 시스템 모니터다. `top`,
+`htop`, `ps`를 더 시각적으로 묶은 TUI에 가깝다.
+
+```text
+Processes / system metrics -> btop
+```
+
+운영 서버에 들어가 상태를 빠르게 훑는 용도로 유용하다.
+
+### gh-dash — GitHub dashboard
+
+GitHub PR과 issue를 터미널에서 대시보드처럼 보는 TUI다. 브라우저를 열지 않고
+review 대기 PR, 내 PR, issue 등을 빠르게 훑을 수 있다.
+
+```text
+Local Git -> lazygit
+GitHub    -> gh-dash
+```
+
+Git 자체는 lazygit, 원격 협업 상태는 gh-dash로 역할을 분리할 수 있다.
+
+### Posting / ATAC — HTTP client
+
+REST API를 터미널에서 호출하고 request/response를 인터랙티브하게 다루는 TUI
+계열이다. `curl`을 완전히 대체하기보다는 Postman/Insomnia 같은 GUI를 터미널에
+가깝게 가져오는 역할이다.
+
+```text
+Quick scripting / automation -> curl
+Interactive API exploration  -> Posting or ATAC
+```
+
+API 테스트를 자주 한다면 후보가 된다.
+
 ## hyperfine — CLI benchmark
 
 hyperfine은 command 실행 시간을 여러 번 측정해서 평균과 편차를 비교한다.
@@ -320,7 +399,13 @@ Filesystem browse/manage      -> Yazi
 Search while editing          -> Neovim/LazyVim picker
 Arbitrary list selection      -> fzf
 Git UI                        -> lazygit
+GitHub dashboard              -> gh-dash
 Docker TUI                    -> lazydocker
+Kubernetes TUI                -> k9s
+Logs                          -> lazyjournal
+Database TUI                  -> rainfrog
+System/process monitor        -> btop
+Interactive HTTP client       -> Posting / ATAC
 File-change automation        -> watchexec
 Test UI inside Neovim         -> Neotest
 Shell quality checks          -> ShellCheck + shfmt + prek + typos
