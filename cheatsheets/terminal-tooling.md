@@ -154,6 +154,35 @@ zoxide -> 목적지를 알고 있을 때 빠르게 점프
 Yazi   -> 구조를 보면서 목적지를 찾고 파일을 관리
 ```
 
+### Yazi 이후의 작업은 전용 도구로 넘긴다
+
+Yazi의 책임은 **탐색·이동·파일 관리까지**로 두는 것이 단순하다. 편집기나 Git
+UI 역할까지 Yazi 안에 겹쳐 넣을 필요는 없다.
+
+```text
+Known destination       -> zoxide (`z`)
+Unknown destination     -> Yazi (`y`)
+After navigation        -> `nvim .`
+Git operations          -> lazygit
+```
+
+예를 들어 Git repository의 깊은 하위 디렉터리를 Yazi로 찾았다면 cwd handoff로
+그 위치에서 shell을 이어가고, 편집이 필요할 때 `nvim .`으로 넘어간다.
+
+```text
+y
+-> repo/backend/src/main 탐색
+-> Yazi 종료 + shell cwd handoff
+-> nvim .
+-> 편집은 Neovim
+-> Git 작업은 lazygit
+```
+
+이 workflow에서는 Neovim/LazyVim과 lazygit이 현재 디렉터리가 Git repository
+내부라면 repository root를 자연스럽게 인식하는 것이 이상적이다. Yazi가 Git
+project root까지 책임지고 이동시키는 것보다 각 개발 도구가 자신의 project
+context를 찾게 하는 편이 역할 분리가 명확하다.
+
 ## fzf — 범용 fuzzy picker
 
 fzf는 file finder 자체가 아니라 **목록에서 항목을 fuzzy search로 선택하는
@@ -362,20 +391,21 @@ Local Git -> lazygit
 GitHub    -> gh-dash
 ```
 
-Git 자체는 lazygit, 원격 협업 상태는 gh-dash로 역할을 분리할 수 있다.
+Git 자체의 commit/branch/rebase 작업은 lazygit, GitHub 원격 협업 상태는 gh-dash로
+나누면 역할이 겹치지 않는다. PR/issue를 자주 보지 않는다면 `gh` CLI만으로도
+충분하다.
 
-### Posting / ATAC — HTTP client
+### Posting / ATAC — HTTP API
 
-REST API를 터미널에서 호출하고 request/response를 인터랙티브하게 다루는 TUI
-계열이다. `curl`을 완전히 대체하기보다는 Postman/Insomnia 같은 GUI를 터미널에
-가깝게 가져오는 역할이다.
+Postman 같은 HTTP client를 터미널에서 쓰고 싶을 때 보는 TUI 계열이다. request,
+headers, body, response를 한 화면에서 다룬다.
 
 ```text
-Quick scripting / automation -> curl
-Interactive API exploration  -> Posting or ATAC
+HTTP API -> Posting or ATAC
 ```
 
-API 테스트를 자주 한다면 후보가 된다.
+둘을 동시에 둘 필요는 없다. curl/httpie 또는 editor의 REST client가 충분하다면
+추가하지 않고, terminal-first API testing이 반복될 때 하나를 선택한다.
 
 ## hyperfine — CLI benchmark
 
@@ -399,13 +429,13 @@ Filesystem browse/manage      -> Yazi
 Search while editing          -> Neovim/LazyVim picker
 Arbitrary list selection      -> fzf
 Git UI                        -> lazygit
-GitHub dashboard              -> gh-dash
 Docker TUI                    -> lazydocker
-Kubernetes TUI                -> k9s
 Logs                          -> lazyjournal
-Database TUI                  -> rainfrog
-System/process monitor        -> btop
-Interactive HTTP client       -> Posting / ATAC
+Kubernetes                    -> k9s
+Database                      -> rainfrog
+Processes/system metrics      -> btop
+GitHub PR/issues              -> gh-dash
+HTTP API                      -> Posting or ATAC
 File-change automation        -> watchexec
 Test UI inside Neovim         -> Neotest
 Shell quality checks          -> ShellCheck + shfmt + prek + typos
