@@ -133,6 +133,19 @@ Finder 같은 탐색을 키보드 중심 TUI로 수행한다.
 
 Vim 스타일의 `h/j/k/l` 이동에 익숙하면 진입 장벽이 낮다.
 
+기본 사용법은 이것만 기억하면 충분하다.
+
+```text
+y         실행 + 종료 시 shell cwd handoff
+h/j/k/l   이동
+Space     선택
+.         숨김 파일 표시 전환
+~         built-in Help
+```
+
+키가 기억나지 않으면 `~` Help를 사용한다. 전체 upstream keymap은 custom
+cheat sheet에 복제하지 않는다.
+
 특히 shell directory handoff를 사용하면 다음 흐름이 가능하다.
 
 ```text
@@ -152,6 +165,7 @@ Yazi 종료
 ```text
 zoxide -> 목적지를 알고 있을 때 빠르게 점프
 Yazi   -> 구조를 보면서 목적지를 찾고 파일을 관리
+fzf    -> 목록에서 항목 하나를 선택
 ```
 
 ### Yazi 이후의 작업은 전용 도구로 넘긴다
