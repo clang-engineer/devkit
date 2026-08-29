@@ -2,7 +2,7 @@
 
 Curated dev cheatsheets and templates I keep handy while working.
 
-**36 cheatsheets** across 11 categories · **5 templates** — only the generic,
+**37 cheatsheets** across 12 categories · **5 templates** — only the generic,
 reusable pieces, no machine- or project-specific config.
 
 ## Cheatsheets
@@ -27,6 +27,8 @@ Quick command/syntax references. Full index with descriptions:
 **Containers & build** · [kubectl](cheatsheets/kubectl.md) · [docker](cheatsheets/docker.md) · [make](cheatsheets/make.md)
 
 **Git & version control** · [git](cheatsheets/git.md) · [gh](cheatsheets/gh.md)
+
+**Config formats** · [toml](cheatsheets/toml.md)
 
 **Dev tools** · [curl](cheatsheets/curl.md) · [claude-code](cheatsheets/claude-code.md)
 
