@@ -84,6 +84,12 @@
 | [code-review-glossary.md](code-review-glossary.md) | 리뷰 약어/용어 (LGTM, PTAL, nit:, Draft PR 등) |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿) |
 
+## 설정 파일 형식
+
+| 파일 | 설명 |
+|------|------|
+| [toml.md](toml.md) | TOML 문법 — 값, 배열, 테이블 `[ ]`, 테이블 배열 `[[ ]]` |
+
 > `delta`(git diff 페이저)는 [modern-cli.md](modern-cli.md)에 통합.
 
 ## 개발 도구
