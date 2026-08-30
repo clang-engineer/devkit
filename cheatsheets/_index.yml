@@ -47,6 +47,7 @@ groups:
 
   - title: 데이터
     items:
+      - {file: harlequin.md, desc: "Harlequin 기본 사용법 (`--config-path`, `--profile`)"}
       - {file: sql-snippets.md, desc: "PostgreSQL 운영 패턴 (`information_schema` ALTER 자동 생성 등)"}
       - {file: vertica.md, desc: "Vertica — 계정 만료 해제(chage) + v_catalog/v_monitor 용량·이력 조회"}
       - {file: elasticsearch.md, desc: "Elasticsearch 쿼리/관리"}

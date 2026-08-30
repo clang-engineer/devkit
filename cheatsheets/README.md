@@ -62,6 +62,7 @@
 
 | 파일 | 설명 |
 |------|------|
+| [harlequin.md](harlequin.md) | Harlequin 기본 사용법 (`--config-path`/`--profile`) |
 | [sql-snippets.md](sql-snippets.md) | PostgreSQL 운영 패턴 (`information_schema` ALTER 자동 생성 등) |
 | [vertica.md](vertica.md) | Vertica — 계정 만료 해제(chage) + v_catalog/v_monitor 용량·이력 조회 |
 | [elasticsearch.md](elasticsearch.md) | Elasticsearch 쿼리/관리 |
