@@ -109,6 +109,7 @@
 | [terminal-tooling.md](terminal-tooling.md) | 터미널 도구 역할 분담과 선택 가이드 |
 | [mise.md](mise.md) | mise — 다언어 런타임 버전 관리 (rbenv/jenv/pyenv/nvm 통합, config+activate) |
 | [curl.md](curl.md) | curl HTTP 요청 |
+| [taskwarrior.md](taskwarrior.md) | Taskwarrior 3.5 — 태스크 관리, 필터, 날짜, JSON export, TaskChampion 동기화 |
 | [python-pypi-publishing.md](python-pypi-publishing.md) | Python PyPI Trusted Publishing — uv 빌드, GitHub OIDC 배포, 검증·문제 해결 |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
 | [ccusage.md](ccusage.md) | ccusage 사용량 집계와 임계치 경보 |

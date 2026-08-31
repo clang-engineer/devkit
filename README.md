@@ -2,7 +2,7 @@
 
 Curated dev cheatsheets and templates I keep handy while working.
 
-**47 cheatsheets** across 11 categories · **5 templates** — only the generic,
+**48 cheatsheets** across 11 categories · **5 templates** — only the generic,
 reusable pieces, no machine- or project-specific config.
 
 ## Cheatsheets
@@ -30,7 +30,7 @@ Tool introductions and operational references. Full index with descriptions:
 
 **Config formats** · [toml](cheatsheets/toml.md)
 
-**Dev tools** · [terminal tooling](cheatsheets/terminal-tooling.md) · [mise](cheatsheets/mise.md) · [curl](cheatsheets/curl.md) · [Python PyPI publishing](cheatsheets/python-pypi-publishing.md) · [claude-code](cheatsheets/claude-code.md) · [ccusage](cheatsheets/ccusage.md) · [opencode](cheatsheets/opencode.md) · [gdb](cheatsheets/gdb.md)
+**Dev tools** · [terminal tooling](cheatsheets/terminal-tooling.md) · [mise](cheatsheets/mise.md) · [curl](cheatsheets/curl.md) · [taskwarrior](cheatsheets/taskwarrior.md) · [Python PyPI publishing](cheatsheets/python-pypi-publishing.md) · [claude-code](cheatsheets/claude-code.md) · [ccusage](cheatsheets/ccusage.md) · [opencode](cheatsheets/opencode.md) · [gdb](cheatsheets/gdb.md)
 
 ## Templates
 
