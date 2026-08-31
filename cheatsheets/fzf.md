@@ -16,6 +16,29 @@
 | 미리보기 패널 | `fzf --preview 'bat --color=always {}'` |
 | 화면 안 종료 | `Esc` |
 
+## 핵심 모델
+
+```text
+후보 목록(stdin) → 검색 가능한 TUI → 선택한 줄(stdout)
+```
+
+`fzf`는 후보가 파일인지 브랜치인지 해석하지 않는다. 후보를 만드는 producer와 선택
+결과를 사용하는 consumer 사이에서 범용 선택기 역할만 한다. `fd`는 파일시스템
+조건으로 후보를 만들고, `fzf`는 받은 후보에서 사용자가 대화형으로 선택한다.
+
+```bash
+git branch | fzf                       # 브랜치 후보 → 선택
+fd --type f --extension sql | fzf      # fd가 파일 후보 생성, fzf가 선택
+```
+
+현대 `fzf`를 입력 없이 실행하면 자체 walker가 현재 디렉터리부터 하위를 재귀 탐색해
+파일 후보를 만든다. 시스템 전체 검색은 아니며 시작 위치는 `--walker-root`로 바꾼다.
+
+```bash
+fzf                                    # 현재 디렉터리 아래 파일 선택
+fzf --walker-root ~/projects           # 탐색 시작 위치 지정
+```
+
 ## 설치
 
 ```bash

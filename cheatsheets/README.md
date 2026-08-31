@@ -2,6 +2,15 @@
 
 자주 쓰지만 매번 검색하게 되는 명령어/문법 모음.
 
+## 콘텐츠 소유권
+
+도구의 일반적인 소개, 설치, 설정, 명령, 옵션, 사용 예와 문제 해결은 이
+디렉터리의 도구별 문서를 원본으로 관리한다.
+
+블로그는 도구의 선택 이유, 비교, 적용 경험과 workflow를 중심으로 작성한다. 글을
+독립적으로 이해하는 데 필요한 짧은 소개와 대표 명령은 포함할 수 있지만, 전체
+사용법을 중복 관리하지 않고 해당 cheatsheet를 연결한다.
+
 ## 에디터 & TUI
 
 | 파일 | 설명 |
@@ -62,7 +71,7 @@
 
 | 파일 | 설명 |
 |------|------|
-| [harlequin.md](harlequin.md) | Harlequin 기본 사용법 (`--config-path`/`--profile`) |
+| [harlequin.md](harlequin.md) | Harlequin 기본 사용법 (`--config-path`, `--profile`) |
 | [sql-snippets.md](sql-snippets.md) | PostgreSQL 운영 패턴 (`information_schema` ALTER 자동 생성 등) |
 | [vertica.md](vertica.md) | Vertica — 계정 만료 해제(chage) + v_catalog/v_monitor 용량·이력 조회 |
 | [elasticsearch.md](elasticsearch.md) | Elasticsearch 쿼리/관리 |
@@ -97,8 +106,10 @@
 
 | 파일 | 설명 |
 |------|------|
+| [terminal-tooling.md](terminal-tooling.md) | 터미널 도구 역할 분담과 선택 가이드 |
 | [mise.md](mise.md) | mise — 다언어 런타임 버전 관리 (rbenv/jenv/pyenv/nvm 통합, config+activate) |
 | [curl.md](curl.md) | curl HTTP 요청 |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
+| [ccusage.md](ccusage.md) | ccusage 사용량 집계와 임계치 경보 |
 | [opencode.md](opencode.md) | opencode — provider-agnostic 터미널 AI 코딩 에이전트 (인증·모델 선택) |
 | [gdb.md](gdb.md) | GDB — GNU 디버거 (중단점·스택·변수·메모리 조사) |
