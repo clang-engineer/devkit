@@ -7,7 +7,6 @@ groups:
       - {file: lazyvim.md, desc: LazyVim 키맵}
       - {file: lazygit.md, desc: LazyGit TUI 단축키}
       - {file: tmux.md, desc: Tmux 세션/윈도우/패널}
-      - {file: smug.md, desc: "smug — 선언형 YAML로 tmux 세션 부팅"}
       - {file: ghostty.md, desc: Ghostty 터미널 탭/분할/키맵}
       - {file: yazi.md, desc: "Yazi — Rust 기반 터미널 파일 매니저 (키맵·검색·경로 복사)"}
 
@@ -38,7 +37,6 @@ groups:
       - {file: systemd.md, desc: "systemd 서비스 관리 + journalctl 로그"}
       - {file: nginx.md, desc: "Nginx 설정/명령어"}
       - {file: openssl.md, desc: "인증서/암호화"}
-      - {file: rocky-linux.md, desc: "Rocky Linux / RHEL 계열 (dnf, firewalld, SELinux)"}
 
   - title: macOS
     items:

@@ -140,6 +140,59 @@ htop                                   # 향상 버전
 
 ---
 
+## Rocky / RHEL 계열 보조 가이드
+
+RHEL 계열 배포판만 따로 쓰는 부분을 한곳에 모았다.
+
+### 패키지 관리 (`dnf`)
+
+```bash
+sudo dnf install <pkg>
+sudo dnf remove <pkg>
+dnf search <keyword>
+dnf provides */nginx
+sudo dnf update [<pkg>]
+dnf history
+sudo dnf history undo <id>
+sudo dnf install epel-release
+dnf repolist
+```
+
+> RHEL 8+ 기준 기본은 `dnf`다. `yum`은 심볼릭 동작이 남은 경우가 많다.
+
+### firewalld
+
+```bash
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --permanent --add-port=5432/tcp
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+```
+
+### SELinux
+
+```bash
+getenforce
+sestatus
+sudo setenforce 0
+sudo setsebool -P httpd_can_network_connect 1
+sudo semanage port -a -t http_port_t -p tcp 8080
+```
+
+### 막혔을 때
+
+```bash
+sudo ausearch -m avc -ts recent
+sudo restorecon -Rv /path
+sudo chcon -t httpd_sys_content_t /path
+```
+
+권장 확인 순서는 `setenforce 0`(임시) → `ausearch -m avc` →
+`restorecon`/`semanage`/`setsebool` 점검이다.
+
+---
+
 ## 네트워크
 
 ### 연결 확인

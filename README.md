@@ -2,7 +2,7 @@
 
 Curated dev cheatsheets and templates I keep handy while working.
 
-**48 cheatsheets** across 11 categories · **5 templates** — only the generic,
+**47 cheatsheets** across 11 categories · **5 templates** — only the generic,
 reusable pieces, no machine- or project-specific config.
 
 ## Cheatsheets
@@ -10,7 +10,7 @@ reusable pieces, no machine- or project-specific config.
 Tool introductions and operational references. Full index with descriptions:
 [cheatsheets/README.md](cheatsheets/README.md).
 
-**Editors & TUI** · [vim](cheatsheets/vim.md) · [lazyvim](cheatsheets/lazyvim.md) · [lazygit](cheatsheets/lazygit.md) · [tmux](cheatsheets/tmux.md) · [smug](cheatsheets/smug.md) · [ghostty](cheatsheets/ghostty.md)
+**Editors & TUI** · [vim](cheatsheets/vim.md) · [lazyvim](cheatsheets/lazyvim.md) · [lazygit](cheatsheets/lazygit.md) · [tmux](cheatsheets/tmux.md) · [yazi](cheatsheets/yazi.md) · [ghostty](cheatsheets/ghostty.md)
 
 **Modern CLI** (grep/find/cat/ls replacements) · [ripgrep](cheatsheets/rg.md) · [fzf](cheatsheets/fzf.md) · [jq](cheatsheets/jq.md) · [bat/eza/fd/zoxide/delta…](cheatsheets/modern-cli.md)
 
@@ -18,7 +18,7 @@ Tool introductions and operational references. Full index with descriptions:
 
 **Shell** · [bash](cheatsheets/shell.md) · [zsh](cheatsheets/zsh.md) · [powershell](cheatsheets/powershell.md)
 
-**System & servers** · [linux](cheatsheets/linux.md) · [process mgmt](cheatsheets/linux-process.md) · [ssh](cheatsheets/ssh.md) · [systemd](cheatsheets/systemd.md) · [nginx](cheatsheets/nginx.md) · [openssl](cheatsheets/openssl.md) · [rocky-linux](cheatsheets/rocky-linux.md)
+**System & servers** · [linux](cheatsheets/linux.md) · [process mgmt](cheatsheets/linux-process.md) · [ssh](cheatsheets/ssh.md) · [systemd](cheatsheets/systemd.md) · [nginx](cheatsheets/nginx.md) · [openssl](cheatsheets/openssl.md)
 
 **macOS** · [admin/troubleshoot](cheatsheets/macos-admin.md) · [aerospace](cheatsheets/aerospace.md) · [hammerspoon](cheatsheets/hammerspoon.md)
 

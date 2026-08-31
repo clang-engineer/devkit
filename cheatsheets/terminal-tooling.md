@@ -3,6 +3,21 @@
 > 터미널 중심 개발 환경에서 도구를 겹치지 않게 배치하기 위한 가이드.
 > 핵심은 **범용 기반 도구 + 역할별 전용 도구**로 나누는 것이다.
 
+## 도구 용어집
+
+`packages/Brewfile` 기준으로, 가끔 헷갈리는 도구명을 핵심만 정리한다.
+신뢰도: `확인`(공식 근거), `추정`(의미 추론), `미확인`(근거 부족)
+
+| 항목 | 의미 | 신뢰도 |
+|---|---|---|
+| Atuin | Tasmanian devil(태즈메이니아 악마) | 확인 |
+| fzf | fuzzy finder | 추정 |
+| rg (ripgrep) | rip + grep | 확인 |
+| fd | find 대체 도구 이름의 축약형 | 추정 |
+| sesh | session의 준말 | 추정 |
+| Yazi | 프로젝트 고유명칭 성격이 강함 | 미확인 |
+| delta | 변화량/차이를 뜻하는 delta | 보통 |
+
 ## 한눈에 보기
 
 | 도구 | 역할 | 사용 방식 | 성격 |
@@ -120,128 +135,30 @@ command argument에 token이나 secret이 남을 수 있으므로 history filter
 
 ## Yazi — 터미널 파일 관리자
 
-Yazi는 fuzzy finder가 아니라 터미널 안에서 사용하는 file manager다.
-Finder 같은 탐색을 키보드 중심 TUI로 수행한다.
+Yazi는 탐색/조작/정렬 역할에 집중한다.
+목표는 구조를 보면서 파일과 디렉터리를 찾고, 종료 시 현재 경로를 shell에
+반영하는 것이다.
 
-주요 용도:
+- `zoxide`: 목적지가 대략적으로 떠오를 때 빠른 점프
+- `Yazi`: 구조를 보며 정확히 찾을 때
+- `fzf`: 후보 목록에서 빠르게 선택할 때
 
-- 디렉터리 탐색
-- 파일 preview
-- rename/copy/move/delete
-- 여러 파일을 보면서 작업
-- 탐색한 디렉터리를 shell cwd로 넘기기
-
-Vim 스타일의 `h/j/k/l` 이동에 익숙하면 진입 장벽이 낮다.
-
-기본 사용법은 이것만 기억하면 충분하다.
-
-```text
-y         실행 + 종료 시 shell cwd handoff
-h/j/k/l   이동
-Space     선택
-.         숨김 파일 표시 전환
-~         built-in Help
-```
-
-키가 기억나지 않으면 `~` Help를 사용한다. 전체 upstream keymap은 custom
-cheat sheet에 복제하지 않는다.
-
-특히 shell directory handoff를 사용하면 다음 흐름이 가능하다.
-
-```text
-~/workspace
-    |
-    y
-    |
-Yazi에서 project/backend/src로 이동
-    |
-Yazi 종료
-    |
-~/workspace/project/backend/src $
-```
-
-역할은 zoxide와 다르다.
-
-```text
-zoxide -> 목적지를 알고 있을 때 빠르게 점프
-Yazi   -> 구조를 보면서 목적지를 찾고 파일을 관리
-fzf    -> 목록에서 항목 하나를 선택
-```
-
-### Yazi 이후의 작업은 전용 도구로 넘긴다
-
-Yazi의 책임은 **탐색·이동·파일 관리까지**로 두는 것이 단순하다. 편집기나 Git
-UI 역할까지 Yazi 안에 겹쳐 넣을 필요는 없다.
-
-```text
-Known destination       -> zoxide (`z`)
-Unknown destination     -> Yazi (`y`)
-After navigation        -> `nvim .`
-Git operations          -> lazygit
-```
-
-예를 들어 Git repository의 깊은 하위 디렉터리를 Yazi로 찾았다면 cwd handoff로
-그 위치에서 shell을 이어가고, 편집이 필요할 때 `nvim .`으로 넘어간다.
-
-```text
-y
--> repo/backend/src/main 탐색
--> Yazi 종료 + shell cwd handoff
--> nvim .
--> 편집은 Neovim
--> Git 작업은 lazygit
-```
-
-이 workflow에서는 Neovim/LazyVim과 lazygit이 현재 디렉터리가 Git repository
-내부라면 repository root를 자연스럽게 인식하는 것이 이상적이다. Yazi가 Git
-project root까지 책임지고 이동시키는 것보다 각 개발 도구가 자신의 project
-context를 찾게 하는 편이 역할 분리가 명확하다.
+자세한 키맵은 [yazi.md](yazi.md).
 
 ## fzf — 범용 fuzzy picker
+`fzf`는 후보 목록을 fuzzy 검색으로 좁히는 **선택기**다.
+파이프 입력과 잘 맞기 때문에, 다른 도구의 출력(파일/브랜치/프로세스)을
+중간에서 연결할 때 강하다.
 
-fzf는 file finder 자체가 아니라 **목록에서 항목을 fuzzy search로 선택하는
-범용 picker**다.
+Atuin을 쓰면 `Ctrl-R`은 history로 나누고, `fzf`는 `Ctrl-T/Alt-C`와
+파이프 기반 선택에 집중해 쓰는 편이 안정적이다.
 
-기본 shell integration은 보통 다음 세 키를 제공한다.
-
-```text
-Ctrl-R -> history 선택
-Ctrl-T -> 파일/경로 선택 후 현재 command line에 삽입
-Alt-C  -> 디렉터리 선택 후 cd
-```
-
-하지만 fzf의 진짜 강점은 arbitrary CLI output을 받을 수 있다는 점이다.
-
-```bash
-fd | fzf
-git branch | fzf
-rg "TODO" | fzf
-ps aux | fzf
-```
-
-전용 도구가 history, directory jump, filesystem browsing을 담당하더라도 fzf는
-가벼운 selection infrastructure로 남겨두기 좋다.
-
-자세한 사용법은 [fzf cheatsheet](fzf.md)를 참고한다.
+핵심 사용 예/키바인딩은 [fzf.md](fzf.md).
 
 ## zoxide — 알고 있는 디렉터리로 빠르게 이동
-
-zoxide는 방문 기록의 frecency를 학습해서 긴 경로를 기억하지 않고도 자주 가는
-디렉터리로 이동하게 해준다.
-
-```bash
-z nova
-z dotfiles
-```
-
-목적지를 대략 알고 있을 때는 파일 관리자나 directory picker를 여는 것보다
-빠르다. fzf `Alt-C`와 일부 겹치지만 목적이 다르다.
-
-```text
-zoxide Alt-C와 비교 -> 기억 기반 빠른 이동
-fzf Alt-C           -> 후보 목록에서 직접 선택
-Yazi                -> 구조를 보면서 탐색
-```
+`zoxide`는 frecency 기반으로 기억 기반 점프를 빠르게 처리한다.
+주요 사용은 `z`/`zi`로, 상세 커맨드는 [modern-cli.md](modern-cli.md)에
+정리되어 있다.
 
 ## watchexec — 파일 변경 시 명령 재실행
 

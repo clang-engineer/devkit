@@ -20,6 +20,42 @@
 | 복사 모드 | `Prefix [` (vi 키로 선택, `y`로 yank) |
 | 세션 죽이기 | `tmux kill-session -t work` |
 
+## smug — 선언형 tmux 세션 부팅
+
+`smug`는 tmux session/window/pane 구성을 YAML로 선언하고 즉시 실행한다.
+
+| 명령 | 동작 |
+|---|---|
+| `smug start <이름>` | 세션 생성 + attach (있으면 기존 세션에 붙음) |
+| `smug start <이름> --detach` | 세션만 생성/업데이트, attach 안 함 |
+| `smug start <이름> --attach` | tmux 안에서 세션으로 switch-client 전환 |
+| `smug start <이름> -w win1` | 특정 window만 시작 |
+| `smug stop <이름>` | 세션 종료 |
+| `smug start <이름> -f <경로>` | 커스텀 config 파일 지정 |
+| `smug list` | `~/.config/smug/`의 config 목록 |
+| `smug switch <이름>` | 기존 세션으로 `switch-client` 전환 |
+
+주의: `smug start`는 tmux 안에서 새 세션으로 화면 전환을 항상 만들지 않는다.
+`switch <이름>`(=`start -a`)이 전환까지 책임진다.
+
+검증: `smug start x --detach && tmux list-panes -t x:server`
+
+설정 파일 예시(`~/.config/smug/<이름>.yml`):
+
+```yaml
+session: workspace1
+root: ~/
+windows:
+  - name: server
+    layout: main-vertical
+    panes:
+      - {}
+      - commands:
+          - npm run dev
+```
+
+YAML의 `~`는 `null`이므로 빈 pane은 반드시 `- {}`로 둔다.
+
 ## 계층 구조
 
 ```

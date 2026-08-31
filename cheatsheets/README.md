@@ -11,6 +11,10 @@
 독립적으로 이해하는 데 필요한 짧은 소개와 대표 명령은 포함할 수 있지만, 전체
 사용법을 중복 관리하지 않고 해당 cheatsheet를 연결한다.
 
+툴 이름의 출처/어원은 기존 카테고리 문서에서 함께 정리한다.
+
+관련 링크: [terminal-tooling.md](terminal-tooling.md)
+
 ## 에디터 & TUI
 
 | 파일 | 설명 |
@@ -19,8 +23,8 @@
 | [lazyvim.md](lazyvim.md) | LazyVim 키맵 |
 | [lazygit.md](lazygit.md) | LazyGit TUI 단축키 |
 | [tmux.md](tmux.md) | Tmux 세션/윈도우/패널 |
-| [smug.md](smug.md) | smug — 선언형 YAML로 tmux 세션 부팅 |
 | [ghostty.md](ghostty.md) | Ghostty 터미널 탭/분할/키맵 |
+| [yazi.md](yazi.md) | Yazi — Rust TUI 파일 매니저 |
 
 ## 모던 CLI 도구 (grep/find/cat/ls 대체)
 
@@ -57,7 +61,6 @@
 | [systemd.md](systemd.md) | systemd 서비스 관리 + journalctl 로그 |
 | [nginx.md](nginx.md) | Nginx 설정/명령어 |
 | [openssl.md](openssl.md) | 인증서/암호화 |
-| [rocky-linux.md](rocky-linux.md) | Rocky Linux / RHEL 계열 (dnf, firewalld, SELinux) |
 
 ## macOS
 
