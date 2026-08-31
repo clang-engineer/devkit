@@ -55,8 +55,7 @@ Copilot 유료 구독(Pro/Pro+/Business/Enterprise)으로 opencode 인증 가능
 주의:
 - 모델 목록은 **Copilot entitlement**를 따름 → 조직에서 안 켠 모델(예: Gemini)은 안 뜬다. admin이 Copilot 정책에서 켜야 함.
 - 조직 정책 바꾼 뒤 반영하려면 **재인증**: `opencode auth logout`(Copilot) → `/connect` 다시.
-- base 모델(Business에선 GPT-5.3-Codex)은 프리미엄 요청 안 씀. premium 모델(Opus·Gemini 등)은 배수만큼 소모.
-  → 과금·라우팅 개념은 vault note `note-opencode-copilot-모델-라우팅` 참고.
+- base 모델(Business에선 GPT-5.3-Codex)은 프리미엄 요청 안 씀. premium 모델(Opus·Gemini 등)은 모델별 배수만큼 소모되므로 `/models`의 제공 범위와 배수를 확인한다.
 
 ## MCP 서버
 

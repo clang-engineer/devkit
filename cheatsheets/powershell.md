@@ -371,4 +371,4 @@ Find-NetRoute -RemoteIPAddress 203.0.113.42                          # 목적지
 
 - 공식: https://learn.microsoft.com/powershell/
 - PS 5.1 vs 7 차이: https://learn.microsoft.com/powershell/scripting/whats-new/differences-from-windows-powershell
-- 우리 Profile: `dotfiles/home/Microsoft.PowerShell_profile.ps1`
+- Profile 예시: https://github.com/clang-engineer/dotfiles/blob/main/chezmoi/Documents/PowerShell/profile.ps1

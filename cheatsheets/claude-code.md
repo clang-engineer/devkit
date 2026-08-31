@@ -71,11 +71,7 @@
 
 ## 권한 모드
 
-| 모드 | 설명 |
-|------|------|
-| `--allowedTools` | 특정 도구만 자동 허용 |
-| `--dangerously-skip-permissions` | 모든 권한 체크 스킵 (주의) |
-| `/permissions` | 대화 중 권한 설정 변경 |
+실행 중 권한 모드는 `Shift+Tab`으로 순환한다. 모드별 동작과 별도의 CLI·대화 중 권한 설정 방법은 아래 [권한 모드 (Shift+Tab 순환)](#권한-모드-shifttab-순환)을 참조.
 
 ## Esc / Esc Esc (헷갈리는 것만)
 
@@ -160,6 +156,16 @@ default → acceptEdits → plan [→ bypassPermissions → auto]
 - `plan` — 읽기만, 변경 전 플랜 수립
 - `auto` — Claude가 권한을 자동 판단 (아래 `autoMode` 규칙 기반)
 - `bypassPermissions` — 모든 체크 스킵 (주의)
+
+### 권한 설정 진입점
+
+권한 **모드**와 다음 설정 수단은 별개다.
+
+| 종류 | 명령 | 용도 |
+|------|------|------|
+| CLI 플래그 | `--allowedTools` | 세션 시작 시 특정 도구를 자동 허용 |
+| CLI 플래그 | `--dangerously-skip-permissions` | 모든 권한 체크를 건너뛰어 시작 (주의) |
+| 슬래시 명령 | `/permissions` | 대화 중 권한 설정 변경 |
 
 `auto` 모드 규칙은 `settings.json`의 `autoMode`로 커스텀:
 

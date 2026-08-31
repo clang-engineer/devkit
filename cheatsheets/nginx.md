@@ -26,15 +26,7 @@
 
 ## 서비스 관리
 
-```sh
-systemctl start nginx       # 시작
-systemctl stop nginx        # 중지
-systemctl restart nginx     # 재시작
-systemctl reload nginx      # 설정 리로드 (무중단)
-systemctl status nginx      # 상태 확인
-systemctl enable nginx      # 부팅 시 자동 시작
-systemctl disable nginx     # 자동 시작 해제
-```
+systemd 서비스의 시작·중지·상태 확인·부팅 자동 시작 등 일반 명령은 [systemd.md](systemd.md)를 참조. nginx 설정을 바꾼 뒤에는 먼저 `nginx -t`로 검증하고, 성공한 경우에만 `systemctl reload nginx`로 무중단 반영한다.
 
 ## 설정 관리
 

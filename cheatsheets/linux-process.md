@@ -147,16 +147,7 @@ kill -l                        # 시그널 목록 전체
 
 ## 셸 잡 vs PID
 
-```bash
-kill %1                        # 잡 번호 1 (앞에 % 필수)
-kill 12345                     # PID 12345
-fg %1                          # 잡을 foreground로
-bg %1                          # 잡을 background로
-jobs -l                        # 잡 + PID 함께 표시
-disown %1                      # 셸 종료해도 안 죽게 detach
-```
-
-> `%` 빼면 같은 숫자가 PID로 해석된다. 잡 제어는 [shell.md](shell.md) 참조.
+셸 잡은 현재 셸이 관리하는 작업 단위이고 `%1`처럼 `%`가 붙은 잡 번호로 지정한다. PID는 운영체제가 관리하는 프로세스 식별자이므로 같은 숫자라도 `%`가 없으면 PID로 해석된다. `jobs`/`fg`/`bg`/`disown` 명령과 사용 예시는 [shell.md](shell.md)를 참조.
 
 ## 실전 흐름 — 포트 잡힌 서버 재시작
 

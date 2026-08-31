@@ -22,11 +22,8 @@
 
 ### 프로필 구성 파일 분리(추천)
 
-- 런타임은 최종적으로 `harlequin/harlequin_config.toml` 하나만 사용.
-- 실제 관리 파일은 `harlequin/config/*.toml` 조각으로 분리.
-- 수정 후 병합:
-  - `python3 scripts/build-harlequin-config.py`
-  - `python3 scripts/build-harlequin-config.py --check` (검증만)
+- DB나 환경마다 완결된 TOML 파일을 따로 관리하고 실행할 파일을 명시한다.
+- 실행: `harlequin --config-path ./harlequin_config.toml --profile <PROFILE_NAME>`
 
 ### 최소 `harlequin_config.toml` 템플릿
 

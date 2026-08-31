@@ -303,7 +303,7 @@ tmux -L iso_$$ -f /dev/null new-session -d \; list-keys -T copy-mode-vi \; kill-
 tmux -L iso_$$ -f /dev/null new-session -d \; show -gv <option> \; kill-server
 ```
 
-> 왜 단일 호출인지·running 서버 오염 함정·키맵 diff 시 awk `-v` 이스케이프 함정 상세: vault `flow-tmux-default-verify`.
+> `-L`로 격리한 소켓과 `-f /dev/null`을 함께 써야 실행 중인 서버와 사용자 config의 영향을 받지 않는다. 확인 후 `kill-server`까지 실행해 격리 서버를 정리한다.
 
 ## 기타
 
@@ -469,7 +469,7 @@ tmux_conf_preserve_stock_bindings=true
 
 OMT 상태줄을 hex 절대색 대신 `colour0~15`(ANSI 팔레트 참조) 블록으로 스위치하면, 터미널 테마 한 줄이 tmux 상태줄까지 재테마.
 
-> hex vs colourN 원리·standalone 테마 플러그인 충돌 상세: blog "Oh My Tmux! — 완성형 tmux config 배포판", vault `note-terminal-theme-ansi-delegation`.
+> `colour0~15`는 터미널 ANSI 팔레트를 따르지만 hex 색은 고정된다. standalone 테마 플러그인이 상태줄 색을 다시 설정하면 이 위임이 덮어써질 수 있다.
 
 ## 훅 (hooks)
 

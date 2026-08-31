@@ -40,7 +40,6 @@ windows:
 ```
 
 - **빈 pane은 `- {}`로.** bare `-`(null)는 smug가 조용히 버려 pane이 안 생긴다.
-  (함정 상세: vault `note-smug-empty-pane-trap.md`)
 - layout 프리셋: `even-horizontal` `even-vertical` `main-horizontal`
   `main-vertical` `tiled`. 비표준 배치는 tmux layout 문자열로 고정
   (`tmux list-windows`의 `[layout ...]` 문자열을 복사).

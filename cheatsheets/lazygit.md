@@ -203,7 +203,7 @@ git:
 기본 `git.mainBranches`는 `[master, main]`이다. 프로젝트의 실제 main branch가 다를 때만 변경한다.
 시작 화면을 대시보드 대신 전체 브랜치 그래프로 바꾸려면 `gui.statusPanelView: allBranchesLog`를 추가한다.
 
-LazyVim 통합 설정은 `dotfiles/nvim/lazy/lua/plugins/lazygit.lua` 참고
+LazyVim 통합 설정은 https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/lazygit.lua 참고
 (Windows에서 nvim-remote editPreset 비활성화 처리).
 
 ## 트러블슈팅

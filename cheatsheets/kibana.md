@@ -86,35 +86,7 @@ url.path:/api/* and @timestamp >= "2026-05-01" and message:"timeout"
 
 좌측 메뉴 → Management → Dev Tools.
 
-```text
-# 클러스터 헬스
-GET _cluster/health
-
-# 인덱스 목록
-GET _cat/indices?v&s=index
-
-# 매핑 확인
-GET my-index/_mapping
-
-# 검색
-GET my-index/_search
-{
-  "query": { "match": { "message": "timeout" } },
-  "size": 5
-}
-
-# count
-GET my-index/_count
-{
-  "query": { "range": { "@timestamp": { "gte": "now-1h" } } }
-}
-
-# 인덱스 삭제
-DELETE my-index
-
-# 별칭 확인
-GET _cat/aliases?v
-```
+클러스터 health, 인덱스·매핑·별칭 조회, 검색·count·삭제 요청 예시는 [Elasticsearch cheatsheet](elasticsearch.md)를 참조. 해당 REST 요청을 Console에 그대로 붙여 실행할 수 있다.
 
 | 단축키 | 설명 |
 |--------|------|

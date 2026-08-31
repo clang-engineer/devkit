@@ -278,51 +278,27 @@ git --no-pager diff            # delta 우회 (복붙용)
 
 lazygit과 조합 (`~/.config/lazygit/config.yml`):
 
-```yaml
-git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
-```
+[lazygit.md의 delta 페이저 설정](lazygit.md)을 참조.
 
 ---
 
 ## grep 계보 — grep → ack → ag → rg
 
-오늘 새 코드라면 **`rg`** 한 줄이 답. 그 전 도구들의 자리:
-
-| 도구 | 정규식 | 속도 | `.gitignore` | 특이점 |
-|---|---|---|---|---|
-| `grep` | POSIX (`-E`로 확장) | 느림 | 무시 (`-r` + `--exclude`) | 거의 모든 환경에 기본 설치 |
-| `ack` | Perl regex | 보통 | 부분 지원 (`--ignore-file`) | Perl 기반, 파일 타입 필터(`--type`) |
-| `ag` (Silver Searcher) | PCRE | 빠름 | 자동 무시 | C 구현, ack의 후속 |
-| `rg` (ripgrep) | Rust regex (PCRE2 `--pcre2`) | 가장 빠름 | 자동 무시 | 현재 표준. LazyVim/Telescope 기본 |
+새 코드 저장소 검색은 `.gitignore`를 기본 반영하는 **`rg`**가 주역이다. `grep`은 설치를 기대하기 어려운 최소·레거시 환경과 POSIX 파이프라인용이고, `ack`·`ag`는 `rg` 이전 세대의 코드 검색 도구다. 옵션과 정규식 엔진은 서로 완전히 호환되지 않는다.
 
 ### grep 자주 쓰는 옵션 (legacy 환경)
 
-| 옵션 | 의미 |
-|---|---|
-| `-i` | 대소문자 무시 |
-| `-v` | 일치하지 않는 행 |
-| `-n` | 행 번호 |
-| `-l` / `-L` | 매치된 / 안 된 파일명만 |
-| `-w` / `-x` | 단어 / 줄 전체 일치 |
-| `-c` | 매치 행 수 |
-| `-r` | 재귀 |
-| `-E` (= `egrep`) | 확장 정규식 |
-| `-F` (= `fgrep`) | 리터럴 문자열 |
-| `-A n` / `-B n` / `-C n` | 뒤/앞/양쪽 n줄 컨텍스트 |
-| `-m N` | 최대 매치 |
+레거시 환경의 `grep` 옵션은 해당 시스템의 `man grep`을 기준으로 확인한다. 저장소 검색용 `rg` 옵션은 [rg.md](rg.md)에 정리되어 있다.
 
 ### ack / ag도 위 옵션 대부분 동일
 
-`-i`, `-w`, `-A`/`-B`/`-C`, `-l`/`-L`은 셋 다 호환. `--type=python`은 ack·ag·rg 공통.
+비슷한 단축 옵션이 있어도 도구 간 완전한 호환을 가정하지 않는다. 새 설정과 스크립트에는 `rg`를 우선한다.
 
 ### 어디서 어떤 걸 쓰나
 
 - **개발 환경**: `rg`. `.gitignore` 자동 무시, 가장 빠름.
 - **서버·최소 환경**: `grep`. 설치 불필요.
-- **레거시 PCRE 의존 코드**: `rg --pcre2`로 충분, ag는 굳이 새로 도입할 이유 X.
+- **기존 ack/ag 환경**: 그대로 유지할 수 있지만 새로 도입할 이유는 적음.
 
 자세한 `rg` 사용법은 [rg.md](rg.md).
 
