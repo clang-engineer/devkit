@@ -9,6 +9,7 @@ groups:
       - {file: tmux.md, desc: Tmux 세션/윈도우/패널}
       - {file: smug.md, desc: "smug — 선언형 YAML로 tmux 세션 부팅"}
       - {file: ghostty.md, desc: Ghostty 터미널 탭/분할/키맵}
+      - {file: yazi.md, desc: "Yazi — Rust 기반 터미널 파일 매니저 (키맵·검색·경로 복사)"}
 
   - title: 모던 CLI 도구 (grep/find/cat/ls 대체)
     items:
