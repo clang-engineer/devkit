@@ -4,6 +4,34 @@
 > CLI git 명령을 외우지 않아도 거의 모든 워크플로가 가능.
 > 공식: https://github.com/jesseduffield/lazygit
 
+## 개념 흐름
+
+```text
+Status → Files → Branches → Commits → Stash
+  ↓        ↓         ↓          ↓        ↓
+  a        Space     n          e        Space
+  변경확인  스테이지   브랜치생성   리베이스   적용
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 스테이지 | `Space` (Files) | 파일/히크 단위 토글 |
+| 커밋 | `c` (한 줄) / `C` (에디터) | 메시지 입력 |
+| 브랜치 | `n` (Branches) | 새 브랜치 생성 |
+| 리베이스 | `e` (Commits) | 인터랙티브 리베이스 |
+| stash | `Space` (Stash) | stash 적용 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| git | lazygit이 감싸는 CLI 도구 |
+| gh | GitHub CLI와 함께 사용 |
+| delta | diff 페이저 (lazygit 내부에서 사용) |
+| LazyVim | `<leader>gg`로 lazygit 실행 |
+
 ## 30초만 본다면
 
 | 상황 | 키 |

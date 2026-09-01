@@ -8,6 +8,35 @@
 
 편집은 **source를 고치고 `apply`** 하는 게 정석. destination(`~/.zshrc` 등)을 직접 고치면 다음 `apply`에서 덮인다.
 
+## 개념 흐름
+
+```text
+source state (git 추적) → target state (계산) → destination (실제 ~)
+         ↓                      ↓                    ↓
+    ~/.local/share/chezmoi   템플릿/스크립트 적용    ~/.zshrc 등
+         ↓                      ↓
+      edit → apply (실제 적용)
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 초기화 | `chezmoi init` | source 디렉토리 생성 |
+| 편집 | `chezmoi edit ~/.zshrc` | source 파일 편집 |
+| 적용 | `chezmoi apply` | destination에 반영 |
+| 미리보기 | `chezmoi diff` | 적용 전 차이 확인 |
+| 상태 확인 | `chezmoi managed` | 추적 중인 파일 목록 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| git | source state를 git으로 추적 |
+| SSH | 여러 머신에 dotfiles 배포 |
+| tmux | chezmoi로 tmux 설정 관리 |
+| zsh | chezmoi로 .zshrc 관리 |
+
 ## 일상 명령어
 
 | 명령 | 동작 |

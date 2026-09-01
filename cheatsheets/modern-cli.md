@@ -2,15 +2,32 @@
 
 > 기본 Unix 도구의 모던 대체품 모음. `cat`/`ls`/`find`/`cd`/`man`/`tree`/`git diff`를 더 빠르고 예쁘게.
 
+## 개념 흐름
+
+```text
+기존 도구 → 모던 대체품
+  cat    → bat (구문 강조)
+  ls     → eza (git + 트리)
+  find   → fd (직관 문법)
+  cd     → zoxide (빈도 학습)
+  man    → tldr (핵심 예시)
+```
+
 | 도구 | 대체 대상 | 핵심 |
 |------|----------|------|
 | `bat` | `cat` | 구문 강조 + 페이저 |
 | `eza` | `ls` | 컬러 + git + 트리 (구 `exa`) |
 | `fd` | `find` | 직관 문법 + `.gitignore` 반영 |
-| `tree` | — | 디렉터리 구조 시각화 |
 | `zoxide` | `cd` | 빈도+최근성 학습 점프 |
 | `delta` | `git diff` 페이저 | side-by-side + 구문 강조 |
-| `tldr` | `man` | 핵심 예시만 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| rg | 텍스트 검색과 함께 사용 |
+| fzf | 파일 선택과 함께 사용 |
+| git | delta가 git diff 페이저로 사용 |
 
 별도 파일 cheatsheet: [rg.md](rg.md), [fzf.md](fzf.md), [jq.md](jq.md), [lazygit.md](lazygit.md), [gh.md](gh.md).
 

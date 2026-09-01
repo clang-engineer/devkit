@@ -2,6 +2,34 @@
 
 > **Client URL** — URL로 HTTP/FTP/SCP 요청을 보내는 CLI. API 테스트·다운로드·디버깅의 표준 도구.
 
+## 개념 흐름
+
+```text
+URL → 요청 → 응답
+     ↓
+GET/POST/PUT/DELETE
+     ↓
+-headers, -data, -o (파일)
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| GET | `curl https://example.com` | 기본 요청 |
+| POST | `curl -X POST -d "key=val"` | 데이터 전송 |
+| 헤더 | `curl -H "Authorization: Bearer ..."` | 헤더 추가 |
+| 파일 저장 | `curl -o file.zip <url>` | 다운로드 |
+| 상세 | `curl -v <url>` | 요청/응답 상세 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| jq | curl 응답을 jq로 파싱 |
+| HTTPie | 더 사용자 친화적인 curl 대체 |
+| wget | 다운로드 전용 대체 도구 |
+
 ## 설치
 
 ```sh

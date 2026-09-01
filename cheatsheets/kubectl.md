@@ -2,6 +2,35 @@
 
 > Kubernetes 클러스터 CLI. 조회·로그·디버깅·배포·롤백 한 곳에. 컨텍스트/네임스페이스 함정 포함.
 
+## 개념 흐름
+
+```text
+클러스터 → 네임스페이스 → 파드 → 컨테이너
+    ↓           ↓           ↓       ↓
+cluster-info  get ns      get pods exec
+    ↓           ↓           ↓       ↓
+config        context     logs    port-forward
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 클러스터 | `kubectl cluster-info` | 클러스터 정보 |
+| 파드 목록 | `kubectl get pods -A` | 전체 네임스페이스 |
+| 로그 | `kubectl logs -f <pod>` | 실시간 로그 |
+| 쉘 접속 | `kubectl exec -it <pod> -- bash` | 컨테이너 안으로 |
+| 배포 | `kubectl apply -f deploy.yml` | 리소스 적용 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| docker | Kubernetes 컨테이너 런타임 |
+| helm | Kubernetes 패키지 매니저 |
+| kubectx/kubens | 컨텍스트/네임스페이스 빠른 전환 |
+| stern | 멀티 파드 로그 수집 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

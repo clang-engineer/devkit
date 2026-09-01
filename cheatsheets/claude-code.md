@@ -2,6 +2,33 @@
 
 > [Claude Code](https://docs.claude.com/en/docs/claude-code) — Anthropic이 만든 터미널용 코딩 에이전트. `npm i -g @anthropic-ai/claude-code` 후 `claude` 실행.
 
+## 개념 흐름
+
+```text
+claude 실행 → 대화 → 파일 수정
+     ↓           ↓        ↓
+  -c (이어서)   /compact  @파일첨부
+     ↓           ↓        ↓
+  세션 유지     토큰 절약  컨텍스트 제공
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 시작 | `claude` | 대화 시작 |
+| 이어서 | `claude -c` | 이전 세션 이어서 |
+| compact | `/compact` | 토큰 절약 |
+| 모드 전환 | `Shift+Tab` | plan/accept 순환 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| git | claude가 파일 수정 후 git으로 추적 |
+| opencode | 대안 AI 코딩 에이전트 |
+| ccusage | claude code 사용량 집계 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

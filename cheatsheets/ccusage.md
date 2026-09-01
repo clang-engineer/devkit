@@ -2,6 +2,30 @@
 
 `ccusage`는 AI 코딩 도구의 사용 로그를 집계해 보여주는 CLI 모듈이다. 잔여량이 아닌 사용량 기반 리포팅에 유리하다.
 
+## 개념 흐름
+
+```text
+사용 로그 → 집계 → 리포트
+     ↓         ↓        ↓
+  일별/주별   임계치    JSON/compact
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 일별 보기 | `ccusage opencode daily --compact` | 일별 사용량 |
+| 주간 보기 | `ccusage opencode weekly --compact` | 주간 사용량 |
+| 임계치 | `ccusage-budget --days 7 --warn 100` | 사용량 모니터링 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| opencode | OpenCode 사용량 집계 |
+| Claude Code | Claude Code 사용량 집계 |
+| GitHub Copilot | Copilot 사용량 집계 |
+
 ## 30초 가이드
 
 | 상황 | 명령 |

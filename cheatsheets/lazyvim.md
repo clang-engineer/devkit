@@ -5,6 +5,34 @@
 > `<leader>` 기본값: `Space`
 > 모드: `n`(Normal) `i`(Insert) `v`(Visual) `x`(Visual+Select) `o`(Operator) `t`(Terminal) `s`(Select) `c`(Cmdline)
 
+## 개념 흐름
+
+```text
+LazyVim = Neovim + 사전 설정 배포
+     ↓
+리더 키(Space) → 그룹별 명령
+     ↓
+f(파일) / b(버퍼) / g(Git) / s(검색) / w(윈도우)
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 파일 탐색 | `<leader>ff` | Telescope 파일 찾기 |
+| 파일 검색 | `<leader>sg` | ripgrep로 내용 검색 |
+| Git 변경 | `<leader>gg` | lazygit 실행 |
+| 설정 | `:LazyExtras` | Extras 관리 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| Neovim | LazyVim이 설치되는 기반 |
+| ripgrep | `<leader>sg` 검색에 사용 |
+| telescope | 파일/버퍼 탐색 UI |
+| lazy.nvim | 플러그인 매니저 |
+
 ## 목차
 
 1. [Leader 그룹 인덱스](#leader-그룹-인덱스)

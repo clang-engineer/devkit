@@ -2,6 +2,34 @@
 
 > GitHub / GitLab / Bitbucket / Gerrit 리뷰 코멘트에서 자주 보이는 약어와 관용 표현. 도구 중립.
 
+## 개념 흐름
+
+```text
+PR/MR 작성 → 리뷰 → 승인/수정
+     ↓          ↓       ↓
+  브라우저    코멘트    LGTM/NACK
+     ↓          ↓       ↓
+  설명/지시    변경요청  머지
+```
+
+핵심 약어:
+
+| 약어 | 의미 |
+|------|------|
+| LGTM | Looks Good To Me (승인) |
+| NACK | 반대 |
+| PTAL | Please Take A Look |
+| nit: | 사소한 의견 |
+| Draft PR | 작업 중인 PR |
+
+## 관련 도구
+
+| 도구 | 관계 |
+|------|------|
+| GitHub | PR 리뷰 시스템 |
+| GitLab | MR 리뷰 시스템 |
+| Gerrit | 코드 리뷰 플랫폼 |
+
 ## 승인 · 반대 신호
 
 | 약어 | 풀이 | 의미 |

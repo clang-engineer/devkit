@@ -2,6 +2,32 @@
 
 > 디스크 정리·LaunchDaemons·심볼릭 링크·Secure Input 같은 macOS 운영 트러블슈팅.
 
+## 개념 흐름
+
+```text
+디스크 정리 → LaunchDaemons → 시스템 설정
+     ↓              ↓              ↓
+  du -sh         launchctl      defaults
+  brew cleanup   load/unload    plist 편집
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 디스크 | `du -sh ~/Library/Caches/*` | 캐시 용량 |
+| APFS | `diskutil apfs list` | 실제 사용량 |
+| 캐시 정리 | `brew cleanup --prune=all` | Homebrew 캐시 |
+| daemon | `sudo launchctl load ...` | LaunchDaemons 등록 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| tmux | macOS에서 tmux 사용 |
+| Homebrew | 패키지 매니저 |
+| Aerospace | 타일링 윈도우 매니저 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

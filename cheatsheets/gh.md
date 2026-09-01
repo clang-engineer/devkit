@@ -2,6 +2,34 @@
 
 > GitHub CLI. PR/이슈/리포 작업을 터미널에서. 브라우저 왔다갔다 줄임.
 
+## 개념 흐름
+
+```text
+gh auth login → PR/이슈 작업 → 워크플로우
+     ↓              ↓            ↓
+  인증 설정      create/merge    run watch
+     ↓              ↓            ↓
+  토큰 관리      checkout/status  API 호출
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 로그인 | `gh auth login` | 인증 설정 |
+| PR 만들기 | `gh pr create --fill` | 현재 브랜치로 PR |
+| PR 머지 | `gh pr merge 123 --squash` | PR 머지 + 브랜치 삭제 |
+| PR 상태 | `gh pr status` | 내 PR/리뷰 현황 |
+| 이슈 | `gh issue create --title "..."` | 이슈 만들기 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| git | gh는 git 저장소 위에서 동작 |
+| GitHub API | `gh api`로 임의 호출 |
+| GitHub Actions | `gh run`으로 워크플로우 관리 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

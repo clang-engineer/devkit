@@ -2,6 +2,33 @@
 
 > 웹 서버 + 리버스 프록시. 무중단 리로드, 정적 파일 + API 라우팅, 로그 위치까지.
 
+## 개념 흐름
+
+```text
+설정 파일 → nginx -t (검증) → nginx -s reload (무중단 리로드)
+     ↓
+/etc/nginx/nginx.conf
+/etc/nginx/conf.d/*.conf
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 설정 검증 | `nginx -t` | 문법 검사 |
+| 무중단 리로드 | `nginx -s reload` | 설정 변경 반영 |
+| 에러 로그 | `tail -f /var/log/nginx/error.log` | 실시간 확인 |
+| 전체 설정 | `nginx -T` | 합쳐서 출력 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| systemd | nginx 서비스 관리 |
+| OpenSSL | HTTPS 인증서 관리 |
+| Docker | nginx 컨테이너 실행 |
+| curl | nginx 동작 확인 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

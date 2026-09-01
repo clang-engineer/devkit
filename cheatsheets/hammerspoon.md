@@ -2,8 +2,31 @@
 
 macOS 자동화 런타임. Lua로 창 관리·키바인딩·알림·이벤트 반응을 스크립팅.
 
-- 설정 진입점: `~/.hammerspoon/init.lua`
-- 모듈 로드: `require('modules.<이름>')` (`.lua` 생략)
+## 개념 흐름
+
+```text
+init.lua → 모듈 로드 → 이벤트 반응
+     ↓           ↓           ↓
+  hs.reload   require()    hs.timer
+     ↓           ↓           ↓
+  리로드      기능 확장     자동 실행
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 리로드 | 메뉴바 → Reload Config | 설정 반영 |
+| 콘솔 | 메뉴바 → Console | 즉석 디버깅 |
+| CLI | `hs -c "hs.reload()"` | 터미널에서 리로드 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| Aerospace | 타일링 윈도우 매니저와 보완 |
+| tmux | Hammerspoon으로 tmux 윈도우 관리 |
+| skhd | 키바인딩 보조 |
 
 ## 필수 조작
 

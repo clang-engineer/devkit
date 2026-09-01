@@ -4,6 +4,32 @@
 > `PYPI_API_TOKEN` 없이, 지정한 저장소·워크플로·환경에서만 짧은 수명의 배포
 > 자격을 받는다.
 
+## 개념 흐름
+
+```text
+PyPI 등록 → GitHub Actions → 배포
+     ↓            ↓            ↓
+  Publishing   OIDC 토큰    twine check
+     ↓            ↓            ↓
+  환경(pypi)   uv build     dist/*
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 빌드 | `uv build --no-sources` | 소스 빌드 |
+| 검사 | `uvx twine check --strict dist/*` | 배포 전 검증 |
+| 배포 | `uvx twine upload dist/*` | PyPI 업로드 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| uv | Python 패키지 빌드 |
+| GitHub Actions | CI/CD에서 배포 자동화 |
+| twine | PyPI 업로드 도구 |
+
 ## 30초만 본다면
 
 | 단계 | 핵심 |

@@ -2,6 +2,33 @@
 
 > 터미널 기반 SQL IDE. `--profile`/`--config-path`로 여러 DB를 빠르게 전환한다.
 
+## 개념 흐름
+
+```text
+harlequin 실행 → 프로필 선택 → SQL 실행
+     ↓              ↓           ↓
+  --profile     설정 파일    쿼리 실행
+     ↓              ↓           ↓
+  DB 연결       자동 선택    결과 표시
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 시작 | `harlequin` | 기본 실행 |
+| 프로필 | `harlequin --profile <name>` | 특정 프로필 |
+| 쿼리 | `hsql -P <name> -c "select 1"` | 한 줄 실행 |
+| 검증 | `hsql --config validate` | 설정 확인 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| PostgreSQL | harlequin으로 접속 |
+| Vertica | harlequin으로 접속 |
+| DuckDB | harlequin으로 접속 |
+
 ## 1) 기본 사용법
 
 | 상황 | 명령 |

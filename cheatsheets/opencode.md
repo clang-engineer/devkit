@@ -2,6 +2,33 @@
 
 > [opencode](https://opencode.ai) — 터미널용 오픈소스 AI 코딩 에이전트(sst/Anomaly). provider-agnostic(75+ provider)라 모델을 골라 붙인다. `curl -fsSL https://opencode.ai/install | bash` 후 `opencode` 실행.
 
+## 개념 흐름
+
+```text
+opencode 실행 → provider 인증 → 모델 선택
+     ↓              ↓              ↓
+  TUI 시작      /connect        /models
+     ↓              ↓              ↓
+  대화 시작      토큰 관리       모델 전환
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 시작 | `opencode` | TUI 실행 |
+| 인증 | `/connect` | provider 추가 |
+| 모델 | `/models` | 모델 변경 |
+| 한 번만 | `opencode run --model ...` | 단일 실행 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| claude code | 대안 AI 코딩 에이전트 |
+| ccusage | opencode 사용량 집계 |
+| git | 파일 수정 후 추적 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

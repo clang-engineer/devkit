@@ -2,6 +2,33 @@
 
 운영하면서 다시 찾게 되는 PostgreSQL 쿼리 모음. PostgreSQL 13+ 기준.
 
+## 개념 흐름
+
+```text
+모니터링 → 문제 해결 → 유지보수
+     ↓           ↓           ↓
+  세션/쿼리    슬로우 쿼리   백업/복구
+     ↓           ↓           ↓
+  pg_stat     pg_stat_activity pg_dump
+```
+
+핵심 쿼리:
+
+| 단계 | 쿼리 | 설명 |
+|------|------|------|
+| 세션 | `SELECT * FROM pg_stat_activity` | 활성 세션 |
+| 슬로우 | `duration > '1s'` | 느린 쿼리 |
+| 락 | `pg_locks` | 락 확인 |
+| 크기 | `pg_database_size()` | DB 크기 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| harlequin | 터미널 SQL IDE |
+| pgAdmin | PostgreSQL GUI 관리 도구 |
+| psql | PostgreSQL CLI |
+
 ## 활성 세션 / 슬로우 쿼리
 
 ```sql

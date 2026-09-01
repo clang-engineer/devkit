@@ -2,6 +2,34 @@
 
 > KQL·Discover·Dev Tools·대시보드 운영. Elasticsearch 위에 얹는 시각화/탐색 UI.
 
+## 개념 흐름
+
+```text
+Elasticsearch 데이터 → Kibana 시각화
+       ↓                  ↓
+    쿼리 (KQL)          Discover
+       ↓                  ↓
+    필터링             대시보드
+```
+
+핵심 쿼리:
+
+| 패턴 | 의미 |
+|------|------|
+| `field:value` | 정확 일치 |
+| `message:fox` | 부분 매칭 |
+| `message:"brown fox"` | 구문 매칭 |
+| `bytes >= 1000` | 범위 |
+| `not response:200` | 부정 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| Elasticsearch | Kibana가 시각화하는 데이터 |
+| Logstash | 데이터 수집 |
+| Beats | 로그 수집 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 / 위치 |

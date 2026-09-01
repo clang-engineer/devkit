@@ -3,6 +3,34 @@
 > Bash 쓰던 사람이 Windows에서 PowerShell 만났을 때 손 안 닿는 부분 위주.
 > 대상: Windows PowerShell 5.1 + PowerShell 7 (PSCore). 차이가 있으면 표기.
 
+## 개념 흐름
+
+```text
+Bash → PowerShell
+  var=1       → $var = 1
+  export      → $env:FOO
+  ls -la      → Get-ChildItem
+  grep        → Select-String
+  find        → Get-ChildItem -Recurse
+```
+
+핵심 명령어:
+
+| Bash | PowerShell | 설명 |
+|------|------------|------|
+| `ls -la` | `Get-ChildItem -Force` | 파일 목록 |
+| `grep` | `Select-String` (sls) | 텍스트 검색 |
+| `cat` | `Get-Content` | 파일 내용 |
+| `echo` | `Write-Output` | 출력 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| WSL | Linux에서 PowerShell 사용 |
+| Windows Terminal | PowerShell용 터미널 |
+| Azure | PowerShell로 Azure 관리 |
+
 ## 30초만 본다면 (Bash → PowerShell)
 
 | Bash | PowerShell |

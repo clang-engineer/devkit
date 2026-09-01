@@ -2,6 +2,32 @@
 
 > 컬럼형 분석 DB. OS 계정 관리(chage) + `v_catalog`/`v_monitor` 시스템 테이블로 메타데이터·용량 조회.
 
+## 개념 흐름
+
+```text
+OS 계정 관리 → Vertica 시스템 테이블 → 모니터링
+     ↓                ↓                   ↓
+  chage           v_catalog           v_monitor
+     ↓                ↓                   ↓
+  계정 만료        메타데이터          용량·이력
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 계정 만료 해제 | `sudo chage -E -1 -M -1 -I -1 -m 0 vertica` | 서비스 계정 보호 |
+| 계정 확인 | `sudo chage -l vertica` | 만료 상태 확인 |
+| 용량 조회 | `SELECT * FROM v_monitor.schema_size` | 스키마 용량 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| harlequin | Vertica SQL IDE |
+| vsql | Vertica CLI |
+| Docker | Vertica 컨테이너 실행 |
+
 ## OS `vertica` 서비스 계정 만료 해제
 
 데몬이 쓰는 리눅스 서비스 계정에 패스워드/계정 만료가 걸리면 서비스가 끊길 수 있다. `chage`(change age)로 만료를 전부 해제.

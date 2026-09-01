@@ -2,6 +2,34 @@
 
 > 인증서·키 발급/변환/검증. CSR·자체서명·만료확인·포맷 변환을 한 곳에.
 
+## 개념 흐름
+
+```text
+키 생성 → CSR 생성 → 인증서 발급/서명
+     ↓        ↓           ↓
+genpkey    req -new     req -x509
+     ↓        ↓           ↓
+개인키     CSR 파일     인증서.pem
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 키 생성 | `openssl genpkey -algorithm RSA -out key.pem` | 개인키 생성 |
+| 자체서명 | `openssl req -x509 ...` | 자체서명 인증서 |
+| 인증서 확인 | `openssl x509 -in cert.pem -text -noout` | 상세 정보 |
+| 포맷 변환 | `openssl x509 -in cert.pem -outform DER` | PEM → DER |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| nginx | HTTPS 인증서 적용 |
+| SSH | 키 기반 인증과 다른 목적 |
+| Docker | TLS 인증서로 컨테이너 보안 |
+| curl | HTTPS 연결 테스트 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

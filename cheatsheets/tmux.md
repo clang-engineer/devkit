@@ -5,6 +5,38 @@
 > **Prefix Key**: `Ctrl+b` (기본 설정 기준)  
 > 아래 명령어에서 `Prefix`는 `Ctrl+b`를 의미합니다.
 
+## 개념 흐름
+
+```text
+Session → Window → Pane
+  ↑          ↑       ↑
+ new        c      %
+ ls         n/p    방향키
+ attach     w      s
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 새 세션 | `tmux new -s work` | 이름 지정 세션 시작 |
+| 세션 목록 | `tmux ls` | 살아있는 세션 확인 |
+| 세션 붙기 | `tmux a -t work` | 세션에 다시 연결 |
+| 세션 떠나기 | `Prefix d` | 세션 유지하고 나오기 |
+| 새 윈도우 | `Prefix c` | 새 탭 생성 |
+| 분할 | `Prefix "` / `Prefix %` | 가로/세로 분할 |
+| 복사 모드 | `Prefix [` | vi 키로 선택, `y`로 yank |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| sesh | tmux 세션 빠른 선택/전환 |
+| smug | YAML로 tmux 세션 선언형 관리 |
+| oh-my-tmux | tmux 설정 프레임워크 |
+| zsh | tmux 안에서 셸 사용 |
+| SSH | tmux로 SSH 세션 유지 (연결 끊겨도 보존) |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

@@ -2,6 +2,36 @@
 
 > Linux 서비스/타이머/로그의 표준. 부팅·자동시작·재시작 정책·로그 조회 한 곳.
 
+## 개념 흐름
+
+```text
+서비스 파일 → systemctl 명령 → 로그 조회
+     ↓              ↓            ↓
+/etc/systemd/   start/stop    journalctl
+  system/        status        -f -u <svc>
+     ↓              ↓
+ daemon-reload   enable/disable
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 서비스 시작 | `systemctl start <svc>` | 서비스 시작 |
+| 상태 확인 | `systemctl status <svc>` | 상태 + 최근 로그 |
+| 무중단 리로드 | `systemctl reload <svc>` | 설정 변경 |
+| 부팅 시 자동 | `systemctl enable <svc>` | 부팅 자동 시작 |
+| 로그 조회 | `journalctl -f -u <svc>` | 실시간 로그 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| journalctl | systemd 로그 조회 |
+| nginx | systemd 서비스로 관리 |
+| Docker | systemd로 Docker 데몬 관리 |
+| SSH | systemd로 sshd 서비스 관리 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

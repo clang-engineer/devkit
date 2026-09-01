@@ -2,6 +2,34 @@
 
 > tar / gzip / zip / xz / bzip2 / 7z. 매번 헷갈리는 플래그(`-c` 만들기, `-x` 풀기) 한 곳에.
 
+## 개념 흐름
+
+```text
+압축 포맷 선택 → 만들기/풀기
+     ↓              ↓
+tar.gz (범용)    -czf (만들기)
+zip (호환성)     -xzf (풀기)
+xz/bzip2 (압축률)
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| tar.gz 만들기 | `tar -czf out.tar.gz dir/` | 압축 |
+| tar.gz 풀기 | `tar -xzf in.tar.gz` | 해제 |
+| zip 만들기 | `zip -r out.zip dir/` | 재귀 압축 |
+| zip 풀기 | `unzip in.zip` | 해제 |
+| 내용 확인 | `tar -tzf in.tar.gz` | 목록만 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| gzip | tar와 함께 사용되는 압축 도구 |
+| zip | 크로스 플랫폼 호환 |
+| rsync | 동기화 후 압축 전송 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 |

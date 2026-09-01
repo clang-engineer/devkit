@@ -4,6 +4,34 @@
 > 재작성된 것은 아니며, 3.x에서는 Rust 라이브러리 **TaskChampion**이 저장·동기화
 > 코어를 담당한다.
 
+## 개념 흐름
+
+```text
+태스크 추가 → 목록/검색 → 완료/수정
+     ↓            ↓           ↓
+task add       task next    task done
+     ↓            ↓           ↓
+project/due   +PENDING     task undo
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 추가 | `task add "작업" project:home` | 태스크 추가 |
+| 목록 | `task next` | 다음 할 작업 |
+| 완료 | `task 3 done` | 태스크 완료 |
+| 수정 | `task 3 modify due:fri` | 마감일 변경 |
+| 복구 | `task undo` | 실수 복구 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| TaskChampion | 저장/동기화 코어 (Rust) |
+| todoist | 클라우드 기반 대안 |
+| vim/tmux | 터미널에서 태스크 관리 |
+
 ## 30초만 본다면
 
 | 상황 | 명령 / 핵심 |
