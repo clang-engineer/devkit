@@ -3,7 +3,7 @@ intro: 자주 쓰지만 매번 검색하게 되는 명령어/문법 모음.
 groups:
   - title: 도구 사전
     items:
-      - {file: tools-dictionary.md, desc: "tldr 대체 CLI 도구/개념 사전 (curl, docker, jq, rg, sed/awk 등)"}
+      - {file: tools-dictionary.md, desc: "CLI 도구/개념 사전 + 핵심 명령어 (curl, docker, nginx, systemctl 등)"}
 
   - title: 에디터 & TUI
     items:
@@ -22,22 +22,17 @@ groups:
 
   - title: 시스템 & 서버
     items:
-      - {file: linux-process.md, desc: "프로세스 찾기·종료 (`pgrep`/`pkill`/`lsof`/`kill` 시그널)"}
-      - {file: linux.md, desc: "Linux 디렉터리 구조 + 자원 모니터링 + 네트워크"}
       - {file: ssh.md, desc: "ssh-agent/ssh-add, ~/.ssh/config, scp/rsync"}
       - {file: systemd.md, desc: "systemd 서비스 관리 + journalctl 로그"}
-      - {file: nginx.md, desc: "Nginx 설정/명령어"}
 
   - title: macOS
     items:
-      - {file: macos-admin.md, desc: "macOS troubleshoot (LaunchDaemons, Secure Input 등)"}
       - {file: aerospace.md, desc: "macOS 타일링 WM"}
       - {file: hammerspoon.md, desc: "macOS 자동화/윈도우 관리 (Lua)"}
 
   - title: 데이터
     items:
       - {file: harlequin.md, desc: "Harlequin 기본 사용법 (`--config-path`, `--profile`)"}
-      - {file: vertica.md, desc: "Vertica — 계정 만료 해제(chage) + v_catalog/v_monitor 용량·이력 조회"}
       - {file: elasticsearch.md, desc: "Elasticsearch 쿼리/관리"}
       - {file: kibana.md, desc: "KQL, Dev Tools, Discover, 운영 진단"}
 
