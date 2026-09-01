@@ -1,0 +1,206 @@
+{
+  "title": "Modern CLI Tools Map",
+  "philosophy": "거시에서 미시로: 명령어의 진화 과정을 이해하고 탐색하기",
+  "categories": [
+    {
+      "name": "File Operations",
+      "why": "기본 명령어는 기능은 있지만 속도·가독성·UX가 부족하다",
+      "relations": [
+        {
+          "from": "cat",
+          "to": "bat",
+          "why": "구문강조 없음",
+          "problem": "긴 파일 읽기 시 구문 구분이 어렵고, 줄번호가 없어 위치 파악이 힘들다",
+          "solution": "200+ 언어 구문강조, Git 변경 라인 표시, 자동 페이징, 줄번호",
+          "relation": "alternative",
+          "boundary": "스크립트 안에서 cat 대체 불가. bat은 인터랙티브 열람에 특화",
+          "install": "brew install bat",
+          "tldr": "bat"
+        },
+        {
+          "from": "ls",
+          "to": "eza",
+          "why": "Git 정보와 아이콘 없음",
+          "problem": "파일 목록에 Git 상태, 아이콘, 트리 뷰가 없어 한눈에 파악이 어렵다",
+          "solution": "아이콘, Git 통합, 트리 뷰, 정렬 옵션, 색상 지원",
+          "relation": "alternative",
+          "boundary": "일부 환경에서 기본 ls보다 느릴 수 있음",
+          "install": "brew install eza",
+          "tldr": "eza"
+        },
+        {
+          "from": "find",
+          "to": "fd",
+          "why": "구문 복잡",
+          "problem": "find의 조건식과 옵션이 직관적이지 않고, 결과 출력 형식이 단조롭다",
+          "solution": "단순한 구문, 색상 출력, .gitignore 자동 무시, 기본값이 실용적",
+          "relation": "alternative",
+          "boundary": "find의 모든 기능을 대체하지 않음. POSIX 호환성이 필요하면 find 사용",
+          "install": "brew install fd",
+          "tldr": "fd"
+        },
+        {
+          "from": "du",
+          "to": "dust",
+          "why": "시각화 부족",
+          "problem": "du 출력은 숫자 나열이 직관적이지 않다",
+          "solution": "시각적 바 차트로 디스크 사용량 표시, 직관적 인터페이스",
+          "relation": "alternative",
+          "install": "brew install dust",
+          "tldr": "dust"
+        },
+        {
+          "from": "tree",
+          "to": "broot",
+          "why": "정적 출력만 가능",
+          "problem": "tree는 대화형 탐색이 불가능하고, 대량 디렉토리에서 쓸 수 없다",
+          "solution": "대화형 디렉토리 탐색, 파일 미리보기, 빠른 이동",
+          "relation": "alternative",
+          "install": "brew install broot",
+          "tldr": "broot"
+        }
+      ]
+    },
+    {
+      "name": "Text Search",
+      "why": "텍스트 검색 도구는 속도와 실용적 기본값이 중요하다",
+      "relations": [
+        {
+          "from": "grep",
+          "to": "ripgrep",
+          "why": "느림",
+          "problem": "grep은 대규모 코드베이스에서 느리고, .gitignore를 무시하지 않는다",
+          "solution": "10~100배 빠름, .gitignore 자동 무시, 바이너리 파일 자동 건너뜀, 색상 지원",
+          "relation": "alternative",
+          "boundary": "스크립트에서 grep은 여전히 포터블. ripgrep은 인터랙티브 검색에 최적화",
+          "install": "brew install ripgrep",
+          "tldr": "rg"
+        },
+        {
+          "from": "sed",
+          "to": "sd",
+          "why": "구문 난이도",
+          "problem": "sed의 정규식과 치환 구문은 배우기 어렵고 실수가 잦다",
+          "solution": "직관적인 find & replace 구문, 예시 기반 설명",
+          "relation": "alternative",
+          "boundary": "sed의 스트리밍 처리, 복잡한 정규식은 sd로 대체 어려움",
+          "install": "brew install sd",
+          "tldr": "sd"
+        },
+        {
+          "from": "diff",
+          "to": "delta",
+          "why": "가독성 부족",
+          "problem": "기본 diff 출력은 읽기 어렵고, 구문 강조가 없다",
+          "solution": "구문 강조, 사이드바 비교, 줄 번호, Git 통합",
+          "relation": "alternative",
+          "install": "brew install git-delta",
+          "tldr": "delta"
+        }
+      ]
+    },
+    {
+      "name": "Navigation",
+      "why": "디렉토리 이동은 반복적이며 기억에 의존한다",
+      "relations": [
+        {
+          "from": "cd",
+          "to": "zoxide",
+          "why": "기억 못함",
+          "problem": "cd는 자주 가는 경로를 기억하지 못하고, 매번 전체 경로를 입력해야 한다",
+          "solution": "방문 기반 학습, 부분 경로로 점프, fzf 통합",
+          "relation": "alternative",
+          "boundary": "zoxide는 cd를 완전히 대체하지 않음. 새로운 디렉토리에는 cd 사용",
+          "install": "brew install zoxide",
+          "tldr": "zoxide"
+        }
+      ]
+    },
+    {
+      "name": "System Monitoring",
+      "why": "기본 모니터링 도구는 정보 밀도와 인터페이스가 부족하다",
+      "relations": [
+        {
+          "from": "top",
+          "to": "htop",
+          "why": "UX 부족",
+          "problem": "top은 인터페이스가 단조롭고, 색상과 인터랙션이 제한적이다",
+          "solution": "색상 지원, 마우스 인터랙션, 프로세스 트리, 스케일러 표시",
+          "relation": "alternative",
+          "install": "brew install htop",
+          "tldr": "htop"
+        },
+        {
+          "from": "htop",
+          "to": "btop",
+          "why": "더 나은 시각화",
+          "problem": "htop은 아직 메모리/CPU 그래프와 네트워크 모니터링이 부족하다",
+          "solution": "CPU/메모리 그래프, 네트워크 모니터링, 디스크 I/O, 테마 지원",
+          "relation": "specialized",
+          "install": "brew install btop",
+          "tldr": "btop"
+        },
+        {
+          "from": "ps",
+          "to": "procs",
+          "why": "가독성 부족",
+          "problem": "ps 출력은 컬럼이 많고 읽기 어렵다",
+          "solution": "색상 지원, 트리 뷰, 검색,人类-readable 형식",
+          "relation": "alternative",
+          "install": "brew install procs",
+          "tldr": "procs"
+        }
+      ]
+    },
+    {
+      "name": "Git",
+      "why": "CLI git은 강력하지만 복잡한 작업에 UX가 부족하다",
+      "relations": [
+        {
+          "from": "git",
+          "to": "lazygit",
+          "why": "복잡한 작업에 UX 부족",
+          "problem": "인터랙티브 리베이스, 스테이징, 브랜치 관리가 터미널에서 어렵다",
+          "solution": "풀 스크린 TUI, 펀치 단계 staging, 인터랙티브 리베이스, 브랜치 관리",
+          "relation": "complement",
+          "boundary": "lazygit은 git을 대체하지 않고 보완. 단순 명령은 git 사용",
+          "install": "brew install lazygit",
+          "tldr": "lazygit"
+        }
+      ]
+    },
+    {
+      "name": "HTTP",
+      "why": "curl은 강력하지만 사용법이 복잡하다",
+      "relations": [
+        {
+          "from": "curl",
+          "to": "httpie",
+          "why": "사용법 복잡",
+          "problem": "curl 옵션이 많고, JSON 요청/응답 처리가 번거롭다",
+          "solution": "자연어 구문, JSON 자동 형식화, 색상 출력, 세션 유지",
+          "relation": "alternative",
+          "boundary": "curl은 여전히 스크립트와 포터블 환경에서 필수",
+          "install": "brew install httpie",
+          "tldr": "http"
+        }
+      ]
+    },
+    {
+      "name": "Compression",
+      "why": "압축 포맷별 명령어가 다르고 복잡하다",
+      "relations": [
+        {
+          "from": "tar",
+          "to": "ouch",
+          "why": "포맷별 명령어 복잡",
+          "problem": "tar, zip, gzip 등 포맷마다 명령어와 옵션이 다르다",
+          "solution": "단일 명령어로 모든 포맷 지원, 직관적인 인터페이스",
+          "relation": "alternative",
+          "install": "cargo install ouch",
+          "tldr": "ouch"
+        }
+      ]
+    }
+  ]
+}
