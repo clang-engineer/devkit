@@ -71,7 +71,7 @@ rg "from (\w+)" -r '$1'        # replace로 캡처 변환 출력
 rg --vimgrep "TODO"            # file:line:col:text — vim quickfix 호환
 rg --files-with-matches "TODO"  # = -l
 rg --files-without-match "@license"   # 매칭 안 된 파일만
-rg --count-matches "TODO"      # 파일당이 아니라 줄당 매칭 수
+rg --count-matches "TODO"      # 파일별 개별 match 수 (-c는 matching line 수)
 rg --files | wc -l             # rg가 인식하는 파일 수
 rg --debug "패턴" 2>&1 | head  # 어떤 ignore 규칙이 적용됐는지
 ```
@@ -109,14 +109,17 @@ rg "def parse_url\(" -t py
 ### TODO 있는 파일을 골라 nvim으로 열기
 
 ```bash
-rg -l "TODO" | fzf | xargs nvim
+rg -l -0 "TODO" | fzf --read0 --print0 | xargs -0 -o nvim --
 ```
 
 ### 매칭 줄을 수정하려는 파일들 추리기
 
 ```bash
-rg -l "deprecated_api" | xargs sed -i 's/deprecated_api/new_api/g'
+rg -l -0 "deprecated_api" | \
+  xargs -0 perl -pi -e 's/deprecated_api/new_api/g' --
 ```
+
+`-r`/`--replace`는 변환된 검색 결과만 출력하며 파일을 수정하지 않는다.
 
 ## LazyVim에서
 

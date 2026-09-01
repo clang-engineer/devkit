@@ -13,7 +13,7 @@
 | 메인 설정 위치 | `/etc/nginx/nginx.conf` |
 | 사이트 설정 | `/etc/nginx/conf.d/*.conf` 또는 `sites-available/` |
 | 전체 설정 dump | `nginx -T` (문법검사 + 합쳐서 출력) |
-| 즉시 종료 | `nginx -s stop` (정상 종료는 `nginx -s quit`) |
+| 빠른 종료 | `nginx -s stop` (SIGTERM; graceful 종료는 `nginx -s quit`) |
 
 ## 파일 위치
 
@@ -35,7 +35,7 @@ nginx -t                    # 설정 파일 문법 검사
 nginx -T                    # 설정 파일 전체 출력 + 문법 검사
 nginx -s reload             # 설정 리로드 (systemctl reload와 동일)
 nginx -s quit               # 정상 종료 (처리 중인 요청 완료 후)
-nginx -s stop               # 즉시 종료
+nginx -s stop               # 빠른 종료 (SIGTERM; graceful 아님)
 nginx -V                    # 빌드 정보 및 모듈 확인
 ```
 
@@ -170,13 +170,16 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_ssl_verify off;          # 백엔드가 self-signed일 때
+        proxy_ssl_trusted_certificate /data/ssl/backend-ca.crt;
+        proxy_ssl_verify on;
         proxy_ssl_server_name on;
+        proxy_ssl_name backend.internal;  # 백엔드 인증서의 DNS SAN
     }
 }
 ```
 
 > **루프 주의**: `proxy_pass`를 `server_name`과 같은 도메인으로 두면 DNS가 다시 이 nginx의 443으로 해석해 자기 자신에게 프록시한다. 내부 백엔드는 IP로 직접 보낼 것.
+> self-signed 인증서도 검증을 끄지 말고 발급 CA를 신뢰 목록에 둔다. `proxy_set_header Host`는 HTTP 헤더일 뿐 TLS 인증서 이름 검증에는 영향을 주지 않는다.
 
 ## 디버깅
 

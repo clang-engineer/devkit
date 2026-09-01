@@ -8,6 +8,8 @@
 Working Tree → Staging Area → Local Repo → Remote Repo
      ↑              ↑              ↑              ↑
   restore        add           commit          push/pull
+                                ↓
+                    branch ← merge/rebase
 ```
 
 핵심 명령어:
@@ -18,6 +20,7 @@ Working Tree → Staging Area → Local Repo → Remote Repo
 | 스테이징 | `git add -p` | 조각 단위로 선택 (안전) |
 | 커밋 | `git commit -m "msg"` | 이력 남기기 |
 | 브랜치 | `git switch -c feat/x` | 새 작업 가지 만들기 |
+| 병합 | `git merge --no-ff <branch>` | 브랜치 병합 (merge 커밋 유지) |
 | 원격 동기화 | `git pull --ff-only` | fast-forward만 허용 |
 | 되돌리기 | `git restore <file>` | 파일 변경사항 취소 |
 
@@ -223,75 +226,6 @@ git restore --source=HEAD~3 path/to/file.txt
 | `git config --global pull.rebase true` | Pull 시 기본 rebase |
 | `git config --list` | 설정 확인 |
 
-## 커밋 메시지 컨벤션 (Conventional Commits)
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-<footer>
-```
-
-### Type
-
-| type | 의미 |
-|---|---|
-| `feat` | 새로운 기능 |
-| `fix` | 버그 수정 |
-| `docs` | 문서 |
-| `style` | 포맷·세미콜론 등 (동작 변경 없음) |
-| `refactor` | 리팩토링 |
-| `test` | 테스트 코드 |
-| `chore` | 빌드·패키지 매니저 |
-| `revert` | 이전 커밋 되돌리기 |
-
-Subject 규칙: 50자 이내, 마침표 X, 명령문(현재 시제), 소문자.
-
-Body: 72자 폭, **무엇/왜** 중심 (어떻게보다는).
-
-### Footer
-
-| 키 | 용도 |
-|---|---|
-| `BREAKING CHANGE:` | 호환성 깨지는 변경 |
-| `Closes #N` / `Refs #N` | 이슈 참조 |
-| `Co-authored-by: name <email>` | 공동 작업자 |
-| `Signed-off-by: ...` | DCO 서명 |
-
-### Breaking change 표기 (`!`)
-
-```
-feat!: send email to customer
-feat(api)!: drop old endpoint
-
-BREAKING CHANGE: legacy /v1 removed
-```
-
-### 예시
-
-```
-fix: prevent racing of requests
-
-Introduce a request id and a reference to latest request. Dismiss
-incoming responses other than from latest request.
-
-Reviewed-by: Z
-Refs: #123
-```
-
-### `.gitmessage` 템플릿
-
-```sh
-git config --global commit.template ~/.gitmessage
-```
-
-```
-# <type>: subject (50자 이내, 명령문, 마침표 X)
-
-# Body — 무엇/왜 (72자 폭)
-```
-
 ## 자주 쓰는 패턴
 
 ```bash
@@ -313,37 +247,6 @@ git status
 git switch main
 ```
 
-## History 재작성 (filter-repo)
-
-`git filter-branch`는 deprecated. `git-filter-repo`가 표준.
-
-```bash
-brew install git-filter-repo
-```
-
-### Author/committer 통일하면서 날짜는 보존
-
-```bash
-git filter-repo --force --commit-callback '
-commit.author_name = b"Your Name"
-commit.author_email = b"you@example.com"
-commit.committer_name = b"Your Name"
-commit.committer_email = b"you@example.com"
-'
-```
-
-- `author_date`/`committer_date`는 건드리지 않으면 원본 유지
-- bytes 리터럴(`b"..."`) 필수 (내부 표현이 bytes)
-- `--force`는 freshly cloned가 아닌 repo 안전 검사 건너뜀
-- 한 번 rewrite하면 SHA가 다 바뀌므로 외부 참조 깨짐
-- **본인 archive 같은 사적 정리 용도에만**. 공개 협업 history에는 금지
-
-검증:
-```bash
-git log --pretty=format:"%ae" | sort -u
-git log --pretty=format:"%ai %s" | tail-3   # 원본 날짜 보존 확인
-```
-
 ## 이미 추적 중인 파일을 .gitignore로 무시하기
 
 `.gitignore`는 **아직 추적 안 된** 파일에만 적용. 이미 커밋된 파일은 캐시에서 명시 제거해야 한다.
@@ -358,49 +261,6 @@ git rm -r --cached path/  # 디렉토리 전체
 
 - `--cached` 없이 `git rm`하면 **로컬 파일까지 삭제**되니 주의.
 - 이후 `status`에 `D`로 잡히고, 커밋하면 추적이 끊긴다. 로컬 파일은 남고 `.gitignore` 덕에 재추가 안 됨.
-
-## push 안 됨 vs 커밋 안 됨 (일괄 스크립트)
-
-두 상태는 감지 명령이 다르다. ahead만 검사하면 dirty를 놓친다.
-
-```bash
-# 커밋했지만 push 안 됨 (ahead)
-git rev-parse "@{u}" &>/dev/null || continue   # upstream 없으면 스킵
-git log "@{u}..HEAD" --oneline                  # 있으면 push 대상
-
-# 아직 커밋 안 됨 (dirty working tree)
-[ -n "$(git status --porcelain)" ] && echo "dirty"
-```
-
-`--porcelain`은 변경 있으면 파일 목록, 없으면 빈 문자열 → 스크립트에서 안정적으로 dirty 판정.
-
-## GitHub 활동 검색 필터
-
-전용 UI가 없는 "내 활동 모아보기"는 검색 필터가 사실상 유일하다.
-
-| 필터 | 대상 |
-|---|---|
-| `commenter:<id>` | 내가 댓글 단 이슈/PR |
-| `involves:<id>` | 작성·할당·멘션·댓글 등 관여한 전부 (`sort:updated-desc` 조합) |
-| `author:<id> type:pr` | 내가 연 PR |
-| `review-requested:<id> type:pr` | 리뷰 요청받은 PR |
-| `reviewed-by:<id> type:pr` | 내가 리뷰한 PR |
-
-- UI: `github.com/pulls`, `github.com/issues` (Created/Assigned/Review requests/Mentioned 탭).
-- 릴리스 알림이 계속 뜨면 **Watch** 때문 → `github.com/watching`에서 Unwatch. (Star는 알림 안 만듦.)
-
-## Contribution graph (잔디밭) 보존
-
-잔디는 커밋이 소속된 레포에 귀속 → 레포를 지우면 함께 사라진다. 유지하려면:
-
-| 방법 | 효과 |
-|---|---|
-| `gh repo archive owner/repo --yes` | 읽기 전용 보관, 잔디 유지 (목록엔 계속 뜸) |
-| private 전환 | 남의 프로필 목록에서 숨김 + 잔디 유지 (private contribution 표시 옵션 ON) |
-| 삭제 후 90일 내 복원 | Settings → Repositories (fork 등 조건부) |
-| `git subtree`로 하나의 아카이브 레포에 흡수 | 과거 커밋 날짜 보존 → 잔디 살고 목록 준다 (본인 author 커밋만 카운트) |
-
-- 삭제 전 백업: `git clone --mirror` → 나중에 재 push로 복구 가능.
 
 ## 위험한 명령어 (주의)
 

@@ -161,6 +161,4 @@ docker run --rm -it alpine sh
 docker run --rm -it -v $(pwd):/work -w /work alpine sh
 ```
 
-## 폐쇄망(air-gapped) 이미지 이전
 
-인터넷 PC에서 이미지를 `docker save`로 tar 저장(문법은 [이미지](#이미지) 섹션) → 파일 옮긴 뒤 폐쇄망에서 `docker load`. Engine 자체를 오프라인 설치할 땐 정적 바이너리 tar(`download.docker.com/linux/static/`) → 공식 [Docker — Binaries](https://docs.docker.com/engine/install/binaries/).

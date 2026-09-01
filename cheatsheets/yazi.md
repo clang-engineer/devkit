@@ -26,14 +26,14 @@
   ↕ Space로 선택, y/x/p로 복사/이동
 ```
 
-Yazi는 세로 3패널 구조. 왼쪽은 경로(nazbar), 가운데는 파일 목록, 오른쪽은 미리보기.
-vim 키bindings로 조작하고, `q`로 종료하면 현재 위치가 셸에 반영된다.
+Yazi는 세로 3패널 구조다. 왼쪽은 경로(navbar), 가운데는 파일 목록, 오른쪽은 미리보기다.
+vim 키바인딩으로 조작한다. 종료 위치를 부모 셸에 반영하려면 공식 `y` shell wrapper로 실행해야 한다.
 
 ## 설치
 
 ```bash
 brew install yazi          # macOS
-cargo install yazi-fm      # Rust 소스에서 빌드
+cargo install --force yazi-build  # Rust 소스에서 빌드
 ```
 
 ## 자주 쓰는 기본 키
@@ -48,8 +48,8 @@ cargo install yazi-fm      # Rust 소스에서 빌드
 | `a` | 파일·폴더 생성 (`폴더명/`이면 폴더) |
 | `r` | 이름 변경 |
 | `.` | 숨김 파일 표시·숨김 |
-| `q` | 종료하면서 현재 폴더를 셸에 반영 |
-| `Q` | 셸의 현재 폴더를 바꾸지 않고 종료 |
+| `q` | 종료 (`y` shell wrapper로 실행한 경우 현재 폴더를 셸에 반영) |
+| `Q` | cwd-file을 출력하지 않고 종료 |
 
 ## 복사·이동·삭제
 

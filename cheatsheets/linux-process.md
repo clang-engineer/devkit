@@ -9,7 +9,7 @@
 | 이름으로 PID 찾기 | `pgrep -fl <pattern>` |
 | 이름으로 종료 | `pkill -f <pattern>` |
 | 포트 누가 잡았나 | `lsof -iTCP:<port> -sTCP:LISTEN` |
-| 포트 잡은 놈 한 번에 죽이기 | `fuser -k <port>/tcp` |
+| 포트 사용 프로세스 종료 요청 | `fuser -k -TERM <port>/tcp` |
 | 정확한 실행파일명으로 PID | `pidof <name>` |
 | 설정 리로드 | `kill -HUP <pid>` 또는 `pkill -HUP <name>` |
 
@@ -108,13 +108,17 @@ lsof -u zero                   # 특정 유저
 ## `fuser` — 포트/파일 점유자 (리눅스)
 
 ```bash
-fuser 4000/tcp                 # 4000 포트 점유 PID
-fuser -k 4000/tcp              # 점유 프로세스 즉시 종료
+fuser 4000/tcp                 # 로컬 TCP 4000 포트 사용 PID
+fuser -k -TERM 4000/tcp        # 정상 종료 요청
+fuser -k -i -TERM 4000/tcp     # 대상마다 확인 후 종료 요청
+fuser -k -KILL 4000/tcp        # 강제 종료 (최후의 수단)
 fuser -v 4000/tcp              # 상세 출력
 fuser /var/log/syslog          # 파일 연 프로세스
 ```
 
-> `lsof`보다 가볍지만 출력 빈약. macOS 기본 없음.
+> `fuser -k`의 기본 시그널은 SIGKILL이므로 `-TERM`을 명시한다. `4000/tcp`는
+> 로컬 TCP 포트 사용자를 찾으며 항상 서버 프로세스만 뜻하지는 않는다. 권한이 부족하면
+> 결과가 누락될 수 있다. macOS에는 기본 설치되지 않는다.
 
 ## `kill` — 시그널
 

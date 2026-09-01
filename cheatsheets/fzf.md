@@ -27,7 +27,7 @@
 조건으로 후보를 만들고, `fzf`는 받은 후보에서 사용자가 대화형으로 선택한다.
 
 ```bash
-git branch | fzf                       # 브랜치 후보 → 선택
+git branch --format='%(refname:short)' | fzf  # 브랜치 후보 → 선택
 fd --type f --extension sql | fzf      # fd가 파일 후보 생성, fzf가 선택
 ```
 
@@ -69,19 +69,23 @@ eval "$(fzf --bash)"            # bash
 |----|------|
 | `Ctrl+J` / `Ctrl+K` | 아래/위 이동 |
 | `Tab` / `Shift+Tab` | 멀티 선택 (`--multi`) |
-| `Ctrl+/` | 프리뷰 줄바꿈 토글 (`toggle-wrap-word`; 프리뷰 자체 토글은 기본 미바인딩 → `--bind ctrl-/:toggle-preview`) |
+| `Ctrl+/` | 프리뷰 줄바꿈 토글 (`toggle-wrap-word`; 프리뷰 표시 토글은 별도 바인딩 필요) |
 | `Enter` | 확정 |
 | `Esc` / `Ctrl+C` | 취소 |
 
 ## 파이프 조합
 
 ```bash
-vim $(fzf)                                    # 파일 골라 vim 열기
-git checkout $(git branch | fzf)              # 브랜치 골라 체크아웃
-kill -9 $(ps aux | fzf | awk '{print $2}')    # 프로세스 골라 kill
+fzf --print0 | xargs -0 -o vim --             # 파일 골라 vim 열기
+git branch --format='%(refname:short)' | fzf | xargs git checkout --
+pid="$(ps -Ao pid=,command= | fzf | awk '{print $1}')"
+[ -n "$pid" ] && kill "$pid"                 # 기본 SIGTERM; 확인 후 실행
 rg "TODO" | fzf                               # rg 결과에서 좁히기
-ls | fzf -m | xargs rm                        # 멀티 선택 후 일괄 처리
+fd --max-depth 1 --type f --print0 | \
+  fzf --read0 --print0 -m | xargs -0 rm --    # 파일명 공백·특수문자 안전
 ```
+
+삭제 명령은 선택 결과를 먼저 출력해 확인한 뒤 실행한다.
 
 ## 미리보기
 

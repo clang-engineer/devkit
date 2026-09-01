@@ -180,16 +180,27 @@ sudo setsebool -P httpd_can_network_connect 1
 sudo semanage port -a -t http_port_t -p tcp 8080
 ```
 
+`setenforce 0`은 재부팅 전까지만 permissive 모드로 전환하며 SELinux를 비활성화하지 않는다.
+
 ### 막혔을 때
 
 ```bash
-sudo ausearch -m avc -ts recent
+sudo ausearch -m AVC,USER_AVC,SELINUX_ERR,USER_SELINUX_ERR -ts recent
+matchpathcon -V /path
 sudo restorecon -Rv /path
-sudo chcon -t httpd_sys_content_t /path
+
+# 정책에 없는 비표준 서비스 경로라면 영속 규칙을 등록한 뒤 적용
+sudo semanage fcontext -a -t httpd_sys_content_t '/path(/.*)?'
+sudo restorecon -Rv /path
+
+# 위 점검으로 원인이 불명확할 때만 한 번 재현하고 즉시 enforcing 복귀
+sudo setenforce 0
+sudo setenforce 1
 ```
 
-권장 확인 순서는 `setenforce 0`(임시) → `ausearch -m avc` →
-`restorecon`/`semanage`/`setsebool` 점검이다.
+권장 확인 순서는 AVC 로그 → 예상 라벨 확인 → `restorecon` → 필요한
+`semanage`/`setsebool` 점검이다. `chcon` 라벨은 `restorecon`이나 파일시스템 재라벨 때
+사라질 수 있으므로 영속 설정에는 `semanage fcontext`를 사용한다.
 
 ---
 

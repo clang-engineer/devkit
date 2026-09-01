@@ -111,7 +111,7 @@ Branches 패널(3번)은 안에 탭 3개를 가진다. Local Branches는 **로�
 | `[` `]` | 패널 내 탭 순환 (Local ↔ Remotes ↔ Tags) — **remote 브랜치는 여기 있다** |
 
 remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` → 브랜치 목록 → `Space`(로컬 tracking 브랜치 생성).
-목록에 새 브랜치가 없으면 `f`(선택 fetch) / `F`(fetch all)로 갱신.
+목록에 새 브랜치가 없으면 Remotes에서 remote를 선택하고 `f`로 fetch한다. 현재 기본 `F`는 fork remote 추가다.
 
 > "remote 브랜치가 안 보인다"는 Branches 패널(3)에서 `]`(다음 탭)로 Remotes 탭에 넘어가면 된다. Local Branches 탭은 로컬만 보여준다.
 
@@ -156,7 +156,7 @@ remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` �
 
 1. Commits 패널에서 베이스 커밋 위에 커서 → `e`
 2. 각 커밋에 `s`(squash) / `f`(fixup) / `d`(drop) / `r`(reword)
-3. `m`으로 merge mode 진입 시 자동 진행
+3. 진행/중단/건너뛰기가 필요하면 `m`으로 merge/rebase options를 열어 선택
 
 ### 3. 충돌 해결
 
