@@ -264,6 +264,18 @@ Docker GUI가 충분하면 필수는 아니다. tmux 안에서 Docker 작업까�
 작업을 키보드 중심 TUI로 묶어 주는 경우가 많다는 점이다. 아래 도구들은 같은
 맥락에서 추가 후보로 볼 만하다.
 
+### Posting / ATAC — HTTP API
+
+Postman 같은 HTTP client를 터미널에서 쓰고 싶을 때 보는 TUI 계열이다. request,
+headers, body, response를 한 화면에서 다룬다. 둘을 동시에 둘 필요는 없다.
+
+```text
+HTTP API -> Posting or ATAC
+```
+
+curl/httpie 또는 editor의 REST client가 충분하다면 추가하지 않고, terminal-first
+API testing이 반복될 때 하나를 선택한다.
+
 ### lazyjournal — logs
 
 systemd journal, 파일 로그, Docker/Podman/Compose/Kubernetes 로그를 TUI에서
@@ -275,6 +287,7 @@ Logs -> lazyjournal
 ```
 
 서버 운영이나 장애 대응이 잦다면 lazydocker보다 더 자주 쓰게 될 수도 있다.
+`lnav`와 역할이 일부 중복된다.
 
 ### k9s — Kubernetes
 
@@ -289,16 +302,16 @@ Kubernetes  -> k9s
 
 Kubernetes를 실제로 자주 다루지 않는다면 선제 설치할 필요는 없다.
 
-### rainfrog — database
+### rainfrog / Harlequin — database
 
 터미널에서 DB를 탐색하고 SQL을 실행하는 TUI다. database/table/schema를 보면서
 쿼리할 수 있어 GUI DB client와 raw `psql`/`mysql` 사이에 있는 느낌이다.
 
 ```text
-Database -> rainfrog
+Database -> rainfrog 또는 Harlequin
 ```
 
-rainfrog 자체에 connection picker가 있다. 설정 파일의 `[db]` 아래에 여러 연결을
+rainfrog에 connection picker가 있다. 설정 파일의 `[db]` 아래에 여러 연결을
 등록하고 `default = true`를 지정하지 않으면 시작할 때 선택 목록이 나타난다.
 
 ```toml
@@ -316,31 +329,19 @@ rainfrog
 ```
 
 연결 문자열과 TOML에는 비밀번호를 넣지 않는다. 연결을 선택한 뒤 입력한
-비밀번호는 macOS Keychain 등 플랫폼 keychain에 저장할 수 있다. 최초 접속에서는
-비밀번호를 입력해야 하지만, 이후에는 rainfrog가 선택한 연결에 대응하는 값을
-keychain에서 조회한다. 이 저장소는 `psql`이나 Dadbod이 사용하는 `.pgpass`와
-별개이며, 저장된 값을 바꾸려면 `rainfrog --reenter-password`로 다시 입력한다.
+비밀번호는 macOS Keychain 등 플랫폼 keychain에 저장할 수 있다.
 
 PostgreSQL은 최우선 지원 대상이지만 Vertica는 공식 지원 대상이 아니고 Oracle
 지원은 실험적이므로, 여러 DBMS를 한 도구로 통합할 목적이라면 지원 범위를 먼저
-확인한다. 또한 프로젝트는 아직 breaking change 가능성과 쓰기 권한이 있는
-production DB 사용에 대한 주의를 명시하고 있다.
+확인한다.
 
-H2는 직접 지원하지 않는다. H2의 실험적인 PostgreSQL protocol server를 거치면
-테이블 목록까지 보일 수 있지만, rainfrog가 쿼리마다 호출하는
-`pg_backend_pid()`와 쿼리 취소용 `pg_cancel_backend()`, PostgreSQL catalog가 H2와
-호환되지 않아 일반적인 사용 경로로 삼기 어렵다. 호환 함수를 DB에 추가해
-우회하기보다 H2만 공식 Shell로 분리하는 편이 안정적이다.
+H2는 직접 지원하지 않는다. H2 Shell을 별도로 사용한다.
 
 ```bash
 java -cp "$(brew --prefix h2)/libexec/bin/*" org.h2.tools.Shell \
   -url 'jdbc:h2:./build/h2db/app;MODE=PostgreSQL;AUTO_SERVER=TRUE' \
   -user sa
 ```
-
-즉 PostgreSQL/MySQL/SQLite 탐색은 rainfrog, H2는 H2 Shell처럼 DBMS의 native
-접속 경로를 사용한다. Harlequin이나 lazysql 같은 다른 풀스크린 TUI도 H2/JDBC를
-직접 지원하지 않으므로, H2 하나 때문에 기본 TUI를 교체할 필요는 없다.
 
 Neovim의 dadbod workflow가 편하면 겹칠 수 있으므로, DB 작업을 editor 밖에서도
 자주 하는지가 도입 기준이다.
@@ -369,18 +370,6 @@ GitHub    -> gh-dash
 Git 자체의 commit/branch/rebase 작업은 lazygit, GitHub 원격 협업 상태는 gh-dash로
 나누면 역할이 겹치지 않는다. PR/issue를 자주 보지 않는다면 `gh` CLI만으로도
 충분하다.
-
-### Posting / ATAC — HTTP API
-
-Postman 같은 HTTP client를 터미널에서 쓰고 싶을 때 보는 TUI 계열이다. request,
-headers, body, response를 한 화면에서 다룬다.
-
-```text
-HTTP API -> Posting or ATAC
-```
-
-둘을 동시에 둘 필요는 없다. curl/httpie 또는 editor의 REST client가 충분하다면
-추가하지 않고, terminal-first API testing이 반복될 때 하나를 선택한다.
 
 ## hyperfine — CLI benchmark
 
