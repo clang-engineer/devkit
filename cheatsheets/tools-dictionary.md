@@ -84,11 +84,29 @@
 
 | 도구 | 설명 | 핵심 명령어 |
 |------|------|------------|
-| harlequin | 터미널 SQL IDE | `harlequin --profile x`, `--config-path ~/.config/harlequin/` |
-| PostgreSQL | 모니터링 쿼리 | `SELECT * FROM pg_stat_activity WHERE state <> 'idle'`, `pg_size_pretty(pg_database_size(current_database()))` |
-| elasticsearch | 검색 엔진 API | `curl -XGET 'localhost:9200/_cat/health'`, `_search`, `_cat/indices`, `_cat/nodes` |
-| kibana | ES 시각화 UI | KQL 필터, Discover, Dev Tools(`GET _search`), 대시보드 |
-| Vertica | 컬럼형 분석 DB | `SELECT * FROM v_catalog.tables`, `v_monitor`, `chage -l username` |
+| harlequin | 터미널 SQL IDE | `harlequin --profile x`, `--config-path`, `hsql -P x -c "select 1"`, `--keys`(키맵 확인) |
+| PostgreSQL | 모니터링 쿼리 | `pg_stat_activity`(세션), `pg_size_pretty(pg_database_size())`, `pg_locks`(락) |
+| elasticsearch | 검색 엔진 API | `_cat/health`, `_cat/indices`, `_search`, `_count`, `_delete_by_query` |
+| kibana | ES 시각화 UI | KQL: `field:value`, `message:"exact"`, `bytes >= 1000`, `not field:x`. Dev Tools: `Ctrl+Enter` |
+
+### Elasticsearch curl↔Dev Tools 변환
+
+| curl | Dev Tools |
+|------|-----------|
+| `curl -XGET "HOST:9200/INDEX/_search"` | `GET INDEX/_search` |
+| `-H 'Content-Type: application/json'` | 생략 (자동) |
+| `-d '{...}'` | 다음 줄에 JSON 그대로 |
+
+### KQL 핵심 문법
+
+| 패턴 | 예시 |
+|------|------|
+| 정확 일치 | `response:200` |
+| 구문 매칭 | `message:"quick brown"` |
+| 범위 | `bytes >= 1000 and bytes < 5000` |
+| 부정 | `not response:200` |
+| 그룹 | `response:(200 or 404)` |
+| 와일드카드 | `field:value*` (`*`만 지원, `?`는 미지원) |
 
 ## 개념/참조
 

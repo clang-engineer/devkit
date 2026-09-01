@@ -32,9 +32,7 @@ groups:
 
   - title: 데이터
     items:
-      - {file: harlequin.md, desc: "Harlequin 기본 사용법 (`--config-path`, `--profile`)"}
-      - {file: elasticsearch.md, desc: "Elasticsearch 쿼리/관리"}
-      - {file: kibana.md, desc: "KQL, Dev Tools, Discover, 운영 진단"}
+      - {file: elasticsearch.md, desc: "Elasticsearch 쿼리/관리 (curl↔Dev Tools, bool 쿼리, bulk, _cat API)"}
 
   - title: Git & 버전 관리
     items:
