@@ -2,18 +2,37 @@
 
 > SSH 키·`~/.ssh/config`·SCP/rsync·포트 포워딩·점프 호스트. macOS Keychain 통합 포함.
 
-## 30초만 본다면
+## 개념 흐름
 
-| 상황 | 명령 |
-|---|---|
-| 처음 키 만들기 | `ssh-keygen -t ed25519 -C "email"` |
-| 서버에 키 등록 | `ssh-copy-id user@host` |
-| config 한 줄로 접속 | `~/.ssh/config`에 `Host` 정의 → `ssh alias` |
-| 점프 호스트 경유 | `ssh -J bastion target` |
-| 로컬 포트 → 원격 | `ssh -L 8080:localhost:80 host` |
-| 원격 포트 → 로컬 | `ssh -R 9000:localhost:9000 host` |
-| 디버그 | `ssh -vvv host` |
-| 키 인증 실패 | `ssh-add -l` 확인 → `ssh -vT host`로 어떤 키 시도되는지 |
+```text
+키 생성 (ssh-keygen) → 서버 등록 (ssh-copy-id) → 접속 (ssh)
+                                    ↓
+                    ssh-agent에 키 등록 (ssh-add)
+                                    ↓
+              ~/.ssh/config로 alias 관리 → ssh host
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 키 만들기 | `ssh-keygen -t ed25519 -C "email"` | ed25519 권장 |
+| 서버에 키 등록 | `ssh-copy-id user@host` | 공개키 자동 복사 |
+| config 설정 | `~/.ssh/config`에 `Host` 정의 | `ssh alias`로 접속 |
+| 포트 포워딩 | `ssh -L 8080:localhost:80 host` | 로컬 포트 → 원격 |
+| 점프 호스트 | `ssh -J bastion target` | 중간 서버 경유 |
+| 키 등록 확인 | `ssh-add -l` | 어떤 키가 있는지 |
+| 디버그 | `ssh -vvv host` | 상세 로그 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| rsync | SSH 위 디렉토리 동기화 (변경분만 전송) |
+| scp | SSH 채널 위 파일 복사 |
+| autossh | 연결 끊기면 자동 재연결 |
+| git | SSH로 GitHub/GitLab 접속 |
+| tmux | SSH 세션 유지 (연결 끊겨도 프로세스 보존) |
 
 ## ssh-agent + ssh-add
 
@@ -47,7 +66,6 @@ Host *
 
 ```sh
 ssh-keygen -t ed25519 -C "email" -f ~/.ssh/id_ed25519
-ssh-keygen -t rsa -b 4096 -C "email" -f ~/.ssh/id_rsa -N ""   # 비밀번호 없음
 
 # 서버 ~/.ssh/authorized_keys에 공개키 추가 (한 줄)
 ssh-copy-id user@host
@@ -61,9 +79,19 @@ ssh-copy-id -p 2222 user@host                                  # 비표준 포�
 | `-b 4096` | RSA 비트 (보안 강화) |
 | `-C "email"` | 주석 (키 식별용) |
 | `-f path` | 저장 경로 |
-| `-N ""` | 비밀번호 없음 |
+| `-N ""` | 빈 passphrase (무인 자동화 등 필요한 경우에만) |
 
-> `ssh-copy-id`가 없으면 수동: `cat ~/.ssh/id_ed25519.pub | ssh user@host 'mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'`
+기본은 passphrase를 설정한다. 무인 자동화 때문에 빈 passphrase가 꼭 필요하면 해당 키를
+별도로 만들고 서버 측 명령·접속 원본·포트 포워딩 권한을 최소화한다.
+
+```sh
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/id_ed25519
+
+# ssh-copy-id가 없을 때
+cat ~/.ssh/id_ed25519.pub | ssh user@host \
+  'umask 077; mkdir -p ~/.ssh; cat >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys'
+```
 
 ## ~/.ssh/config
 

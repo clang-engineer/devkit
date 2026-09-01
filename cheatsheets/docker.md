@@ -2,20 +2,38 @@
 
 > 컨테이너 + 이미지 + 네트워크/볼륨 + Compose. Docker Engine 20+ / Compose v2 (공백, `docker compose`) 기준.
 
-## 30초만 본다면
+## 개념 흐름
 
-| 상황 | 명령 |
-|---|---|
-| 실행 중인 것 | `docker ps` (전체: `-a`) |
-| 빠르게 띄우기 (포트·이름·자동삭제) | `docker run --rm -d -p 8080:80 --name nginx nginx` |
-| 안으로 들어가기 | `docker exec -it <name> bash` |
-| 로그 | `docker logs -f --tail=100 <name>` |
-| 정지·삭제 | `docker rm -f <name>` |
-| 이미지 빌드 | `docker build -t myapp .` |
-| 디스크 정리 | `docker system prune -a` (이미지·캐시 회수, 볼륨은 `--volumes` 추가) |
-| Compose 띄우기 | `docker compose up -d` |
-| Compose 한 서비스 재시작 | `docker compose restart <svc>` |
-| Compose 로그 | `docker compose logs -f <svc>` |
+```text
+Image (build/pull)
+  ↓ run
+Container ←→ Network
+  ↕
+Volume
+
+Compose = 여러 컨테이너를 서비스로 묶어 관리
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 이미지 빌드 | `docker build -t myapp .` | Dockerfile → 이미지 |
+| 컨테이너 실행 | `docker run --rm -d -p 8080:80 --name nginx nginx` | 백그라운드, 포트 매핑 |
+| 쉘 접속 | `docker exec -it <name> bash` | 실행 중 컨테이너 안으로 |
+| 로그 확인 | `docker logs -f --tail=100 <name>` | follow + 마지막 100줄 |
+| 정지·삭제 | `docker rm -f <name>` | 강제 삭제 |
+| 디스크 정리 | `docker system prune -a` | 미참조 이미지까지 회수 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| kubectl | Kubernetes에서 Docker 이미지 사용 |
+| docker compose | 멀티 컨테이너 오케스트레이션 |
+| lazydocker | Docker TUI 프론트엔드 |
+| docker scout | 이미지 보안 취약점 분석 |
+| dive | 이미지 레이어 상세 분석 |
 
 ## 컨테이너 라이프사이클
 

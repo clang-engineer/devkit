@@ -2,22 +2,34 @@
 
 > 분산 버전 관리의 표준. 일상 워크플로 + 자주 망치는 작업을 한 곳에.
 
-## 30초만 본다면
+## 개념 흐름
 
-| 상황 | 명령 |
-|---|---|
-| 변경 확인 | `git status -sb` / `git diff` |
-| 스테이지 | `git add .` / `git add -p` (조각 단위) |
-| 커밋 | `git commit -m "..."` / `git commit -v` (diff 보면서) |
-| 마지막 커밋 수정 | `git commit --amend` (push 전에만) |
-| 브랜치 만들고 이동 | `git switch -c feat/x` |
-| 브랜치 전환 | `git switch main` |
-| 변경 임시 보관 | `git stash` / 복구 `git stash pop` |
-| 원격 받기 | `git pull --ff-only` |
-| 원격 보내기 | `git push -u origin HEAD` |
-| 마지막 커밋 되돌리기 (이력 보존) | `git revert HEAD` |
-| 작업 디렉터리 되돌리기 | `git restore <file>` |
-| 그래프 보기 | `git log --oneline --graph --all` |
+```text
+Working Tree → Staging Area → Local Repo → Remote Repo
+     ↑              ↑              ↑              ↑
+  restore        add           commit          push/pull
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 변경 확인 | `git status -sb` / `git diff` | 어떤 파일이 바뀌었는지 |
+| 스테이징 | `git add -p` | 조각 단위로 선택 (안전) |
+| 커밋 | `git commit -m "msg"` | 이력 남기기 |
+| 브랜치 | `git switch -c feat/x` | 새 작업 가지 만들기 |
+| 원격 동기화 | `git pull --ff-only` | fast-forward만 허용 |
+| 되돌리기 | `git restore <file>` | 파일 변경사항 취소 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| gh | GitHub CLI - PR/이슈/Actions/API |
+| lazygit | Git TUI 프론트엔드 |
+| delta | diff 페이저 (syntax highlighting) |
+| git-filter-repo | 히스토리 재작성 |
+| chezmoi | dotfiles 관리 (Git 기반) |
 
 ## 상태 확인 & 변경 비교
 
@@ -329,7 +341,7 @@ commit.committer_email = b"you@example.com"
 검증:
 ```bash
 git log --pretty=format:"%ae" | sort -u
-git log --pretty=format:"%ai %s" | tail -3   # 원본 날짜 보존 확인
+git log --pretty=format:"%ai %s" | tail-3   # 원본 날짜 보존 확인
 ```
 
 ## 이미 추적 중인 파일을 .gitignore로 무시하기
