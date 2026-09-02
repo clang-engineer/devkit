@@ -17,7 +17,6 @@ const (
 	viewTree viewState = iota
 	viewDetail
 	viewSearch
-	viewTldr
 )
 
 type TreeItem struct {
@@ -41,6 +40,8 @@ type Model struct {
 	detail     *model.Relation
 	textInput  textinput.Model
 	tldrOutput string
+	showTldr   bool
+	explored   map[[2]int]bool
 	width      int
 	height     int
 }
@@ -56,6 +57,7 @@ func NewModel(data model.CommandsData) Model {
 		state:     viewTree,
 		textInput: ti,
 		items:     buildTreeItems(data),
+		explored:  make(map[[2]int]bool),
 	}
 }
 
@@ -92,7 +94,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			m.tldrOutput = msg.output
 		}
-		m.state = viewTldr
 		return m, nil
 
 	case tea.KeyMsg:
@@ -103,8 +104,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.updateDetail(msg)
 		case viewSearch:
 			return m.updateSearch(msg)
-		case viewTldr:
-			return m.updateTldr(msg)
 		}
 	}
 
@@ -130,7 +129,10 @@ func (m Model) updateTree(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		if m.cursor < len(m.items) {
 			item := m.items[m.cursor]
 			m.detail = &m.data.Categories[item.CategoryIndex].Relations[item.RelationIndex]
+			m.explored[[2]int{item.CategoryIndex, item.RelationIndex}] = true
 			m.state = viewDetail
+			m.showTldr = false
+			m.tldrOutput = ""
 		}
 
 	case "/":
@@ -149,11 +151,23 @@ func (m Model) updateDetail(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 
 	case "esc", "b", "backspace":
+		if m.showTldr {
+			m.showTldr = false
+			m.tldrOutput = ""
+			return m, nil
+		}
 		m.state = viewTree
 		m.detail = nil
 
 	case "t":
 		if m.detail != nil && m.detail.Tldr != "" {
+			if m.showTldr {
+				m.showTldr = false
+				m.tldrOutput = ""
+				return m, nil
+			}
+			m.showTldr = true
+			m.tldrOutput = ""
 			tldrCmd := m.detail.Tldr
 			return m, func() tea.Msg {
 				cmd := exec.Command("tldr", tldrCmd)
@@ -164,19 +178,6 @@ func (m Model) updateDetail(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 				return tldrDoneMsg{output: string(out), err: nil}
 			}
 		}
-	}
-
-	return m, nil
-}
-
-func (m Model) updateTldr(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
-	switch msg.String() {
-	case "ctrl+c", "q":
-		return m, tea.Quit
-
-	case "esc", "b", "backspace":
-		m.state = viewDetail
-		m.tldrOutput = ""
 	}
 
 	return m, nil
@@ -230,8 +231,6 @@ func (m Model) View() string {
 		b.WriteString(m.viewDetail())
 	case viewSearch:
 		b.WriteString(m.viewSearch())
-	case viewTldr:
-		b.WriteString(m.viewTldr())
 	}
 
 	return b.String()
@@ -255,11 +254,16 @@ func (m Model) viewTree() string {
 			cursor = selectedStyle.Render("▶ ")
 		}
 
+		explored := " "
+		if m.explored[[2]int{item.CategoryIndex, item.RelationIndex}] {
+			explored = exploredStyle.Render("✓")
+		}
+
 		from := fromStyle.Render(item.From)
 		arrow := arrowStyle.Render(" ──[" + item.Why + "]──→ ")
 		to := toStyle.Render(item.To)
 
-		b.WriteString(cursor + from + arrow + to)
+		b.WriteString(cursor + explored + " " + from + arrow + to)
 		b.WriteString("\n")
 	}
 
@@ -306,18 +310,20 @@ func (m Model) viewDetail() string {
 		b.WriteString("\n\n")
 	}
 
-	b.WriteString(helpStyle.Render("[t] tldr 보기  [b] 뒤로  [q] 종료"))
+	if m.showTldr {
+		b.WriteString(detailLabelStyle.Render("tldr: " + d.Tldr))
+		b.WriteString("\n")
+		if m.tldrOutput != "" {
+			b.WriteString(m.tldrOutput)
+		} else {
+			b.WriteString(helpStyle.Render("로딩 중..."))
+		}
+		b.WriteString("\n\n")
+		b.WriteString(helpStyle.Render("[t] tldr 닫기  [b] 뒤로  [q] 종료"))
+	} else {
+		b.WriteString(helpStyle.Render("[t] tldr 보기  [b] 뒤로  [q] 종료"))
+	}
 
-	return b.String()
-}
-
-func (m Model) viewTldr() string {
-	var b strings.Builder
-	b.WriteString(detailTitleStyle.Render("tldr: " + m.detail.Tldr))
-	b.WriteString("\n\n")
-	b.WriteString(m.tldrOutput)
-	b.WriteString("\n\n")
-	b.WriteString(helpStyle.Render("[b/Esc] 뒤로  [q] 종료"))
 	return b.String()
 }
 

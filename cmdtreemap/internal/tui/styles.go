@@ -24,9 +24,8 @@ var (
 			Bold(true).
 			Foreground(lipgloss.Color("#50FA7B"))
 
-	whyStyle = lipgloss.NewStyle().
-			Italic(true).
-			Foreground(lipgloss.Color("#6272A4"))
+	exploredStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#50FA7B"))
 
 	selectedStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#BD93F9"))
