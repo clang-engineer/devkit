@@ -257,6 +257,19 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	case "ctrl+c", "q":
 		return m, tea.Quit
 	case "enter":
+		node := m.tree.NodeAtCurrentOffset()
+		if node == nil {
+			return m, nil
+		}
+		val, ok := node.GivenValue().(treeItem)
+		if !ok {
+			return m, nil
+		}
+		if !val.isLeaf || val.rel == nil {
+			return m, nil
+		}
+		m.detail = val.rel
+		m.explored[[2]int{val.catIdx, val.relIdx}] = true
 		m.state = viewDetail
 		m.showTldr = false
 		m.tldrOutput = ""
