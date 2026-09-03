@@ -4,6 +4,7 @@ type Relation struct {
 	From       string `json:"from"`
 	To         string `json:"to"`
 	Why        string `json:"why"`
+	Group      string `json:"group"`
 	Problem    string `json:"problem"`
 	Solution   string `json:"solution"`
 	Relation   string `json:"relation"` // alternative, specialized, complement, successor

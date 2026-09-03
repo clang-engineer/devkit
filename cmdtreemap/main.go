@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	tea "github.com/charmbracelet/bubbletea"
+	tea "charm.land/bubbletea/v2"
 
 	"github.com/clang/cmdtreemap/internal/model"
 	"github.com/clang/cmdtreemap/internal/tui"
@@ -23,7 +23,7 @@ func main() {
 	}
 
 	m := tui.NewModel(data)
-	p := tea.NewProgram(m, tea.WithAltScreen())
+	p := tea.NewProgram(m)
 
 	if _, err := p.Run(); err != nil {
 		fmt.Fprintf(os.Stderr, "실행 실패: %v\n", err)
