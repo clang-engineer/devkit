@@ -39,6 +39,10 @@ groups:
       - {file: git.md, desc: "Git 명령어 (브랜치, stash, rebase, tag 등)"}
       - {file: chezmoi.md, desc: "chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿)"}
 
+  - title: 보안 & 비밀정보
+    items:
+      - {file: sops.md, desc: "SOPS + age — 설정 파일 암호화, Git 관리, key 교체와 문제 해결"}
+
   - title: 개발 도구
     items:
       - {file: mise.md, desc: "mise — 다언어 런타임 버전 관리 (rbenv/jenv/pyenv/nvm 통합, config+activate)"}

@@ -73,6 +73,12 @@
 | [git.md](git.md) | Git 명령어 (브랜치, stash, rebase, tag 등) |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 |
 
+## 보안 & 비밀정보
+
+| 파일 | 설명 |
+|------|------|
+| [sops.md](sops.md) | SOPS + age로 설정 파일을 암호화해 Git에서 관리 |
+
 ## 개발 도구
 
 | 파일 | 설명 |

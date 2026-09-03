@@ -28,6 +28,8 @@ Tool introductions and operational references. Full index with descriptions:
 
 **Git & version control** · [git](cheatsheets/git.md) · [gh](cheatsheets/gh.md) · [code review glossary](cheatsheets/code-review-glossary.md) · [chezmoi](cheatsheets/chezmoi.md)
 
+**Security & secrets** · [sops](cheatsheets/sops.md)
+
 **Config formats** · [toml](cheatsheets/toml.md)
 
 **Dev tools** · [terminal tooling](cheatsheets/terminal-tooling.md) · [mise](cheatsheets/mise.md) · [curl](cheatsheets/curl.md) · [taskwarrior](cheatsheets/taskwarrior.md) · [Python PyPI publishing](cheatsheets/python-pypi-publishing.md) · [claude-code](cheatsheets/claude-code.md) · [ccusage](cheatsheets/ccusage.md) · [opencode](cheatsheets/opencode.md) · [gdb](cheatsheets/gdb.md)
