@@ -118,20 +118,7 @@ func NewModel(data model.CommandsData) Model {
 	// all folders (categories and groups) start collapsed; enter/space/l open
 	// them on demand. Close() also marks each node initialClosed so the closed
 	// state is preserved on subsequent child additions.
-	for _, n := range t.Root().AllNodes() {
-		if n != t.Root() && len(n.ChildNodes()) > 0 {
-			n.Close()
-		}
-	}
-	// Node.Close() skips the library's internal yOffset recalculation, leaving
-	// every node's yOffset stale (as if all folders were open). Force a
-	// recalculation through the public API so cursor navigation j/k finds nodes.
-	t.SetYOffset(0)
-	t.OpenCurrentNode()
-	// move the cursor off the (invisible) root line onto the first category.
-	if len(t.Root().ChildNodes()) > 0 {
-		t.SetYOffset(1)
-	}
+	collapseAllFolders(t)
 
 	styles := tree.DefaultDarkStyles()
 	styles.SelectedNodeStyle = lipgloss.NewStyle().
@@ -154,6 +141,28 @@ func NewModel(data model.CommandsData) Model {
 		textInput:   ti,
 		filterInput: fi,
 		explored:    make(map[[2]int]bool),
+	}
+}
+
+// collapseAllFolders closes every non-root folder and resets the cursor to the
+// first category. Used at startup and when exiting filter mode so folders that
+// were opened by the search are folded back up.
+func collapseAllFolders(t tree.Model) {
+	// Close() also marks each node initialClosed so the closed state is
+	// preserved on subsequent child additions.
+	for _, n := range t.Root().AllNodes() {
+		if n != t.Root() && len(n.ChildNodes()) > 0 {
+			n.Close()
+		}
+	}
+	// Node.Close() skips the library's internal yOffset recalculation, leaving
+	// every node's yOffset stale (as if all folders were open). Force a
+	// recalculation through the public API so cursor navigation j/k finds nodes.
+	t.SetYOffset(0)
+	t.OpenCurrentNode()
+	// move the cursor off the (invisible) root line onto the first category.
+	if len(t.Root().ChildNodes()) > 0 {
+		t.SetYOffset(1)
 	}
 }
 
@@ -812,7 +821,8 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.filterInput.Blur()
 		m.filterInput.Reset()
 		m.applyFilter(m.tree.Root(), "")
-		m.tree.SetYOffset(m.tree.YOffset())
+		// Fold back up any folders the search opened.
+		collapseAllFolders(m.tree)
 		m.updateSizes()
 		return m, nil
 	case "enter":
