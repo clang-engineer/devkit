@@ -166,6 +166,42 @@ func collapseAllFolders(t tree.Model) {
 	}
 }
 
+// findNextVisibleOffset scans from the current cursor position in the given
+// direction and returns the first offset whose node is not hidden. Falls back
+// to the opposite direction if no visible node exists in the requested
+// direction. Returns the current offset if no visible node is found at all.
+func (m *Model) findNextVisibleOffset(direction int) int {
+	current := m.tree.YOffset()
+	total := m.tree.Root().Size()
+
+	// Primary: scan in the requested direction.
+	for offset := current + direction; offset >= 0 && offset < total; offset += direction {
+		if node := m.tree.Node(offset); node != nil && !node.Hidden() {
+			return offset
+		}
+	}
+	// Fallback: scan the opposite direction.
+	for offset := current - direction; offset >= 0 && offset < total; offset -= direction {
+		if node := m.tree.Node(offset); node != nil && !node.Hidden() {
+			return offset
+		}
+	}
+	return current
+}
+
+// skipHiddenIfNeeded moves the cursor off a hidden node to the nearest visible
+// one. direction should match the movement that just occurred (+1 for down,
+// -1 for up). No-op when the cursor is already on a visible node.
+func (m *Model) skipHiddenIfNeeded(direction int) {
+	if node := m.tree.NodeAtCurrentOffset(); node == nil || !node.Hidden() {
+		return
+	}
+	target := m.findNextVisibleOffset(direction)
+	if target != m.tree.YOffset() {
+		m.tree.SetYOffset(target)
+	}
+}
+
 func buildTreeRoot(data model.CommandsData) *tree.Node {
 	// empty root name → the root node line is never rendered, so the top-level
 	// categories appear as the tree's top items.
@@ -487,7 +523,19 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	}
 
 	var cmd tea.Cmd
-	m.tree, cmd = m.tree.Update(msg)
+	if m.filterQuery != "" {
+		prevY := m.tree.YOffset()
+		m.tree, cmd = m.tree.Update(msg)
+		if newY := m.tree.YOffset(); newY != prevY {
+			dir := 1
+			if newY < prevY {
+				dir = -1
+			}
+			m.skipHiddenIfNeeded(dir)
+		}
+	} else {
+		m.tree, cmd = m.tree.Update(msg)
+	}
 	m.refreshPreview()
 	return m, cmd
 }
@@ -828,6 +876,10 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	case "enter":
 		m.filterActive = false
 		m.filterInput.Blur()
+		// Move the cursor onto the first visible node so the user can select
+		// a search result immediately instead of starting on the hidden root.
+		m.tree.SetYOffset(0)
+		m.skipHiddenIfNeeded(1)
 		m.updateSizes()
 		return m, nil
 	case "ctrl+u":
@@ -841,7 +893,9 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	m.filterInput, cmd = m.filterInput.Update(msg)
 	query := m.filterInput.Value()
 	m.applyFilter(m.tree.Root(), query)
-	m.tree.SetYOffset(m.tree.YOffset())
+	// Position the cursor on the first visible node after the root.
+	m.tree.SetYOffset(0)
+	m.skipHiddenIfNeeded(1)
 	return m, cmd
 }
 
