@@ -299,7 +299,9 @@ func buildCategoryTrees(cat model.Category) []*TreeNode {
 func (m *Model) applyFilter(root *tree.Node, query string) {
 	m.filterQuery = query
 
-	// Keep every treeItem's filterQuery in sync so String() can highlight.
+	// AllNodes only returns currently visible nodes, but that's fine: the
+	// filterQuery field is only used by String() for highlight rendering, and
+	// String() is only called on visible nodes anyway.
 	for _, node := range root.AllNodes() {
 		if item, ok := node.GivenValue().(treeItem); ok {
 			item.filterQuery = query
@@ -316,29 +318,35 @@ func (m *Model) applyFilter(root *tree.Node, query string) {
 
 	q := strings.ToLower(query)
 
-	// 루트의 직계 자식(카테고리)부터 재귀 필터링
-	for _, cat := range root.ChildNodes() {
-		filterNode(cat, q)
-	}
-}
+	// filterNode traverses each category tree. It opens the node before
+	// walking its children so the lazy children list is materialised and
+	// deeper nodes become reachable for the search.
+	var filterNode func(node *tree.Node) bool
+	filterNode = func(node *tree.Node) bool {
+		item, _ := node.GivenValue().(treeItem)
+		selfMatch := item.name != "" && strings.Contains(strings.ToLower(item.name), q)
 
-func filterNode(node *tree.Node, q string) bool {
-	item, _ := node.GivenValue().(treeItem)
-	selfMatch := item.name != "" && strings.Contains(strings.ToLower(item.name), q)
-
-	anyChild := false
-	for _, child := range node.ChildNodes() {
-		if filterNode(child, q) {
-			anyChild = true
-		}
-	}
-
-	hide := !(selfMatch || anyChild)
-	node.SetHidden(hide)
-	if !hide {
+		// Materialise lazy children before walking them.
 		node.Open()
+
+		anyChild := false
+		for _, child := range node.ChildNodes() {
+			if filterNode(child) {
+				anyChild = true
+			}
+		}
+
+		match := selfMatch || anyChild
+		node.SetHidden(!match)
+		return match
 	}
-	return !hide
+
+	// Process all top-level categories. filterNode's recursive Open() calls
+	// materialise deeper lazy children as we go, so each subsequent category
+	// traversal reaches more of the tree.
+	for _, cat := range root.ChildNodes() {
+		filterNode(cat)
+	}
 }
 
 func (m Model) Init() tea.Cmd { return nil }
