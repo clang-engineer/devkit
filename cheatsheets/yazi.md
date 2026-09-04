@@ -1,18 +1,18 @@
 # Yazi Cheatsheet
 
 > **터미널 파일 매니저** — Rust로 만든 빠르고 모던한 파일 관리자.
-> navbar, preview, multi-tab 지원. `ranger`의 대체제.
+> 3패널 탐색, preview, 비동기 파일 작업, multi-tab을 지원한다.
 
 ## 개념 흐름
 
 ```text
-navbar (경로) → 파일 목록 → 미리보기
-  ↓              ↓           ↓
-  h/l           j/k         Space
-  경로이동       파일선택      미리보기
-  ↓              ↓
-  y/x/p         s/S
-  복사/이동      검색 (fd/ripgrep)
+부모 폴더 → 현재 폴더 → 미리보기
+   ↓          ↓          ↓
+   h/l       j/k        J/K
+ 폴더 이동   항목 이동   미리보기 이동
+              ↓
+      Space, y/x/p, s/S
+      선택·복사·이동·검색
 ```
 
 핵심 명령어:
@@ -31,8 +31,8 @@ navbar (경로) → 파일 목록 → 미리보기
 |------|------|
 | fd | 파일명 검색 (`s` 키 내부 사용) |
 | ripgrep | 파일 내용 검색 (`S` 키 내부 사용) |
-| zoxide | 디렉토리 점프 (yazi 안에서 `z` 명령) |
-| tmux | yazi 세션 유지 |
+| fzf | 파일·디렉터리 탐색 (`z`) |
+| zoxide | 방문 기록 기반 디렉터리 이동 (`Z`, fzf 필요) |
 
 ## 30초만 본다면
 
@@ -52,20 +52,80 @@ navbar (경로) → 파일 목록 → 미리보기
 ## 핵심 모델
 
 ```text
-타입별 패널 (navbar / 파일 목록 / 미리보기)
-  ↕ h/l 로 탐색, j/k 로 이동
+3패널 (부모 폴더 / 현재 폴더 / 미리보기)
+  ↕ h/l 로 폴더 이동, j/k 로 항목 이동
   ↕ Space로 선택, y/x/p로 복사/이동
 ```
 
-Yazi는 세로 3패널 구조다. 왼쪽은 경로(navbar), 가운데는 파일 목록, 오른쪽은 미리보기다.
+Yazi는 세로 3패널 구조다. 왼쪽은 부모 폴더의 항목, 가운데는 현재 폴더의 항목, 오른쪽은 미리보기다.
 vim 키바인딩으로 조작한다. 종료 위치를 부모 셸에 반영하려면 공식 `y` shell wrapper로 실행해야 한다.
 
 ## 설치
 
 ```bash
-brew install yazi          # macOS
+brew install yazi          # macOS, 기본 설치
 cargo install --force yazi-build  # Rust 소스에서 빌드
 ```
+
+검색·이동과 풍부한 미리보기를 사용하려면 필요한 도구만 추가한다.
+
+```bash
+brew install fd ripgrep fzf zoxide  # 검색·이동
+brew install ffmpeg-full sevenzip jq poppler resvg imagemagick-full \
+  font-symbols-only-nerd-font       # 미디어·압축·문서 미리보기와 아이콘
+brew link ffmpeg-full imagemagick-full -f --overwrite
+```
+
+## 설정과 확장
+
+기본 설정 전체를 복사하지 않아도 된다. 아래 파일에 바꿀 항목만 작성하면 Yazi 기본값 위에 병합된다.
+
+| 파일 | 역할 |
+|---|---|
+| `~/.config/yazi/yazi.toml` | 파일 관리, 정렬, opener, previewer 등 일반 동작 |
+| `~/.config/yazi/keymap.toml` | 키맵 추가·변경 |
+| `~/.config/yazi/theme.toml` | 색상과 Flavor 선택 |
+| `~/.config/yazi/init.lua` | Lua 플러그인 초기화 |
+| `~/.config/yazi/package.toml` | `ya pkg`가 관리하는 패키지 버전 잠금 |
+
+```toml
+# ~/.config/yazi/yazi.toml
+[mgr]
+show_hidden = true
+```
+
+기본 키맵을 유지하면서 사용자 키를 추가하려면 `prepend_keymap` 또는 `append_keymap`을 사용한다.
+
+## 플러그인과 Flavor
+
+Yazi는 Lua 플러그인으로 명령, 메타데이터 수집, 사전 로딩과 미리보기를 확장한다. 공식 문서 기준 Plugin과 Flavor는 아직 Beta다. Flavor는 외형만 묶은 배포 가능한 테마 패키지다.
+
+```bash
+ya pkg add yazi-rs/plugins:git       # 공식 저장소의 Git 플러그인
+ya pkg add yazi-rs/flavors:dracula  # Dracula Flavor
+
+ya pkg list                          # 관리 중인 패키지
+ya pkg upgrade                       # 전체 업그레이드
+ya pkg delete yazi-rs/plugins:git   # 패키지 제거
+ya pkg install                       # package.toml의 잠금 버전 설치
+```
+
+새 환경에서는 dotfiles의 `package.toml`을 가져온 뒤 `ya pkg install`로 같은 버전을 복원한다. `ya`와 `yazi`의 버전은 정확히 같아야 한다.
+
+```lua
+-- ~/.config/yazi/init.lua
+require("my-plugin"):setup {
+  key = "value",
+}
+```
+
+```toml
+# ~/.config/yazi/theme.toml
+[flavor]
+dark = "dracula"
+```
+
+직접 설치한 플러그인은 `~/.config/yazi/plugins/<name>.yazi/main.lua`, Flavor는 `~/.config/yazi/flavors/<name>.yazi/flavor.toml`을 진입점으로 사용한다.
 
 ## 자주 쓰는 기본 키
 
@@ -152,4 +212,8 @@ cargo install --force yazi-build  # Rust 소스에서 빌드
 - `yazi --help`, `man yazi`
 - 공식: https://yazi-rs.github.io
 - Quick Start: https://yazi-rs.github.io/docs/quick-start
+- 설정: https://yazi-rs.github.io/docs/configuration/overview
+- 플러그인: https://yazi-rs.github.io/docs/plugins/overview
+- `ya pkg`: https://yazi-rs.github.io/docs/cli#pm
+- Flavor: https://yazi-rs.github.io/docs/flavors/overview
 - 키 도움말: Yazi 안에서 `F1` 누르기
