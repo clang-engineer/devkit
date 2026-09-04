@@ -152,7 +152,7 @@ func addTreeNodes(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 		rel:    rootRel,
 	})
 	parentNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
-		return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#8BE9FD"))
+		return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#BD93F9"))
 	})
 
 	for _, child := range node.Children {
@@ -260,41 +260,29 @@ func applyFilter(root *tree.Node, query string) {
 
 	q := strings.ToLower(query)
 
-	for _, node := range root.AllNodes() {
-		node.SetHidden(true)
-	}
-
-	for _, node := range root.AllNodes() {
-		if node == root {
-			node.SetHidden(false)
-			continue
-		}
-		if matchesOrHasMatch(node, q) {
-			setVisible(node)
-			node.Open()
-		}
+	// 루트의 직계 자식(카테고리)부터 재귀 필터링
+	for _, cat := range root.ChildNodes() {
+		filterNode(cat, q)
 	}
 }
 
-func matchesOrHasMatch(node *tree.Node, q string) bool {
-	item, ok := node.GivenValue().(treeItem)
-	if ok && strings.Contains(strings.ToLower(item.name), q) {
-		return true
-	}
+func filterNode(node *tree.Node, q string) bool {
+	item, _ := node.GivenValue().(treeItem)
+	selfMatch := item.name != "" && strings.Contains(strings.ToLower(item.name), q)
+
+	anyChild := false
 	for _, child := range node.ChildNodes() {
-		if matchesOrHasMatch(child, q) {
-			return true
+		if filterNode(child, q) {
+			anyChild = true
 		}
 	}
-	return false
-}
 
-func setVisible(node *tree.Node) {
-	node.SetHidden(false)
-	node.Open()
-	for _, child := range node.ChildNodes() {
-		setVisible(child)
+	hide := !(selfMatch || anyChild)
+	node.SetHidden(hide)
+	if !hide {
+		node.Open()
 	}
+	return !hide
 }
 
 func (m Model) Init() tea.Cmd { return nil }
@@ -304,13 +292,16 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-		treeWidth := m.width*35/100 - 1
-		previewWidth := m.width - treeWidth - 3
-		treeHeight := m.height - 3
-		m.tree.SetSize(treeWidth, treeHeight)
-		m.viewport.SetWidth(previewWidth)
-		m.viewport.SetHeight(m.height)
-		m.filterInput.SetWidth(treeWidth - 2)
+treeWidth := m.width*35/100 - 1
+	if treeWidth < 4 {
+		treeWidth = 4
+	}
+	previewWidth := m.width - treeWidth - 3
+	treeHeight := m.height - 3
+	m.tree.SetSize(treeWidth, treeHeight)
+	m.viewport.SetWidth(previewWidth)
+	m.viewport.SetHeight(m.height)
+	m.filterInput.SetWidth(treeWidth - 2)
 		return m, nil
 	case tea.KeyPressMsg:
 		return m.updateTree(msg)
@@ -357,17 +348,25 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		}
 		m.previewActive = true
 		m.explored[[2]int{val.catIdx, val.relIdx}] = true
+		m.showTldr = true
+		m.tldrOutput = ""
 		m.refreshPreview()
+		if val.rel.Tldr != "" {
+			return m, fetchTldrCmd(val.rel.Tldr)
+		}
 		return m, nil
 	case "/":
 		m.filterActive = true
 		m.filterInput.Reset()
 		return m, m.filterInput.Focus()
 	case "ctrl+l":
-		if m.previewActive {
-			m.focusedPane = panePreview
-			m.previewMode = previewNormal
-			m.previewCursor = m.viewport.YOffset()
+		m.focusedPane = panePreview
+		m.previewMode = previewNormal
+		m.previewCursor = m.viewport.YOffset()
+		return m, nil
+	case "ctrl+h":
+		if m.focusedPane == panePreview {
+			m.focusedPane = paneTree
 			return m, nil
 		}
 	case "b", "esc", "backspace":
@@ -661,7 +660,7 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 
 func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
-	case "ctrl+c":
+	case "ctrl+c", "q":
 		return m, tea.Quit
 	case "esc":
 		m.filterActive = false
@@ -693,11 +692,15 @@ func (m Model) View() tea.View {
 
 	// 필터 바
 	if m.filterActive {
+		treeWidth := m.width*35/100 - 1
+		if treeWidth < 4 {
+			treeWidth = 4
+		}
 		prefix := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFB86C")).Bold(true).Render("/")
 		bar := lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder(), true, true, true, true).
 			BorderForeground(lipgloss.Color("#FFB86C")).
-			Width(m.width * 35 / 100 - 2).
+			Width(treeWidth - 2).
 			Render(prefix + m.filterInput.View())
 		treeView = lipgloss.JoinVertical(lipgloss.Left, treeView, bar)
 	}
@@ -720,8 +723,20 @@ func (m Model) View() tea.View {
 		previewContent = helpStyle.Render("명령어를 선택하고 Enter로 상세 보기\n\nCtrl+H:트리  Ctrl+L:미리보기")
 	}
 
-	// 미리보기 포커스 표시
-	if m.focusedPane == panePreview && m.previewActive {
+	// 미리보기 포커스 시 모드 표시기 (lazyvim 스타일)
+	if m.focusedPane == panePreview {
+		modeStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#50FA7B")).Bold(true)
+		modeLabel := "NORMAL"
+		if m.previewMode == previewVisual {
+			modeLabel = "VISUAL"
+		}
+		if !m.previewActive {
+			previewContent = lipgloss.JoinVertical(lipgloss.Left,
+				modeStyle.Render("["+modeLabel+"]  < >:이동  Enter:상세  /:필터  q:종료"),
+				previewContent,
+			)
+		}
+
 		previewStyle := lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder(), false, false, false, true).
 			BorderForeground(lipgloss.Color("#50FA7B"))
@@ -745,6 +760,16 @@ func (m Model) View() tea.View {
 	v.SetContent(combined)
 	v.AltScreen = true
 	return v
+}
+
+func fetchTldrCmd(name string) tea.Cmd {
+	return func() tea.Msg {
+		out, err := exec.Command("tldr", name).CombinedOutput()
+		if err != nil {
+			return tldrDoneMsg{err: err}
+		}
+		return tldrDoneMsg{output: string(out)}
+	}
 }
 
 type tldrDoneMsg struct {
