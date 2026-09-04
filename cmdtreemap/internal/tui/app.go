@@ -14,7 +14,17 @@ import (
 	"github.com/clang/cmdtreemap/internal/model"
 )
 
-var filterQuery string
+// lazygit-inspired color palette
+const (
+	colorGreen   = "#50FA7B" // active panel border
+	colorMuted   = "#3C3C3C" // inactive panel border
+	colorBlue    = "#44475A" // selected line background
+	colorOrange  = "#FFB86C" // category nodes
+	colorCyan    = "#8BE9FD" // group nodes
+	colorDefault = "#F8F8F2" // leaf tool nodes
+	colorDim     = "#6272A4" // dim / secondary text
+	colorPurple  = "#BD93F9" // accents
+)
 
 type pane int
 
@@ -31,21 +41,22 @@ const (
 )
 
 type treeItem struct {
-	name    string
-	catIdx  int
-	relIdx  int
-	isLeaf  bool
-	rel     *model.Relation
+	name        string
+	catIdx      int
+	relIdx      int
+	isLeaf      bool
+	rel         *model.Relation
+	filterQuery string
 }
 
 func (i treeItem) String() string {
 	name := i.name
-	if filterQuery != "" {
-		name = highlightMatch(name, filterQuery)
+	if i.filterQuery != "" {
+		name = highlightMatch(name, i.filterQuery)
 	}
 	if i.isLeaf && i.rel != nil {
-		toStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#50FA7B"))
-		whyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
+		toStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
+		whyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
 		return toStyle.Render(name) + whyStyle.Render("  ["+i.rel.Why+"]")
 	}
 	return name
@@ -70,6 +81,7 @@ type Model struct {
 	filterInput   textinput.Model
 	explored      map[[2]int]bool
 	filterActive  bool
+	filterQuery   string
 	focusedPane   pane
 	previewActive bool
 	previewMode   previewMode
@@ -98,6 +110,40 @@ func NewModel(data model.CommandsData) Model {
 	t.KeyMap.Toggle.SetKeys(" ")
 	t.KeyMap.Open.SetKeys("l", "right")
 	t.KeyMap.Close.SetKeys("h", "left")
+	t.SetShowHelp(false)
+	t.SetOpenCharacter("▾")
+	t.SetClosedCharacter("▸")
+	t.SetCursorCharacter("")
+
+	// all folders (categories and groups) start collapsed; enter/space/l open
+	// them on demand. Close() also marks each node initialClosed so the closed
+	// state is preserved on subsequent child additions.
+	for _, n := range t.Root().AllNodes() {
+		if n != t.Root() && len(n.ChildNodes()) > 0 {
+			n.Close()
+		}
+	}
+	// Node.Close() skips the library's internal yOffset recalculation, leaving
+	// every node's yOffset stale (as if all folders were open). Force a
+	// recalculation through the public API so cursor navigation j/k finds nodes.
+	t.SetYOffset(0)
+	t.OpenCurrentNode()
+	// move the cursor off the (invisible) root line onto the first category.
+	if len(t.Root().ChildNodes()) > 0 {
+		t.SetYOffset(1)
+	}
+
+	styles := tree.DefaultDarkStyles()
+	styles.SelectedNodeStyle = lipgloss.NewStyle().
+		Background(lipgloss.Color(colorBlue)).
+		Foreground(lipgloss.Color(colorDefault))
+	t.SetStyles(styles)
+
+	// The library's setRootStyles installs an EnumeratorStyleFunc that indexes
+	// children.At(i) while the renderer shrinks the children list as hidden
+	// (filtered) nodes are removed, which panics on re-render. Override it with
+	// a static style so filtering + viewport refresh works.
+	t.Root().EnumeratorStyle(lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim)))
 
 	vp := viewport.New()
 
@@ -112,12 +158,14 @@ func NewModel(data model.CommandsData) Model {
 }
 
 func buildTreeRoot(data model.CommandsData) *tree.Node {
-	root := tree.Root("cmdtreemap")
+	// empty root name → the root node line is never rendered, so the top-level
+	// categories appear as the tree's top items.
+	root := tree.Root("")
 
 	for ci, cat := range data.Categories {
 		catNode := tree.Root(cat.Name)
 		catNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
-			return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFB86C"))
+			return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorOrange))
 		})
 
 		trees := buildCategoryTrees(cat)
@@ -152,7 +200,7 @@ func addTreeNodes(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 		rel:    rootRel,
 	})
 	parentNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
-		return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#BD93F9"))
+		return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorCyan))
 	})
 
 	for _, child := range node.Children {
@@ -187,7 +235,7 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 			rel:    node.Rel,
 		})
 		interNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
-			return lipgloss.NewStyle().Foreground(lipgloss.Color("#8BE9FD"))
+			return lipgloss.NewStyle().Foreground(lipgloss.Color(colorCyan))
 		})
 		for _, grandchild := range node.Children {
 			if grandchild.Rel != nil {
@@ -248,8 +296,16 @@ func buildCategoryTrees(cat model.Category) []*TreeNode {
 	return roots
 }
 
-func applyFilter(root *tree.Node, query string) {
-	filterQuery = query
+func (m *Model) applyFilter(root *tree.Node, query string) {
+	m.filterQuery = query
+
+	// Keep every treeItem's filterQuery in sync so String() can highlight.
+	for _, node := range root.AllNodes() {
+		if item, ok := node.GivenValue().(treeItem); ok {
+			item.filterQuery = query
+			node.SetValue(item)
+		}
+	}
 
 	if query == "" {
 		for _, node := range root.AllNodes() {
@@ -292,16 +348,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
-treeWidth := m.width*35/100 - 1
-	if treeWidth < 4 {
-		treeWidth = 4
-	}
-	previewWidth := m.width - treeWidth - 3
-	treeHeight := m.height - 3
-	m.tree.SetSize(treeWidth, treeHeight)
-	m.viewport.SetWidth(previewWidth)
-	m.viewport.SetHeight(m.height)
-	m.filterInput.SetWidth(treeWidth - 2)
+		m.updateSizes()
 		return m, nil
 	case tea.KeyPressMsg:
 		return m.updateTree(msg)
@@ -325,6 +372,27 @@ treeWidth := m.width*35/100 - 1
 	return m, nil
 }
 
+// updateSizes recomputes the tree/viewport/filter sizes from the current
+// window dimensions and filter state.
+func (m *Model) updateSizes() {
+	treePanelWidth := m.width * 35 / 100
+	if treePanelWidth < 4 {
+		treePanelWidth = 4
+	}
+	previewPanelWidth := m.width - treePanelWidth
+	panelHeight := m.height - 1
+	treeInnerWidth := treePanelWidth - 2
+	previewInnerWidth := previewPanelWidth - 2
+	treeHeight := panelHeight - 2
+	if m.filterActive {
+		treeHeight -= 3 // filter bar: top border + input line + bottom border
+	}
+	m.tree.SetSize(treeInnerWidth, treeHeight)
+	m.viewport.SetWidth(previewInnerWidth)
+	m.viewport.SetHeight(panelHeight - 2)
+	m.filterInput.SetWidth(treeInnerWidth - 2)
+}
+
 func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	if m.filterActive {
 		return m.updateFilterMode(msg)
@@ -332,6 +400,16 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 
 	if m.focusedPane == panePreview {
 		return m.updatePreview(msg)
+	}
+
+	if msg.Key().Mod&tea.ModCtrl != 0 {
+		switch msg.Key().Code {
+		case 'l', tea.KeyRight:
+			m.focusedPane = panePreview
+			m.previewMode = previewNormal
+			m.previewCursor = m.viewport.YOffset()
+			return m, nil
+		}
 	}
 
 	switch msg.String() {
@@ -343,32 +421,45 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		val, ok := node.GivenValue().(treeItem)
-		if !ok || val.rel == nil {
+		if !ok {
 			return m, nil
 		}
-		m.previewActive = true
-		m.explored[[2]int{val.catIdx, val.relIdx}] = true
-		m.showTldr = true
-		m.tldrOutput = ""
-		m.refreshPreview()
-		if val.rel.Tldr != "" {
-			return m, fetchTldrCmd(val.rel.Tldr)
+		if val.isLeaf && val.rel != nil {
+			// Leaf tool: open preview.
+			m.previewActive = true
+			m.previewCursor = 0
+			m.viewport.GotoTop()
+			m.explored[[2]int{val.catIdx, val.relIdx}] = true
+			m.showTldr = true
+			m.tldrOutput = ""
+			m.refreshPreview()
+			if val.rel.Tldr != "" {
+				return m, fetchTldrCmd(val.rel.Tldr)
+			}
+			return m, nil
 		}
+		// Non-leaf: toggle expand/collapse.
+		m.tree.ToggleCurrentNode()
+		m.refreshPreview()
 		return m, nil
-	case "/":
-		m.filterActive = true
-		m.filterInput.Reset()
-		return m, m.filterInput.Focus()
-	case "ctrl+l":
+	case "tab", "ctrl+l":
 		m.focusedPane = panePreview
 		m.previewMode = previewNormal
 		m.previewCursor = m.viewport.YOffset()
+		return m, nil
+	case "h", "left":
+		m = m.closeParent()
 		return m, nil
 	case "ctrl+h":
 		if m.focusedPane == panePreview {
 			m.focusedPane = paneTree
 			return m, nil
 		}
+	case "/":
+		m.filterActive = true
+		m.filterInput.Reset()
+		m.updateSizes()
+		return m, m.filterInput.Focus()
 	case "b", "esc", "backspace":
 		if m.previewActive {
 			m.previewActive = false
@@ -384,7 +475,49 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// closeParent closes the parent folder of the currently selected node. From a
+// leaf tool or a nested group, h collapses the enclosing folder (matching the
+// "h goes up/left" tree convention) rather than only closing the selected node.
+// It moves the cursor onto the parent, then closes it via the native tree API so
+// yOffsets stay consistent and the cursor remains on the now-collapsed folder.
+// It returns the updated Model so the tree state (cursor offset, collapsed
+// folders) propagates back to the caller; m is a value type so direct mutation
+// here would otherwise be lost.
+func (m Model) closeParent() Model {
+	current := m.tree.NodeAtCurrentOffset()
+	if current == nil {
+		return m
+	}
+	parent := findParentNode(m.tree.Root(), current)
+	if parent == nil || parent == m.tree.Root() {
+		return m
+	}
+	m.tree.SetYOffset(parent.YOffset())
+	m.tree.CloseCurrentNode()
+	m.refreshPreview()
+	return m
+}
+
+// findParentNode returns the immediate parent of target, or nil if not found.
+func findParentNode(node, target *tree.Node) *tree.Node {
+	for _, child := range node.ChildNodes() {
+		if child == target {
+			return node
+		}
+		if parent := findParentNode(child, target); parent != nil {
+			return parent
+		}
+	}
+	return nil
+}
+
 func (m Model) updatePreview(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+	// Ctrl + h (lowercase): move to tree pane, from any preview mode.
+	if msg.Key().Mod&tea.ModCtrl != 0 && (msg.Key().Code == 'h' || msg.Key().Code == tea.KeyBackspace) {
+		m.focusedPane = paneTree
+		m.previewMode = previewNormal
+		return m, nil
+	}
 	switch m.previewMode {
 	case previewVisual:
 		return m.updateVisualMode(msg)
@@ -395,33 +528,30 @@ func (m Model) updatePreview(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 
 func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
-	case "ctrl+h":
+	case "ctrl+h", "backspace", "tab":
 		m.focusedPane = paneTree
+		m.previewMode = previewNormal
 		return m, nil
 	case "ctrl+c", "q":
 		return m, tea.Quit
 	case "j", "down":
 		if m.previewCursor < len(m.previewLines)-1 {
 			m.previewCursor++
-			yoff := m.viewport.YOffset()
-			vh := m.viewport.Height()
-			if m.previewCursor >= yoff+vh {
-				m.viewport.ScrollDown(1)
-			}
+			m.ensureVisible(m.previewCursor)
 		}
+		m.refreshPreview()
 		return m, nil
 	case "k", "up":
 		if m.previewCursor > 0 {
 			m.previewCursor--
-			yoff := m.viewport.YOffset()
-			if m.previewCursor < yoff {
-				m.viewport.ScrollUp(1)
-			}
+			m.ensureVisible(m.previewCursor)
 		}
+		m.refreshPreview()
 		return m, nil
 	case "g":
 		m.previewCursor = 0
 		m.viewport.GotoTop()
+		m.refreshPreview()
 		return m, nil
 	case "G":
 		m.previewCursor = len(m.previewLines) - 1
@@ -429,6 +559,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			m.previewCursor = 0
 		}
 		m.viewport.GotoBottom()
+		m.refreshPreview()
 		return m, nil
 	case "ctrl+d":
 		m.viewport.HalfPageDown()
@@ -441,6 +572,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		if m.previewCursor < 0 {
 			m.previewCursor = 0
 		}
+		m.refreshPreview()
 		return m, nil
 	case "ctrl+u":
 		m.viewport.HalfPageUp()
@@ -453,6 +585,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		if m.previewCursor < 0 {
 			m.previewCursor = 0
 		}
+		m.refreshPreview()
 		return m, nil
 	case "v":
 		m.previewMode = previewVisual
@@ -571,41 +704,45 @@ func (m *Model) refreshPreview() {
 	content := m.buildPreviewContent(d)
 	m.previewLines = strings.Split(content, "\n")
 
-	// visual mode일 때 선택 영역 하이라이트
-	if m.previewMode == previewVisual && len(m.previewLines) > 0 {
-		start := m.visualStart
-		end := m.visualEnd
+	highlighted := make([]string, len(m.previewLines))
+	copy(highlighted, m.previewLines)
+
+	start, end := m.visualStart, m.visualEnd
+	if m.previewMode == previewVisual {
 		if start > end {
 			start, end = end, start
 		}
-		if start < 0 {
-			start = 0
-		}
-		if end >= len(m.previewLines) {
-			end = len(m.previewLines) - 1
-		}
-
-		highlighted := make([]string, len(m.previewLines))
-		copy(highlighted, m.previewLines)
-		for i := start; i <= end; i++ {
+	}
+	// normal mode: cursor line only; visual mode: selected range.
+	// clamp so the highlight never falls outside the content.
+	if start < 0 {
+		start = 0
+	}
+	if end >= len(m.previewLines) {
+		end = len(m.previewLines) - 1
+	}
+	curStart, curEnd := start, end
+	if m.previewMode != previewVisual {
+		curStart, curEnd = m.previewCursor, m.previewCursor
+	}
+	if m.focusedPane == panePreview && curStart >= 0 && curStart < len(m.previewLines) {
+		for i := curStart; i <= curEnd && i < len(m.previewLines); i++ {
 			highlighted[i] = lipgloss.NewStyle().
-				Background(lipgloss.Color("#44475A")).
-				Foreground(lipgloss.Color("#F8F8F2")).
+				Background(lipgloss.Color(colorBlue)).
+				Foreground(lipgloss.Color(colorDefault)).
 				Render(m.previewLines[i])
 		}
-		m.viewport.SetContent(strings.Join(highlighted, "\n"))
-	} else {
-		m.viewport.SetContent(content)
 	}
+	m.viewport.SetContent(strings.Join(highlighted, "\n"))
 }
 
 func (m Model) buildPreviewContent(d *model.Relation) string {
 	var b strings.Builder
 
-	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#BD93F9"))
-	labelStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFB86C"))
-	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#F8F8F2"))
-	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
+	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorPurple))
+	labelStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorOrange))
+	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
+	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
 
 	b.WriteString(titleStyle.Render(d.From + " → " + d.To))
 	b.WriteString("\n\n")
@@ -625,7 +762,7 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 	}
 
 	b.WriteString(labelStyle.Render("관계 유형"))
-	b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4")).Render(d.Relation))
+	b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim)).Render(d.Relation))
 	b.WriteString("\n\n")
 
 	if d.Install != "" {
@@ -651,9 +788,9 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 			modeLabel = "VISUAL"
 		}
 		b.WriteString(helpStyle.Render("[" + modeLabel + "] "))
-		b.WriteString(helpStyle.Render("j/k:이동 v:선택 y:복사 Ctrl+H:트리 t:tldr Esc:뒤로"))
+		b.WriteString(helpStyle.Render("j/k:이동 v:선택 y:복사 Tab:트리 t:tldr Esc:뒤로"))
 	} else {
-		b.WriteString(helpStyle.Render("[Enter] 선택  [/] 필터  Ctrl+L:미리보기  [q] 종료"))
+		b.WriteString(helpStyle.Render("[Enter] 선택  [/] 필터  Tab:미리보기  [q] 종료"))
 	}
 	return b.String()
 }
@@ -666,52 +803,110 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.filterActive = false
 		m.filterInput.Blur()
 		m.filterInput.Reset()
-		applyFilter(m.tree.Root(), "")
+		m.applyFilter(m.tree.Root(), "")
+		m.tree.SetYOffset(m.tree.YOffset())
+		m.updateSizes()
 		return m, nil
 	case "enter":
 		m.filterActive = false
 		m.filterInput.Blur()
+		m.updateSizes()
 		return m, nil
 	case "ctrl+u":
 		m.filterInput.Reset()
-		applyFilter(m.tree.Root(), "")
+		m.applyFilter(m.tree.Root(), "")
+		m.tree.SetYOffset(m.tree.YOffset())
 		return m, nil
 	}
 
 	var cmd tea.Cmd
 	m.filterInput, cmd = m.filterInput.Update(msg)
 	query := m.filterInput.Value()
-	applyFilter(m.tree.Root(), query)
+	m.applyFilter(m.tree.Root(), query)
+	m.tree.SetYOffset(m.tree.YOffset())
 	return m, cmd
+}
+
+// renderPanel draws a rounded-border panel with an embedded title in the top
+// border, e.g. "╭─ cmdtreemap ────────╮".
+func renderPanel(title, content string, width, height int, active bool) string {
+	borderColor := lipgloss.Color(colorMuted)
+	if active {
+		borderColor = lipgloss.Color(colorGreen)
+	}
+	borderStyle := lipgloss.NewStyle().Foreground(borderColor).Bold(active)
+
+	innerWidth := width - 2
+	if innerWidth < 0 {
+		innerWidth = 0
+	}
+
+	titleStr := " " + title + " "
+	titleWidth := lipgloss.Width(titleStr)
+	dashCount := innerWidth - titleWidth
+	if dashCount < 0 {
+		dashCount = 0
+	}
+	top := borderStyle.Render("╭─" + titleStr + strings.Repeat("─", dashCount) + "╮")
+
+	contentLines := strings.Split(content, "\n")
+	var lines []string
+	lines = append(lines, top)
+	for i := 0; i < height-2; i++ {
+		var line string
+		if i < len(contentLines) {
+			line = contentLines[i]
+		}
+		line = lipgloss.NewStyle().Width(innerWidth).Render(line)
+		lines = append(lines, borderStyle.Render("│")+line+borderStyle.Render("│"))
+	}
+	bottom := borderStyle.Render("╰" + strings.Repeat("─", innerWidth) + "╯")
+	lines = append(lines, bottom)
+
+	return strings.Join(lines, "\n")
+}
+
+// statusBar renders the bottom keybinding hints line.
+func statusBar() string {
+	keyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorGreen)).Bold(true)
+	descStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
+
+	hint := func(k, rest string) string {
+		return keyStyle.Render("["+k+"]") + descStyle.Render(rest)
+	}
+
+	return hint("q", "uit") + "  " +
+		hint("enter", "expand") + "  " +
+		hint("/", "filter") + "  " +
+		hint("tab", "switch") + "  " +
+		hint("t", "tldr")
 }
 
 func (m Model) View() tea.View {
 	var v tea.View
 
-	treeView := m.tree.View()
+	treePanelWidth := m.width * 35 / 100
+	if treePanelWidth < 4 {
+		treePanelWidth = 4
+	}
+	previewPanelWidth := m.width - treePanelWidth
+	panelHeight := m.height - 1
+	if panelHeight < 3 {
+		panelHeight = 3
+	}
 
-	// 필터 바
+	// 트리 패널
+	treeContent := m.tree.View()
 	if m.filterActive {
-		treeWidth := m.width*35/100 - 1
-		if treeWidth < 4 {
-			treeWidth = 4
-		}
-		prefix := lipgloss.NewStyle().Foreground(lipgloss.Color("#FFB86C")).Bold(true).Render("/")
+		prefix := lipgloss.NewStyle().Foreground(lipgloss.Color(colorOrange)).Bold(true).Render("/")
 		bar := lipgloss.NewStyle().
 			Border(lipgloss.NormalBorder(), true, true, true, true).
-			BorderForeground(lipgloss.Color("#FFB86C")).
-			Width(treeWidth - 2).
+			BorderForeground(lipgloss.Color(colorOrange)).
+			Width(treePanelWidth - 4).
 			Render(prefix + m.filterInput.View())
-		treeView = lipgloss.JoinVertical(lipgloss.Left, treeView, bar)
+		treeContent = lipgloss.JoinVertical(lipgloss.Left, treeContent, bar)
 	}
-
-	// 트리 포커스 표시
-	if m.focusedPane == paneTree {
-		treeStyle := lipgloss.NewStyle().
-			Border(lipgloss.NormalBorder(), false, false, false, true).
-			BorderForeground(lipgloss.Color("#BD93F9"))
-		treeView = treeStyle.Render(treeView)
-	}
+	treePanel := renderPanel("cmdtreemap", treeContent, treePanelWidth, panelHeight, m.focusedPane == paneTree)
 
 	// 미리보기 패널
 	var previewContent string
@@ -719,45 +914,16 @@ func (m Model) View() tea.View {
 		m.refreshPreview()
 		previewContent = m.viewport.View()
 	} else {
-		helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
-		previewContent = helpStyle.Render("명령어를 선택하고 Enter로 상세 보기\n\nCtrl+H:트리  Ctrl+L:미리보기")
+		helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
+		previewContent = helpStyle.Render("명령어를 선택하고 Enter로 상세 보기")
 	}
+	previewPanel := renderPanel("상세 정보", previewContent, previewPanelWidth, panelHeight, m.focusedPane == panePreview)
 
-	// 미리보기 포커스 시 모드 표시기 (lazyvim 스타일)
-	if m.focusedPane == panePreview {
-		modeStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#50FA7B")).Bold(true)
-		modeLabel := "NORMAL"
-		if m.previewMode == previewVisual {
-			modeLabel = "VISUAL"
-		}
-		if !m.previewActive {
-			previewContent = lipgloss.JoinVertical(lipgloss.Left,
-				modeStyle.Render("["+modeLabel+"]  < >:이동  Enter:상세  /:필터  q:종료"),
-				previewContent,
-			)
-		}
+	combined := lipgloss.JoinHorizontal(lipgloss.Top, treePanel, previewPanel)
 
-		previewStyle := lipgloss.NewStyle().
-			Border(lipgloss.NormalBorder(), false, false, false, true).
-			BorderForeground(lipgloss.Color("#50FA7B"))
-		previewContent = previewStyle.Render(previewContent)
-	}
+	status := statusBar()
 
-	// 분리선
-	sepStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#6272A4"))
-	n := m.height
-	if n < 1 {
-		n = 1
-	}
-	sepLines := make([]string, 0, n)
-	for i := 0; i < n; i++ {
-		sepLines = append(sepLines, "│")
-	}
-	separator := sepStyle.Render(strings.Join(sepLines, "\n"))
-
-	combined := lipgloss.JoinHorizontal(lipgloss.Top, treeView, separator, previewContent)
-
-	v.SetContent(combined)
+	v.SetContent(lipgloss.JoinVertical(lipgloss.Left, combined, status))
 	v.AltScreen = true
 	return v
 }

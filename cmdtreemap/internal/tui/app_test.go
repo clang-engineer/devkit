@@ -33,6 +33,24 @@ func newTestModel(t *testing.T) Model {
 	return m
 }
 
+// selectFirstTool expands the first category and its first group, then moves the
+// cursor onto the first leaf tool, using only the public tree API. Returns false
+// if no leaf tool is reachable. (Direct n.Open() calls do not refresh the
+// library's lazy child list, so tests must expand via ToggleCurrentNode.)
+func selectFirstTool(m *Model) bool {
+	m.tree.SetYOffset(1)
+	m.tree.ToggleCurrentNode()
+	m.tree.Down()
+	m.tree.ToggleCurrentNode()
+	m.tree.Down()
+	n := m.tree.NodeAtCurrentOffset()
+	if n == nil {
+		return false
+	}
+	item, ok := n.GivenValue().(treeItem)
+	return ok && item.isLeaf && item.rel != nil
+}
+
 func key(code rune) tea.KeyPressMsg {
 	return tea.KeyPressMsg(tea.Key{Code: code, Text: string(code)})
 }
@@ -47,6 +65,10 @@ func keyEnter() tea.KeyPressMsg {
 
 func keyEsc() tea.KeyPressMsg {
 	return tea.KeyPressMsg(tea.Key{Code: tea.KeyEscape})
+}
+
+func keyTab() tea.KeyPressMsg {
+	return tea.KeyPressMsg(tea.Key{Code: tea.KeyTab})
 }
 
 func TestNewModelBuilds(t *testing.T) {
@@ -140,36 +162,18 @@ func TestFilterAndHighlight(t *testing.T) {
 	if m.filterActive {
 		t.Fatal("Esc로 필터 모드가 해제되지 않음")
 	}
-	if filterQuery != "" {
-		t.Fatalf("Esc 후 filterQuery가 초기화되지 않음: %q", filterQuery)
+	if m.filterQuery != "" {
+		t.Fatalf("Esc 후 filterQuery가 초기화되지 않음: %q", m.filterQuery)
 	}
 }
 
 func TestFocusSwitchAndPreview(t *testing.T) {
 	m := newTestModel(t)
 
-	// 실제 tool 노드에 접근하기 위해 트리 확장 & 이동
-	// 모든 노드를 펼치고 tool 노드로 이동
-	root := m.tree.Root()
-	for _, n := range root.AllNodes() {
-		n.Open()
-	}
-
-	// 카테고리를 제외한 tool 노드(rel != nil)를 찾아 선택
-	// yOffset을 tool 노드로 이동
-	toolNodes := []int{}
-	all := root.AllNodes()
-	for off, n := range all {
-		if item, ok := n.GivenValue().(treeItem); ok && item.rel != nil {
-			toolNodes = append(toolNodes, off)
-		}
-	}
-	if len(toolNodes) == 0 {
+	// 첫 카테고리와 첫 그룹을 펼쳐 첫 tool 노드로 이동 (공개 API 사용)
+	if !selectFirstTool(&m) {
 		t.Fatal("tool 노드를 찾을 수 없음")
 	}
-
-	// 첫 tool 노드로 이동
-	m.tree.SetYOffset(toolNodes[0])
 	m.previewActive = false
 	m2, _ := m.Update(keyEnter())
 	m = m2.(Model)
@@ -222,11 +226,95 @@ func TestFocusSwitchAndPreview(t *testing.T) {
 func TestQuit(t *testing.T) {
 	m := newTestModel(t)
 	_, cmd := m.Update(keyMod('c', tea.ModCtrl))
-	// quit 명령이 반환되는지 확인
-	_ = cmd
-	// cmd가 tea.Quit인지 확인
 	if cmd == nil {
 		t.Fatal("ctrl+c가 quit 명령을 반환하지 않음")
+	}
+}
+
+func TestPreviewCursorHighlightAndVisualSelect(t *testing.T) {
+	m := newTestModel(t)
+
+	if !selectFirstTool(&m) {
+		t.Fatal("tool 노드를 찾을 수 없음")
+	}
+	m2, _ := m.Update(keyEnter())
+	m = m2.(Model)
+	if !m.previewActive {
+		t.Fatal("enter로 preview 미열림")
+	}
+
+	// Tab으로 상세 패널로 이동
+	m2, _ = m.Update(keyTab())
+	m = m2.(Model)
+	if m.focusedPane != panePreview {
+		t.Fatal("Tab으로 상세 패널 전환 실패")
+	}
+	if m.previewCursor != 0 {
+		t.Fatalf("previewCursor 초기값이 0이 아님: %d", m.previewCursor)
+	}
+
+	// j로 커서 이동 → refreshPreview가 커서 하이라이트 반영
+	before := m.previewCursor
+	m2, _ = m.Update(key('j'))
+	m = m2.(Model)
+	if m.previewCursor != before+1 {
+		t.Fatalf("j로 커서 이동 실패: %d -> %d", before, m.previewCursor)
+	}
+	content := m.viewport.View()
+	if !strings.Contains(content, "\x1b[") {
+		t.Fatal("커서 하이라이트(ANSI)가 viewport 내용에 없음")
+	}
+
+	// v로 비주얼 모드 진입
+	m2, _ = m.Update(key('v'))
+	m = m2.(Model)
+	if m.previewMode != previewVisual {
+		t.Fatal("v로 비주얼 모드 진입 실패")
+	}
+	if m.visualStart != m.visualEnd {
+		t.Fatal("v 진입 시 visualStart/End가 같아야 함")
+	}
+
+	// j로 선택 영역 확장
+	ve := m.visualEnd
+	m2, _ = m.Update(key('j'))
+	m = m2.(Model)
+	if m.visualEnd <= ve {
+		t.Fatal("j로 visual 선택 영역 확장 실패")
+	}
+
+	// y로 복사 후 normal 복귀
+	m2, _ = m.Update(key('y'))
+	m = m2.(Model)
+	if m.previewMode != previewNormal {
+		t.Fatal("y 후 normal 모드 복귀 실패")
+	}
+}
+
+func TestHFromLeafClosesParent(t *testing.T) {
+	m := newTestModel(t)
+
+	if !selectFirstTool(&m) {
+		t.Fatal("tool 노드를 찾을 수 없음")
+	}
+
+	root := m.tree.Root()
+	leaf := m.tree.NodeAtCurrentOffset()
+	firstParent := findParentNode(root, leaf)
+	if firstParent == nil || firstParent == root {
+		t.Fatal("leaf의 부모(폴더)를 찾지 못함")
+	}
+	if !firstParent.IsOpen() {
+		t.Fatal("테스트 전제: leaf의 부모 폴더가 열려 있어야 함")
+	}
+
+	// h 한 번으로 부모 폴더 닫기 (값 리시버 변경이 Model로 전파되는지 검증)
+	m2, _ := m.Update(key('h'))
+	m = m2.(Model)
+
+	// 현재 yOffset의 노드의 부모가 닫혔는지 확인
+	if firstParent.IsOpen() {
+		t.Fatal("h로 부모 폴더가 닫히지 않음")
 	}
 }
 
