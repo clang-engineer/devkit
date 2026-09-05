@@ -13,6 +13,7 @@ groups:
       - {file: tmux.md, desc: Tmux 세션/윈도우/패널}
       - {file: ghostty.md, desc: Ghostty 터미널 탭/분할/키맵}
       - {file: yazi.md, desc: "Yazi — Rust 기반 터미널 파일 매니저 (키맵·검색·플러그인·Flavor)"}
+      - {file: terminal-tui.md, desc: "현대적 TUI 도구 지도와 선택 기준 (lazy 계열, 영역별 대안, 도입 우선순위)"}
 
   - title: 셸
     items:
