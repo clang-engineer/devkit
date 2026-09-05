@@ -37,6 +37,7 @@
 | [tmux.md](tmux.md) | Tmux 세션/윈도우/패널 |
 | [ghostty.md](ghostty.md) | Ghostty 터미널 탭/분할/키맵 |
 | [yazi.md](yazi.md) | Yazi — Rust TUI 파일 매니저 |
+| [terminal-tui.md](terminal-tui.md) | 현대적 TUI 도구 지도와 선택 기준 |
 
 ## 셸
 
