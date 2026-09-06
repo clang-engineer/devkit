@@ -11,6 +11,7 @@ type Relation struct {
 	Boundary   string `json:"boundary,omitempty"`
 	Install    string `json:"install,omitempty"`
 	Tldr       string `json:"tldr,omitempty"`
+	URL        string `json:"url,omitempty"`
 }
 
 type Category struct {

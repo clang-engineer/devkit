@@ -16,7 +16,8 @@
           "relation": "alternative",
           "boundary": "스크립트 안에서 cat 대체 불가. bat은 인터랙티브 열람에 특화",
           "install": "brew install bat",
-          "tldr": "bat"
+          "tldr": "bat",
+          "url": "https://github.com/sharkdp/bat"
         },
         {
           "from": "ls",
@@ -28,7 +29,8 @@
           "relation": "alternative",
           "boundary": "일부 환경에서 기본 ls보다 느릴 수 있음",
           "install": "brew install eza",
-          "tldr": "eza"
+          "tldr": "eza",
+          "url": "https://github.com/eza-community/eza"
         },
         {
           "from": "find",
@@ -40,7 +42,8 @@
           "relation": "alternative",
           "boundary": "find의 모든 기능을 대체하지 않음. POSIX 호환성이 필요하면 find 사용",
           "install": "brew install fd",
-          "tldr": "fd"
+          "tldr": "fd",
+          "url": "https://github.com/sharkdp/fd"
         },
         {
           "from": "du",
@@ -51,7 +54,8 @@
           "solution": "시각적 바 차트로 디스크 사용량 표시, 직관적 인터페이스",
           "relation": "alternative",
           "install": "brew install dust",
-          "tldr": "dust"
+          "tldr": "dust",
+          "url": "https://github.com/bootandy/dust"
         },
         {
           "from": "tree",
@@ -62,7 +66,8 @@
           "solution": "대화형 디렉토리 탐색, 파일 미리보기, 빠른 이동",
           "relation": "alternative",
           "install": "brew install broot",
-          "tldr": "broot"
+          "tldr": "broot",
+          "url": "https://github.com/Canop/broot"
         },
         {
           "from": "cp",
@@ -73,9 +78,10 @@
           "solution": "진행률 바, 병렬 복사, xattr 보존, 모드/소유권 복사",
           "relation": "alternative",
           "install": "brew install xcp",
-          "tldr": "xcp"
+          "tldr": "xcp",
+          "url": "https://github.com/tarka/xcp"
         },
-        {
+{
           "from": "rm",
           "to": "rip",
           "why": "실수 복구 불가",
@@ -85,7 +91,8 @@
           "relation": "alternative",
           "boundary": "rip은 휴지통으로 이동. 완전한 삭제가 필요하면 rm 사용",
           "install": "brew install rip",
-          "tldr": "rip"
+          "tldr": "rip",
+          "url": "https://github.com/nivekuil/rip"
         }
       ]
     },
@@ -103,7 +110,8 @@
           "relation": "alternative",
           "boundary": "스크립트에서 grep은 여전히 포터블. ripgrep은 인터랙티브 검색에 최적화",
           "install": "brew install ripgrep",
-          "tldr": "rg"
+          "tldr": "rg",
+          "url": "https://github.com/BurntSushi/ripgrep"
         },
         {
           "from": "sed",
@@ -115,9 +123,10 @@
           "relation": "alternative",
           "boundary": "sed의 스트리밍 처리, 복잡한 정규식은 sd로 대체 어려움",
           "install": "brew install sd",
-          "tldr": "sd"
+          "tldr": "sd",
+          "url": "https://github.com/chmln/sd"
         },
-        {
+{
           "from": "diff",
           "to": "delta",
           "why": "가독성 부족",
@@ -126,7 +135,8 @@
           "solution": "구문 강조, 사이드바 비교, 줄 번호, Git 통합",
           "relation": "alternative",
           "install": "brew install git-delta",
-          "tldr": "delta"
+          "tldr": "delta",
+          "url": "https://github.com/dandavison/delta"
         }
       ]
     },
@@ -143,7 +153,8 @@
           "solution": "Go로 재작성, 2~10배 빠름, JSON 출력, 고급 함수 지원",
           "relation": "alternative",
           "install": "brew install goawk",
-          "tldr": "goawk"
+          "tldr": "goawk",
+          "url": "https://github.com/benhoyt/goawk"
         },
         {
           "from": "sort",
@@ -154,7 +165,8 @@
           "solution": "병렬 처리, 외부 정렬, 대용량 파일 최적화",
           "relation": "alternative",
           "install": "cargo install ssort",
-          "tldr": "ssort"
+          "tldr": "ssort",
+          "url": "https://github.com/ssort/ssort"
         },
         {
           "from": "jq",
@@ -166,7 +178,8 @@
           "relation": "alternative",
           "boundary": "jq는 여전히 스크립트와 파이프라인에서 강력",
           "install": "brew install fx",
-          "tldr": "fx"
+          "tldr": "fx",
+          "url": "https://github.com/antonmedv/fx"
         },
         {
           "from": "jq",
@@ -177,9 +190,10 @@
           "solution": "실시간 필터링, 대화형 jq 실행, 미리보기",
           "relation": "specialized",
           "install": "brew install jiq",
-          "tldr": "jiq"
+          "tldr": "jiq",
+          "url": "https://github.com/fiatjaf/jiq"
         },
-        {
+{
           "from": "jq",
           "to": "gron",
           "why": "JSON 구조 파악 어려움",
@@ -188,7 +202,8 @@
           "solution": "JSON을 평평한 경로-값 쌍으로 변환, grep으로 검색 가능",
           "relation": "complement",
           "install": "brew install gron",
-          "tldr": "gron"
+          "tldr": "gron",
+          "url": "https://github.com/tomnomnom/gron"
         }
       ]
     },
@@ -205,9 +220,10 @@
           "solution": "실시간 필터링, 하이라이팅, 패턴 매칭, 스트림 처리",
           "relation": "alternative",
           "install": "brew install tailspin",
-          "tldr": "tailspin"
+          "tldr": "tailspin",
+          "url": "https://github.com/bensadeh/tailspin"
         },
-        {
+{
           "from": "less",
           "to": "bat",
           "why": "구문강조 없음",
@@ -217,7 +233,8 @@
           "relation": "complement",
           "boundary": "bat은 파일 열람에 특화. less는 파이프라인 출력에 여전히 유용",
           "install": "brew install bat",
-          "tldr": "bat"
+          "tldr": "bat",
+          "url": "https://github.com/sharkdp/bat"
         }
       ]
     },
@@ -235,9 +252,10 @@
           "relation": "alternative",
           "boundary": "zoxide는 cd를 완전히 대체하지 않음. 새로운 디렉토리에는 cd 사용",
           "install": "brew install zoxide",
-          "tldr": "zoxide"
+          "tldr": "zoxide",
+          "url": "https://github.com/ajeetdsouza/zoxide"
         },
-        {
+{
           "from": "ls",
           "to": "lsd",
           "why": "시각화 부족",
@@ -246,7 +264,8 @@
           "solution": "아이콘, 색상, 트리 뷰, Git 통합, 블록/문자 장치 표시",
           "relation": "alternative",
           "install": "brew install lsd",
-          "tldr": "lsd"
+          "tldr": "lsd",
+          "url": "https://github.com/lsd-rs/lsd"
         }
       ]
     },
@@ -263,9 +282,10 @@
           "solution": "세션 분할, 데스크톱 관리, 스크립팅, 플러그인 생태계",
           "relation": "alternative",
           "install": "brew install tmux",
-          "tldr": "tmux"
+          "tldr": "tmux",
+          "url": "https://github.com/tmux/tmux"
         },
-        {
+{
           "from": "tmux",
           "to": "zellij",
           "why": "학습 곡선 높음",
@@ -275,7 +295,8 @@
           "relation": "alternative",
           "boundary": "tmux는 여전히 강력한 기능과 안정성. zellij는 최신 UX 중시",
           "install": "brew install zellij",
-          "tldr": "zellij"
+          "tldr": "zellij",
+          "url": "https://github.com/zellij-org/zellij"
         }
       ]
     },
@@ -292,7 +313,8 @@
           "solution": "색상 지원, 마우스 인터랙션, 프로세스 트리, 스케일러 표시",
           "relation": "alternative",
           "install": "brew install htop",
-          "tldr": "htop"
+          "tldr": "htop",
+          "url": "https://htop.dev"
         },
         {
           "from": "htop",
@@ -303,7 +325,8 @@
           "solution": "CPU/메모리 그래프, 네트워크 모니터링, 디스크 I/O, 테마 지원",
           "relation": "specialized",
           "install": "brew install btop",
-          "tldr": "btop"
+          "tldr": "btop",
+          "url": "https://github.com/aristocratos/btop"
         },
         {
           "from": "ps",
@@ -314,7 +337,8 @@
           "solution": "색상 지원, 트리 뷰, 검색, 사용자 친화적 형식",
           "relation": "alternative",
           "install": "brew install procs",
-          "tldr": "procs"
+          "tldr": "procs",
+          "url": "https://github.com/dalance/procs"
         },
         {
           "from": "df",
@@ -325,9 +349,10 @@
           "solution": "시각적 바 차트, 파일시스템 유형별 색상, 직관적 인터페이스",
           "relation": "alternative",
           "install": "brew install duf",
-          "tldr": "duf"
+          "tldr": "duf",
+          "url": "https://github.com/muesli/duf"
         },
-        {
+{
           "from": "free",
           "to": "smem",
           "why": "정보 부족",
@@ -336,7 +361,8 @@
           "solution": "프로세스별 메모리 사용량, PSS/USS, 공유 메모리, 정렬 지원",
           "relation": "specialized",
           "install": "brew install smem",
-          "tldr": "smem"
+          "tldr": "smem",
+          "url": "https://github.com/smem/smem"
         }
       ]
     },
@@ -353,7 +379,8 @@
           "solution": "실시간 그래프, 핑 패킷 시각화, 다중 호스트 지원",
           "relation": "alternative",
           "install": "brew install gping",
-          "tldr": "gping"
+          "tldr": "gping",
+          "url": "https://github.com/orf/gping"
         },
         {
           "from": "netstat",
@@ -364,7 +391,8 @@
           "solution": "kernel netlink 사용, 빠름, 필터링 강화, 소켓 통계",
           "relation": "alternative",
           "install": "시스템에 이미 포함됨",
-          "tldr": "ss"
+          "tldr": "ss",
+          "url": "https://man7.org/linux/man-pages/man8/ss.8.html"
         },
         {
           "from": "dig",
@@ -375,7 +403,8 @@
           "solution": "현대적 CLI, 색상 지원, DNSSEC 검증, 직관적 출력",
           "relation": "alternative",
           "install": "brew install dog",
-          "tldr": "dog"
+          "tldr": "dog",
+          "url": "https://github.com/ogham/dog"
         },
         {
           "from": "wget",
@@ -387,9 +416,10 @@
           "relation": "alternative",
           "boundary": "wget은 여전히 간단한 다운로드에 유용. aria2c는 대용량에 최적화",
           "install": "brew install aria2",
-          "tldr": "aria2c"
+          "tldr": "aria2c",
+          "url": "https://aria2.github.io"
         },
-        {
+{
           "from": "ssh",
           "to": "mosh",
           "why": "연결 불안정",
@@ -399,7 +429,8 @@
           "relation": "specialized",
           "boundary": "mosh는 대화형 세션에 특화. 스크립트와 포트 포워딩은 SSH 사용",
           "install": "brew install mosh",
-          "tldr": "mosh"
+          "tldr": "mosh",
+          "url": "https://mosh.org"
         }
       ]
     },
@@ -417,7 +448,8 @@
           "relation": "alternative",
           "boundary": "fish는 POSIX 호환성이 없음. 스크립트는 bash/zsh 사용",
           "install": "brew install fish",
-          "tldr": "fish"
+          "tldr": "fish",
+          "url": "https://fishshell.com"
         },
         {
           "from": "bash",
@@ -428,9 +460,10 @@
           "solution": "플러그인 시스템, 테마, 자동 완성 강화, POSIX 호환",
           "relation": "alternative",
           "install": "시스템에 이미 포함됨 (macOS)",
-          "tldr": "zsh"
+          "tldr": "zsh",
+          "url": "https://www.zsh.org"
         },
-        {
+{
           "from": "history",
           "to": "atuin",
           "why": "검색 기능 부족",
@@ -439,7 +472,8 @@
           "solution": "동기화, 고급 검색, 스냅샷, 위젯, SQLite 기반",
           "relation": "alternative",
           "install": "brew install atuin",
-          "tldr": "atuin"
+          "tldr": "atuin",
+          "url": "https://github.com/atuinsh/atuin"
         }
       ]
     },
@@ -457,7 +491,8 @@
           "relation": "complement",
           "boundary": "lazygit은 git을 대체하지 않고 보완. 단순 명령은 git 사용",
           "install": "brew install lazygit",
-          "tldr": "lazygit"
+          "tldr": "lazygit",
+          "url": "https://github.com/jesseduffield/lazygit"
         },
         {
           "from": "git log",
@@ -468,9 +503,10 @@
           "solution": "대화형 인터페이스, 브랜치 비교, 파일 변경 보기, 키보드 네비게이션",
           "relation": "alternative",
           "install": "brew install tig",
-          "tldr": "tig"
+          "tldr": "tig",
+          "url": "https://github.com/jonas/tig"
         },
-        {
+{
           "from": "git diff",
           "to": "delta",
           "why": "가독성 부족",
@@ -479,7 +515,8 @@
           "solution": "구문 강조, 사이드바 비교, 줄 번호, 하이라이팅",
           "relation": "alternative",
           "install": "brew install git-delta",
-          "tldr": "delta"
+          "tldr": "delta",
+          "url": "https://github.com/dandavison/delta"
         }
       ]
     },
@@ -487,7 +524,7 @@
       "name": "HTTP",
       "why": "curl은 강력하지만 사용법이 복잡하다",
       "relations": [
-        {
+{
           "from": "curl",
           "to": "httpie",
           "why": "사용법 복잡",
@@ -497,7 +534,8 @@
           "relation": "alternative",
           "boundary": "curl은 여전히 스크립트와 포터블 환경에서 필수",
           "install": "brew install httpie",
-          "tldr": "http"
+          "tldr": "http",
+          "url": "https://httpie.io"
         }
       ]
     },
@@ -514,7 +552,8 @@
           "solution": "단일 명령어로 모든 포맷 지원, 직관적인 인터페이스",
           "relation": "alternative",
           "install": "cargo install ouch",
-          "tldr": "ouch"
+          "tldr": "ouch",
+          "url": "https://github.com/ouch-org/ouch"
         },
         {
           "from": "gzip",
@@ -525,9 +564,10 @@
           "solution": "병렬 압축/해제, 멀티코어 활용, 빠른 속도",
           "relation": "alternative",
           "install": "brew install pigz",
-          "tldr": "pigz"
+          "tldr": "pigz",
+          "url": "https://zlib.net/pigz/"
         },
-        {
+{
           "from": "zip",
           "to": "7z",
           "why": "압축률 부족",
@@ -536,7 +576,8 @@
           "solution": "높은 압축률, AES-256 암호화, 다양한 포맷 지원",
           "relation": "alternative",
           "install": "brew install p7zip",
-          "tldr": "7z"
+          "tldr": "7z",
+          "url": "https://www.7-zip.org"
         }
       ]
     },
@@ -554,7 +595,8 @@
           "relation": "alternative",
           "boundary": "make는 C/C++ 빌드에서 여전히 표준. just는 일반 작업에 유용",
           "install": "brew install just",
-          "tldr": "just"
+          "tldr": "just",
+          "url": "https://github.com/casey/just"
         },
         {
           "from": "gcc",
@@ -565,7 +607,8 @@
           "solution": "명확한 에러 메시지, 정적 분석, 모던 C++ 지원, 빠른 속도",
           "relation": "alternative",
           "install": "시스템에 이미 포함됨 (macOS)",
-          "tldr": "clang"
+          "tldr": "clang",
+          "url": "https://clang.llvm.org"
         },
         {
           "from": "gdb",
@@ -576,7 +619,8 @@
           "solution": "LLVM 기반, Swift 지원, 직관적 명령어, 스크립팅",
           "relation": "alternative",
           "install": "시스템에 이미 포함됨 (macOS)",
-          "tldr": "lldb"
+          "tldr": "lldb",
+          "url": "https://lldb.llvm.org"
         }
       ]
     }

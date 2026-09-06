@@ -91,6 +91,8 @@ type Model struct {
 	previewLines  []string
 	tldrOutput    string
 	showTldr      bool
+	tldrLine      int
+	urlLine       int
 	width         int
 	height        int
 }
@@ -483,12 +485,9 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			m.previewCursor = 0
 			m.viewport.GotoTop()
 			m.explored[[2]int{val.catIdx, val.relIdx}] = true
-			m.showTldr = true
+			m.showTldr = false
 			m.tldrOutput = ""
 			m.refreshPreview()
-			if val.rel.Tldr != "" {
-				return m, fetchTldrCmd(val.rel.Tldr)
-			}
 			return m, nil
 		}
 		// Non-leaf: toggle expand/collapse.
@@ -599,6 +598,39 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case "ctrl+c", "q":
 		return m, tea.Quit
+	case "enter":
+		node := m.tree.NodeAtCurrentOffset()
+		if node != nil {
+			if val, ok := node.GivenValue().(treeItem); ok && val.rel != nil {
+				// Enter on tldr line
+				if m.tldrLine >= 0 && m.previewCursor == m.tldrLine && val.rel.Tldr != "" {
+					if m.showTldr {
+						m.showTldr = false
+						m.tldrOutput = ""
+					} else {
+						m.showTldr = true
+						m.tldrOutput = ""
+						tldrCmd := val.rel.Tldr
+						m.refreshPreview()
+						return m, func() tea.Msg {
+							cmd := exec.Command("tldr", tldrCmd)
+							out, err := cmd.CombinedOutput()
+							if err != nil {
+								return tldrDoneMsg{output: "", err: err}
+							}
+							return tldrDoneMsg{output: string(out), err: nil}
+						}
+					}
+					m.refreshPreview()
+					return m, nil
+				}
+				// Enter on URL line
+				if m.urlLine >= 0 && m.previewCursor == m.urlLine && val.rel.URL != "" {
+					return m, openURLCmd(val.rel.URL)
+				}
+			}
+		}
+		return m, nil
 	case "j", "down":
 		if m.previewCursor < len(m.previewLines)-1 {
 			m.previewCursor++
@@ -808,6 +840,7 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 	labelStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorOrange))
 	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
 	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
+	linkStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorCyan)).Underline(true)
 
 	b.WriteString(titleStyle.Render(d.From + " → " + d.To))
 	b.WriteString("\n\n")
@@ -836,8 +869,16 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 		b.WriteString("\n\n")
 	}
 
+	// tldr line
 	if d.Tldr != "" {
-		b.WriteString(labelStyle.Render("tldr: " + d.Tldr))
+		m.tldrLine = len(strings.Split(b.String(), "\n"))
+		tldrLabel := "tldr: " + d.Tldr
+		if m.showTldr {
+			tldrLabel += " [Enter] 닫기"
+		} else {
+			tldrLabel += " [Enter] 열기"
+		}
+		b.WriteString(labelStyle.Render(tldrLabel))
 		b.WriteString("\n")
 		if m.showTldr && m.tldrOutput != "" {
 			b.WriteString(m.tldrOutput)
@@ -845,6 +886,18 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 			b.WriteString(helpStyle.Render("로딩 중..."))
 		}
 		b.WriteString("\n\n")
+	} else {
+		m.tldrLine = -1
+	}
+
+	// URL line
+	if d.URL != "" {
+		m.urlLine = len(strings.Split(b.String(), "\n"))
+		b.WriteString(labelStyle.Render("공식 문서"))
+		b.WriteString("\n  " + linkStyle.Render(d.URL) + "  " + helpStyle.Render("[Enter] 브라우저에서 열기"))
+		b.WriteString("\n\n")
+	} else {
+		m.urlLine = -1
 	}
 
 	if m.focusedPane == panePreview {
@@ -1007,6 +1060,13 @@ func fetchTldrCmd(name string) tea.Cmd {
 			return tldrDoneMsg{err: err}
 		}
 		return tldrDoneMsg{output: string(out)}
+	}
+}
+
+func openURLCmd(url string) tea.Cmd {
+	return func() tea.Msg {
+		exec.Command("open", url).Run()
+		return nil
 	}
 }
 
