@@ -1,8 +1,11 @@
 package tui
 
 import (
+	"fmt"
 	"os/exec"
+	"regexp"
 	"strings"
+	"unicode"
 
 	"charm.land/bubbles/v2/cursor"
 	"charm.land/bubbles/v2/textinput"
@@ -14,16 +17,20 @@ import (
 	"github.com/clang/cmdtreemap/internal/model"
 )
 
-// lazygit-inspired color palette
+// Vim-inspired color palette
 const (
-	colorGreen   = "#50FA7B" // active panel border
-	colorMuted   = "#3C3C3C" // inactive panel border
-	colorBlue    = "#44475A" // selected line background
-	colorOrange  = "#FFB86C" // category nodes
-	colorCyan    = "#8BE9FD" // group nodes
-	colorDefault = "#F8F8F2" // leaf tool nodes
-	colorDim     = "#6272A4" // dim / secondary text
-	colorPurple  = "#BD93F9" // accents
+	colorGreen   = "#98c379" // active panel border
+	colorMuted   = "#3b4252" // inactive panel border
+	colorBlue    = "#3b4261" // selected line background
+	colorOrange  = "#d19a66" // category nodes
+	colorCyan    = "#56b6c2" // group nodes
+	colorDefault = "#e5c07b" // leaf tool nodes
+	colorDim     = "#5c6370" // dim / secondary text
+	colorPurple  = "#c678dd" // accents
+	colorCursor  = "#e06c75" // block cursor
+	colorGutter  = "#4b5263" // line numbers
+	colorGutterCur = "#e06c75" // current line number
+	colorStatusBg = "#2c323c" // status bar background
 )
 
 type pane int
@@ -38,6 +45,7 @@ type previewMode int
 const (
 	previewNormal previewMode = iota
 	previewVisual
+	previewSearch
 )
 
 type treeItem struct {
@@ -86,9 +94,15 @@ type Model struct {
 	previewActive bool
 	previewMode   previewMode
 	previewCursor int
+	previewCol    int
 	visualStart   int
 	visualEnd     int
 	previewLines  []string
+	rawLines      []string
+	pendingG      bool
+	searchQuery   string
+	searchActive  bool
+	searchInput   textinput.Model
 	tldrOutput    string
 	showTldr      bool
 	tldrLine      int
@@ -105,6 +119,10 @@ func NewModel(data model.CommandsData) Model {
 	fi := textinput.New()
 	fi.Placeholder = "필터..."
 	fi.CharLimit = 30
+
+	si := textinput.New()
+	si.Placeholder = "검색..."
+	si.CharLimit = 30
 
 	root := buildTreeRoot(data)
 
@@ -135,6 +153,7 @@ func NewModel(data model.CommandsData) Model {
 	t.Root().EnumeratorStyle(lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim)))
 
 	vp := viewport.New()
+	vp.SetContent("")
 
 	return Model{
 		data:        data,
@@ -142,6 +161,7 @@ func NewModel(data model.CommandsData) Model {
 		viewport:    vp,
 		textInput:   ti,
 		filterInput: fi,
+		searchInput: si,
 		explored:    make(map[[2]int]bool),
 	}
 }
@@ -406,12 +426,18 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.updateSizes()
 		return m, nil
 	case tea.KeyPressMsg:
+		if m.searchActive {
+			return m.updateSearchMode(msg)
+		}
 		return m.updateTree(msg)
 	case cursor.BlinkMsg:
-		// 필터 입력 커서 깜빡임 유지
-		if m.filterActive {
+		if m.filterActive || m.searchActive {
 			var cmd tea.Cmd
-			m.filterInput, cmd = m.filterInput.Update(msg)
+			if m.filterActive {
+				m.filterInput, cmd = m.filterInput.Update(msg)
+			} else {
+				m.searchInput, cmd = m.searchInput.Update(msg)
+			}
 			return m, cmd
 		}
 		return m, nil
@@ -422,6 +448,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.tldrOutput = msg.output
 		}
 		m.refreshPreview()
+		return m, nil
+	case lessDoneMsg:
 		return m, nil
 	}
 	return m, nil
@@ -480,13 +508,11 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		if val.isLeaf && val.rel != nil {
-			// Leaf tool: open preview.
-			m.previewActive = true
-			m.previewCursor = 0
-			m.viewport.GotoTop()
 			m.explored[[2]int{val.catIdx, val.relIdx}] = true
-			m.showTldr = false
-			m.tldrOutput = ""
+			m.focusedPane = panePreview
+			m.previewMode = previewNormal
+			m.previewCursor = 0
+			m.previewCol = 0
 			m.refreshPreview()
 			return m, nil
 		}
@@ -513,8 +539,8 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.updateSizes()
 		return m, m.filterInput.Focus()
 	case "b", "esc", "backspace":
-		if m.previewActive {
-			m.previewActive = false
+		if m.focusedPane == panePreview {
+			m.focusedPane = paneTree
 			m.showTldr = false
 			m.tldrOutput = ""
 			return m, nil
@@ -591,8 +617,22 @@ func (m Model) updatePreview(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+	if m.pendingG {
+		m.pendingG = false
+		if msg.String() == "g" {
+			m.previewCursor = 0
+			m.previewCol = 0
+			m.viewport.GotoTop()
+			m.refreshPreview()
+			return m, nil
+		}
+		return m, nil
+	}
+
 	switch msg.String() {
-	case "ctrl+h", "backspace", "tab":
+	case "esc":
+		return m, nil
+	case "ctrl+h", "tab":
 		m.focusedPane = paneTree
 		m.previewMode = previewNormal
 		return m, nil
@@ -602,7 +642,6 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		node := m.tree.NodeAtCurrentOffset()
 		if node != nil {
 			if val, ok := node.GivenValue().(treeItem); ok && val.rel != nil {
-				// Enter on tldr line
 				if m.tldrLine >= 0 && m.previewCursor == m.tldrLine && val.rel.Tldr != "" {
 					if m.showTldr {
 						m.showTldr = false
@@ -624,7 +663,6 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 					m.refreshPreview()
 					return m, nil
 				}
-				// Enter on URL line
 				if m.urlLine >= 0 && m.previewCursor == m.urlLine && val.rel.URL != "" {
 					return m, openURLCmd(val.rel.URL)
 				}
@@ -634,6 +672,9 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	case "j", "down":
 		if m.previewCursor < len(m.previewLines)-1 {
 			m.previewCursor++
+			if len(m.rawLines) > 0 {
+				m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
+			}
 			m.ensureVisible(m.previewCursor)
 		}
 		m.refreshPreview()
@@ -641,19 +682,23 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	case "k", "up":
 		if m.previewCursor > 0 {
 			m.previewCursor--
+			if len(m.rawLines) > 0 {
+				m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
+			}
 			m.ensureVisible(m.previewCursor)
 		}
 		m.refreshPreview()
 		return m, nil
 	case "g":
-		m.previewCursor = 0
-		m.viewport.GotoTop()
-		m.refreshPreview()
+		m.pendingG = true
 		return m, nil
 	case "G":
 		m.previewCursor = len(m.previewLines) - 1
 		if m.previewCursor < 0 {
 			m.previewCursor = 0
+		}
+		if len(m.rawLines) > 0 {
+			m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
 		}
 		m.viewport.GotoBottom()
 		m.refreshPreview()
@@ -669,6 +714,9 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		if m.previewCursor < 0 {
 			m.previewCursor = 0
 		}
+		if len(m.rawLines) > 0 {
+			m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
+		}
 		m.refreshPreview()
 		return m, nil
 	case "ctrl+u":
@@ -682,6 +730,9 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		if m.previewCursor < 0 {
 			m.previewCursor = 0
 		}
+		if len(m.rawLines) > 0 {
+			m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
+		}
 		m.refreshPreview()
 		return m, nil
 	case "v":
@@ -690,7 +741,66 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.visualEnd = m.previewCursor
 		m.refreshPreview()
 		return m, nil
-	case "esc", "b":
+	case "V":
+		m.previewMode = previewVisual
+		m.visualStart = m.previewCursor
+		m.visualEnd = m.previewCursor
+		m.refreshPreview()
+		return m, nil
+	case "y":
+		if len(m.rawLines) > 0 && m.previewCursor < len(m.rawLines) {
+			m.copyToClipboard(m.rawLines[m.previewCursor])
+		}
+		return m, nil
+	case "w":
+		if len(m.rawLines) > 0 && m.previewCursor < len(m.rawLines) {
+			m.previewCol = wordForward(m.rawLines[m.previewCursor], m.previewCol)
+			m.refreshPreview()
+		}
+		return m, nil
+	case "b":
+		if len(m.rawLines) > 0 && m.previewCursor < len(m.rawLines) {
+			m.previewCol = wordBackward(m.rawLines[m.previewCursor], m.previewCol)
+			m.refreshPreview()
+		}
+		return m, nil
+	case "e":
+		if len(m.rawLines) > 0 && m.previewCursor < len(m.rawLines) {
+			m.previewCol = wordEnd(m.rawLines[m.previewCursor], m.previewCol)
+			m.refreshPreview()
+		}
+		return m, nil
+	case "0":
+		m.previewCol = 0
+		m.refreshPreview()
+		return m, nil
+	case "$":
+		if len(m.rawLines) > 0 && m.previewCursor < len(m.rawLines) {
+			runes := []rune(m.rawLines[m.previewCursor])
+			m.previewCol = len(runes) - 1
+			if m.previewCol < 0 {
+				m.previewCol = 0
+			}
+			m.refreshPreview()
+		}
+		return m, nil
+	case "/":
+		m.searchActive = true
+		m.searchInput.Reset()
+		return m, m.searchInput.Focus()
+	case "n":
+		if m.searchQuery != "" {
+			m.viewport.HighlightNext()
+			m.refreshPreview()
+		}
+		return m, nil
+	case "N":
+		if m.searchQuery != "" {
+			m.viewport.HighlightPrevious()
+			m.refreshPreview()
+		}
+		return m, nil
+	case "backspace":
 		m.focusedPane = paneTree
 		m.previewMode = previewNormal
 		return m, nil
@@ -782,24 +892,139 @@ func (m Model) copyToClipboard(text string) {
 	cmd.Run()
 }
 
+func isVimWordChar(r rune) bool {
+	return unicode.IsLetter(r) || unicode.IsDigit(r) || r == '_'
+}
+
+func wordForward(line string, col int) int {
+	runes := []rune(line)
+	n := len(runes)
+	if col >= n-1 {
+		return n - 1
+	}
+	i := col
+	// skip current word
+	if isVimWordChar(runes[i]) {
+		for i < n && isVimWordChar(runes[i]) {
+			i++
+		}
+	} else if !unicode.IsSpace(runes[i]) {
+		for i < n && !unicode.IsSpace(runes[i]) && !isVimWordChar(runes[i]) {
+			i++
+		}
+	}
+	// skip whitespace
+	for i < n && unicode.IsSpace(runes[i]) {
+		i++
+	}
+	if i >= n {
+		return n - 1
+	}
+	return i
+}
+
+func wordBackward(line string, col int) int {
+	runes := []rune(line)
+	if col <= 0 {
+		return 0
+	}
+	i := col - 1
+	// skip whitespace
+	for i > 0 && unicode.IsSpace(runes[i]) {
+		i--
+	}
+	// skip word
+	if isVimWordChar(runes[i]) {
+		for i > 0 && isVimWordChar(runes[i-1]) {
+			i--
+		}
+	} else if !unicode.IsSpace(runes[i]) {
+		for i > 0 && !unicode.IsSpace(runes[i-1]) && !isVimWordChar(runes[i-1]) {
+			i--
+		}
+	}
+	return i
+}
+
+func wordEnd(line string, col int) int {
+	runes := []rune(line)
+	n := len(runes)
+	if col >= n-1 {
+		return n - 1
+	}
+	i := col + 1
+	// skip whitespace
+	for i < n && unicode.IsSpace(runes[i]) {
+		i++
+	}
+	if i >= n {
+		return n - 1
+	}
+	// move to end of word
+	if isVimWordChar(runes[i]) {
+		for i < n-1 && isVimWordChar(runes[i+1]) {
+			i++
+		}
+	} else if !unicode.IsSpace(runes[i]) {
+		for i < n-1 && !unicode.IsSpace(runes[i+1]) && !isVimWordChar(runes[i+1]) {
+			i++
+		}
+	}
+	return i
+}
+
+func clampCol(line string, col int) int {
+	runes := []rune(line)
+	maxCol := len(runes) - 1
+	if maxCol < 0 {
+		maxCol = 0
+	}
+	if col < 0 {
+		return 0
+	}
+	if col > maxCol {
+		return maxCol
+	}
+	return col
+}
+
+func stripANSI(s string) string {
+	re := regexp.MustCompile(`\x1b\[[0-9;]*m`)
+	return re.ReplaceAllString(s, "")
+}
+
 func (m *Model) refreshPreview() {
+	m.refreshPreviewContent()
+	m.scrollToCursor()
+}
+
+func (m *Model) refreshPreviewContent() {
 	node := m.tree.NodeAtCurrentOffset()
 	if node == nil {
 		m.previewLines = []string{"명령어를 선택하세요"}
+		m.rawLines = m.previewLines
 		m.viewport.SetContent(strings.Join(m.previewLines, "\n"))
+		m.setLineNumbers()
 		return
 	}
 
 	val, ok := node.GivenValue().(treeItem)
 	if !ok || val.rel == nil {
 		m.previewLines = []string{"상세 정보가 없습니다"}
+		m.rawLines = m.previewLines
 		m.viewport.SetContent(strings.Join(m.previewLines, "\n"))
+		m.setLineNumbers()
 		return
 	}
 
 	d := val.rel
 	content := m.buildPreviewContent(d)
 	m.previewLines = strings.Split(content, "\n")
+
+	m.rawLines = make([]string, len(m.previewLines))
+	for i, l := range m.previewLines {
+		m.rawLines[i] = stripANSI(l)
+	}
 
 	highlighted := make([]string, len(m.previewLines))
 	copy(highlighted, m.previewLines)
@@ -810,27 +1035,179 @@ func (m *Model) refreshPreview() {
 			start, end = end, start
 		}
 	}
-	// normal mode: cursor line only; visual mode: selected range.
-	// clamp so the highlight never falls outside the content.
 	if start < 0 {
 		start = 0
 	}
 	if end >= len(m.previewLines) {
 		end = len(m.previewLines) - 1
 	}
-	curStart, curEnd := start, end
-	if m.previewMode != previewVisual {
-		curStart, curEnd = m.previewCursor, m.previewCursor
-	}
-	if m.focusedPane == panePreview && curStart >= 0 && curStart < len(m.previewLines) {
-		for i := curStart; i <= curEnd && i < len(m.previewLines); i++ {
+
+	if m.focusedPane == panePreview && m.previewMode == previewVisual {
+		for i := start; i <= end && i < len(m.previewLines); i++ {
 			highlighted[i] = lipgloss.NewStyle().
 				Background(lipgloss.Color(colorBlue)).
 				Foreground(lipgloss.Color(colorDefault)).
 				Render(m.previewLines[i])
 		}
+	} else if m.focusedPane == panePreview && m.previewCursor >= 0 && m.previewCursor < len(m.previewLines) {
+		curLine := m.previewLines[m.previewCursor]
+		if len(m.rawLines) > 0 && m.previewCursor < len(m.rawLines) {
+			rawLine := m.rawLines[m.previewCursor]
+			col := m.previewCol
+			if col >= len(rawLine) {
+				col = len(rawLine) - 1
+			}
+			if col < 0 {
+				col = 0
+			}
+			highlighted[m.previewCursor] = insertBlockCursor(curLine, rawLine, col)
+		} else {
+			highlighted[m.previewCursor] = lipgloss.NewStyle().
+				Background(lipgloss.Color(colorBlue)).
+				Foreground(lipgloss.Color(colorDefault)).
+				Render(curLine)
+		}
 	}
+
 	m.viewport.SetContent(strings.Join(highlighted, "\n"))
+	m.setLineNumbers()
+}
+
+func (m *Model) setLineNumbers() {
+	lines := m.previewLines
+	cursor := m.previewCursor
+	total := len(lines)
+
+	m.viewport.LeftGutterFunc = func(ctx viewport.GutterContext) string {
+		idx := ctx.Index
+		if idx < 0 || idx >= total {
+			return ""
+		}
+		numStr := fmt.Sprintf("%4d", idx+1)
+		if m.focusedPane == panePreview && idx == cursor {
+			return lipgloss.NewStyle().
+				Foreground(lipgloss.Color(colorGutterCur)).
+				Bold(true).
+				Render(numStr) + " "
+		}
+		return lipgloss.NewStyle().
+			Foreground(lipgloss.Color(colorGutter)).
+			Render(numStr) + " "
+	}
+}
+
+func (m *Model) scrollToCursor() {
+	if m.previewCursor < 0 || m.previewCursor >= len(m.rawLines) {
+		return
+	}
+	line := m.rawLines[m.previewCursor]
+	runes := []rune(line)
+	if len(runes) == 0 {
+		return
+	}
+	col := m.previewCol
+	if col >= len(runes) {
+		col = len(runes) - 1
+	}
+	if col < 0 {
+		col = 0
+	}
+
+	// Calculate visual width from start of line to cursor
+	visPos := 0
+	for i := 0; i < col && i < len(runes); i++ {
+		visPos += lipgloss.Width(string(runes[i]))
+	}
+	// Add half cursor width for centering
+	cursorWidth := lipgloss.Width(string(runes[col]))
+
+	vpWidth := m.viewport.Width()
+	// maxWidth() accounts for gutter, but we calculate manually for safety
+	var gutterW int
+	if m.viewport.LeftGutterFunc != nil {
+		gutterW = lipgloss.Width(m.viewport.LeftGutterFunc(viewport.GutterContext{}))
+	}
+	availWidth := vpWidth - gutterW
+	if availWidth < 1 {
+		availWidth = 1
+	}
+
+	xOff := m.viewport.XOffset()
+	if visPos < xOff {
+		m.viewport.SetXOffset(visPos)
+	} else if visPos+cursorWidth > xOff+availWidth {
+		m.viewport.SetXOffset(visPos + cursorWidth - availWidth)
+	}
+}
+
+func insertBlockCursor(styledLine, rawLine string, col int) string {
+	rawRunes := []rune(rawLine)
+	if len(rawRunes) == 0 {
+		return styledLine
+	}
+	if col >= len(rawRunes) {
+		col = len(rawRunes) - 1
+	}
+	if col < 0 {
+		col = 0
+	}
+
+	// Find visual position in styled line by counting visible characters
+	cursorPos := 0
+	inEscape := false
+	vIdx := 0
+	for i := 0; i < len(styledLine); i++ {
+		if styledLine[i] == '\x1b' {
+			inEscape = true
+			continue
+		}
+		if inEscape {
+			if styledLine[i] == 'm' {
+				inEscape = false
+			}
+			continue
+		}
+		if vIdx == col {
+			cursorPos = i
+			break
+		}
+		vIdx++
+	}
+
+	// If col is at end of line, place cursor on last character
+	if vIdx < col {
+		// Find last visible character
+		lastVis := 0
+		inEsc := false
+		for i := 0; i < len(styledLine); i++ {
+			if styledLine[i] == '\x1b' {
+				inEsc = true
+				continue
+			}
+			if inEsc {
+				if styledLine[i] == 'm' {
+					inEsc = false
+				}
+				continue
+			}
+			lastVis = i
+		}
+		cursorPos = lastVis
+	}
+
+	// Find end of the character at cursorPos
+	charEnd := cursorPos + 1
+	for charEnd < len(styledLine) && styledLine[charEnd] != '\x1b' && styledLine[charEnd] != '\n' {
+		charEnd++
+	}
+
+	cursorChar := styledLine[cursorPos:charEnd]
+	cursorStyle := lipgloss.NewStyle().
+		Background(lipgloss.Color(colorCursor)).
+		Foreground(lipgloss.Color("#1a1b26")).
+		Bold(true)
+
+	return styledLine[:cursorPos] + cursorStyle.Render(cursorChar) + styledLine[charEnd:]
 }
 
 func (m Model) buildPreviewContent(d *model.Relation) string {
@@ -902,11 +1279,17 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 
 	if m.focusedPane == panePreview {
 		modeLabel := "NORMAL"
+		modeStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorGreen)).Bold(true)
 		if m.previewMode == previewVisual {
 			modeLabel = "VISUAL"
+			modeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(colorPurple)).Bold(true)
 		}
-		b.WriteString(helpStyle.Render("[" + modeLabel + "] "))
-		b.WriteString(helpStyle.Render("j/k:이동 v:선택 y:복사 Tab:트리 t:tldr Esc:뒤로"))
+		if m.searchActive {
+			modeLabel = "SEARCH"
+			modeStyle = lipgloss.NewStyle().Foreground(lipgloss.Color(colorOrange)).Bold(true)
+		}
+		b.WriteString(modeStyle.Render(" " + modeLabel + " "))
+		b.WriteString(helpStyle.Render("  j/k  w/b/e  0/$  gg/G  v  y  /  n/N  t  Esc  ⌫"))
 	} else {
 		b.WriteString(helpStyle.Render("[Enter] 선택  [/] 필터  Tab:미리보기  [q] 종료"))
 	}
@@ -949,6 +1332,48 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	// Position the cursor on the first visible node after the root.
 	m.tree.SetYOffset(0)
 	m.skipHiddenIfNeeded(1)
+	return m, cmd
+}
+
+func (m Model) updateSearchMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+	switch msg.String() {
+	case "esc":
+		m.searchActive = false
+		m.searchInput.Blur()
+		m.searchInput.Reset()
+		m.searchQuery = ""
+		m.viewport.ClearHighlights()
+		m.refreshPreview()
+		return m, nil
+	case "enter":
+		m.searchActive = false
+		m.searchInput.Blur()
+		query := m.searchInput.Value()
+		if query != "" {
+			m.searchQuery = query
+			// Build highlight matches from all raw lines
+			re, err := regexp.Compile(strings.ToLower(query))
+			if err != nil {
+				m.refreshPreview()
+				return m, nil
+			}
+			content := strings.Join(m.rawLines, "\n")
+			var matches [][]int
+			for _, loc := range re.FindAllStringIndex(strings.ToLower(content), -1) {
+				matches = append(matches, loc)
+			}
+			m.viewport.SetHighlights(matches)
+			m.viewport.HighlightNext()
+		} else {
+			m.searchQuery = ""
+			m.viewport.ClearHighlights()
+		}
+		m.refreshPreview()
+		return m, nil
+	}
+
+	var cmd tea.Cmd
+	m.searchInput, cmd = m.searchInput.Update(msg)
 	return m, cmd
 }
 
@@ -997,14 +1422,14 @@ func statusBar() string {
 	descStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
 
 	hint := func(k, rest string) string {
-		return keyStyle.Render("["+k+"]") + descStyle.Render(rest)
+		return keyStyle.Render(k) + descStyle.Render(rest)
 	}
 
 	return hint("q", "uit") + "  " +
-		hint("enter", "expand") + "  " +
-		hint("/", "filter") + "  " +
-		hint("tab", "switch") + "  " +
-		hint("t", "tldr")
+		hint("Enter", " expand") + "  " +
+		hint("/", " filter") + "  " +
+		hint("Tab", " switch") + "  " +
+		hint("t", " tldr")
 }
 
 func (m Model) View() tea.View {
@@ -1034,14 +1459,8 @@ func (m Model) View() tea.View {
 	treePanel := renderPanel("cmdtreemap", treeContent, treePanelWidth, panelHeight, m.focusedPane == paneTree)
 
 	// 미리보기 패널
-	var previewContent string
-	if m.previewActive {
-		m.refreshPreview()
-		previewContent = m.viewport.View()
-	} else {
-		helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
-		previewContent = helpStyle.Render("명령어를 선택하고 Enter로 상세 보기")
-	}
+	m.refreshPreview()
+	previewContent := m.viewport.View()
 	previewPanel := renderPanel("상세 정보", previewContent, previewPanelWidth, panelHeight, m.focusedPane == panePreview)
 
 	combined := lipgloss.JoinHorizontal(lipgloss.Top, treePanel, previewPanel)
@@ -1073,4 +1492,55 @@ func openURLCmd(url string) tea.Cmd {
 type tldrDoneMsg struct {
 	output string
 	err    error
+}
+
+type lessDoneMsg struct {
+	err error
+}
+
+func buildPreviewText(d *model.Relation) string {
+	var b strings.Builder
+
+	b.WriteString(d.From + " → " + d.To)
+	b.WriteString("\n\n")
+
+	b.WriteString("문제\n  " + d.Problem)
+	b.WriteString("\n\n")
+
+	b.WriteString("해결\n  " + d.Solution)
+	b.WriteString("\n\n")
+
+	if d.Boundary != "" {
+		b.WriteString("경계\n  " + d.Boundary)
+		b.WriteString("\n\n")
+	}
+
+	b.WriteString("관계 유형\n  " + d.Relation)
+	b.WriteString("\n\n")
+
+	if d.Install != "" {
+		b.WriteString("설치\n  $ " + d.Install)
+		b.WriteString("\n\n")
+	}
+
+	if d.Tldr != "" {
+		b.WriteString("tldr: " + d.Tldr)
+		b.WriteString("\n\n")
+	}
+
+	if d.URL != "" {
+		b.WriteString("공식 문서\n  " + d.URL)
+		b.WriteString("\n\n")
+	}
+
+	return b.String()
+}
+
+func openInLess(d *model.Relation) tea.Cmd {
+	content := buildPreviewText(d)
+	cmd := exec.Command("less", "-R", "-S", "-N")
+	cmd.Stdin = strings.NewReader(content)
+	return tea.ExecProcess(cmd, func(err error) tea.Msg {
+		return lessDoneMsg{err: err}
+	})
 }

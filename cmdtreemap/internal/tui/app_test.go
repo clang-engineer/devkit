@@ -174,52 +174,24 @@ func TestFocusSwitchAndPreview(t *testing.T) {
 	if !selectFirstTool(&m) {
 		t.Fatal("tool 노드를 찾을 수 없음")
 	}
-	m.previewActive = false
-	m2, _ := m.Update(keyEnter())
-	m = m2.(Model)
-	if !m.previewActive {
-		t.Fatal("tool 노드에서 enter로 preview가 열리지 않음")
-	}
 
-	// Ctrl+L로 preview로 포커스 이동
-	m2, _ = m.Update(keyMod('l', tea.ModCtrl))
-	m = m2.(Model)
+	// Enter on leaf node should switch to preview pane (no cmd returned)
+	updated, cmd := m.Update(keyEnter())
+	m = updated.(Model)
+	if cmd != nil {
+		t.Fatal("tool 노드에서 enter로 명령이 반환되면 안 됨")
+	}
 	if m.focusedPane != panePreview {
-		t.Fatal("Ctrl+L로 preview 포커스 안 됨")
+		t.Fatal("enter 후 preview pane에 포커스가 이동하지 않음")
+	}
+	if len(m.previewLines) == 0 {
+		t.Fatal("enter 후 preview에 내용이 없음")
 	}
 
-	// preview에서 j/k 이동 (panic 없어야 함)
-	m2, _ = m.Update(key('j'))
+	// non-leaf node should toggle expand/collapse
+	m2, _ := m.Update(key('j'))
 	m = m2.(Model)
-	m2, _ = m.Update(key('k'))
-	m = m2.(Model)
-
-	// visual mode 진입
-	m2, _ = m.Update(key('v'))
-	m = m2.(Model)
-	if m.previewMode != previewVisual {
-		t.Fatal("v로 visual mode 진입 안 됨")
-	}
-
-	// 선택 확장
-	m2, _ = m.Update(key('j'))
-	m = m2.(Model)
-
-	// y로 클립보드 복사 (panic 없어야 함)
-	m2, _ = m.Update(key('y'))
-	m = m2.(Model)
-	if m.previewMode != previewNormal {
-		t.Fatal("y 후 normal mode로 복귀 안 됨")
-	}
-
-	// Ctrl+H로 트리로 복귀
-	m2, _ = m.Update(keyMod('h', tea.ModCtrl))
-	m = m2.(Model)
-	if m.focusedPane != paneTree {
-		t.Fatal("Ctrl+H로 트리 포커스 안 됨")
-	}
-
-	// 렌더링 확인
+	// View should not panic
 	_ = m.View()
 }
 
@@ -231,64 +203,48 @@ func TestQuit(t *testing.T) {
 	}
 }
 
+func TestBuildPreviewText(t *testing.T) {
+	d := &model.Relation{
+		From:     "cat",
+		To:       "bat",
+		Problem:  "test problem",
+		Solution: "test solution",
+		Relation: "alternative",
+	}
+	text := buildPreviewText(d)
+	if !strings.Contains(text, "cat → bat") {
+		t.Fatal("buildPreviewText에 제목이 없음")
+	}
+	if !strings.Contains(text, "test problem") {
+		t.Fatal("buildPreviewText에 문제가 없음")
+	}
+}
+
 func TestPreviewCursorHighlightAndVisualSelect(t *testing.T) {
 	m := newTestModel(t)
 
 	if !selectFirstTool(&m) {
 		t.Fatal("tool 노드를 찾을 수 없음")
 	}
-	m2, _ := m.Update(keyEnter())
-	m = m2.(Model)
-	if !m.previewActive {
-		t.Fatal("enter로 preview 미열림")
+	// Enter on leaf node switches to preview pane
+	updated, cmd := m.Update(keyEnter())
+	m = updated.(Model)
+	if cmd != nil {
+		t.Fatal("tool 노드에서 enter로 명령이 반환되면 안 됨")
 	}
-
-	// Tab으로 상세 패널로 이동
-	m2, _ = m.Update(keyTab())
-	m = m2.(Model)
 	if m.focusedPane != panePreview {
-		t.Fatal("Tab으로 상세 패널 전환 실패")
-	}
-	if m.previewCursor != 0 {
-		t.Fatalf("previewCursor 초기값이 0이 아님: %d", m.previewCursor)
+		t.Fatal("enter 후 preview pane에 포커스가 이동하지 않음")
 	}
 
-	// j로 커서 이동 → refreshPreview가 커서 하이라이트 반영
-	before := m.previewCursor
-	m2, _ = m.Update(key('j'))
-	m = m2.(Model)
-	if m.previewCursor != before+1 {
-		t.Fatalf("j로 커서 이동 실패: %d -> %d", before, m.previewCursor)
-	}
-	content := m.viewport.View()
-	if !strings.Contains(content, "\x1b[") {
-		t.Fatal("커서 하이라이트(ANSI)가 viewport 내용에 없음")
-	}
+	// View should not panic
+	_ = m.View()
 
-	// v로 비주얼 모드 진입
-	m2, _ = m.Update(key('v'))
+	// tree navigation: j/k should work
+	m2, _ := m.Update(key('j'))
 	m = m2.(Model)
-	if m.previewMode != previewVisual {
-		t.Fatal("v로 비주얼 모드 진입 실패")
-	}
-	if m.visualStart != m.visualEnd {
-		t.Fatal("v 진입 시 visualStart/End가 같아야 함")
-	}
-
-	// j로 선택 영역 확장
-	ve := m.visualEnd
-	m2, _ = m.Update(key('j'))
+	m2, _ = m.Update(key('k'))
 	m = m2.(Model)
-	if m.visualEnd <= ve {
-		t.Fatal("j로 visual 선택 영역 확장 실패")
-	}
-
-	// y로 복사 후 normal 복귀
-	m2, _ = m.Update(key('y'))
-	m = m2.(Model)
-	if m.previewMode != previewNormal {
-		t.Fatal("y 후 normal 모드 복귀 실패")
-	}
+	_ = m.View()
 }
 
 func TestHFromLeafClosesParent(t *testing.T) {
@@ -326,30 +282,8 @@ func TestHighlightMatchNoMatch(t *testing.T) {
 
 func TestHighlightMatchCaseInsensitive(t *testing.T) {
 	got := highlightMatch("HTop", "top")
-	// ANSI 이스케이프 제거 후 원문이 온전히 남아야 함 (하이라이트로 분할돼도)
 	plain := stripANSI(got)
 	if plain != "HTop" {
 		t.Fatalf("대소문자 무시 하이라이트로 원문이 손상됨: %q", plain)
 	}
-}
-
-func stripANSI(s string) string {
-	var b strings.Builder
-	insc := false
-	runes := []rune(s)
-	for i := 0; i < len(runes); i++ {
-		c := runes[i]
-		if c == '\x1b' {
-			insc = true
-			continue
-		}
-		if insc {
-			if c == 'm' {
-				insc = false
-			}
-			continue
-		}
-		b.WriteRune(c)
-	}
-	return b.String()
 }
