@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>cmdtreemap WASM spike</title>
+</head>
+<body>
+  <main>
+    <h1>cmdtreemap</h1>
+    <p id="status">WASM을 불러오는 중...</p>
+  </main>
+  <script src="wasm_exec.js"></script>
+  <script>
+    const go = new Go();
+    WebAssembly.instantiateStreaming(fetch('cmdtreemap.wasm'), go.importObject)
+      .then((result) => go.run(result.instance))
+      .catch((error) => {
+        document.getElementById('status').textContent = 'WASM 로드 실패: ' + error;
+      });
+  </script>
+</body>
+</html>
