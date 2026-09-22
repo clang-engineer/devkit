@@ -1,0 +1,44 @@
+.cmdtreemap-app {
+  --cmd-bg: var(--main-bg, #17191f);
+  --cmd-panel: var(--card-bg, #20232b);
+  --cmd-line: var(--btn-border-color, #3a3f4b);
+  --cmd-text: var(--text-color, #e5e7eb);
+  --cmd-muted: var(--text-muted-color, #9aa1ad);
+  --cmd-accent: var(--link-color, #61afef);
+  color: var(--cmd-text);
+  font: 15px/1.6 system-ui, sans-serif;
+}
+
+.cmdtreemap-status { margin: 0 0 .75rem; color: var(--cmd-muted); }
+.cmdtreemap-search { width: 100%; padding: .7rem .85rem; border: 1px solid var(--cmd-line); border-radius: 6px; background: var(--cmd-panel); color: var(--cmd-text); font: inherit; }
+.cmdtreemap-layout { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 1.5fr); gap: 1.5rem; margin-top: 1.5rem; align-items: start; }
+.cmdtreemap-tree, .cmdtreemap-detail { min-width: 0; }
+.cmdtreemap-detail { padding-left: 1.5rem; border-left: 1px solid var(--cmd-line); }
+.cmdtreemap-category, .cmdtreemap-group { border-top: 1px solid var(--cmd-line); }
+.cmdtreemap-app summary { cursor: pointer; padding: .65rem 0; color: var(--cmd-accent); font-weight: 700; }
+.cmdtreemap-app summary span { float: right; color: var(--cmd-muted); font-size: .85rem; font-weight: 400; }
+.cmdtreemap-group summary { padding-left: .8rem; color: var(--cmd-muted); font-size: .9rem; }
+.cmdtreemap-app ul { margin: 0; padding: 0; list-style: none; }
+.cmdtreemap-item { width: 100%; padding: .55rem .7rem .55rem 1.35rem; border: 0; border-left: 2px solid transparent; background: transparent; color: var(--cmd-text); text-align: left; cursor: pointer; }
+.cmdtreemap-item:hover, .cmdtreemap-item:focus-visible, .cmdtreemap-item.is-selected { border-left-color: var(--cmd-accent); background: var(--cmd-panel); }
+.cmdtreemap-item strong, .cmdtreemap-item small { display: block; }
+.cmdtreemap-item small { overflow: hidden; color: var(--cmd-muted); text-overflow: ellipsis; white-space: nowrap; }
+.cmdtreemap-muted, .cmdtreemap-eyebrow { color: var(--cmd-muted); }
+.cmdtreemap-eyebrow { margin: 0 0 .4rem; font-size: .85rem; }
+.cmdtreemap-detail h2 { margin-top: 0; }
+.cmdtreemap-detail h2 span { color: var(--cmd-muted); }
+.cmdtreemap-facts { margin: 1.5rem 0; }
+.cmdtreemap-facts div { padding: .8rem 0; border-top: 1px solid var(--cmd-line); }
+.cmdtreemap-facts dt { color: var(--cmd-accent); font-weight: 700; }
+.cmdtreemap-facts dd { margin: .2rem 0 0; }
+.cmdtreemap-section { margin-top: 1.5rem; }
+.cmdtreemap-section h3 { margin: 0 0 .6rem; color: var(--cmd-accent); font-size: 1rem; }
+.cmdtreemap-tldr { list-style: decimal; padding-left: 1.4rem; }
+.cmdtreemap-tldr code { color: var(--cmd-accent); }
+.cmdtreemap-app a { color: var(--cmd-accent); }
+.cmdtreemap-error { color: #e06c75; }
+
+@media (max-width: 767px) {
+  .cmdtreemap-layout { display: block; }
+  .cmdtreemap-detail { margin-top: 1.5rem; padding: 1rem 0 0; border-top: 1px solid var(--cmd-line); border-left: 0; }
+}

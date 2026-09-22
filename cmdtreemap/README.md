@@ -21,7 +21,8 @@ cmdtreemap/
 └── web/
     ├── main.go                # Go WASM 진입점
     ├── index.html             # Web 진입점
-    ├── app.js                 # DOM tree·상세 화면·검색
+    ├── app.js                 # DOM 생성·tree·상세 화면·검색
+    ├── app.css                # CLI Web UI 공통 스타일
     ├── commands.json          # Web에서 읽는 데이터 복사본
     ├── wasm_exec.js           # Go WASM 브라우저 런타임
     └── cmdtreemap.wasm        # Web용 WASM 산출물
@@ -32,7 +33,8 @@ cmdtreemap/
 - `internal/model`: 데이터 구조를 공유한다.
 - `internal/tui`: TTY와 Bubble Tea를 사용하는 CLI 화면을 담당한다.
 - `web/main.go`: 브라우저에서 WASM을 로드하기 위한 최소 Go adapter다.
-- `web/app.js`: 브라우저의 tree, 검색, 상세 화면을 담당한다.
+- `web/app.js`: mount point 내부의 markup, tree, 검색, 상세 화면을 담당한다.
+- `web/app.css`: 독립 Web 페이지와 블로그 탭이 함께 사용하는 스타일이다.
 - `internal/data/commands.json`: 명령어 관계의 원본이다.
 - `web/commands.json`: Web 배포를 위해 원본에서 생성되는 복사본이다.
 
@@ -140,6 +142,7 @@ cd ~/Desktop/_zero/devkit/cmdtreemap
 ```text
 index.html
 app.js
+app.css
 commands.json
 wasm_exec.js
 cmdtreemap.wasm

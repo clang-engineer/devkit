@@ -20,11 +20,11 @@ cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" "$WEB_DIR/wasm_exec.js"
 node --check "$WEB_DIR/app.js"
 
 mkdir -p "$TARGET_DIR"
-for file in index.html app.js commands.json wasm_exec.js cmdtreemap.wasm; do
+for file in index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm; do
   cp "$WEB_DIR/$file" "$TARGET_DIR/$file"
 done
 
-for file in index.html app.js commands.json wasm_exec.js cmdtreemap.wasm; do
+for file in index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm; do
   cmp "$WEB_DIR/$file" "$TARGET_DIR/$file"
 done
 
