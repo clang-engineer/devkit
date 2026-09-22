@@ -34,6 +34,10 @@ Tool introductions and operational references. Full index with descriptions:
 
 **Dev tools** · [terminal tooling](cheatsheets/terminal-tooling.md) · [mise](cheatsheets/mise.md) · [curl](cheatsheets/curl.md) · [taskwarrior](cheatsheets/taskwarrior.md) · [Python PyPI publishing](cheatsheets/python-pypi-publishing.md) · [claude-code](cheatsheets/claude-code.md) · [ccusage](cheatsheets/ccusage.md) · [opencode](cheatsheets/opencode.md) · [gdb](cheatsheets/gdb.md)
 
+## cmdtreemap
+
+CLI 도구의 대안·진화 관계를 터미널 TUI와 Web tree로 탐색합니다. 구조, 개발, 실행, WASM 빌드와 블로그 배포 방법은 [cmdtreemap/README.md](cmdtreemap/README.md)를 참고하세요.
+
 ## Templates
 
 Boilerplate starting points — copy and adapt.
