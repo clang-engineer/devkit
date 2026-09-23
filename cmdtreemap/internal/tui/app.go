@@ -49,12 +49,13 @@ const (
 )
 
 type treeItem struct {
-	name        string
-	catIdx      int
-	relIdx      int
-	isLeaf      bool
-	rel         *model.Relation
-	filterQuery string
+	name          string
+	catIdx        int
+	relIdx        int
+	isLeaf        bool
+	isDestination bool
+	rel           *model.Relation
+	filterQuery   string
 }
 
 func (i treeItem) String() string {
@@ -62,10 +63,13 @@ func (i treeItem) String() string {
 	if i.filterQuery != "" {
 		name = highlightMatch(name, i.filterQuery)
 	}
-	if i.isLeaf && i.rel != nil {
+	if i.rel != nil && i.isDestination {
 		toStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
-		whyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
-		return toStyle.Render(name) + whyStyle.Render("  ["+i.rel.Why+"]")
+		if i.rel.Why != "" {
+			whyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
+			return whyStyle.Render(i.rel.Why+" → ") + toStyle.Render(name)
+		}
+		return toStyle.Render(name)
 	}
 	return name
 }
@@ -289,11 +293,12 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 
 	if len(node.Children) > 0 {
 		interNode := tree.Root(treeItem{
-			name:   node.Rel.To,
-			catIdx: catIdx,
-			relIdx: relIdx,
-			isLeaf: false,
-			rel:    node.Rel,
+			name:          node.Rel.To,
+			isDestination: true,
+			catIdx:        catIdx,
+			relIdx:        relIdx,
+			isLeaf:        false,
+			rel:           node.Rel,
 		})
 		interNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
 			return lipgloss.NewStyle().Foreground(lipgloss.Color(colorCyan))
@@ -308,11 +313,12 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 	}
 
 	parent.Child(treeItem{
-		name:   node.Rel.To,
-		catIdx: catIdx,
-		relIdx: relIdx,
-		isLeaf: true,
-		rel:    node.Rel,
+		name:          node.Rel.To,
+		isDestination: true,
+		catIdx:        catIdx,
+		relIdx:        relIdx,
+		isLeaf:        true,
+		rel:           node.Rel,
 	})
 }
 

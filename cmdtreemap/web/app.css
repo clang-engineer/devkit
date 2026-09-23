@@ -24,8 +24,8 @@
 .cmdtreemap-paths strong { overflow-wrap: anywhere; }
 .cmdtreemap-item { width: 100%; padding: .55rem .7rem .55rem 1.35rem; border: 0; border-left: 2px solid transparent; background: transparent; color: var(--cmd-text); text-align: left; cursor: pointer; }
 .cmdtreemap-item:hover, .cmdtreemap-item:focus-visible, .cmdtreemap-item.is-selected { border-left-color: var(--cmd-accent); background: var(--cmd-panel); }
-.cmdtreemap-item strong, .cmdtreemap-item small { display: block; }
-.cmdtreemap-item small { overflow: hidden; color: var(--cmd-muted); text-overflow: ellipsis; white-space: nowrap; }
+.cmdtreemap-item strong { display: inline; }
+.cmdtreemap-reason { color: var(--cmd-muted); font-size: .85rem; line-height: 1.5; overflow-wrap: anywhere; }
 .cmdtreemap-muted, .cmdtreemap-eyebrow { color: var(--cmd-muted); }
 .cmdtreemap-eyebrow { margin: 0 0 .4rem; font-size: .85rem; }
 .cmdtreemap-detail h2 { margin-top: 0; }

@@ -84,6 +84,20 @@ test('disconnected cycles and self loops terminate without losing edges', () => 
   assert.equal(forest[1].children[0].cycle, true);
 });
 
+test('reason labels the edge inline without an extra tree node', () => {
+  const { elements } = setup([{ from: 'cat', to: 'bat', why: '구문강조 없음' }]);
+  const html = elements.get('[data-tree]').innerHTML;
+  assert.equal((html.match(/<li>/g) || []).length, 2);
+  const button = html.match(/<button[\s\S]*?<\/button>/)[0];
+  assert.ok(button.includes('bat'));
+  assert.match(button, /<span class="cmdtreemap-reason">구문강조 없음 → <\/span><strong>bat<\/strong>/);
+});
+
+test('missing reasons do not introduce empty intermediate nodes', () => {
+  const { elements } = setup([{ from: 'cat', to: 'bat' }]);
+  assert.ok(!elements.get('[data-tree]').innerHTML.includes('cmdtreemap-reason'));
+});
+
 test('empty categories render no results', () => {
   const { elements } = setup([]);
   assert.ok(elements.get('[data-tree]').innerHTML.includes('검색 결과가 없습니다'));

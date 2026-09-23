@@ -34,6 +34,10 @@ func TestEnterExpandsCategoryAndGroup(t *testing.T) {
 		t.Fatal("Enter did not open group")
 	}
 	m = press(m, key('j'))
+	item, ok := m.tree.NodeAtCurrentOffset().GivenValue().(treeItem)
+	if !ok || !item.isDestination || !strings.Contains(item.String(), item.rel.Why+" → ") {
+		t.Fatal("expected reason label on destination, without an extra node")
+	}
 	m = press(m, keyEnter())
 	if m.focusedPane != panePreview {
 		t.Fatal("Enter on tool did not open preview")

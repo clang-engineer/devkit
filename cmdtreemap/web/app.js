@@ -93,8 +93,7 @@ function renderTree() {
       const button = `<button class="cmdtreemap-item${selected ? ' is-selected' : ''}"
         data-relation="${id}" aria-pressed="${selected}" type="button"
         aria-label="${escapeHtml(`${relation.from} → ${relation.to}`)}">
-        <strong>→ ${escapeHtml(node.name)}${node.cycle ? ' ↩' : ''}</strong>
-        <small>${escapeHtml(relation.why || '')}</small>
+        ${relation.why ? `<span class="cmdtreemap-reason">${escapeHtml(relation.why)} → </span>` : ''}<strong>${escapeHtml(node.name)}${node.cycle ? ' ↩' : ''}</strong>
       </button>`;
       return `<li>${button}${children ? `<ul>${children}</ul>` : ''}</li>`;
     }
