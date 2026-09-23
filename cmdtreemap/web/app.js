@@ -114,6 +114,21 @@ function renderTree() {
   tree.innerHTML = categories || '<p class="cmdtreemap-muted">검색 결과가 없습니다.</p>';
 }
 
+function renderTldrCommand(command) {
+  let html = '';
+  let offset = 0;
+  for (const match of command.matchAll(/\{\{(.*?)\}\}/g)) {
+    html += escapeHtml(command.slice(offset, match.index));
+    const value = match[1];
+    const alias = /^\[([^|\]]+)\|([^\]]+)\]$/.exec(value);
+    html += alias
+      ? `<span title="${escapeHtml(alias[2])}">${escapeHtml(alias[1])}</span>`
+      : `<var>${escapeHtml(value)}</var>`;
+    offset = match.index + match[0].length;
+  }
+  return html + escapeHtml(command.slice(offset));
+}
+
 async function loadTldr(command, container) {
   if (!command) {
     container.innerHTML = '<p class="cmdtreemap-muted">tldr 없음</p>';
@@ -129,7 +144,7 @@ async function loadTldr(command, container) {
     const text = await response.text();
     const commands = [...text.matchAll(/^\s*`([^`]+)`/gm)]
       .slice(0, 5)
-      .map((match) => `<li><code>${escapeHtml(match[1])}</code></li>`);
+      .map((match) => `<li><code>${renderTldrCommand(match[1])}</code></li>`);
     container.innerHTML = commands.length
       ? `<ol class="cmdtreemap-tldr">${commands.join('')}</ol>`
       : '<p class="cmdtreemap-muted">tldr 예시 없음</p>';

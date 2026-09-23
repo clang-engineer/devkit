@@ -32,6 +32,19 @@ function setup(relations = [{ from: 'cat', to: 'bat', solution: '<script>bad</sc
   return { context, elements, requests };
 }
 
+test('tldr renders aliases and placeholders without leaking markup', () => {
+  const { context } = setup();
+  const render = (command) => vm.runInContext(`renderTldrCommand(${JSON.stringify(command)})`, context);
+  assert.equal(render('lsd {{[-a|--all]}}'), 'lsd <span title="--all">-a</span>');
+  assert.equal(render('lsd {{[-lha|--long --human-readable --all]}}'),
+    'lsd <span title="--long --human-readable --all">-lha</span>');
+  assert.equal(render('dust {{path/to/directory}}'), 'dust <var>path/to/directory</var>');
+  assert.equal(render('cmd {{one|two}}'), 'cmd <var>one|two</var>');
+  assert.equal(render('cmd {{<script>}} &'), 'cmd <var>&lt;script&gt;</var> &amp;');
+  assert.equal(render('cmd {{[-x|"evil"]}}'), 'cmd <span title="&quot;evil&quot;">-x</span>');
+  assert.equal(render('ls -l'), 'ls -l');
+});
+
 test('local and deployed pages load their configured shared data paths', () => {
   assert.equal(setup([], '../commands.json').requests[0], '../commands.json');
   assert.equal(setup([], './commands.json').requests[0], './commands.json');
