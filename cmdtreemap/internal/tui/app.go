@@ -46,7 +46,6 @@ type previewMode int
 const (
 	previewNormal previewMode = iota
 	previewVisual
-	previewSearch
 )
 
 type treeItem struct {
@@ -87,13 +86,11 @@ type Model struct {
 	data          model.CommandsData
 	tree          tree.Model
 	viewport      viewport.Model
-	textInput     textinput.Model
 	filterInput   textinput.Model
 	explored      map[[2]int]bool
 	filterActive  bool
 	filterQuery   string
 	focusedPane   pane
-	previewActive bool
 	previewMode   previewMode
 	previewCursor int
 	previewCol    int
@@ -114,10 +111,6 @@ type Model struct {
 }
 
 func NewModel(data model.CommandsData) Model {
-	ti := textinput.New()
-	ti.Placeholder = "명령어 검색..."
-	ti.CharLimit = 50
-
 	fi := textinput.New()
 	fi.Placeholder = "필터..."
 	fi.CharLimit = 30
@@ -140,7 +133,7 @@ func NewModel(data model.CommandsData) Model {
 	// all folders (categories and groups) start collapsed; enter/space/l open
 	// them on demand. Close() also marks each node initialClosed so the closed
 	// state is preserved on subsequent child additions.
-	collapseAllFolders(t)
+	collapseAllFolders(&t)
 
 	styles := tree.DefaultDarkStyles()
 	styles.SelectedNodeStyle = lipgloss.NewStyle().
@@ -161,7 +154,6 @@ func NewModel(data model.CommandsData) Model {
 		data:        data,
 		tree:        t,
 		viewport:    vp,
-		textInput:   ti,
 		filterInput: fi,
 		searchInput: si,
 		explored:    make(map[[2]int]bool),
@@ -171,7 +163,7 @@ func NewModel(data model.CommandsData) Model {
 // collapseAllFolders closes every non-root folder and resets the cursor to the
 // first category. Used at startup and when exiting filter mode so folders that
 // were opened by the search are folded back up.
-func collapseAllFolders(t tree.Model) {
+func collapseAllFolders(t *tree.Model) {
 	// Close() also marks each node initialClosed so the closed state is
 	// preserved on subsequent child additions.
 	for _, n := range t.Root().AllNodes() {
@@ -327,23 +319,6 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 func (m *Model) applyFilter(root *tree.Node, query string) {
 	m.filterQuery = query
 
-	// AllNodes only returns currently visible nodes, but that's fine: the
-	// filterQuery field is only used by String() for highlight rendering, and
-	// String() is only called on visible nodes anyway.
-	for _, node := range root.AllNodes() {
-		if item, ok := node.GivenValue().(treeItem); ok {
-			item.filterQuery = query
-			node.SetValue(item)
-		}
-	}
-
-	if query == "" {
-		for _, node := range root.AllNodes() {
-			node.SetHidden(false)
-		}
-		return
-	}
-
 	q := strings.ToLower(query)
 
 	// filterNode traverses each category tree. It opens the node before
@@ -351,10 +326,14 @@ func (m *Model) applyFilter(root *tree.Node, query string) {
 	// deeper nodes become reachable for the search.
 	var filterNode func(node *tree.Node) bool
 	filterNode = func(node *tree.Node) bool {
-		item, _ := node.GivenValue().(treeItem)
-		selfMatch := item.name != "" && strings.Contains(strings.ToLower(item.name), q)
+		item, ok := node.GivenValue().(treeItem)
+		if ok {
+			item.filterQuery = query
+			node.SetValue(item)
+		}
+		selfMatch := query == "" || (item.name != "" && strings.Contains(strings.ToLower(item.name), q))
 
-		// Materialise lazy children before walking them.
+		// Materialise lazy children before walking them, including when clearing.
 		node.Open()
 
 		anyChild := false
@@ -413,8 +392,6 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.refreshPreview()
 		return m, nil
-	case lessDoneMsg:
-		return m, nil
 	}
 	return m, nil
 }
@@ -468,10 +445,7 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		val, ok := node.GivenValue().(treeItem)
-		if !ok {
-			return m, nil
-		}
-		if val.isLeaf && val.rel != nil {
+		if ok && val.isLeaf && val.rel != nil {
 			m.explored[[2]int{val.catIdx, val.relIdx}] = true
 			m.focusedPane = panePreview
 			m.previewMode = previewNormal
@@ -607,18 +581,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		if node != nil {
 			if val, ok := node.GivenValue().(treeItem); ok && val.rel != nil {
 				if m.tldrLine >= 0 && m.previewCursor == m.tldrLine && val.rel.Tldr != "" {
-					if m.showTldr {
-						m.showTldr = false
-						m.tldrOutput = ""
-					} else {
-						m.showTldr = true
-						m.tldrOutput = ""
-						tldrCmd := val.rel.Tldr
-						m.refreshPreview()
-						return m, fetchTldrCmd(tldrCmd)
-					}
-					m.refreshPreview()
-					return m, nil
+					return m.toggleTldr()
 				}
 				if m.urlLine >= 0 && m.previewCursor == m.urlLine && val.rel.URL != "" {
 					return m, openURLCmd(val.rel.URL)
@@ -660,45 +623,17 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.viewport.GotoBottom()
 		m.refreshPreview()
 		return m, nil
-	case "ctrl+d":
-		m.viewport.HalfPageDown()
-		yoff := m.viewport.YOffset()
-		vh := m.viewport.Height()
-		m.previewCursor = yoff + vh/2
-		if m.previewCursor >= len(m.previewLines) {
-			m.previewCursor = len(m.previewLines) - 1
+	case "ctrl+d", "ctrl+u":
+		if msg.String() == "ctrl+d" {
+			m.viewport.HalfPageDown()
+		} else {
+			m.viewport.HalfPageUp()
 		}
-		if m.previewCursor < 0 {
-			m.previewCursor = 0
-		}
-		if len(m.rawLines) > 0 {
-			m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
-		}
+		m.previewCursor = m.viewport.YOffset() + m.viewport.Height()/2
+		m.clampPreviewCursor()
 		m.refreshPreview()
 		return m, nil
-	case "ctrl+u":
-		m.viewport.HalfPageUp()
-		yoff2 := m.viewport.YOffset()
-		vh2 := m.viewport.Height()
-		m.previewCursor = yoff2 + vh2/2
-		if m.previewCursor >= len(m.previewLines) {
-			m.previewCursor = len(m.previewLines) - 1
-		}
-		if m.previewCursor < 0 {
-			m.previewCursor = 0
-		}
-		if len(m.rawLines) > 0 {
-			m.previewCol = clampCol(m.rawLines[m.previewCursor], m.previewCol)
-		}
-		m.refreshPreview()
-		return m, nil
-	case "v":
-		m.previewMode = previewVisual
-		m.visualStart = m.previewCursor
-		m.visualEnd = m.previewCursor
-		m.refreshPreview()
-		return m, nil
-	case "V":
+	case "v", "V":
 		m.previewMode = previewVisual
 		m.visualStart = m.previewCursor
 		m.visualEnd = m.previewCursor
@@ -762,23 +697,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.previewMode = previewNormal
 		return m, nil
 	case "t":
-		if m.showTldr {
-			m.showTldr = false
-			m.tldrOutput = ""
-			m.refreshPreview()
-			return m, nil
-		}
-		node := m.tree.NodeAtCurrentOffset()
-		if node != nil {
-			if val, ok := node.GivenValue().(treeItem); ok && val.rel != nil && val.rel.Tldr != "" {
-				m.showTldr = true
-				m.tldrOutput = ""
-				tldrCmd := val.rel.Tldr
-				m.refreshPreview()
-				return m, fetchTldrCmd(tldrCmd)
-			}
-		}
-		return m, nil
+		return m.toggleTldr()
 	}
 
 	return m, nil
@@ -985,6 +904,7 @@ func (m *Model) refreshPreviewContent() {
 	for i, l := range m.previewLines {
 		m.rawLines[i] = stripANSI(l)
 	}
+	m.clampPreviewCursor()
 
 	highlighted := make([]string, len(m.previewLines))
 	copy(highlighted, m.previewLines)
@@ -1264,22 +1184,19 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.filterInput.Reset()
 		m.applyFilter(m.tree.Root(), "")
 		// Fold back up any folders the search opened.
-		collapseAllFolders(m.tree)
+		collapseAllFolders(&m.tree)
 		m.updateSizes()
 		return m, nil
 	case "enter":
 		m.filterActive = false
 		m.filterInput.Blur()
-		// Move the cursor onto the first visible node so the user can select
-		// a search result immediately instead of starting on the hidden root.
-		m.tree.SetYOffset(0)
-		m.skipHiddenIfNeeded(1)
+		m.selectFirstFilterMatch()
 		m.updateSizes()
 		return m, nil
 	case "ctrl+u":
 		m.filterInput.Reset()
 		m.applyFilter(m.tree.Root(), "")
-		m.tree.SetYOffset(m.tree.YOffset())
+		m.selectFirstFilterMatch()
 		return m, nil
 	}
 
@@ -1287,10 +1204,27 @@ func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	m.filterInput, cmd = m.filterInput.Update(msg)
 	query := m.filterInput.Value()
 	m.applyFilter(m.tree.Root(), query)
-	// Position the cursor on the first visible node after the root.
-	m.tree.SetYOffset(0)
-	m.skipHiddenIfNeeded(1)
+	m.selectFirstFilterMatch()
 	return m, cmd
+}
+
+// selectFirstFilterMatch skips the structural root and matching ancestors.
+// Opening the root through the model refreshes offsets after filtering.
+func (m *Model) selectFirstFilterMatch() {
+	m.tree.SetYOffset(0)
+	m.tree.OpenCurrentNode()
+	query := strings.ToLower(m.filterQuery)
+	for _, node := range m.tree.Root().AllNodes() {
+		if node == m.tree.Root() || node.Hidden() {
+			continue
+		}
+		item, ok := node.GivenValue().(treeItem)
+		if query == "" || (ok && strings.Contains(strings.ToLower(item.name), query)) {
+			m.tree.SetYOffset(node.YOffset())
+			break
+		}
+	}
+	m.refreshPreview()
 }
 
 func (m Model) updateSearchMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
@@ -1349,13 +1283,12 @@ func renderPanel(title, content string, width, height int, active bool) string {
 		innerWidth = 0
 	}
 
-	titleStr := " " + title + " "
-	titleWidth := lipgloss.Width(titleStr)
-	dashCount := innerWidth - titleWidth
-	if dashCount < 0 {
-		dashCount = 0
+	titleStr := ""
+	if innerWidth > 0 {
+		titleStr = lipgloss.NewStyle().MaxWidth(innerWidth).MaxHeight(1).Render("─ " + title + " ")
 	}
-	top := borderStyle.Render("╭─" + titleStr + strings.Repeat("─", dashCount) + "╮")
+	dashCount := max(0, innerWidth-lipgloss.Width(titleStr))
+	top := borderStyle.Render("╭" + titleStr + strings.Repeat("─", dashCount) + "╮")
 
 	contentLines := strings.Split(content, "\n")
 	var lines []string
@@ -1365,7 +1298,11 @@ func renderPanel(title, content string, width, height int, active bool) string {
 		if i < len(contentLines) {
 			line = contentLines[i]
 		}
-		line = lipgloss.NewStyle().Width(innerWidth).Render(line)
+		if innerWidth > 0 {
+			line = lipgloss.NewStyle().Width(innerWidth).MaxWidth(innerWidth).MaxHeight(1).Render(line)
+		} else {
+			line = ""
+		}
 		lines = append(lines, borderStyle.Render("│")+line+borderStyle.Render("│"))
 	}
 	bottom := borderStyle.Render("╰" + strings.Repeat("─", innerWidth) + "╯")
@@ -1450,55 +1387,4 @@ func openURLCmd(url string) tea.Cmd {
 type tldrDoneMsg struct {
 	output string
 	err    error
-}
-
-type lessDoneMsg struct {
-	err error
-}
-
-func buildPreviewText(d *model.Relation) string {
-	var b strings.Builder
-
-	b.WriteString(d.From + " → " + d.To)
-	b.WriteString("\n\n")
-
-	b.WriteString("문제\n  " + d.Problem)
-	b.WriteString("\n\n")
-
-	b.WriteString("해결\n  " + d.Solution)
-	b.WriteString("\n\n")
-
-	if d.Boundary != "" {
-		b.WriteString("경계\n  " + d.Boundary)
-		b.WriteString("\n\n")
-	}
-
-	b.WriteString("관계 유형\n  " + d.Relation)
-	b.WriteString("\n\n")
-
-	if d.Install != "" {
-		b.WriteString("설치\n  $ " + d.Install)
-		b.WriteString("\n\n")
-	}
-
-	if d.Tldr != "" {
-		b.WriteString("tldr: " + d.Tldr)
-		b.WriteString("\n\n")
-	}
-
-	if d.URL != "" {
-		b.WriteString("공식 문서\n  " + d.URL)
-		b.WriteString("\n\n")
-	}
-
-	return b.String()
-}
-
-func openInLess(d *model.Relation) tea.Cmd {
-	content := buildPreviewText(d)
-	cmd := exec.Command("less", "-R", "-S", "-N")
-	cmd.Stdin = strings.NewReader(content)
-	return tea.ExecProcess(cmd, func(err error) tea.Msg {
-		return lessDoneMsg{err: err}
-	})
 }

@@ -14,10 +14,7 @@ if [[ ! -d "$BLOG_DIR" ]]; then
   exit 1
 fi
 
-cp "$PROJECT_DIR/internal/data/commands.json" "$WEB_DIR/commands.json"
-(cd "$PROJECT_DIR" && GOOS=js GOARCH=wasm go build -o "$WEB_DIR/cmdtreemap.wasm" ./web)
-cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" "$WEB_DIR/wasm_exec.js"
-node --check "$WEB_DIR/app.js"
+"$SCRIPT_DIR/build-web.sh"
 
 files=(index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm)
 mkdir -p "$TARGET_DIR"

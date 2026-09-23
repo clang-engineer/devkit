@@ -12,7 +12,7 @@ import (
 	"github.com/clang/cmdtreemap/internal/tui"
 )
 
-//go:embed internal/data/commands.json
+//go:embed web/commands.json
 var commandsJSON []byte
 
 func main() {

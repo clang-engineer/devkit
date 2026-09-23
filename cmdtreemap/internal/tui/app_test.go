@@ -86,7 +86,7 @@ func TestEnterOpensPreview(t *testing.T) {
 	// 첫 노드(카테고리)는 rel이 nil이라 enter해도 preview 열리지 않아야 함
 	m2, _ := m.Update(keyEnter())
 	m = m2.(Model)
-	if m.previewActive {
+	if m.focusedPane == panePreview {
 		t.Fatal("rel 없는 노드에서 enter로 preview가 열리면 안 됨")
 	}
 
@@ -203,7 +203,7 @@ func TestQuit(t *testing.T) {
 	}
 }
 
-func TestBuildPreviewText(t *testing.T) {
+func TestBuildPreviewContent(t *testing.T) {
 	d := &model.Relation{
 		From:     "cat",
 		To:       "bat",
@@ -211,12 +211,13 @@ func TestBuildPreviewText(t *testing.T) {
 		Solution: "test solution",
 		Relation: "alternative",
 	}
-	text := buildPreviewText(d)
+	m := newTestModel(t)
+	text := stripANSI(m.buildPreviewContent(d))
 	if !strings.Contains(text, "cat → bat") {
-		t.Fatal("buildPreviewText에 제목이 없음")
+		t.Fatal("buildPreviewContent에 제목이 없음")
 	}
 	if !strings.Contains(text, "test problem") {
-		t.Fatal("buildPreviewText에 문제가 없음")
+		t.Fatal("buildPreviewContent에 문제가 없음")
 	}
 }
 
