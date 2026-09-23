@@ -27,6 +27,8 @@ cat
 
 ```text
 cmdtreemap/
+├── commands.json              # CLI·Web 공통 데이터 원본
+├── Makefile                   # 루트에서 web / cli / test 실행
 ├── main.go                    # CLI 진입점
 ├── internal/
 │   ├── model/                 # 공통 JSON을 읽는 Go 데이터 구조
@@ -36,8 +38,7 @@ cmdtreemap/
 └── web/
     ├── index.html             # Web 진입점
     ├── app.js                 # DOM 생성·tree·상세 화면·검색
-    ├── app.css                # 독립 Web·블로그 공통 스타일
-    └── commands.json          # CLI·Web 공통 데이터 원본
+    └── app.css                # 독립 Web·블로그 공통 스타일
 ```
 
 ## 구현 역할
@@ -46,7 +47,7 @@ cmdtreemap/
 - `internal/tui`: TTY와 Bubble Tea를 사용하는 CLI 화면을 담당한다.
 - `web/app.js`: mount point 내부의 markup, tree, 검색, 상세 화면을 담당한다.
 - `web/app.css`: 독립 Web 페이지와 블로그 탭이 함께 사용하는 스타일이다.
-- `web/commands.json`: CLI·Web 공통 데이터의 유일한 원본이다. Web은 직접 읽고 CLI는 `main.go`의 `go:embed`로 빌드에 포함한다. 데이터 생성·복사 단계는 없다.
+- `commands.json`: CLI·Web 공통 데이터의 유일한 원본이다. 로컬 Web은 루트의 JSON을 직접 읽고 CLI는 `main.go`의 `go:embed`로 빌드에 포함한다. 로컬 실행에는 데이터 복사가 필요 없다.
 
 공통화 대상은 데이터 원본이다. CLI는 Go·Bubble Tea, Web은 JavaScript·DOM으로 화면을 구현한다.
 독립 Web 페이지와 블로그는 같은 `app.js`·`app.css`를 사용한다. Web에는 Go 런타임이나 별도 빌드가 필요 없다.
@@ -56,8 +57,8 @@ cmdtreemap/
 개발 중에는 프로젝트 루트에서 실행한다.
 
 ```bash
-cd ~/Desktop/_zero/devkit/cmdtreemap
-go run .
+cd /path/to/cmdtreemap
+make cli
 ```
 
 빌드 후 실행하려면:
@@ -81,15 +82,17 @@ go build -o cmdtreemap .
 
 ## Web 개발 실행
 
-빌드 없이 정적 서버를 실행한다. 데이터는 `web/commands.json`을 그대로 사용한다.
+프로젝트 루트에서 빌드 없이 정적 서버를 실행한다. 데이터는 루트의 `commands.json`을 그대로 사용한다.
+필요 도구는 Make·Python 3이며, CLI·테스트에는 Go·Node.js도 필요하다.
 `file://`로 직접 열면 JSON을 읽는 `fetch`가 제한될 수 있다.
 
 ```bash
-cd web
-python3 -m http.server 8080
+make web
+# 포트 변경: make web PORT=8081
 ```
 
-브라우저에서 [http://localhost:8080](http://localhost:8080)을 연다.
+브라우저에서 [http://localhost:8080/web/](http://localhost:8080/web/)을 연다.
+서버는 로컬 루프백 주소에만 바인딩된다. 루트 디렉터리를 제공하므로 외부 공개용 서버로 사용하지 않는다.
 `cat` 아래 `bat` 옆에 핵심 개선점이 표시되는지 확인한다. `bat`을 선택하면 상세에 `cat의 문제`, `bat의 개선점`, `남은 한계`가 함께 표시되어야 한다.
 JS·CSS·데이터 수정은 Web 재빌드 없이 새로고침하면 된다. 이전 화면이 남아 있으면 강력 새로고침한다. CLI 바이너리에 반영하려면 다시 빌드한다.
 
@@ -106,10 +109,10 @@ Web UI의 1차 범위:
 
 ## 블로그 배포
 
-개발 원본은 이 저장소의 `web/`에 둔다. 블로그의 `cmdtreemap/`은 GitHub Pages가 제공하는 정적 배포본이다.
+웹 화면 원본은 `web/`, 공통 데이터 원본은 루트의 `commands.json`에 둔다. 블로그의 `cmdtreemap/`은 GitHub Pages가 제공하는 정적 배포본이다.
 
 ```text
- devkit/cmdtreemap/web/
+ devkit/cmdtreemap/{web/, commands.json}
           │
           │ scripts/sync-blog.sh
           ▼
@@ -119,7 +122,7 @@ Web UI의 1차 범위:
 블로그 파일을 직접 수정하지 않고 sync script를 사용한다.
 
 ```bash
-cd ~/Desktop/_zero/devkit/cmdtreemap
+cd /path/to/cmdtreemap
 ./scripts/sync-blog.sh
 ```
 
@@ -138,14 +141,15 @@ app.css
 commands.json
 ```
 
+루트 JSON을 배포 폴더로 복사하고, 배포 HTML의 데이터 경로를 `./commands.json`으로 바꾼다. 블로그의 기존 URL과 `CMDTREEMAP_BASE` 기반 로딩은 유지한다.
 동기화 시 JavaScript 문법을 검사하며, 기존 배포본의 불필요한 WASM·런타임 파일도 제거한다.
 그 외 파일은 삭제하지 않는다.
 
 ## 개발 흐름
 
-1. 공통 원본인 `web/commands.json`을 수정한다.
+1. 공통 원본인 `commands.json`을 수정한다.
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
-3. `go test ./...`와 `node --test web/*.test.cjs scripts/*.test.cjs`를 실행한다.
+3. 루트에서 `make test`로 Go·웹·배포 테스트를 실행한다.
 4. 로컬 Web 서버에서 tree, 검색, 상세, tldr를 확인한다.
 5. `scripts/sync-blog.sh`로 블로그 배포본을 갱신한다.
 6. 블로그의 `/cmdtreemap/`에서 다시 확인한다.

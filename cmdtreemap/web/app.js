@@ -81,6 +81,7 @@ function buildCategoryForest(category) {
 function renderTree() {
   if (!state.data) return;
 
+  const expanded = state.query.trim() ? ' open' : '';
   const categories = state.data.categories.map((category, categoryIndex) => {
     const visibleRelations = new Set();
     function renderNode(node) {
@@ -88,7 +89,7 @@ function renderTree() {
       const relation = category.relations[node.relationIndex];
       if (!children && (!relation || !matches(relation))) return '';
       if (!relation) {
-        return `<li><details class="cmdtreemap-branch" open>
+        return `<li><details class="cmdtreemap-branch"${expanded}>
           <summary>${escapeHtml(node.name)}</summary><ul>${children}</ul>
         </details></li>`;
       }
@@ -104,7 +105,7 @@ function renderTree() {
     }
     const branches = buildCategoryForest(category).map(renderNode).filter(Boolean).join('');
     if (!branches) return '';
-    return `<details class="cmdtreemap-category" open>
+    return `<details class="cmdtreemap-category"${expanded}>
       <summary>${escapeHtml(category.name)} <span>${visibleRelations.size}</span></summary>
       <ul class="cmdtreemap-paths">${branches}</ul>
     </details>`;
@@ -171,7 +172,7 @@ function selectRelation(id) {
 
 async function start() {
   try {
-    const response = await fetch(`${assetBase}commands.json`);
+    const response = await fetch(root.dataset.source || `${assetBase}commands.json`);
     if (!response.ok) throw new Error('commands request failed');
     state.data = await response.json();
     status.textContent = `${state.data.categories.length}개 카테고리 · 도구의 관계 흐름을 펼쳐보세요. 출시 연대순이 아닌 대안·보완 관계입니다.`;

@@ -16,7 +16,7 @@ fi
 
 node --check "$WEB_DIR/app.js"
 
-files=(index.html app.js app.css commands.json)
+files=(app.js app.css)
 mkdir -p "$TARGET_DIR"
 for file in "${files[@]}"; do
   cp "$WEB_DIR/$file" "$TARGET_DIR/$file"
@@ -25,6 +25,18 @@ done
 for file in "${files[@]}"; do
   cmp "$WEB_DIR/$file" "$TARGET_DIR/$file"
 done
+
+cp "$PROJECT_DIR/commands.json" "$TARGET_DIR/commands.json"
+cmp "$PROJECT_DIR/commands.json" "$TARGET_DIR/commands.json"
+
+# Local development reads the root JSON; the flat deployment keeps it alongside HTML.
+node - "$WEB_DIR/index.html" "$TARGET_DIR/index.html" <<'NODE'
+const fs = require('node:fs');
+const [source, target] = process.argv.slice(2);
+const html = fs.readFileSync(source, 'utf8');
+if (!html.includes('data-source="../commands.json"')) throw new Error('missing local data source');
+fs.writeFileSync(target, html.replace('data-source="../commands.json"', 'data-source="./commands.json"'));
+NODE
 
 # Remove only the obsolete runtime assets managed by earlier deployments.
 rm -f "$TARGET_DIR/wasm_exec.js" "$TARGET_DIR/cmdtreemap.wasm"

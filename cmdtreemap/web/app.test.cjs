@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
 const vm = require('node:vm');
 
-function setup(relations = [{ from: 'cat', to: 'bat', solution: '<script>bad</script>' }]) {
+function setup(relations = [{ from: 'cat', to: 'bat', solution: '<script>bad</script>' }], source) {
   const elements = new Map();
   function element() {
     return {
@@ -20,15 +20,23 @@ function setup(relations = [{ from: 'cat', to: 'bat', solution: '<script>bad</sc
     };
   }
   const root = element();
+  if (source) root.dataset.source = source;
+  const requests = [];
   const context = vm.createContext({
     window: {}, document: { querySelector: () => root }, fixtureRelations: relations,
     history: { replaceState() {} },
-    fetch: async () => ({ ok: false }),
+    fetch: async (url) => { requests.push(url); return { ok: false }; },
   });
   vm.runInContext(readFileSync(`${__dirname}/app.js`, 'utf8'), context);
   vm.runInContext(`state.data = { categories: [{ name: 'test', relations: fixtureRelations }] }; renderTree();`, context);
-  return { context, elements };
+  return { context, elements, requests };
 }
+
+test('local and deployed pages load their configured shared data paths', () => {
+  assert.equal(setup([], '../commands.json').requests[0], '../commands.json');
+  assert.equal(setup([], './commands.json').requests[0], './commands.json');
+  assert.equal(setup([]).requests[0], './commands.json');
+});
 
 test('tree escapes data and uses one delegated click listener', () => {
   const { context, elements } = setup();
@@ -49,6 +57,17 @@ test('chains and branches retain source order', () => {
   assert.equal(forest[0].name, 'top');
   assert.deepEqual(forest[0].children.map(n => n.name), ['htop', 'atop']);
   assert.equal(forest[0].children[0].children[0].name, 'btop');
+});
+
+test('folders start collapsed, expand for search, and collapse when cleared', () => {
+  const { context, elements } = setup([{ from: 'cat', to: 'bat' }]);
+  const tree = elements.get('[data-tree]');
+  assert.ok(!tree.innerHTML.includes(' open>'));
+  vm.runInContext("state.query = 'bat'; renderTree()", context);
+  assert.match(tree.innerHTML, /class="cmdtreemap-category" open>/);
+  assert.match(tree.innerHTML, /class="cmdtreemap-branch" open>/);
+  vm.runInContext("state.query = ' '; renderTree()", context);
+  assert.ok(!tree.innerHTML.includes(' open>'));
 });
 
 test('search retains ancestors but removes unrelated branches', () => {

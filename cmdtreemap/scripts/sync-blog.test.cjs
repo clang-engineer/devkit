@@ -20,11 +20,13 @@ test('deploys four static files from another working directory', (t) => {
   execFileSync('bash', [script, blog], { cwd: tmpdir() });
   const target = join(blog, 'cmdtreemap');
   assert.deepEqual(readdirSync(target).sort(), [...files].sort());
-  for (const file of files) {
+  for (const file of ['app.js', 'app.css']) {
     assert.deepEqual(readFileSync(join(target, file)), readFileSync(join(web, file)));
   }
+  assert.deepEqual(readFileSync(join(target, 'commands.json')), readFileSync(resolve(web, '../commands.json')));
   const html = readFileSync(join(target, 'index.html'), 'utf8');
   assert.match(html, /src="app\.js"/);
+  assert.equal(html, readFileSync(join(web, 'index.html'), 'utf8').replace('data-source="../commands.json"', 'data-source="./commands.json"'));
   assert.doesNotMatch(html, /WebAssembly|wasm_exec|cmdtreemap\.wasm/);
 });
 
