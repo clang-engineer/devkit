@@ -37,40 +37,72 @@ function matches(relation) {
     .some((value) => value.toLowerCase().includes(query));
 }
 
+// Keep an edge's identity even when several tools lead to the same destination.
+// Repeated tools terminate a path, so cycles remain visible without recursion loops.
+function buildCategoryForest(category) {
+  const outgoing = new Map();
+  const incoming = new Set();
+  category.relations.forEach((relation, index) => {
+    if (!outgoing.has(relation.from)) outgoing.set(relation.from, []);
+    outgoing.get(relation.from).push(index);
+    incoming.add(relation.to);
+  });
+  const visited = new Set();
+  function expand(name, path) {
+    return (outgoing.get(name) || []).map((relationIndex) => {
+      visited.add(relationIndex);
+      const relation = category.relations[relationIndex];
+      const cycle = path.has(relation.to);
+      return {
+        name: relation.to, relationIndex, cycle,
+        children: cycle ? [] : expand(relation.to, new Set([...path, relation.to])),
+      };
+    });
+  }
+  const roots = [];
+  function addRoot(name) {
+    roots.push({ name, children: expand(name, new Set([name])) });
+  }
+  for (const name of outgoing.keys()) {
+    if (!incoming.has(name)) addRoot(name);
+  }
+  // A disconnected cycle has no natural root; start at its first source.
+  category.relations.forEach((relation, index) => {
+    if (!visited.has(index)) addRoot(relation.from);
+  });
+  return roots;
+}
+
 function renderTree() {
   if (!state.data) return;
 
   const categories = state.data.categories.map((category, categoryIndex) => {
-    const relations = category.relations
-      .map((relation, relationIndex) => ({ relation, relationIndex }))
-      .filter(({ relation }) => matches(relation));
-    if (relations.length === 0) return '';
-
-    const groups = new Map();
-    relations.forEach(({ relation, relationIndex }) => {
-      const key = relation.group || '기타';
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key).push({ relation, relationIndex });
-    });
-
-    const groupMarkup = [...groups.entries()].map(([group, items]) => `
-      <details class="cmdtreemap-group" open>
-        <summary>${escapeHtml(group)} <span>${items.length}</span></summary>
-        <ul>
-          ${items.map(({ relation, relationIndex }) => {
-            const id = `${categoryIndex}:${relationIndex}`;
-            const selected = state.selected === id ? ' is-selected' : '';
-            return `<li><button class="cmdtreemap-item${selected}" data-relation="${id}" aria-pressed="${state.selected === id}" type="button">
-              <strong>${escapeHtml(relation.from)} → ${escapeHtml(relation.to)}</strong>
-              <small>${escapeHtml(relation.why || '')}</small>
-            </button></li>`;
-          }).join('')}
-        </ul>
-      </details>`).join('');
-
+    const visibleRelations = new Set();
+    function renderNode(node) {
+      const children = node.children.map(renderNode).filter(Boolean).join('');
+      const relation = category.relations[node.relationIndex];
+      if (!children && (!relation || !matches(relation))) return '';
+      if (!relation) {
+        return `<li><details class="cmdtreemap-branch" open>
+          <summary>${escapeHtml(node.name)}</summary><ul>${children}</ul>
+        </details></li>`;
+      }
+      visibleRelations.add(node.relationIndex);
+      const id = `${categoryIndex}:${node.relationIndex}`;
+      const selected = state.selected === id;
+      const button = `<button class="cmdtreemap-item${selected ? ' is-selected' : ''}"
+        data-relation="${id}" aria-pressed="${selected}" type="button"
+        aria-label="${escapeHtml(`${relation.from} → ${relation.to}`)}">
+        <strong>→ ${escapeHtml(node.name)}${node.cycle ? ' ↩' : ''}</strong>
+        <small>${escapeHtml(relation.why || '')}</small>
+      </button>`;
+      return `<li>${button}${children ? `<ul>${children}</ul>` : ''}</li>`;
+    }
+    const branches = buildCategoryForest(category).map(renderNode).filter(Boolean).join('');
+    if (!branches) return '';
     return `<details class="cmdtreemap-category" open>
-      <summary>${escapeHtml(category.name)} <span>${relations.length}</span></summary>
-      ${groupMarkup}
+      <summary>${escapeHtml(category.name)} <span>${visibleRelations.size}</span></summary>
+      <ul class="cmdtreemap-paths">${branches}</ul>
     </details>`;
   }).join('');
 
@@ -120,6 +152,7 @@ function selectRelation(id) {
     <p class="cmdtreemap-eyebrow">${escapeHtml(category.name)} / ${escapeHtml(relation.group || '기타')}</p>
     <h2>${escapeHtml(relation.from)} <span>→</span> ${escapeHtml(relation.to)}</h2>
     <dl class="cmdtreemap-facts">
+      ${relation.relation ? `<div><dt>관계 유형</dt><dd>${escapeHtml(relation.relation)}</dd></div>` : ''}
       <div><dt>문제</dt><dd>${escapeHtml(relation.problem || relation.why || '—')}</dd></div>
       <div><dt>해결</dt><dd>${escapeHtml(relation.solution || '—')}</dd></div>
       ${relation.boundary ? `<div><dt>경계</dt><dd>${escapeHtml(relation.boundary)}</dd></div>` : ''}
@@ -137,7 +170,7 @@ async function start() {
     const response = await fetch(`${assetBase}commands.json`);
     if (!response.ok) throw new Error('commands request failed');
     state.data = await response.json();
-    status.textContent = `${state.data.categories.length}개 카테고리 · 관계를 선택해 상세 내용을 확인하세요.`;
+    status.textContent = `${state.data.categories.length}개 카테고리 · 도구의 관계 흐름을 펼쳐보세요. 출시 연대순이 아닌 대안·보완 관계입니다.`;
     renderTree();
   } catch {
     status.textContent = 'commands.json을 불러오지 못했습니다.';

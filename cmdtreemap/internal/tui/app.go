@@ -280,8 +280,8 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 	}
 
 	relIdx := -1
-	for ri, r := range relations {
-		if r.From == node.Rel.From && r.To == node.Rel.To {
+	for ri := range relations {
+		if &relations[ri] == node.Rel {
 			relIdx = ri
 			break
 		}

@@ -14,11 +14,14 @@
 .cmdtreemap-layout { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 1.5fr); gap: 1.5rem; margin-top: 1.5rem; align-items: start; }
 .cmdtreemap-tree, .cmdtreemap-detail { min-width: 0; }
 .cmdtreemap-detail { padding-left: 1.5rem; border-left: 1px solid var(--cmd-line); }
-.cmdtreemap-category, .cmdtreemap-group { border-top: 1px solid var(--cmd-line); }
+.cmdtreemap-category { border-top: 1px solid var(--cmd-line); }
 .cmdtreemap-app summary { cursor: pointer; padding: .65rem 0; color: var(--cmd-accent); font-weight: 700; }
 .cmdtreemap-app summary span { float: right; color: var(--cmd-muted); font-size: .85rem; font-weight: 400; }
-.cmdtreemap-group summary { padding-left: .8rem; color: var(--cmd-muted); font-size: .9rem; }
+.cmdtreemap-branch > summary { padding-left: .4rem; color: var(--cmd-text); font-size: .9rem; }
 .cmdtreemap-app ul { margin: 0; padding: 0; list-style: none; }
+.cmdtreemap-paths ul { margin-left: .8rem; padding-left: .4rem; border-left: 1px solid var(--cmd-line); }
+.cmdtreemap-app .cmdtreemap-paths { padding-bottom: .8rem; }
+.cmdtreemap-paths strong { overflow-wrap: anywhere; }
 .cmdtreemap-item { width: 100%; padding: .55rem .7rem .55rem 1.35rem; border: 0; border-left: 2px solid transparent; background: transparent; color: var(--cmd-text); text-align: left; cursor: pointer; }
 .cmdtreemap-item:hover, .cmdtreemap-item:focus-visible, .cmdtreemap-item.is-selected { border-left-color: var(--cmd-accent); background: var(--cmd-panel); }
 .cmdtreemap-item strong, .cmdtreemap-item small { display: block; }

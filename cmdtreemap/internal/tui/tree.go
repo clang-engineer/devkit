@@ -8,34 +8,49 @@ type TreeNode struct {
 	Rel      *model.Relation
 }
 
-// buildCategoryTrees preserves the source order of roots and relations.
+// buildCategoryTrees keeps source order and gives each incoming relation its
+// own node. Repeated tools terminate a path instead of forming pointer cycles.
 func buildCategoryTrees(cat model.Category) []*TreeNode {
-	type entry struct {
-		node     *TreeNode
-		incoming bool
-	}
-	nodes := make(map[string]*entry)
+	outgoing := make(map[string][]int)
+	incoming := make(map[string]bool)
 	var order []string
-	get := func(name string) *entry {
-		if e, ok := nodes[name]; ok {
-			return e
+	for i, rel := range cat.Relations {
+		if _, ok := outgoing[rel.From]; !ok {
+			order = append(order, rel.From)
 		}
-		e := &entry{node: &TreeNode{From: name}}
-		nodes[name] = e
-		order = append(order, name)
-		return e
+		outgoing[rel.From] = append(outgoing[rel.From], i)
+		incoming[rel.To] = true
 	}
-	for i := range cat.Relations {
-		rel := &cat.Relations[i]
-		from, to := get(rel.From), get(rel.To)
-		to.incoming = true
-		to.node.Rel = rel
-		from.node.Children = append(from.node.Children, to.node)
+	visited := make([]bool, len(cat.Relations))
+	var expand func(string, map[string]bool) []*TreeNode
+	expand = func(name string, path map[string]bool) []*TreeNode {
+		var children []*TreeNode
+		for _, i := range outgoing[name] {
+			visited[i] = true
+			rel := &cat.Relations[i]
+			node := &TreeNode{From: rel.To, Rel: rel}
+			if !path[rel.To] {
+				path[rel.To] = true
+				node.Children = expand(rel.To, path)
+				delete(path, rel.To)
+			}
+			children = append(children, node)
+		}
+		return children
 	}
 	var roots []*TreeNode
+	addRoot := func(name string) {
+		roots = append(roots, &TreeNode{From: name, Children: expand(name, map[string]bool{name: true})})
+	}
 	for _, name := range order {
-		if e := nodes[name]; !e.incoming {
-			roots = append(roots, e.node)
+		if !incoming[name] {
+			addRoot(name)
+		}
+	}
+	// Disconnected cycles have no natural root; start at their first source.
+	for i, rel := range cat.Relations {
+		if !visited[i] {
+			addRoot(rel.From)
 		}
 	}
 	return roots
