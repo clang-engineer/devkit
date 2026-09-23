@@ -18,17 +18,17 @@ import (
 	"github.com/clang/cmdtreemap/internal/model"
 )
 
-// Vim-inspired color palette
+// Neutral content palette; blue is reserved for interaction and focus.
 const (
-	colorGreen     = "#98c379" // active panel border
+	colorGreen     = "#61afef" // active panel border
 	colorMuted     = "#3b4252" // inactive panel border
-	colorBlue      = "#3b4261" // selected line background
-	colorOrange    = "#d19a66" // category nodes
-	colorCyan      = "#56b6c2" // group nodes
-	colorDefault   = "#e5c07b" // leaf tool nodes
-	colorDim       = "#5c6370" // dim / secondary text
-	colorPurple    = "#c678dd" // accents
-	colorCursor    = "#e06c75" // block cursor
+	colorBlue      = "#293b50" // selected line background
+	colorOrange    = "#b0b6c0" // category labels
+	colorCyan      = "#e5e7eb" // source tool names
+	colorDefault   = "#e5e7eb" // destination tool names and body text
+	colorDim       = "#b0b6c0" // readable secondary text
+	colorPurple    = "#e5e7eb" // detail titles
+	colorCursor    = "#61afef" // block cursor
 	colorGutter    = "#4b5263" // line numbers
 	colorGutterCur = "#e06c75" // current line number
 	colorStatusBg  = "#2c323c" // status bar background
@@ -100,7 +100,7 @@ func highlightMatch(s, query string) string {
 	if loc == nil {
 		return s
 	}
-	matchStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF79C6")).Underline(true)
+	matchStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorGreen)).Underline(true)
 	return s[:loc[0]] + matchStyle.Render(s[loc[0]:loc[1]]) + s[loc[1]:]
 }
 
@@ -1119,7 +1119,7 @@ func (m *Model) buildPreviewContent(d *model.Relation) string {
 	labelStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorOrange))
 	valueStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
 	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
-	linkStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorCyan)).Underline(true)
+	linkStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorGreen)).Underline(true)
 
 	b.WriteString(titleStyle.Render(d.From + " → " + d.To))
 	b.WriteString("\n\n")
@@ -1138,7 +1138,7 @@ func (m *Model) buildPreviewContent(d *model.Relation) string {
 
 	if d.Boundary != "" {
 		b.WriteString(labelStyle.Render("남은 한계"))
-		b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color("#FF5555")).Italic(true).Render(d.Boundary))
+		b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault)).Render(d.Boundary))
 		b.WriteString("\n\n")
 	}
 
