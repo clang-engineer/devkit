@@ -60,7 +60,7 @@ function renderTree() {
           ${items.map(({ relation, relationIndex }) => {
             const id = `${categoryIndex}:${relationIndex}`;
             const selected = state.selected === id ? ' is-selected' : '';
-            return `<li><button class="cmdtreemap-item${selected}" data-relation="${id}" type="button">
+            return `<li><button class="cmdtreemap-item${selected}" data-relation="${id}" aria-pressed="${state.selected === id}" type="button">
               <strong>${escapeHtml(relation.from)} → ${escapeHtml(relation.to)}</strong>
               <small>${escapeHtml(relation.why || '')}</small>
             </button></li>`;
@@ -75,9 +75,6 @@ function renderTree() {
   }).join('');
 
   tree.innerHTML = categories || '<p class="cmdtreemap-muted">검색 결과가 없습니다.</p>';
-  tree.querySelectorAll('[data-relation]').forEach((button) => {
-    button.addEventListener('click', () => selectRelation(button.dataset.relation));
-  });
 }
 
 async function loadTldr(command, container) {
@@ -112,7 +109,11 @@ function selectRelation(id) {
 
   state.selected = id;
   history.replaceState(null, '', `#${encodeURIComponent(relation.from)}-${encodeURIComponent(relation.to)}`);
-  renderTree();
+  tree.querySelectorAll('[data-relation]').forEach((button) => {
+    const selected = button.dataset.relation === id;
+    button.classList.toggle('is-selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
 
   detail.hidden = false;
   detail.innerHTML = `
@@ -143,6 +144,11 @@ async function start() {
     tree.innerHTML = '<p class="cmdtreemap-error">데이터 로드 실패</p>';
   }
 }
+
+tree.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-relation]');
+  if (button && tree.contains(button)) selectRelation(button.dataset.relation);
+});
 
 search.addEventListener('input', (event) => {
   state.query = event.target.value;

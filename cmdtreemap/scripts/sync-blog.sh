@@ -15,16 +15,17 @@ if [[ ! -d "$BLOG_DIR" ]]; then
 fi
 
 cp "$PROJECT_DIR/internal/data/commands.json" "$WEB_DIR/commands.json"
-GOOS=js GOARCH=wasm go build -o "$WEB_DIR/cmdtreemap.wasm" "$PROJECT_DIR/web"
+(cd "$PROJECT_DIR" && GOOS=js GOARCH=wasm go build -o "$WEB_DIR/cmdtreemap.wasm" ./web)
 cp "$(go env GOROOT)/lib/wasm/wasm_exec.js" "$WEB_DIR/wasm_exec.js"
 node --check "$WEB_DIR/app.js"
 
+files=(index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm)
 mkdir -p "$TARGET_DIR"
-for file in index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm; do
+for file in "${files[@]}"; do
   cp "$WEB_DIR/$file" "$TARGET_DIR/$file"
 done
 
-for file in index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm; do
+for file in "${files[@]}"; do
   cmp "$WEB_DIR/$file" "$TARGET_DIR/$file"
 done
 

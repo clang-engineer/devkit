@@ -152,7 +152,7 @@ cmdtreemap.wasm
 
 1. `internal/data/commands.json`을 수정한다.
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
-3. `go test ./...`를 실행한다.
+3. `go test ./...`와 `node --test web/app.test.cjs`를 실행한다.
 4. `web/commands.json`을 원본에서 갱신한다.
 5. WASM을 다시 빌드한다.
 6. 로컬 Web 서버에서 tree, 검색, 상세, tldr를 확인한다.
@@ -163,6 +163,8 @@ cmdtreemap.wasm
 
 ```text
 [ ] go test ./...
+[ ] go vet ./...
+[ ] node --test web/app.test.cjs
 [ ] go build -o cmdtreemap .
 [ ] GOOS=js GOARCH=wasm go build -o web/cmdtreemap.wasm ./web
 [ ] web/commands.json이 internal/data/commands.json과 동기화되어 있는가

@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+	"unicode/utf8"
 
 	"charm.land/bubbles/v2/cursor"
 	"charm.land/bubbles/v2/textinput"
@@ -19,18 +20,18 @@ import (
 
 // Vim-inspired color palette
 const (
-	colorGreen   = "#98c379" // active panel border
-	colorMuted   = "#3b4252" // inactive panel border
-	colorBlue    = "#3b4261" // selected line background
-	colorOrange  = "#d19a66" // category nodes
-	colorCyan    = "#56b6c2" // group nodes
-	colorDefault = "#e5c07b" // leaf tool nodes
-	colorDim     = "#5c6370" // dim / secondary text
-	colorPurple  = "#c678dd" // accents
-	colorCursor  = "#e06c75" // block cursor
-	colorGutter  = "#4b5263" // line numbers
+	colorGreen     = "#98c379" // active panel border
+	colorMuted     = "#3b4252" // inactive panel border
+	colorBlue      = "#3b4261" // selected line background
+	colorOrange    = "#d19a66" // category nodes
+	colorCyan      = "#56b6c2" // group nodes
+	colorDefault   = "#e5c07b" // leaf tool nodes
+	colorDim       = "#5c6370" // dim / secondary text
+	colorPurple    = "#c678dd" // accents
+	colorCursor    = "#e06c75" // block cursor
+	colorGutter    = "#4b5263" // line numbers
 	colorGutterCur = "#e06c75" // current line number
-	colorStatusBg = "#2c323c" // status bar background
+	colorStatusBg  = "#2c323c" // status bar background
 )
 
 type pane int
@@ -71,14 +72,15 @@ func (i treeItem) String() string {
 }
 
 func highlightMatch(s, query string) string {
-	lower := strings.ToLower(s)
-	q := strings.ToLower(query)
-	idx := strings.Index(lower, q)
-	if idx == -1 {
+	if query == "" {
+		return s
+	}
+	loc := regexp.MustCompile("(?i)" + regexp.QuoteMeta(query)).FindStringIndex(s)
+	if loc == nil {
 		return s
 	}
 	matchStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF79C6")).Underline(true)
-	return s[:idx] + matchStyle.Render(s[idx:idx+len(query)]) + s[idx+len(query):]
+	return s[:loc[0]] + matchStyle.Render(s[loc[0]:loc[1]]) + s[loc[1]:]
 }
 
 type Model struct {
@@ -322,47 +324,6 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 	})
 }
 
-type TreeNode struct {
-	From     string
-	Children []*TreeNode
-	Rel      *model.Relation
-}
-
-func buildCategoryTrees(cat model.Category) []*TreeNode {
-	type entry struct {
-		node     *TreeNode
-		incoming bool
-	}
-	nodes := make(map[string]*entry)
-
-	for i := range cat.Relations {
-		rel := &cat.Relations[i]
-		f, ok := nodes[rel.From]
-		if !ok {
-			f = &entry{node: &TreeNode{From: rel.From}}
-			nodes[rel.From] = f
-		}
-		t, ok := nodes[rel.To]
-		if !ok {
-			t = &entry{node: &TreeNode{From: rel.To}}
-			nodes[rel.To] = t
-		}
-		t.incoming = true
-		t.node.Rel = rel
-		f.node.Children = append(f.node.Children, t.node)
-		nodes[rel.From] = f
-		nodes[rel.To] = t
-	}
-
-	var roots []*TreeNode
-	for _, e := range nodes {
-		if !e.incoming {
-			roots = append(roots, e.node)
-		}
-	}
-	return roots
-}
-
 func (m *Model) applyFilter(root *tree.Node, query string) {
 	m.filterQuery = query
 
@@ -426,6 +387,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.updateSizes()
 		return m, nil
 	case tea.KeyPressMsg:
+		if msg.String() == "ctrl+c" {
+			return m, tea.Quit
+		}
 		if m.searchActive {
 			return m.updateSearchMode(msg)
 		}
@@ -470,10 +434,10 @@ func (m *Model) updateSizes() {
 	if m.filterActive {
 		treeHeight -= 3 // filter bar: top border + input line + bottom border
 	}
-	m.tree.SetSize(treeInnerWidth, treeHeight)
-	m.viewport.SetWidth(previewInnerWidth)
-	m.viewport.SetHeight(panelHeight - 2)
-	m.filterInput.SetWidth(treeInnerWidth - 2)
+	m.tree.SetSize(max(1, treeInnerWidth), max(1, treeHeight))
+	m.viewport.SetWidth(max(1, previewInnerWidth))
+	m.viewport.SetHeight(max(1, panelHeight-2))
+	m.filterInput.SetWidth(max(1, treeInnerWidth-2))
 }
 
 func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
@@ -651,14 +615,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 						m.tldrOutput = ""
 						tldrCmd := val.rel.Tldr
 						m.refreshPreview()
-						return m, func() tea.Msg {
-							cmd := exec.Command("tldr", tldrCmd)
-							out, err := cmd.CombinedOutput()
-							if err != nil {
-								return tldrDoneMsg{output: "", err: err}
-							}
-							return tldrDoneMsg{output: string(out), err: nil}
-						}
+						return m, fetchTldrCmd(tldrCmd)
 					}
 					m.refreshPreview()
 					return m, nil
@@ -818,14 +775,7 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 				m.tldrOutput = ""
 				tldrCmd := val.rel.Tldr
 				m.refreshPreview()
-				return m, func() tea.Msg {
-					cmd := exec.Command("tldr", tldrCmd)
-					out, err := cmd.CombinedOutput()
-					if err != nil {
-						return tldrDoneMsg{output: "", err: err}
-					}
-					return tldrDoneMsg{output: string(out), err: nil}
-				}
+				return m, fetchTldrCmd(tldrCmd)
 			}
 		}
 		return m, nil
@@ -876,7 +826,7 @@ func (m Model) updateVisualMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) ensureVisible(line int) {
+func (m *Model) ensureVisible(line int) {
 	yoff := m.viewport.YOffset()
 	vh := m.viewport.Height()
 	if line < yoff {
@@ -899,6 +849,10 @@ func isVimWordChar(r rune) bool {
 func wordForward(line string, col int) int {
 	runes := []rune(line)
 	n := len(runes)
+	if n == 0 {
+		return 0
+	}
+	col = clampCol(line, col)
 	if col >= n-1 {
 		return n - 1
 	}
@@ -925,6 +879,7 @@ func wordForward(line string, col int) int {
 
 func wordBackward(line string, col int) int {
 	runes := []rune(line)
+	col = clampCol(line, col)
 	if col <= 0 {
 		return 0
 	}
@@ -949,6 +904,10 @@ func wordBackward(line string, col int) int {
 func wordEnd(line string, col int) int {
 	runes := []rune(line)
 	n := len(runes)
+	if n == 0 {
+		return 0
+	}
+	col = clampCol(line, col)
 	if col >= n-1 {
 		return n - 1
 	}
@@ -988,9 +947,10 @@ func clampCol(line string, col int) int {
 	return col
 }
 
+var ansiStylePattern = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
 func stripANSI(s string) string {
-	re := regexp.MustCompile(`\x1b\[[0-9;]*m`)
-	return re.ReplaceAllString(s, "")
+	return ansiStylePattern.ReplaceAllString(s, "")
 }
 
 func (m *Model) refreshPreview() {
@@ -1156,8 +1116,8 @@ func insertBlockCursor(styledLine, rawLine string, col int) string {
 	cursorPos := 0
 	inEscape := false
 	vIdx := 0
-	for i := 0; i < len(styledLine); i++ {
-		if styledLine[i] == '\x1b' {
+	for i, r := range styledLine {
+		if r == '\x1b' {
 			inEscape = true
 			continue
 		}
@@ -1195,11 +1155,9 @@ func insertBlockCursor(styledLine, rawLine string, col int) string {
 		cursorPos = lastVis
 	}
 
-	// Find end of the character at cursorPos
-	charEnd := cursorPos + 1
-	for charEnd < len(styledLine) && styledLine[charEnd] != '\x1b' && styledLine[charEnd] != '\n' {
-		charEnd++
-	}
+	// Cursor columns count runes, not bytes or whole ANSI-styled spans.
+	_, size := utf8.DecodeRuneInString(styledLine[cursorPos:])
+	charEnd := cursorPos + size
 
 	cursorChar := styledLine[cursorPos:charEnd]
 	cursorStyle := lipgloss.NewStyle().
@@ -1210,7 +1168,7 @@ func insertBlockCursor(styledLine, rawLine string, col int) string {
 	return styledLine[:cursorPos] + cursorStyle.Render(cursorChar) + styledLine[charEnd:]
 }
 
-func (m Model) buildPreviewContent(d *model.Relation) string {
+func (m *Model) buildPreviewContent(d *model.Relation) string {
 	var b strings.Builder
 
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorPurple))
@@ -1248,7 +1206,7 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 
 	// tldr line
 	if d.Tldr != "" {
-		m.tldrLine = len(strings.Split(b.String(), "\n"))
+		m.tldrLine = strings.Count(b.String(), "\n")
 		tldrLabel := "tldr: " + d.Tldr
 		if m.showTldr {
 			tldrLabel += " [Enter] 닫기"
@@ -1269,7 +1227,7 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 
 	// URL line
 	if d.URL != "" {
-		m.urlLine = len(strings.Split(b.String(), "\n"))
+		m.urlLine = strings.Count(b.String(), "\n")
 		b.WriteString(labelStyle.Render("공식 문서"))
 		b.WriteString("\n  " + linkStyle.Render(d.URL) + "  " + helpStyle.Render("[Enter] 브라우저에서 열기"))
 		b.WriteString("\n\n")
@@ -1298,7 +1256,7 @@ func (m Model) buildPreviewContent(d *model.Relation) string {
 
 func (m Model) updateFilterMode(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	switch msg.String() {
-	case "ctrl+c", "q":
+	case "ctrl+c":
 		return m, tea.Quit
 	case "esc":
 		m.filterActive = false
