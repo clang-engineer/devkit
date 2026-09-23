@@ -65,13 +65,31 @@ func (i treeItem) String() string {
 	}
 	if i.rel != nil && i.isDestination {
 		toStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
-		if i.rel.Why != "" {
-			whyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
-			return whyStyle.Render(i.rel.Why+" → ") + toStyle.Render(name)
+		if summary := improvementSummary(i.rel.Solution); summary != "" {
+			summaryStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
+			return toStyle.Render(name) + summaryStyle.Render(" — "+summary)
 		}
 		return toStyle.Render(name)
 	}
 	return name
+}
+
+// Keep the tree compact; the detail panel retains the complete solution.
+func improvementSummary(solution string) string {
+	var parts []string
+	for _, part := range strings.Split(solution, ",") {
+		if part = strings.TrimSpace(part); part != "" {
+			parts = append(parts, part)
+		}
+		if len(parts) == 2 {
+			break
+		}
+	}
+	summary := []rune(strings.Join(parts, " · "))
+	if len(summary) > 48 {
+		return string(summary[:48]) + "…"
+	}
+	return string(summary)
 }
 
 func highlightMatch(s, query string) string {
@@ -1106,16 +1124,20 @@ func (m *Model) buildPreviewContent(d *model.Relation) string {
 	b.WriteString(titleStyle.Render(d.From + " → " + d.To))
 	b.WriteString("\n\n")
 
-	b.WriteString(labelStyle.Render("문제"))
-	b.WriteString("\n  " + valueStyle.Render(d.Problem))
+	b.WriteString(labelStyle.Render(d.From + "의 문제"))
+	problem := d.Problem
+	if problem == "" {
+		problem = d.Why
+	}
+	b.WriteString("\n  " + valueStyle.Render(problem))
 	b.WriteString("\n\n")
 
-	b.WriteString(labelStyle.Render("해결"))
+	b.WriteString(labelStyle.Render(d.To + "의 개선점"))
 	b.WriteString("\n  " + valueStyle.Render(d.Solution))
 	b.WriteString("\n\n")
 
 	if d.Boundary != "" {
-		b.WriteString(labelStyle.Render("경계"))
+		b.WriteString(labelStyle.Render("남은 한계"))
 		b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color("#FF5555")).Italic(true).Render(d.Boundary))
 		b.WriteString("\n\n")
 	}

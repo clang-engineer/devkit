@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
 const vm = require('node:vm');
 
-function setup(relations = [{ from: 'cat', to: 'bat', why: '<script>bad</script>' }]) {
+function setup(relations = [{ from: 'cat', to: 'bat', solution: '<script>bad</script>' }]) {
   const elements = new Map();
   function element() {
     return {
@@ -84,18 +84,24 @@ test('disconnected cycles and self loops terminate without losing edges', () => 
   assert.equal(forest[1].children[0].cycle, true);
 });
 
-test('reason labels the edge inline without an extra tree node', () => {
-  const { elements } = setup([{ from: 'cat', to: 'bat', why: '구문강조 없음' }]);
+test('tree shows improvements and detail explains the original problem', () => {
+  const { context, elements } = setup([{ from: 'cat', to: 'bat', why: '구문강조 없음', solution: '구문강조, 줄번호, Git 표시', boundary: '완전 대체 아님' }]);
   const html = elements.get('[data-tree]').innerHTML;
   assert.equal((html.match(/<li>/g) || []).length, 2);
   const button = html.match(/<button[\s\S]*?<\/button>/)[0];
   assert.ok(button.includes('bat'));
-  assert.match(button, /<span class="cmdtreemap-reason">구문강조 없음 → <\/span><strong>bat<\/strong>/);
+  assert.match(button, /<strong>bat<\/strong><span class="cmdtreemap-improvement"> — 구문강조 · 줄번호<\/span>/);
+  assert.ok(!button.includes('구문강조 없음'));
+  vm.runInContext("selectRelation('0:0')", context);
+  const detail = elements.get('[data-detail]').innerHTML;
+  for (const text of ['cat의 문제', '구문강조 없음', 'bat의 개선점', '구문강조, 줄번호, Git 표시', '남은 한계']) assert.ok(detail.includes(text));
+  assert.equal(vm.runInContext("improvementSummary(' , a, b, c')", context), 'a · b');
+  assert.equal(vm.runInContext("improvementSummary('가'.repeat(49)).length", context), 49);
 });
 
-test('missing reasons do not introduce empty intermediate nodes', () => {
+test('missing solutions do not show empty summaries', () => {
   const { elements } = setup([{ from: 'cat', to: 'bat' }]);
-  assert.ok(!elements.get('[data-tree]').innerHTML.includes('cmdtreemap-reason'));
+  assert.ok(!elements.get('[data-tree]').innerHTML.includes('cmdtreemap-improvement'));
 });
 
 test('empty categories render no results', () => {

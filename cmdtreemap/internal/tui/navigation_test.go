@@ -35,8 +35,8 @@ func TestEnterExpandsCategoryAndGroup(t *testing.T) {
 	}
 	m = press(m, key('j'))
 	item, ok := m.tree.NodeAtCurrentOffset().GivenValue().(treeItem)
-	if !ok || !item.isDestination || !strings.Contains(item.String(), item.rel.Why+" → ") {
-		t.Fatal("expected reason label on destination, without an extra node")
+	if !ok || !item.isDestination || !strings.Contains(item.String(), " — "+improvementSummary(item.rel.Solution)) {
+		t.Fatal("expected improvement summary on destination, without an extra node")
 	}
 	m = press(m, keyEnter())
 	if m.focusedPane != panePreview {

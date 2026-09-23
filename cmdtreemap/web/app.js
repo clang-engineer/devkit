@@ -29,6 +29,11 @@ function escapeHtml(value = '') {
     .replaceAll("'", '&#039;');
 }
 
+function improvementSummary(solution = '') {
+  const summary = [...solution.split(',').map(part => part.trim()).filter(Boolean).slice(0, 2).join(' · ')];
+  return summary.length > 48 ? summary.slice(0, 48).join('') + '…' : summary.join('');
+}
+
 function matches(relation) {
   const query = state.query.trim().toLowerCase();
   if (!query) return true;
@@ -93,7 +98,7 @@ function renderTree() {
       const button = `<button class="cmdtreemap-item${selected ? ' is-selected' : ''}"
         data-relation="${id}" aria-pressed="${selected}" type="button"
         aria-label="${escapeHtml(`${relation.from} → ${relation.to}`)}">
-        ${relation.why ? `<span class="cmdtreemap-reason">${escapeHtml(relation.why)} → </span>` : ''}<strong>${escapeHtml(node.name)}${node.cycle ? ' ↩' : ''}</strong>
+        <strong>${escapeHtml(node.name)}${node.cycle ? ' ↩' : ''}</strong>${improvementSummary(relation.solution) ? `<span class="cmdtreemap-improvement"> — ${escapeHtml(improvementSummary(relation.solution))}</span>` : ''}
       </button>`;
       return `<li>${button}${children ? `<ul>${children}</ul>` : ''}</li>`;
     }
@@ -152,9 +157,9 @@ function selectRelation(id) {
     <h2>${escapeHtml(relation.from)} <span>→</span> ${escapeHtml(relation.to)}</h2>
     <dl class="cmdtreemap-facts">
       ${relation.relation ? `<div><dt>관계 유형</dt><dd>${escapeHtml(relation.relation)}</dd></div>` : ''}
-      <div><dt>문제</dt><dd>${escapeHtml(relation.problem || relation.why || '—')}</dd></div>
-      <div><dt>해결</dt><dd>${escapeHtml(relation.solution || '—')}</dd></div>
-      ${relation.boundary ? `<div><dt>경계</dt><dd>${escapeHtml(relation.boundary)}</dd></div>` : ''}
+      <div><dt>${escapeHtml(relation.from)}의 문제</dt><dd>${escapeHtml(relation.problem || relation.why || '—')}</dd></div>
+      <div><dt>${escapeHtml(relation.to)}의 개선점</dt><dd>${escapeHtml(relation.solution || '—')}</dd></div>
+      ${relation.boundary ? `<div><dt>남은 한계</dt><dd>${escapeHtml(relation.boundary)}</dd></div>` : ''}
       ${relation.install ? `<div><dt>설치</dt><dd><code>${escapeHtml(relation.install)}</code></dd></div>` : ''}
     </dl>
     <section class="cmdtreemap-section"><h3>tldr</h3><div data-tldr-result></div></section>
