@@ -14,9 +14,9 @@ if [[ ! -d "$BLOG_DIR" ]]; then
   exit 1
 fi
 
-"$SCRIPT_DIR/build-web.sh"
+node --check "$WEB_DIR/app.js"
 
-files=(index.html app.js app.css commands.json wasm_exec.js cmdtreemap.wasm)
+files=(index.html app.js app.css commands.json)
 mkdir -p "$TARGET_DIR"
 for file in "${files[@]}"; do
   cp "$WEB_DIR/$file" "$TARGET_DIR/$file"
@@ -25,5 +25,8 @@ done
 for file in "${files[@]}"; do
   cmp "$WEB_DIR/$file" "$TARGET_DIR/$file"
 done
+
+# Remove only the obsolete runtime assets managed by earlier deployments.
+rm -f "$TARGET_DIR/wasm_exec.js" "$TARGET_DIR/cmdtreemap.wasm"
 
 printf 'cmdtreemap Web 배포본 동기화 완료: %s\n' "$TARGET_DIR"
