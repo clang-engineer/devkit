@@ -44,14 +44,14 @@ func TestWordMotionBounds(t *testing.T) {
 func TestPreviewActionLines(t *testing.T) {
 	m := newTestModel(t)
 	rel := &model.Relation{From: "cat", To: "bat", Tldr: "bat", URL: "https://example.com"}
-	lines := strings.Split(stripANSI(m.buildPreviewContent(rel)), "\n")
+	lines := strings.Split(stripANSI(m.buildPreviewContent(nil, rel)), "\n")
 	if !strings.HasPrefix(lines[m.tldrLine], "tldr: bat") {
 		t.Fatalf("wrong tldr line: %d", m.tldrLine)
 	}
 	if lines[m.urlLine] != "공식 문서" {
 		t.Fatalf("wrong URL line: %d", m.urlLine)
 	}
-	m.buildPreviewContent(&model.Relation{})
+	m.buildPreviewContent(nil, &model.Relation{})
 	if m.tldrLine != -1 || m.urlLine != -1 {
 		t.Fatal("action lines not reset")
 	}

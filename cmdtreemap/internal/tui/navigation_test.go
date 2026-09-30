@@ -19,19 +19,19 @@ func TestStartupSelectsFirstCategory(t *testing.T) {
 	}
 }
 
-func TestEnterExpandsCategoryAndGroup(t *testing.T) {
+func TestLExpandsCategoryAndGroup(t *testing.T) {
 	m := newTestModel(t)
 	m.tree.SetYOffset(1)
 	category := m.tree.NodeAtCurrentOffset()
-	m = press(m, keyEnter())
+	m = press(m, key('l'))
 	if !category.IsOpen() {
-		t.Fatal("Enter did not open category")
+		t.Fatal("l did not open category")
 	}
 	m = press(m, key('j'))
 	group := m.tree.NodeAtCurrentOffset()
-	m = press(m, keyEnter())
+	m = press(m, key('l'))
 	if !group.IsOpen() {
-		t.Fatal("Enter did not open group")
+		t.Fatal("l did not open group")
 	}
 	m = press(m, key('j'))
 	item, ok := m.tree.NodeAtCurrentOffset().GivenValue().(treeItem)
@@ -41,6 +41,16 @@ func TestEnterExpandsCategoryAndGroup(t *testing.T) {
 	m = press(m, keyEnter())
 	if m.focusedPane != panePreview {
 		t.Fatal("Enter on tool did not open preview")
+	}
+}
+
+func TestEnterDoesNotExpandCategory(t *testing.T) {
+	m := newTestModel(t)
+	m.tree.SetYOffset(1)
+	category := m.tree.NodeAtCurrentOffset()
+	m = press(m, keyEnter())
+	if category.IsOpen() {
+		t.Fatal("Enter expanded category")
 	}
 }
 

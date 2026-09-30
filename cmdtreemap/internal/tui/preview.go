@@ -11,11 +11,20 @@ func (m Model) toggleTldr() (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 	if node := m.tree.NodeAtCurrentOffset(); node != nil {
-		if item, ok := node.GivenValue().(treeItem); ok && item.rel != nil && item.rel.Tldr != "" {
-			m.showTldr = true
-			m.tldrOutput = ""
-			m.refreshPreview()
-			return m, fetchTldrCmd(item.rel.Tldr)
+		if item, ok := node.GivenValue().(treeItem); ok {
+			tldr := ""
+			if item.command != nil {
+				tldr = item.command.Tldr
+			}
+			if tldr == "" && item.rel != nil {
+				tldr = item.rel.Tldr
+			}
+			if tldr != "" {
+				m.showTldr = true
+				m.tldrOutput = ""
+				m.refreshPreview()
+				return m, fetchTldrCmd(tldr)
+			}
 		}
 	}
 	return m, nil

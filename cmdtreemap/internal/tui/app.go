@@ -54,6 +54,7 @@ type treeItem struct {
 	relIdx        int
 	isLeaf        bool
 	isDestination bool
+	command       *model.Command
 	rel           *model.Relation
 	filterQuery   string
 }
@@ -251,9 +252,10 @@ func buildTreeRoot(data model.CommandsData) *tree.Node {
 			return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorOrange))
 		})
 
+		commands := buildCommandIndex(cat)
 		trees := buildCategoryTrees(cat)
 		for _, tNode := range trees {
-			addTreeNodes(catNode, tNode, ci, data.Categories[ci].Relations)
+			addTreeNodes(catNode, tNode, ci, data.Categories[ci].Relations, commands)
 		}
 
 		root.Child(catNode)
@@ -262,7 +264,47 @@ func buildTreeRoot(data model.CommandsData) *tree.Node {
 	return root
 }
 
-func addTreeNodes(parent *tree.Node, node *TreeNode, catIdx int, relations []model.Relation) {
+func buildCommandIndex(cat model.Category) map[string]*model.Command {
+	commands := make(map[string]*model.Command)
+	for i := range cat.Commands {
+		cmd := cat.Commands[i]
+		if cmd.Tldr == "" {
+			cmd.Tldr = cmd.Name
+		}
+		commands[cmd.Name] = &cmd
+	}
+	ensure := func(name string) *model.Command {
+		if cmd := commands[name]; cmd != nil {
+			return cmd
+		}
+		cmd := &model.Command{Name: name, Tldr: name}
+		commands[name] = cmd
+		return cmd
+	}
+	for i := range cat.Relations {
+		rel := &cat.Relations[i]
+		from := ensure(rel.From)
+		if from.Description == "" {
+			from.Description = rel.Problem
+		}
+		to := ensure(rel.To)
+		if to.Description == "" {
+			to.Description = rel.Solution
+		}
+		if to.Install == "" {
+			to.Install = rel.Install
+		}
+		if to.Tldr == "" {
+			to.Tldr = rel.Tldr
+		}
+		if to.URL == "" {
+			to.URL = rel.URL
+		}
+	}
+	return commands
+}
+
+func addTreeNodes(parent *tree.Node, node *TreeNode, catIdx int, relations []model.Relation, commands map[string]*model.Command) {
 	if node.Rel != nil {
 		return
 	}
@@ -277,10 +319,11 @@ func addTreeNodes(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 	}
 
 	parentNode := tree.Root(treeItem{
-		name:   node.From,
-		catIdx: catIdx,
-		isLeaf: false,
-		rel:    rootRel,
+		name:    node.From,
+		catIdx:  catIdx,
+		isLeaf:  false,
+		command: commands[node.From],
+		rel:     rootRel,
 	})
 	parentNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
 		return lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorCyan))
@@ -290,13 +333,13 @@ func addTreeNodes(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 		if child.Rel == nil {
 			continue
 		}
-		addChildNode(parentNode, child, catIdx, relations)
+		addChildNode(parentNode, child, catIdx, relations, commands)
 	}
 
 	parent.Child(parentNode)
 }
 
-func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []model.Relation) {
+func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []model.Relation, commands map[string]*model.Command) {
 	if node.Rel == nil {
 		return
 	}
@@ -316,6 +359,7 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 			catIdx:        catIdx,
 			relIdx:        relIdx,
 			isLeaf:        false,
+			command:       commands[node.Rel.To],
 			rel:           node.Rel,
 		})
 		interNode.ItemStyleFunc(func(children tree.Nodes, i int) lipgloss.Style {
@@ -323,7 +367,7 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 		})
 		for _, grandchild := range node.Children {
 			if grandchild.Rel != nil {
-				addChildNode(interNode, grandchild, catIdx, relations)
+				addChildNode(interNode, grandchild, catIdx, relations, commands)
 			}
 		}
 		parent.Child(interNode)
@@ -336,6 +380,7 @@ func addChildNode(parent *tree.Node, node *TreeNode, catIdx int, relations []mod
 		catIdx:        catIdx,
 		relIdx:        relIdx,
 		isLeaf:        true,
+		command:       commands[node.Rel.To],
 		rel:           node.Rel,
 	})
 }
@@ -469,8 +514,10 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		val, ok := node.GivenValue().(treeItem)
-		if ok && val.isLeaf && val.rel != nil {
-			m.explored[[2]int{val.catIdx, val.relIdx}] = true
+		if ok && val.rel != nil {
+			if val.relIdx >= 0 {
+				m.explored[[2]int{val.catIdx, val.relIdx}] = true
+			}
 			m.focusedPane = panePreview
 			m.previewMode = previewNormal
 			m.previewCursor = 0
@@ -478,7 +525,9 @@ func (m Model) updateTree(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 			m.refreshPreview()
 			return m, nil
 		}
-		// Non-leaf: toggle expand/collapse.
+		m.refreshPreview()
+		return m, nil
+	case "l", "right", " ", "space":
 		m.tree.ToggleCurrentNode()
 		m.refreshPreview()
 		return m, nil
@@ -603,12 +652,26 @@ func (m Model) updatePreviewNormal(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	case "enter":
 		node := m.tree.NodeAtCurrentOffset()
 		if node != nil {
-			if val, ok := node.GivenValue().(treeItem); ok && val.rel != nil {
-				if m.tldrLine >= 0 && m.previewCursor == m.tldrLine && val.rel.Tldr != "" {
+			if val, ok := node.GivenValue().(treeItem); ok {
+				tldr := ""
+				url := ""
+				if val.command != nil {
+					tldr = val.command.Tldr
+					url = val.command.URL
+				}
+				if val.rel != nil {
+					if tldr == "" {
+						tldr = val.rel.Tldr
+					}
+					if url == "" {
+						url = val.rel.URL
+					}
+				}
+				if m.tldrLine >= 0 && m.previewCursor == m.tldrLine && tldr != "" {
 					return m.toggleTldr()
 				}
-				if m.urlLine >= 0 && m.previewCursor == m.urlLine && val.rel.URL != "" {
-					return m, openURLCmd(val.rel.URL)
+				if m.urlLine >= 0 && m.previewCursor == m.urlLine && url != "" {
+					return m, openURLCmd(url)
 				}
 			}
 		}
@@ -912,7 +975,7 @@ func (m *Model) refreshPreviewContent() {
 	}
 
 	val, ok := node.GivenValue().(treeItem)
-	if !ok || val.rel == nil {
+	if !ok || (val.command == nil && val.rel == nil) {
 		m.previewLines = []string{"상세 정보가 없습니다"}
 		m.rawLines = m.previewLines
 		m.viewport.SetContent(strings.Join(m.previewLines, "\n"))
@@ -920,8 +983,7 @@ func (m *Model) refreshPreviewContent() {
 		return
 	}
 
-	d := val.rel
-	content := m.buildPreviewContent(d)
+	content := m.buildPreviewContent(val.command, val.rel)
 	m.previewLines = strings.Split(content, "\n")
 
 	m.rawLines = make([]string, len(m.previewLines))
@@ -1112,7 +1174,7 @@ func insertBlockCursor(styledLine, rawLine string, col int) string {
 	return styledLine[:cursorPos] + cursorStyle.Render(cursorChar) + styledLine[charEnd:]
 }
 
-func (m *Model) buildPreviewContent(d *model.Relation) string {
+func (m *Model) buildPreviewContent(cmd *model.Command, d *model.Relation) string {
 	var b strings.Builder
 
 	titleStyle := lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color(colorPurple))
@@ -1121,41 +1183,53 @@ func (m *Model) buildPreviewContent(d *model.Relation) string {
 	helpStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
 	linkStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorGreen)).Underline(true)
 
-	b.WriteString(titleStyle.Render(d.From + " → " + d.To))
-	b.WriteString("\n\n")
-
-	b.WriteString(labelStyle.Render(d.From + "의 문제"))
-	problem := d.Problem
-	if problem == "" {
-		problem = d.Why
-	}
-	b.WriteString("\n  " + valueStyle.Render(problem))
-	b.WriteString("\n\n")
-
-	b.WriteString(labelStyle.Render(d.To + "의 개선점"))
-	b.WriteString("\n  " + valueStyle.Render(d.Solution))
-	b.WriteString("\n\n")
-
-	if d.Boundary != "" {
-		b.WriteString(labelStyle.Render("남은 한계"))
-		b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault)).Render(d.Boundary))
+	if cmd != nil {
+		b.WriteString(titleStyle.Render(cmd.Name))
+		b.WriteString("\n\n")
+		if cmd.Description != "" {
+			b.WriteString(labelStyle.Render("설명"))
+			b.WriteString("\n  " + valueStyle.Render(cmd.Description))
+			b.WriteString("\n\n")
+		}
+		if cmd.Usage != "" {
+			b.WriteString(labelStyle.Render("사용법"))
+			b.WriteString("\n  " + valueStyle.Render(cmd.Usage))
+			b.WriteString("\n\n")
+		}
+		if len(cmd.Examples) > 0 {
+			b.WriteString(labelStyle.Render("예제"))
+			for _, ex := range cmd.Examples {
+				b.WriteString("\n  " + valueStyle.Render("$ "+ex))
+			}
+			b.WriteString("\n\n")
+		}
+		if cmd.Install != "" {
+			b.WriteString(labelStyle.Render("설치"))
+			b.WriteString("\n  " + valueStyle.Render("$ "+cmd.Install))
+			b.WriteString("\n\n")
+		}
+	} else if d != nil {
+		b.WriteString(titleStyle.Render(d.From + " → " + d.To))
 		b.WriteString("\n\n")
 	}
 
-	b.WriteString(labelStyle.Render("관계 유형"))
-	b.WriteString("\n  " + lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim)).Render(d.Relation))
-	b.WriteString("\n\n")
-
-	if d.Install != "" {
-		b.WriteString(labelStyle.Render("설치"))
-		b.WriteString("\n  " + valueStyle.Render("$ "+d.Install))
-		b.WriteString("\n\n")
+	tldr := ""
+	url := ""
+	if cmd != nil {
+		tldr = cmd.Tldr
+		url = cmd.URL
+	}
+	if d != nil && tldr == "" {
+		tldr = d.Tldr
+	}
+	if d != nil && url == "" {
+		url = d.URL
 	}
 
 	// tldr line
-	if d.Tldr != "" {
+	if tldr != "" {
 		m.tldrLine = strings.Count(b.String(), "\n")
-		tldrLabel := "tldr: " + d.Tldr
+		tldrLabel := "tldr: " + tldr
 		if m.showTldr {
 			tldrLabel += " [Enter] 닫기"
 		} else {
@@ -1174,13 +1248,29 @@ func (m *Model) buildPreviewContent(d *model.Relation) string {
 	}
 
 	// URL line
-	if d.URL != "" {
+	if url != "" {
 		m.urlLine = strings.Count(b.String(), "\n")
 		b.WriteString(labelStyle.Render("공식 문서"))
-		b.WriteString("\n  " + linkStyle.Render(d.URL) + "  " + helpStyle.Render("[Enter] 브라우저에서 열기"))
+		b.WriteString("\n  " + linkStyle.Render(url) + "  " + helpStyle.Render("[Enter] 브라우저에서 열기"))
 		b.WriteString("\n\n")
 	} else {
 		m.urlLine = -1
+	}
+
+	if d != nil {
+		b.WriteString(labelStyle.Render("관계"))
+		b.WriteString("\n  " + valueStyle.Render(d.From+" → "+d.To))
+		problem := d.Problem
+		if problem == "" {
+			problem = d.Why
+		}
+		if problem != "" {
+			b.WriteString("\n  " + valueStyle.Render(problem))
+		}
+		if d.Solution != "" {
+			b.WriteString("\n  " + valueStyle.Render(d.Solution))
+		}
+		b.WriteString("\n\n")
 	}
 
 	if m.focusedPane == panePreview {
@@ -1197,7 +1287,7 @@ func (m *Model) buildPreviewContent(d *model.Relation) string {
 		b.WriteString(modeStyle.Render(" " + modeLabel + " "))
 		b.WriteString(helpStyle.Render("  j/k  w/b/e  0/$  gg/G  v  y  /  n/N  t  Esc  ⌫"))
 	} else {
-		b.WriteString(helpStyle.Render("[Enter] 선택  [/] 필터  Tab:미리보기  [q] 종료"))
+		b.WriteString(helpStyle.Render("[Enter] 정보  [l/Space] 펼치기  [/] 필터  Tab:미리보기  [q] 종료"))
 	}
 	return b.String()
 }

@@ -212,7 +212,7 @@ func TestBuildPreviewContent(t *testing.T) {
 		Relation: "alternative",
 	}
 	m := newTestModel(t)
-	text := stripANSI(m.buildPreviewContent(d))
+	text := stripANSI(m.buildPreviewContent(nil, d))
 	if !strings.Contains(text, "cat → bat") {
 		t.Fatal("buildPreviewContent에 제목이 없음")
 	}
