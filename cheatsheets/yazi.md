@@ -207,6 +207,12 @@ dark = "dracula"
 5단계: 경로 복사
 : `cc`, `cd`, `cf`
 
+## 문제 해결
+
+| 증상 | 원인 | 해결 |
+|---|---|---|
+| SVG 미리보기에서 `Failed to start \`resvg\`` / `No such file or directory (os error 2)` | Yazi가 SVG 렌더링을 위해 호출하는 외부 도구 `resvg`가 없음 | `brew install resvg` |
+
 ## 더 보기
 
 - `yazi --help`, `man yazi`
