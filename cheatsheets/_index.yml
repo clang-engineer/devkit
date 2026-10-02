@@ -19,6 +19,9 @@ groups:
     items:
       - {file: shell.md, desc: "Bash `set` 옵션, `&`/`&&`/`;`/`\\|\\|`, job 관리"}
       - {file: zsh.md, desc: "Zsh 단축키, glob, alias"}
+      - {file: atuin.md, desc: "Atuin — 구조화 shell history 검색과 Ctrl-R 대체"}
+      - {file: fzf.md, desc: "fzf — 범용 fuzzy finder, 파일·디렉터리·브랜치 선택 UI"}
+      - {file: zoxide.md, desc: "zoxide — 방문 기반 디렉터리 점프"}
       - {file: powershell.md, desc: "PowerShell — Bash와 다른 점 위주 (PS 5.1 vs 7, 서비스 관리 sc/nssm 포함)"}
 
   - title: 시스템 & 서버
@@ -38,6 +41,7 @@ groups:
   - title: Git & 버전 관리
     items:
       - {file: git.md, desc: "Git 명령어 (브랜치, stash, rebase, tag 등)"}
+      - {file: git-delta.md, desc: "git-delta — 구문 강조 Git diff pager"}
       - {file: chezmoi.md, desc: "chezmoi — dotfiles 관리 (source/target 모델, 네이밍 규칙, 템플릿)"}
 
   - title: 보안 & 비밀정보
@@ -47,6 +51,7 @@ groups:
   - title: 개발 도구
     items:
       - {file: mise.md, desc: "mise — 다언어 런타임 버전 관리 (rbenv/jenv/pyenv/nvm 통합, config+activate)"}
+      - {file: uv.md, desc: "uv — Python package/project manager, venv, lock, tool 실행"}
       - {file: taskwarrior.md, desc: "Taskwarrior 3.5 — 태스크 관리, 필터, 날짜, JSON export, TaskChampion 동기화"}
       - {file: python-pypi-publishing.md, desc: "Python PyPI Trusted Publishing — uv 빌드, GitHub OIDC 배포, 검증·문제 해결"}
       - {file: claude-code.md, desc: "Claude Code CLI"}

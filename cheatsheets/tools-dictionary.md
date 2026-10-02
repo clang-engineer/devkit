@@ -24,7 +24,8 @@
 | 도구 | 설명 | 핵심 명령어 |
 |------|------|------------|
 | rg | `grep -r` 대체 (Rust) | `rg "pattern"`, `-t py`(파일타입), `-g '*.js'`(glob), `-C 3`(컨텍스트), `--pcre2`(lookaround) |
-| fzf | 범용 fuzzy finder | `Ctrl+R`(히스토리), `Ctrl+T`(파일), `Alt+C`(cd), `... \| fzf`, `-m`(멀티) |
+| fzf | 범용 fuzzy finder | `Ctrl+T`(파일), `Alt+C`(cd), `... \| fzf`, `-m`(멀티), `--preview` |
+| atuin | 구조화 shell history | `atuin search`, `atuin search --cwd`, `atuin stats`, `atuin import zsh` |
 | jq | JSON 가공 | `jq '.key'`, `.items[]`, `select(.active)`, `map({id,name})`, `-r`(raw), `-c`(compact) |
 
 ### 텍스트 처리
@@ -50,6 +51,7 @@
 | fd | `find` 대체 | `fd config`, `-e lua`, `-E node_modules`, `-X rm`(batch) |
 | gdb | GNU 디버거 | `gdb ./prog`, `run`(r), `break main`(b), `next`(n), `step`(s), `print var`(p), `backtrace`(bt) |
 | make | 빌드 자동화 | `make`, `make target`, `make -n`(dry-run), `.PHONY:`, `$@`/`$<`/`$^` |
+| uv | Python package/project manager | `uv init`, `uv add requests`, `uv run pytest`, `uv sync`, `uv tool run ruff` |
 
 ### 유틸리티
 
@@ -142,6 +144,8 @@ source <(fzf --zsh)
 - ssh → ssh.md (config 다중 계정 패턴)
 - chezmoi → chezmoi.md (dotfiles 관리)
 - powershell → powershell.md (Bash→PS 마이그레이션)
-- shell/zsh → shell.md, zsh.md (heredoc/배열/확장)
+- shell/zsh/atuin/fzf/zoxide → shell.md, zsh.md, atuin.md, fzf.md, zoxide.md
+- git-delta → git-delta.md (Git diff pager)
+- uv → uv.md (Python package/project manager)
 - vim/tmux/lazyvim/lazygit/ghostty/yazi → 에디터 & TUI 그룹
 - aerospace/hammerspoon/macos-admin → macOS 그룹

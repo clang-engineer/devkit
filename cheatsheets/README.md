@@ -45,6 +45,9 @@
 |------|------|
 | [shell.md](shell.md) | Bash `set` 옵션, `&`/`&&`/`;`/`\|\|`, job 관리 |
 | [zsh.md](zsh.md) | Zsh 단축키, glob, alias |
+| [atuin.md](atuin.md) | Atuin 구조화 shell history 검색 |
+| [fzf.md](fzf.md) | fzf 범용 fuzzy finder |
+| [zoxide.md](zoxide.md) | zoxide 방문 기반 디렉터리 점프 |
 | [powershell.md](powershell.md) | PowerShell — Bash와 다른 점 위주 |
 
 ## 시스템 & 서버
@@ -72,6 +75,7 @@
 | 파일 | 설명 |
 |------|------|
 | [git.md](git.md) | Git 명령어 (브랜치, stash, rebase, tag 등) |
+| [git-delta.md](git-delta.md) | git-delta — Git diff pager |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 |
 
 ## 보안 & 비밀정보
@@ -85,6 +89,7 @@
 | 파일 | 설명 |
 |------|------|
 | [mise.md](mise.md) | mise — 다언어 런타임 버전 관리 |
+| [uv.md](uv.md) | uv — Python package/project manager |
 | [taskwarrior.md](taskwarrior.md) | Taskwarrior 3.5 — 태스크 관리 |
 | [python-pypi-publishing.md](python-pypi-publishing.md) | Python PyPI Trusted Publishing |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
