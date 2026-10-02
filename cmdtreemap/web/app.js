@@ -92,8 +92,8 @@ function renderTree() {
         const id = `${categoryIndex}:${node.name}`;
         const selected = state.selected === `command:${id}`;
         return `<li><details class="cmdtreemap-branch"${expanded}>
-          <summary><button class="cmdtreemap-command${selected ? ' is-selected' : ''}"
-            data-command="${escapeHtml(id)}" aria-pressed="${selected}" type="button">${escapeHtml(node.name)}</button></summary><ul>${children}</ul>
+          <summary class="cmdtreemap-command${selected ? ' is-selected' : ''}"
+            data-command="${escapeHtml(id)}" aria-pressed="${selected}">${escapeHtml(node.name)}</summary><ul>${children}</ul>
         </details></li>`;
       }
       visibleRelations.add(node.relationIndex);
@@ -244,7 +244,6 @@ tree.addEventListener('click', (event) => {
   }
   const commandButton = event.target.closest('[data-command]');
   if (commandButton && tree.contains(commandButton)) {
-    event.preventDefault();
     selectCommand(commandButton.dataset.command);
   }
 });
