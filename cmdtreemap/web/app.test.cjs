@@ -11,7 +11,7 @@ function setup(relations = [{ from: 'cat', to: 'bat', solution: '<script>bad</sc
       classList: { add() {}, toggle() {} },
       listeners: {},
       addEventListener(type, callback) { this.listeners[type] = callback; },
-      setAttribute() {}, scrollIntoView() {}, contains() { return true; },
+      setAttribute() {}, scrollIntoView() {}, contains() { return true; }, matches() { return true; },
       querySelectorAll() { return []; },
       querySelector(selector) {
         if (!elements.has(selector)) elements.set(selector, element());
@@ -90,7 +90,7 @@ test('search retains ancestors but removes unrelated branches', () => {
   ]);
   vm.runInContext("state.query = 'btop'; renderTree()", context);
   const html = elements.get('[data-tree]').innerHTML;
-  assert.ok(html.includes('<summary>top</summary>'));
+  assert.ok(html.includes('data-command="0:top"'));
   assert.ok(html.includes('data-relation="0:0"'));
   assert.ok(html.includes('data-relation="0:1"'));
   assert.ok(!html.includes('data-relation="0:2"'));
@@ -120,7 +120,7 @@ test('tree shows improvements and detail explains the original problem', () => {
   const { context, elements } = setup([{ from: 'cat', to: 'bat', why: '구문강조 없음', solution: '구문강조, 줄번호, Git 표시', boundary: '완전 대체 아님' }]);
   const html = elements.get('[data-tree]').innerHTML;
   assert.equal((html.match(/<li>/g) || []).length, 2);
-  const button = html.match(/<button[\s\S]*?<\/button>/)[0];
+  const button = html.match(/<button[^>]*data-relation="0:0"[\s\S]*?<\/button>/)[0];
   assert.ok(button.includes('bat'));
   assert.match(button, /<strong>bat<\/strong><span class="cmdtreemap-improvement"> — 구문강조 · 줄번호<\/span>/);
   assert.ok(!button.includes('구문강조 없음'));
@@ -139,6 +139,18 @@ test('missing solutions do not show empty summaries', () => {
 test('empty categories render no results', () => {
   const { elements } = setup([]);
   assert.ok(elements.get('[data-tree]').innerHTML.includes('검색 결과가 없습니다'));
+});
+
+test('root command buttons show command detail and tldr', () => {
+  const { context, elements } = setup([{ from: 'cd', to: 'zoxide', solution: '방문 기반 학습, 부분 경로로 점프' }]);
+  const html = elements.get('[data-tree]').innerHTML;
+  assert.ok(html.includes('data-command="0:cd"'));
+  vm.runInContext("selectCommand('0:cd')", context);
+  const detail = elements.get('[data-detail]').innerHTML;
+  assert.ok(detail.includes('<h2>cd</h2>'));
+  assert.ok(detail.includes('이어지는 도구'));
+  assert.ok(detail.includes('zoxide'));
+  assert.equal(vm.runInContext('state.selected', context), 'command:0:cd');
 });
 
 test('selection preserves tree DOM and search hides details', () => {

@@ -89,8 +89,11 @@ function renderTree() {
       const relation = category.relations[node.relationIndex];
       if (!children && (!relation || !matches(relation))) return '';
       if (!relation) {
+        const id = `${categoryIndex}:${node.name}`;
+        const selected = state.selected === `command:${id}`;
         return `<li><details class="cmdtreemap-branch"${expanded}>
-          <summary>${escapeHtml(node.name)}</summary><ul>${children}</ul>
+          <summary><button class="cmdtreemap-command${selected ? ' is-selected' : ''}"
+            data-command="${escapeHtml(id)}" aria-pressed="${selected}" type="button">${escapeHtml(node.name)}</button></summary><ul>${children}</ul>
         </details></li>`;
       }
       visibleRelations.add(node.relationIndex);
@@ -153,6 +156,14 @@ async function loadTldr(command, container) {
   }
 }
 
+function updateSelection(selector, selectedId) {
+  tree.querySelectorAll('[data-relation], [data-command]').forEach((button) => {
+    const selected = button.matches(selector) && (button.dataset.relation || button.dataset.command) === selectedId;
+    button.classList.toggle('is-selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+}
+
 function selectRelation(id) {
   const [categoryIndex, relationIndex] = id.split(':').map(Number);
   const category = state.data.categories[categoryIndex];
@@ -161,11 +172,7 @@ function selectRelation(id) {
 
   state.selected = id;
   history.replaceState(null, '', `#${encodeURIComponent(relation.from)}-${encodeURIComponent(relation.to)}`);
-  tree.querySelectorAll('[data-relation]').forEach((button) => {
-    const selected = button.dataset.relation === id;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  });
+  updateSelection('[data-relation]', id);
 
   detail.hidden = false;
   detail.innerHTML = `
@@ -185,6 +192,37 @@ function selectRelation(id) {
   detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
+function selectCommand(id) {
+  const separator = id.indexOf(':');
+  const categoryIndex = Number(id.slice(0, separator));
+  const name = id.slice(separator + 1);
+  const category = state.data.categories[categoryIndex];
+  if (!category) return;
+  const outgoing = category.relations.filter((relation) => relation.from === name);
+  const incoming = category.relations.filter((relation) => relation.to === name);
+  if (!outgoing.length && !incoming.length) return;
+
+  state.selected = `command:${id}`;
+  history.replaceState(null, '', `#${encodeURIComponent(name)}`);
+  updateSelection('[data-command]', id);
+
+  const relationItems = outgoing.map((relation) => `<li><strong>${escapeHtml(relation.to)}</strong>${relation.solution ? ` — ${escapeHtml(improvementSummary(relation.solution))}` : ''}</li>`).join('');
+  const incomingItems = incoming.map((relation) => `<li>${escapeHtml(relation.from)} <span>→</span> <strong>${escapeHtml(name)}</strong></li>`).join('');
+
+  detail.hidden = false;
+  detail.innerHTML = `
+    <p class="cmdtreemap-eyebrow">${escapeHtml(category.name)} / 명령어</p>
+    <h2>${escapeHtml(name)}</h2>
+    <dl class="cmdtreemap-facts">
+      ${outgoing.length ? `<div><dt>이어지는 도구</dt><dd><ul>${relationItems}</ul></dd></div>` : ''}
+      ${incoming.length ? `<div><dt>들어오는 관계</dt><dd><ul>${incomingItems}</ul></dd></div>` : ''}
+    </dl>
+    <section class="cmdtreemap-section"><h3>tldr</h3><div data-tldr-result></div></section>`;
+
+  loadTldr(name, detail.querySelector('[data-tldr-result]'));
+  detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 async function start() {
   try {
     const response = await fetch(root.dataset.source || `${assetBase}commands.json`);
@@ -199,8 +237,16 @@ async function start() {
 }
 
 tree.addEventListener('click', (event) => {
-  const button = event.target.closest('[data-relation]');
-  if (button && tree.contains(button)) selectRelation(button.dataset.relation);
+  const relationButton = event.target.closest('[data-relation]');
+  if (relationButton && tree.contains(relationButton)) {
+    selectRelation(relationButton.dataset.relation);
+    return;
+  }
+  const commandButton = event.target.closest('[data-command]');
+  if (commandButton && tree.contains(commandButton)) {
+    event.preventDefault();
+    selectCommand(commandButton.dataset.command);
+  }
 });
 
 search.addEventListener('input', (event) => {
