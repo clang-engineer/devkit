@@ -106,6 +106,83 @@
           "tldr": "rip",
           "url": "https://github.com/nivekuil/rip"
         }
+      ],
+      "commands": [
+        {
+          "name": "cat",
+          "description": "파일 내용을 표준 출력으로 보여주는 기본 도구",
+          "tldr": "cat"
+        },
+        {
+          "name": "bat",
+          "description": "구문 강조·줄번호·Git 표시를 제공하는 파일 뷰어",
+          "tldr": "bat"
+        },
+        {
+          "name": "ls",
+          "description": "디렉터리의 파일과 하위 디렉터리를 나열하는 기본 도구",
+          "tldr": "ls"
+        },
+        {
+          "name": "eza",
+          "description": "색상·아이콘·Git 정보·트리 출력을 강화한 ls 대안",
+          "tldr": "eza"
+        },
+        {
+          "name": "lsd",
+          "description": "아이콘과 색상으로 파일 유형을 보기 쉽게 표시하는 ls 대안",
+          "tldr": "lsd"
+        },
+        {
+          "name": "find",
+          "description": "파일·디렉터리를 조건식으로 검색하는 기본 도구",
+          "tldr": "find"
+        },
+        {
+          "name": "fd",
+          "description": "단순한 문법과 실용적 기본값을 제공하는 빠른 파일 검색 도구",
+          "tldr": "fd"
+        },
+        {
+          "name": "du",
+          "description": "파일·디렉터리의 디스크 사용량을 계산하는 기본 도구",
+          "tldr": "du"
+        },
+        {
+          "name": "dust",
+          "description": "디스크 사용량을 시각적 트리와 막대로 보여주는 도구",
+          "tldr": "dust"
+        },
+        {
+          "name": "tree",
+          "description": "디렉터리 구조를 트리 형태로 출력하는 도구",
+          "tldr": "tree"
+        },
+        {
+          "name": "broot",
+          "description": "대화형으로 디렉터리 트리를 탐색하고 검색하는 도구",
+          "tldr": "broot"
+        },
+        {
+          "name": "cp",
+          "description": "파일과 디렉터리를 복사하는 기본 도구",
+          "tldr": "cp"
+        },
+        {
+          "name": "xcp",
+          "description": "진행률과 병렬 처리를 제공하는 파일 복사 도구",
+          "tldr": "xcp"
+        },
+        {
+          "name": "rm",
+          "description": "파일과 디렉터리를 삭제하는 기본 도구",
+          "tldr": "rm"
+        },
+        {
+          "name": "rip",
+          "description": "삭제 대상을 휴지통으로 이동해 복구 가능성을 남기는 도구",
+          "tldr": "rip"
+        }
       ]
     },
     {
@@ -149,6 +226,38 @@
           "install": "brew install git-delta",
           "tldr": "delta",
           "url": "https://github.com/dandavison/delta"
+        }
+      ],
+      "commands": [
+        {
+          "name": "grep",
+          "description": "텍스트에서 패턴과 일치하는 줄을 찾는 기본 검색 도구",
+          "tldr": "grep"
+        },
+        {
+          "name": "rg",
+          "description": "코드베이스 검색에 최적화된 빠른 grep 계열 도구",
+          "tldr": "rg"
+        },
+        {
+          "name": "sed",
+          "description": "스트림 텍스트를 줄 단위로 치환·삭제·변환하는 기본 도구",
+          "tldr": "sed"
+        },
+        {
+          "name": "sd",
+          "description": "간단한 문자열·정규식 치환에 초점을 둔 sed 대안",
+          "tldr": "sd"
+        },
+        {
+          "name": "diff",
+          "description": "두 파일이나 디렉터리의 차이를 비교하는 기본 도구",
+          "tldr": "diff"
+        },
+        {
+          "name": "delta",
+          "description": "Git diff와 diff 출력을 구문 강조와 레이아웃으로 보기 좋게 표시하는 도구",
+          "tldr": "delta"
         }
       ]
     },
@@ -217,6 +326,48 @@
           "tldr": "gron",
           "url": "https://github.com/tomnomnom/gron"
         }
+      ],
+      "commands": [
+        {
+          "name": "awk",
+          "description": "텍스트를 레코드와 필드 단위로 처리하는 패턴 기반 언어",
+          "tldr": "awk"
+        },
+        {
+          "name": "goawk",
+          "description": "Go로 구현된 이식성 높은 awk 구현체",
+          "tldr": "goawk"
+        },
+        {
+          "name": "sort",
+          "description": "텍스트 줄을 정렬하는 기본 도구",
+          "tldr": "sort"
+        },
+        {
+          "name": "ssort",
+          "description": "구조화된 데이터나 특정 키 기준 정렬을 돕는 도구",
+          "tldr": "ssort"
+        },
+        {
+          "name": "jq",
+          "description": "JSON 데이터를 필터링·변환·조회하는 명령줄 프로세서",
+          "tldr": "jq"
+        },
+        {
+          "name": "fx",
+          "description": "JSON을 대화형으로 탐색하고 가공하는 도구",
+          "tldr": "fx"
+        },
+        {
+          "name": "jiq",
+          "description": "jq 필터를 대화형으로 작성하며 JSON을 탐색하는 도구",
+          "tldr": "jiq"
+        },
+        {
+          "name": "gron",
+          "description": "JSON을 grep하기 쉬운 할당문 형태로 펼치는 도구",
+          "tldr": "gron"
+        }
       ]
     },
     {
@@ -247,6 +398,28 @@
           "install": "brew install bat",
           "tldr": "bat",
           "url": "https://github.com/sharkdp/bat"
+        }
+      ],
+      "commands": [
+        {
+          "name": "tail",
+          "description": "파일 끝부분을 출력하고 새로 추가되는 내용을 따라가는 기본 도구",
+          "tldr": "tail"
+        },
+        {
+          "name": "tspin",
+          "description": "로그를 색상 강조와 패턴 구분으로 보기 쉽게 표시하는 tail 계열 도구",
+          "tldr": "tspin"
+        },
+        {
+          "name": "less",
+          "description": "긴 텍스트를 페이지 단위로 탐색하는 기본 페이저",
+          "tldr": "less"
+        },
+        {
+          "name": "bat",
+          "description": "구문 강조·줄번호·Git 표시를 제공하는 파일 뷰어",
+          "tldr": "bat"
         }
       ]
     },
@@ -293,6 +466,33 @@
           "tldr": "fzf",
           "url": "https://github.com/junegunn/fzf"
         }
+      ],
+      "commands": [
+        {
+          "name": "cd",
+          "description": "현재 셸의 작업 디렉터리를 변경하는 기본 명령",
+          "tldr": "cd"
+        },
+        {
+          "name": "zoxide",
+          "description": "방문 기록의 빈도와 최근성을 학습해 빠르게 이동하는 cd 보조 도구",
+          "tldr": "zoxide"
+        },
+        {
+          "name": "yazi",
+          "description": "터미널에서 파일을 대화형으로 탐색·관리하는 파일 매니저",
+          "tldr": "yazi"
+        },
+        {
+          "name": "select",
+          "description": "셸 스크립트에서 번호 선택 메뉴를 만드는 기본 구문",
+          "tldr": "select"
+        },
+        {
+          "name": "fzf",
+          "description": "목록을 퍼지 검색으로 고르는 범용 대화형 필터",
+          "tldr": "fzf"
+        }
       ]
     },
     {
@@ -336,6 +536,28 @@
           "install": "brew install sesh",
           "tldr": "sesh",
           "url": "https://github.com/joshmedeski/sesh"
+        }
+      ],
+      "commands": [
+        {
+          "name": "screen",
+          "description": "터미널 세션을 분리·재접속하고 여러 창을 관리하는 도구",
+          "tldr": "screen"
+        },
+        {
+          "name": "tmux",
+          "description": "터미널 세션·창·패널을 관리하는 멀티플렉서",
+          "tldr": "tmux"
+        },
+        {
+          "name": "zellij",
+          "description": "레이아웃과 플러그인을 갖춘 현대적 터미널 워크스페이스",
+          "tldr": "zellij"
+        },
+        {
+          "name": "sesh",
+          "description": "tmux 세션을 검색·생성·전환하는 세션 관리자",
+          "tldr": "sesh"
         }
       ]
     },
@@ -416,6 +638,63 @@
           "tldr": "lazydocker",
           "url": "https://github.com/jesseduffield/lazydocker"
         }
+      ],
+      "commands": [
+        {
+          "name": "top",
+          "description": "실행 중인 프로세스와 시스템 자원 사용량을 실시간으로 보여주는 기본 도구",
+          "tldr": "top"
+        },
+        {
+          "name": "htop",
+          "description": "프로세스를 대화형으로 정렬·검색·종료할 수 있는 시스템 모니터",
+          "tldr": "htop"
+        },
+        {
+          "name": "btop",
+          "description": "CPU·메모리·디스크·네트워크를 시각적으로 보여주는 시스템 모니터",
+          "tldr": "btop"
+        },
+        {
+          "name": "ps",
+          "description": "현재 프로세스 목록과 상태를 출력하는 기본 도구",
+          "tldr": "ps"
+        },
+        {
+          "name": "procs",
+          "description": "프로세스 목록을 색상과 트리 형태로 보기 좋게 표시하는 ps 대안",
+          "tldr": "procs"
+        },
+        {
+          "name": "df",
+          "description": "파일시스템별 디스크 여유 공간을 출력하는 기본 도구",
+          "tldr": "df"
+        },
+        {
+          "name": "duf",
+          "description": "디스크 사용량과 여유 공간을 표 형태로 보기 좋게 표시하는 df 대안",
+          "tldr": "duf"
+        },
+        {
+          "name": "free",
+          "description": "시스템 메모리 사용량을 출력하는 기본 도구",
+          "tldr": "free"
+        },
+        {
+          "name": "smem",
+          "description": "프로세스별 메모리 사용량을 USS/PSS/RSS 기준으로 분석하는 도구",
+          "tldr": "smem"
+        },
+        {
+          "name": "docker",
+          "description": "컨테이너와 이미지를 관리하는 Docker CLI",
+          "tldr": "docker"
+        },
+        {
+          "name": "lazydocker",
+          "description": "Docker 컨테이너·이미지·로그를 터미널 UI로 관리하는 도구",
+          "tldr": "lazydocker"
+        }
       ]
     },
     {
@@ -484,6 +763,58 @@
           "tldr": "mosh",
           "url": "https://mosh.org"
         }
+      ],
+      "commands": [
+        {
+          "name": "ping",
+          "description": "ICMP 패킷으로 네트워크 도달성과 지연 시간을 확인하는 기본 도구",
+          "tldr": "ping"
+        },
+        {
+          "name": "gping",
+          "description": "ping 결과를 그래프로 시각화하는 네트워크 진단 도구",
+          "tldr": "gping"
+        },
+        {
+          "name": "netstat",
+          "description": "네트워크 연결·라우팅·포트 상태를 출력하는 전통적 도구",
+          "tldr": "netstat"
+        },
+        {
+          "name": "ss",
+          "description": "소켓과 네트워크 연결 상태를 빠르게 조회하는 netstat 대안",
+          "tldr": "ss"
+        },
+        {
+          "name": "dig",
+          "description": "DNS 레코드를 질의하고 응답을 분석하는 표준 도구",
+          "tldr": "dig"
+        },
+        {
+          "name": "dog",
+          "description": "DNS 질의를 색상 출력과 간단한 문법으로 보여주는 dig 대안",
+          "tldr": "dog"
+        },
+        {
+          "name": "wget",
+          "description": "URL에서 파일을 내려받는 비대화형 다운로드 도구",
+          "tldr": "wget"
+        },
+        {
+          "name": "aria2c",
+          "description": "HTTP·FTP·BitTorrent를 지원하는 병렬 다운로드 도구",
+          "tldr": "aria2c"
+        },
+        {
+          "name": "ssh",
+          "description": "원격 시스템에 암호화된 셸 접속을 제공하는 기본 도구",
+          "tldr": "ssh"
+        },
+        {
+          "name": "mosh",
+          "description": "불안정한 네트워크에서도 끊김에 강한 원격 터미널 도구",
+          "tldr": "mosh"
+        }
       ]
     },
     {
@@ -526,6 +857,33 @@
           "install": "brew install atuin",
           "tldr": "atuin",
           "url": "https://github.com/atuinsh/atuin"
+        }
+      ],
+      "commands": [
+        {
+          "name": "bash",
+          "description": "POSIX 계열 시스템에서 널리 쓰이는 셸과 스크립트 언어",
+          "tldr": "bash"
+        },
+        {
+          "name": "fish",
+          "description": "자동완성·구문 강조 등 대화형 사용성을 강화한 셸",
+          "tldr": "fish"
+        },
+        {
+          "name": "zsh",
+          "description": "확장성과 플러그인 생태계가 큰 대화형 셸",
+          "tldr": "zsh"
+        },
+        {
+          "name": "history",
+          "description": "셸에서 실행한 명령 기록을 조회하는 기본 기능",
+          "tldr": "history"
+        },
+        {
+          "name": "atuin",
+          "description": "셸 히스토리를 검색·동기화·구조화하는 도구",
+          "tldr": "atuin"
         }
       ]
     },
@@ -570,6 +928,38 @@
           "tldr": "delta",
           "url": "https://github.com/dandavison/delta"
         }
+      ],
+      "commands": [
+        {
+          "name": "git",
+          "description": "분산 버전 관리를 위한 표준 CLI",
+          "tldr": "git"
+        },
+        {
+          "name": "lazygit",
+          "description": "Git 작업을 터미널 UI로 수행하는 도구",
+          "tldr": "lazygit"
+        },
+        {
+          "name": "git log",
+          "description": "Git 커밋 이력을 조회하는 명령",
+          "tldr": "git-log"
+        },
+        {
+          "name": "tig",
+          "description": "Git 이력과 diff를 터미널 UI로 탐색하는 도구",
+          "tldr": "tig"
+        },
+        {
+          "name": "git diff",
+          "description": "Git 변경 내용을 비교해 보여주는 명령",
+          "tldr": "git-diff"
+        },
+        {
+          "name": "delta",
+          "description": "Git diff와 diff 출력을 구문 강조와 레이아웃으로 보기 좋게 표시하는 도구",
+          "tldr": "delta"
+        }
       ]
     },
     {
@@ -588,6 +978,18 @@
           "install": "brew install httpie",
           "tldr": "http",
           "url": "https://httpie.io"
+        }
+      ],
+      "commands": [
+        {
+          "name": "curl",
+          "description": "URL로 HTTP 등 네트워크 요청을 보내는 범용 CLI",
+          "tldr": "curl"
+        },
+        {
+          "name": "http",
+          "description": "사람이 읽기 쉬운 문법과 출력에 초점을 둔 HTTPie 명령",
+          "tldr": "http"
         }
       ]
     },
@@ -631,6 +1033,38 @@
           "install": "brew install p7zip",
           "tldr": "7z",
           "url": "https://www.7-zip.org"
+        }
+      ],
+      "commands": [
+        {
+          "name": "tar",
+          "description": "여러 파일을 하나의 아카이브로 묶거나 푸는 기본 도구",
+          "tldr": "tar"
+        },
+        {
+          "name": "ouch",
+          "description": "확장자를 기준으로 압축·해제를 단순화한 아카이브 도구",
+          "tldr": "ouch"
+        },
+        {
+          "name": "gzip",
+          "description": "단일 파일을 gzip 형식으로 압축·해제하는 기본 도구",
+          "tldr": "gzip"
+        },
+        {
+          "name": "pigz",
+          "description": "gzip 형식을 병렬 처리로 더 빠르게 다루는 도구",
+          "tldr": "pigz"
+        },
+        {
+          "name": "zip",
+          "description": "ZIP 아카이브를 만들고 관리하는 기본 도구",
+          "tldr": "zip"
+        },
+        {
+          "name": "7z",
+          "description": "7-Zip 형식을 포함한 다양한 아카이브를 다루는 도구",
+          "tldr": "7z"
         }
       ]
     },
@@ -700,6 +1134,58 @@
           "install": "brew install uv",
           "tldr": "uv",
           "url": "https://docs.astral.sh/uv/"
+        }
+      ],
+      "commands": [
+        {
+          "name": "make",
+          "description": "Makefile 규칙으로 빌드와 작업 의존성을 실행하는 도구",
+          "tldr": "make"
+        },
+        {
+          "name": "just",
+          "description": "프로젝트 작업 명령을 간단한 레시피로 정의·실행하는 태스크 러너",
+          "tldr": "just"
+        },
+        {
+          "name": "gcc",
+          "description": "GNU Compiler Collection의 C/C++ 등 컴파일러",
+          "tldr": "gcc"
+        },
+        {
+          "name": "clang",
+          "description": "LLVM 기반 C/C++/Objective-C 컴파일러",
+          "tldr": "clang"
+        },
+        {
+          "name": "gdb",
+          "description": "프로그램 실행을 중단점과 스택으로 분석하는 GNU 디버거",
+          "tldr": "gdb"
+        },
+        {
+          "name": "lldb",
+          "description": "LLVM 기반 디버거",
+          "tldr": "lldb"
+        },
+        {
+          "name": "pre-commit",
+          "description": "Git 커밋 전 훅을 구성·실행하는 품질 검사 프레임워크",
+          "tldr": "pre-commit"
+        },
+        {
+          "name": "prek",
+          "description": "pre-commit 호환 훅 실행을 빠르게 하는 도구",
+          "tldr": "prek"
+        },
+        {
+          "name": "python",
+          "description": "Python 인터프리터와 표준 명령줄 실행기",
+          "tldr": "python"
+        },
+        {
+          "name": "uv",
+          "description": "Python 패키지·가상환경·프로젝트 실행을 빠르게 처리하는 도구",
+          "tldr": "uv"
         }
       ]
     }

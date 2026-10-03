@@ -34,10 +34,19 @@ function improvementSummary(solution = '') {
   return summary.length > 48 ? summary.slice(0, 48).join('') + '…' : summary.join('');
 }
 
-function matches(relation) {
+function commandByName(category, name) {
+  return (category.commands || []).find((command) => command.name === name);
+}
+
+function matches(relation, category) {
   const query = state.query.trim().toLowerCase();
   if (!query) return true;
-  return [relation.from, relation.to, relation.group, relation.why, relation.problem, relation.solution]
+  const from = commandByName(category, relation.from);
+  const to = commandByName(category, relation.to);
+  return [
+    relation.from, relation.to, relation.group, relation.why, relation.problem, relation.solution,
+    from?.description, to?.description,
+  ]
     .filter(Boolean)
     .some((value) => value.toLowerCase().includes(query));
 }
@@ -87,7 +96,7 @@ function renderTree() {
     function renderNode(node) {
       const children = node.children.map(renderNode).filter(Boolean).join('');
       const relation = category.relations[node.relationIndex];
-      if (!children && (!relation || !matches(relation))) return '';
+      if (!children && (!relation || !matches(relation, category))) return '';
       if (!relation) {
         const id = `${categoryIndex}:${node.name}`;
         const selected = state.selected === `command:${id}`;
@@ -198,9 +207,10 @@ function selectCommand(id) {
   const name = id.slice(separator + 1);
   const category = state.data.categories[categoryIndex];
   if (!category) return;
+  const command = commandByName(category, name);
   const outgoing = category.relations.filter((relation) => relation.from === name);
   const incoming = category.relations.filter((relation) => relation.to === name);
-  if (!outgoing.length && !incoming.length) return;
+  if (!command && !outgoing.length && !incoming.length) return;
 
   state.selected = `command:${id}`;
   history.replaceState(null, '', `#${encodeURIComponent(name)}`);
@@ -214,12 +224,15 @@ function selectCommand(id) {
     <p class="cmdtreemap-eyebrow">${escapeHtml(category.name)} / 명령어</p>
     <h2>${escapeHtml(name)}</h2>
     <dl class="cmdtreemap-facts">
+      ${command?.description ? `<div><dt>정의</dt><dd>${escapeHtml(command.description)}</dd></div>` : ''}
+      ${command?.usage ? `<div><dt>사용법</dt><dd><code>${escapeHtml(command.usage)}</code></dd></div>` : ''}
+      ${command?.examples?.length ? `<div><dt>예제</dt><dd><ul>${command.examples.map((example) => `<li><code>${escapeHtml(example)}</code></li>`).join('')}</ul></dd></div>` : ''}
       ${outgoing.length ? `<div><dt>이어지는 도구</dt><dd><ul>${relationItems}</ul></dd></div>` : ''}
       ${incoming.length ? `<div><dt>들어오는 관계</dt><dd><ul>${incomingItems}</ul></dd></div>` : ''}
     </dl>
     <section class="cmdtreemap-section"><h3>tldr</h3><div data-tldr-result></div></section>`;
 
-  loadTldr(name, detail.querySelector('[data-tldr-result]'));
+  loadTldr(command?.tldr || name, detail.querySelector('[data-tldr-result]'));
   detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
