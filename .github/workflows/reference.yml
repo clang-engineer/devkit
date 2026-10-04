@@ -1,0 +1,37 @@
+name: Reference validation
+on:
+  push:
+    paths:
+      - 'reference/**'
+      - 'cmdtreemap/**'
+      - '.github/workflows/reference.yml'
+  pull_request:
+    paths:
+      - 'reference/**'
+      - 'cmdtreemap/**'
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: cmdtreemap/go.mod
+      - name: Validate and test cmdtreemap
+        working-directory: cmdtreemap
+        run: |
+          make test
+          go vet ./...
+          go build -o /tmp/cmdtreemap .
+      - name: Validate cheatsheet catalog
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path('reference/cheatsheets')
+          data = json.loads((root / 'catalog.json').read_text())
+          items = [item for group in data['groups'] for item in group['items']]
+          assert len({item['slug'] for item in items}) == len(items)
+          assert all((root / item['file']).is_file() for item in items)
+          PY

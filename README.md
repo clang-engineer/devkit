@@ -8,35 +8,35 @@ reusable pieces, no machine- or project-specific config.
 ## Cheatsheets
 
 Tool introductions and operational references. Full index with descriptions:
-[cheatsheets/README.md](cheatsheets/README.md).
+[cheatsheets/README.md](reference/cheatsheets/README.md).
 
-**Editors & TUI** · [vim](cheatsheets/vim.md) · [lazyvim](cheatsheets/lazyvim.md) · [lazygit](cheatsheets/lazygit.md) · [tmux](cheatsheets/tmux.md) · [yazi](cheatsheets/yazi.md) · [ghostty](cheatsheets/ghostty.md)
+**Editors & TUI** · [vim](reference/cheatsheets/vim.md) · [lazyvim](reference/cheatsheets/lazyvim.md) · [lazygit](reference/cheatsheets/lazygit.md) · [tmux](reference/cheatsheets/tmux.md) · [yazi](reference/cheatsheets/yazi.md) · [ghostty](reference/cheatsheets/ghostty.md)
 
-**Modern CLI** (grep/find/cat/ls replacements) · [ripgrep](cheatsheets/rg.md) · [fzf](cheatsheets/fzf.md) · [jq](cheatsheets/jq.md) · [bat/eza/fd/zoxide/delta…](cheatsheets/modern-cli.md)
+**Modern CLI** (grep/find/cat/ls replacements) · [ripgrep](reference/cheatsheets/rg.md) · [fzf](reference/cheatsheets/fzf.md) · [jq](reference/cheatsheets/jq.md) · [bat/eza/fd/zoxide/delta…](reference/cheatsheets/modern-cli.md)
 
-**Text processing** · [sed & awk](cheatsheets/sed-awk.md) · [regex](cheatsheets/regex.md) · [compression](cheatsheets/compression.md)
+**Text processing** · [sed & awk](reference/cheatsheets/sed-awk.md) · [regex](reference/cheatsheets/regex.md) · [compression](reference/cheatsheets/compression.md)
 
-**Shell** · [bash](cheatsheets/shell.md) · [zsh](cheatsheets/zsh.md) · [powershell](cheatsheets/powershell.md)
+**Shell** · [bash](reference/cheatsheets/shell.md) · [zsh](reference/cheatsheets/zsh.md) · [powershell](reference/cheatsheets/powershell.md)
 
-**System & servers** · [linux](cheatsheets/linux.md) · [process mgmt](cheatsheets/linux-process.md) · [ssh](cheatsheets/ssh.md) · [systemd](cheatsheets/systemd.md) · [nginx](cheatsheets/nginx.md) · [openssl](cheatsheets/openssl.md)
+**System & servers** · [linux](reference/cheatsheets/linux.md) · [process mgmt](reference/cheatsheets/linux-process.md) · [ssh](reference/cheatsheets/ssh.md) · [systemd](reference/cheatsheets/systemd.md) · [nginx](reference/cheatsheets/nginx.md) · [openssl](reference/cheatsheets/openssl.md)
 
-**macOS** · [admin/troubleshoot](cheatsheets/macos-admin.md) · [aerospace](cheatsheets/aerospace.md) · [hammerspoon](cheatsheets/hammerspoon.md)
+**macOS** · [admin/troubleshoot](reference/cheatsheets/macos-admin.md) · [aerospace](reference/cheatsheets/aerospace.md) · [hammerspoon](reference/cheatsheets/hammerspoon.md)
 
-**Data** · [harlequin](cheatsheets/harlequin.md) · [sql-snippets](cheatsheets/sql-snippets.md) · [vertica](cheatsheets/vertica.md) · [elasticsearch](cheatsheets/elasticsearch.md) · [kibana](cheatsheets/kibana.md)
+**Data** · [harlequin](reference/cheatsheets/harlequin.md) · [sql-snippets](reference/cheatsheets/sql-snippets.md) · [vertica](reference/cheatsheets/vertica.md) · [elasticsearch](reference/cheatsheets/elasticsearch.md) · [kibana](reference/cheatsheets/kibana.md)
 
-**Containers & build** · [kubectl](cheatsheets/kubectl.md) · [docker](cheatsheets/docker.md) · [make](cheatsheets/make.md)
+**Containers & build** · [kubectl](reference/cheatsheets/kubectl.md) · [docker](reference/cheatsheets/docker.md) · [make](reference/cheatsheets/make.md)
 
-**Git & version control** · [git](cheatsheets/git.md) · [gh](cheatsheets/gh.md) · [code review glossary](cheatsheets/code-review-glossary.md) · [chezmoi](cheatsheets/chezmoi.md)
+**Git & version control** · [git](reference/cheatsheets/git.md) · [gh](reference/cheatsheets/gh.md) · [code review glossary](reference/cheatsheets/code-review-glossary.md) · [chezmoi](reference/cheatsheets/chezmoi.md)
 
-**Security & secrets** · [sops](cheatsheets/sops.md)
+**Security & secrets** · [sops](reference/cheatsheets/sops.md)
 
-**Config formats** · [toml](cheatsheets/toml.md)
+**Config formats** · [toml](reference/cheatsheets/toml.md)
 
-**Dev tools** · [terminal tooling](cheatsheets/terminal-tooling.md) · [mise](cheatsheets/mise.md) · [curl](cheatsheets/curl.md) · [taskwarrior](cheatsheets/taskwarrior.md) · [Python PyPI publishing](cheatsheets/python-pypi-publishing.md) · [claude-code](cheatsheets/claude-code.md) · [ccusage](cheatsheets/ccusage.md) · [opencode](cheatsheets/opencode.md) · [gdb](cheatsheets/gdb.md)
+**Dev tools** · [terminal tooling](reference/cheatsheets/terminal-tooling.md) · [mise](reference/cheatsheets/mise.md) · [curl](reference/cheatsheets/curl.md) · [taskwarrior](reference/cheatsheets/taskwarrior.md) · [Python PyPI publishing](reference/cheatsheets/python-pypi-publishing.md) · [claude-code](reference/cheatsheets/claude-code.md) · [ccusage](reference/cheatsheets/ccusage.md) · [opencode](reference/cheatsheets/opencode.md) · [gdb](reference/cheatsheets/gdb.md)
 
 ## cmdtreemap
 
-CLI 도구의 대안·진화 관계를 터미널 TUI와 Web tree로 탐색합니다. 구조, 개발, 실행, WASM 빌드와 블로그 배포 방법은 [cmdtreemap/README.md](cmdtreemap/README.md)를 참고하세요.
+CLI 도구의 대안·진화 관계를 터미널 TUI와 Web tree로 탐색합니다. 구조, 개발, 실행, 빌드와 데이터 배포 방법은 [cmdtreemap/README.md](cmdtreemap/README.md)를 참고하세요.
 
 ## Templates
 
@@ -49,3 +49,4 @@ Boilerplate starting points — copy and adapt.
 | [pg-dump.sh](templates/pg-dump.sh) | PostgreSQL dump helper |
 | [port.sh](templates/port.sh) | Find / free a process by port |
 | [swap-jar.sh](templates/swap-jar.sh) | Swap a running JAR in place |
+

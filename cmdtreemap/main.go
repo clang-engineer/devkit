@@ -12,7 +12,8 @@ import (
 	"github.com/clang/cmdtreemap/internal/tui"
 )
 
-//go:embed commands.json
+//go:generate cp ../reference/cli/catalog.json catalog.json
+//go:embed catalog.json
 var commandsJSON []byte
 
 func main() {
@@ -30,3 +31,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+

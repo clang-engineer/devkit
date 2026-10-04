@@ -1,0 +1,248 @@
+# LazyGit Cheatsheet
+
+> Git TUI. `git add -p`, `git log --graph`, `git rebase -i`, `git stash` 같은 작업을 키 한두 번으로.
+> CLI git 명령을 외우지 않아도 거의 모든 워크플로가 가능.
+> 공식: https://github.com/jesseduffield/lazygit
+
+## 개념 흐름
+
+```text
+Status → Files → Branches → Commits → Stash
+  ↓        ↓         ↓          ↓        ↓
+  a        Space     n          e        Space
+  변경확인  스테이지   브랜치생성   리베이스   적용
+```
+
+핵심 명령어:
+
+| 단계 | 명령 | 설명 |
+|------|------|------|
+| 스테이지 | `Space` (Files) | 파일/히크 단위 토글 |
+| 커밋 | `c` (한 줄) / `C` (에디터) | 메시지 입력 |
+| 브랜치 | `n` (Branches) | 새 브랜치 생성 |
+| 리베이스 | `e` (Commits) | 인터랙티브 리베이스 |
+| stash | `Space` (Stash) | stash 적용 |
+
+## 연결 도구
+
+| 도구 | 관계 |
+|------|------|
+| git | lazygit이 감싸는 CLI 도구 |
+| gh | GitHub CLI와 함께 사용 |
+| delta | diff 페이저 (lazygit 내부에서 사용) |
+| LazyVim | `<leader>gg`로 lazygit 실행 |
+
+## 30초만 본다면
+
+| 상황 | 키 |
+|---|---|
+| 패널 직접 점프 | `1`~`5` (Status·Files·Branches·Commits·Stash) |
+| 현재 패널 도움말 | `?` (가장 좋은 학습 자료) |
+| 파일 스테이지 토글 | `Files`에서 `Space` |
+| Hunk 단위 스테이지 | 파일에 `Enter` → hunk마다 `Space` |
+| 한 줄 커밋 메시지 | `c` |
+| 멀티라인 (에디터) | `C` (대문자) |
+| amend | `A` |
+| 브랜치 만들기 | `Branches`에서 `n` |
+| 전체 브랜치 관계 보기 | `Status`에서 `a` (`A`는 역순) |
+| 인터랙티브 리베이스 | `Commits`에서 베이스 위에 `e` |
+| squash / fixup / drop / reword | `s` / `f` / `d` / `r` |
+| stash 적용 | `Stash`에서 `Space` |
+| 종료 | `q` |
+
+## 설치
+
+```sh
+brew install lazygit                            # macOS / Linux
+scoop install lazygit                           # Windows
+go install github.com/jesseduffield/lazygit@latest
+```
+
+## 실행
+
+```sh
+lazygit         # Git 리포지토리 내부에서
+lg              # 흔한 alias
+```
+
+LazyVim에서: `<leader>gg` (cwd) / `<leader>gG` (root dir)
+
+## 인터페이스 구성
+
+```
+┌──────────┬─────────────┐
+│ 1 Status │             │
+├──────────┤             │
+│ 2 Files  │  Main view  │
+├──────────┤  (diff,     │
+│ 3 Branch │   commit,   │
+├──────────┤   log...)   │
+│ 4 Commits│             │
+├──────────┤             │
+│ 5 Stash  │             │
+└──────────┴─────────────┘
+```
+
+`1`~`5` 숫자키 또는 `←`/`→` 으로 패널 이동. 패널 **안의 탭** 전환은 `[`/`]`.
+
+## 주요 단축키
+
+### 전역
+
+| 키 | 동작 |
+|----|------|
+| `?` | 현재 패널 도움말 (가장 좋은 학습 자료) |
+| `1`~`5` / `←` `→` | 패널 직접 점프 / 이전·다음 패널 |
+| `[` `]` | 패널 **안의 탭** 전환 (Branches: Local↔Remotes↔Tags 등) |
+| `R` | 새로고침 (대문자) |
+| `/` | 검색 |
+| `:` | 커스텀 명령(셸) 실행 |
+| `+` / `_` | 화면 모드 전환 (normal/half/full) |
+| `Esc` | 취소/뒤로 |
+| `q` | 종료 |
+
+### Files 패널 (스테이징)
+
+| 키 | 동작 |
+|----|------|
+| `Space` | 파일 스테이지 토글 |
+| `a` | 모든 변경 스테이지 토글 |
+| `Enter` | 파일 열어 hunk/line 단위 스테이지 |
+| `c` | 커밋 (한 줄 메시지) |
+| `C` | $EDITOR로 커밋 (멀티라인) |
+| `A` | amend (마지막 커밋에 추가) |
+| `d` | 변경 폐기 |
+| `D` | reset (전체 폐기) |
+| `s` | stash |
+| `e` | $EDITOR로 파일 열기 |
+| `=` / `-` | 모든 폴더 열기/닫기 |
+
+### Branches 패널
+
+| 키 | 동작 |
+|----|------|
+| `Space` | 체크아웃 |
+| `n` | 새 브랜치 |
+| `d` | 브랜치 삭제 |
+| `r` | 체크아웃된 브랜치를 선택 브랜치 위로 rebase |
+| `M` | 선택 브랜치를 현재로 merge |
+| `f` | fast-forward (체크아웃 없이) |
+| `R` | 이름 변경 |
+| `P` / `p` | Push / Pull (전역 키) |
+
+### Branches 패널 내부 탭 (Local / Remotes / Tags)
+
+Branches 패널(3번)은 안에 탭 3개를 가진다. Local Branches는 **로컬만** 보여준다 (의도된 분리).
+
+| 키 | 동작 |
+|----|------|
+| `[` `]` | 패널 내 탭 순환 (Local ↔ Remotes ↔ Tags) — **remote 브랜치는 여기 있다** |
+
+remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` → 브랜치 목록 → `Space`(로컬 tracking 브랜치 생성).
+목록에 새 브랜치가 없으면 Remotes에서 remote를 선택하고 `f`로 fetch한다. 현재 기본 `F`는 fork remote 추가다.
+
+> "remote 브랜치가 안 보인다"는 Branches 패널(3)에서 `]`(다음 탭)로 Remotes 탭에 넘어가면 된다. Local Branches 탭은 로컬만 보여준다.
+
+### Commits 패널
+
+| 키 | 동작 |
+|----|------|
+| `Enter` | 커밋 상세 / 파일별 diff |
+| `Space` | 그 커밋으로 체크아웃 |
+| `r` | 메시지 reword (HEAD가 아니어도 됨) |
+| `e` | 그 커밋 edit (인터랙티브 리베이스 자동) |
+| `d` | 커밋 drop |
+| `s` | squash (위 커밋과 합치기) |
+| `f` | fixup |
+| `Ctrl+J` / `Ctrl+K` | 커밋 위/아래 이동 (재정렬) |
+| `g` | reset to (이 커밋으로 reset) |
+| `C` | 커밋 복사 (cherry-pick 마크) |
+| `V` | 복사한 커밋 붙여넣기 (cherry-pick 적용) |
+| `y` | 커밋 정보 복사 |
+| `Ctrl+S` | 로그 필터 모드 |
+
+> `g` reset은 현재 체크아웃된 브랜치 포인터를 선택 커밋으로 옮긴다. hard 모드를 고르면 미커밋 변경도 제거되므로 실행 전 대상 브랜치와 `git status`를 확인한다. 실수했다면 `git reflog show <branch>`에서 reset 직전 SHA를 찾아 복구한다.
+
+### Stash 패널
+
+| 키 | 동작 |
+|----|------|
+| `Space` | apply |
+| `g` | pop |
+| `d` | drop |
+
+## 활용 시나리오
+
+### 1. Hunk 단위 커밋 (가장 자주)
+
+1. Files 패널에서 파일 위에 커서
+2. `Enter`로 들어가서 hunk별 `Space`
+3. 더 잘게 쪼개고 싶으면 `Enter`(line mode)에서 `Space`
+4. `Esc`로 나와서 `c` → 메시지 → Enter
+
+### 2. 인터랙티브 리베이스 (커밋 정리)
+
+1. Commits 패널에서 베이스 커밋 위에 커서 → `e`
+2. 각 커밋에 `s`(squash) / `f`(fixup) / `d`(drop) / `r`(reword)
+3. 진행/중단/건너뛰기가 필요하면 `m`으로 merge/rebase options를 열어 선택
+
+### 3. 충돌 해결
+
+머지/리베이스 중 충돌 → Files 패널에 충돌 파일 → `Enter`로 hunk 보면서
+`Space`(커서 위치 hunk 채택) / `b`(양쪽 다 채택), `←`/`→`로 conflict 이동. (`ours`/`theirs` 전용 키는 없음)
+
+### 4. 멀티라인 커밋 메시지
+
+`C` (대문자) → `$EDITOR`(=nvim) 열림 → 정상 커밋 작성.
+
+### 5. 브랜치 관계 / 병합 여부 진단
+
+| 목적 | 방법 | 해석 |
+|------|------|------|
+| 전체 관계 확인 | Status에서 `a` (`A`는 역순) | 모든 브랜치의 분기·병합 지점을 그래프로 표시 |
+| upstream 관계 | Branches의 `✓`, `↑N`, `↓N` | 해당 브랜치와 원격 upstream의 동기화 상태 |
+| main보다 뒤처진 정도 | `showDivergenceFromBaseBranch: arrowAndNumber` | 가장 가까운 main branch 대비 `↓N` 표시 |
+| 특정 브랜치 로그 | Branches에서 `/` 검색 → `Enter` | 선택한 브랜치의 커밋 표시 |
+| GitHub PR 상태 | Branches의 PR 아이콘 | 보라색은 merged (`gh auth login` 필요) |
+
+커밋 색상은 green = `git.mainBranches` 중 하나에 포함, yellow = 미포함이지만 upstream에 push됨,
+red = 미포함이고 아직 push되지 않음을 뜻한다.
+
+> 커밋 색상과 그래프는 커밋 조상 관계를 보여준다. 따라서 regular merge와 fast-forward는 판별할 수 있지만,
+> 원래 커밋 SHA를 보존하지 않는 squash/rebase merge의 완료 여부는 PR 상태 등으로 확인해야 한다.
+
+## 설정 (`~/.config/lazygit/config.yml`)
+
+```yaml
+gui:
+  showFileTree: true
+  expandFocusedSidePanel: true
+  nerdFontsVersion: "3"
+  theme:
+    activeBorderColor: [cyan, bold]
+  # 브랜치 패널에 가장 가까운 main branch 대비 behind 숫자 표시
+  showDivergenceFromBaseBranch: arrowAndNumber
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+```
+
+기본 `git.mainBranches`는 `[master, main]`이다. 프로젝트의 실제 main branch가 다를 때만 변경한다.
+시작 화면을 대시보드 대신 전체 브랜치 그래프로 바꾸려면 `gui.statusPanelView: allBranchesLog`를 추가한다.
+
+LazyVim 통합 설정은 https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/lazygit.lua 참고
+(Windows에서 nvim-remote editPreset 비활성화 처리).
+
+## 트러블슈팅
+
+| 문제 | 해결 |
+|------|------|
+| 실행 안 됨 | Git 리포지토리 내부에서 실행 |
+| 한글/아이콘 깨짐 | NerdFont 사용 |
+| diff 색상 이상 | `config.yml` pager 설정 (delta 미설치 시 제거) |
+
+## 더 보기
+
+- `?` (lazygit 안에서)
+- 키바인딩 전체: https://github.com/jesseduffield/lazygit/blob/master/docs/keybindings/Keybindings_en.md

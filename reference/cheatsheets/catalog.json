@@ -1,0 +1,547 @@
+{
+  "intro": "도구를 바로 GitHub로 보내기 전에 블로그 안에서 짧은 설명, tldr 빠른 예시, 공식 문서, devkit 커스텀 치트시트를 순서대로 확인한다.",
+  "source_repo": "https://github.com/clang-engineer/devkit/tree/main/reference/cheatsheets",
+  "groups": [
+    {
+      "title": "에디터 & TUI",
+      "items": [
+        {
+          "slug": "vim",
+          "name": "Vim",
+          "desc": "Vim 모드, motion, operator를 빠르게 다시 확인한다.",
+          "tldr": "common/vim",
+          "official": [
+            {
+              "label": "Vim documentation",
+              "url": "https://www.vim.org/docs.php"
+            }
+          ],
+          "custom": {
+            "label": "devkit Vim Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/vim.md"
+          },
+          "file": "vim.md"
+        },
+        {
+          "slug": "lazyvim",
+          "name": "LazyVim",
+          "desc": "LazyVim 키맵과 Extra 중심의 Neovim 배포판.",
+          "official": [
+            {
+              "label": "LazyVim documentation",
+              "url": "https://www.lazyvim.org/"
+            }
+          ],
+          "custom": {
+            "label": "devkit LazyVim Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/lazyvim.md"
+          },
+          "file": "lazyvim.md"
+        },
+        {
+          "slug": "lazygit",
+          "name": "LazyGit",
+          "desc": "Git 작업을 TUI에서 빠르게 처리하는 도구.",
+          "tldr": "common/lazygit",
+          "official": [
+            {
+              "label": "LazyGit repository",
+              "url": "https://github.com/jesseduffield/lazygit"
+            }
+          ],
+          "custom": {
+            "label": "devkit LazyGit Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/lazygit.md"
+          },
+          "file": "lazygit.md"
+        },
+        {
+          "slug": "tmux",
+          "name": "tmux",
+          "desc": "세션, 윈도우, 패널을 관리하는 terminal multiplexer.",
+          "tldr": "common/tmux",
+          "official": [
+            {
+              "label": "tmux wiki",
+              "url": "https://github.com/tmux/tmux/wiki"
+            },
+            {
+              "label": "tmux manual",
+              "url": "https://man7.org/linux/man-pages/man1/tmux.1.html"
+            }
+          ],
+          "custom": {
+            "label": "devkit tmux Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tmux.md"
+          },
+          "file": "tmux.md"
+        },
+        {
+          "slug": "ghostty",
+          "name": "Ghostty",
+          "desc": "빠른 네이티브 터미널 에뮬레이터와 설정·키맵.",
+          "official": [
+            {
+              "label": "Ghostty documentation",
+              "url": "https://ghostty.org/docs"
+            }
+          ],
+          "custom": {
+            "label": "devkit Ghostty Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/ghostty.md"
+          },
+          "file": "ghostty.md"
+        },
+        {
+          "slug": "yazi",
+          "name": "Yazi",
+          "desc": "Rust 기반 터미널 파일 매니저의 검색, 키맵, 플러그인.",
+          "tldr": "common/yazi",
+          "official": [
+            {
+              "label": "Yazi documentation",
+              "url": "https://yazi-rs.github.io/docs/"
+            }
+          ],
+          "custom": {
+            "label": "devkit Yazi Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/yazi.md"
+          },
+          "file": "yazi.md"
+        },
+        {
+          "slug": "terminal-tui",
+          "name": "terminal-tui",
+          "desc": "현대적 TUI 도구 지도와 선택 기준 (lazy 계열, 영역별 대안, 도입 우선순위)",
+          "file": "terminal-tui.md",
+          "official": [],
+          "custom": {
+            "label": "devkit terminal-tui",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/terminal-tui.md"
+          }
+        }
+      ]
+    },
+    {
+      "title": "셸",
+      "items": [
+        {
+          "slug": "shell",
+          "name": "Shell",
+          "desc": "Bash set 옵션, 리다이렉션, job 관리처럼 셸 공통 흐름을 정리한다.",
+          "official": [
+            {
+              "label": "Bash manual",
+              "url": "https://www.gnu.org/software/bash/manual/bash.html"
+            }
+          ],
+          "custom": {
+            "label": "devkit Shell Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/shell.md"
+          },
+          "file": "shell.md"
+        },
+        {
+          "slug": "zsh",
+          "name": "Zsh",
+          "desc": "Zsh 단축키, glob, alias와 대화형 셸 사용법.",
+          "tldr": "common/zsh",
+          "official": [
+            {
+              "label": "Zsh documentation",
+              "url": "https://zsh.sourceforge.io/Doc/"
+            }
+          ],
+          "custom": {
+            "label": "devkit Zsh Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/zsh.md"
+          },
+          "file": "zsh.md"
+        },
+        {
+          "slug": "atuin",
+          "name": "Atuin",
+          "desc": "구조화된 shell history 검색과 Ctrl-R 대체.",
+          "tldr": "common/atuin",
+          "official": [
+            {
+              "label": "Atuin documentation",
+              "url": "https://docs.atuin.sh/"
+            }
+          ],
+          "custom": {
+            "label": "devkit Atuin Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/atuin.md"
+          },
+          "file": "atuin.md"
+        },
+        {
+          "slug": "fzf",
+          "name": "fzf",
+          "desc": "파일, 디렉터리, 브랜치 목록을 고르는 범용 fuzzy finder.",
+          "tldr": "common/fzf",
+          "official": [
+            {
+              "label": "fzf repository",
+              "url": "https://github.com/junegunn/fzf"
+            }
+          ],
+          "custom": {
+            "label": "devkit fzf Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/fzf.md"
+          },
+          "file": "fzf.md"
+        },
+        {
+          "slug": "zoxide",
+          "name": "zoxide",
+          "desc": "방문 이력을 학습해 디렉터리로 빠르게 점프한다.",
+          "tldr": "common/zoxide",
+          "official": [
+            {
+              "label": "zoxide repository",
+              "url": "https://github.com/ajeetdsouza/zoxide"
+            }
+          ],
+          "custom": {
+            "label": "devkit zoxide Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/zoxide.md"
+          },
+          "file": "zoxide.md"
+        },
+        {
+          "slug": "powershell",
+          "name": "PowerShell",
+          "desc": "Bash와 다른 객체 Pipeline, 서비스 관리, Windows 운영 명령.",
+          "tldr": "common/powershell",
+          "official": [
+            {
+              "label": "PowerShell documentation",
+              "url": "https://learn.microsoft.com/powershell/"
+            }
+          ],
+          "custom": {
+            "label": "devkit PowerShell Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/powershell.md"
+          },
+          "file": "powershell.md"
+        }
+      ]
+    },
+    {
+      "title": "시스템 & 서버",
+      "items": [
+        {
+          "slug": "ssh",
+          "name": "SSH",
+          "desc": "SSH 접속, agent, config, scp/rsync 기반 원격 작업.",
+          "tldr": "common/ssh",
+          "official": [
+            {
+              "label": "OpenSSH manual pages",
+              "url": "https://www.openssh.com/manual.html"
+            }
+          ],
+          "custom": {
+            "label": "devkit SSH Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/ssh.md"
+          },
+          "file": "ssh.md"
+        },
+        {
+          "slug": "systemd",
+          "name": "systemd",
+          "desc": "서비스와 타이머 관리, journalctl 로그 확인.",
+          "tldr": "linux/systemctl",
+          "official": [
+            {
+              "label": "systemd manual pages",
+              "url": "https://www.freedesktop.org/software/systemd/man/latest/"
+            }
+          ],
+          "custom": {
+            "label": "devkit systemd Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/systemd.md"
+          },
+          "file": "systemd.md"
+        }
+      ]
+    },
+    {
+      "title": "macOS",
+      "items": [
+        {
+          "slug": "aerospace",
+          "name": "AeroSpace",
+          "desc": "macOS 타일링 Window Manager 설정과 명령.",
+          "official": [
+            {
+              "label": "AeroSpace guide",
+              "url": "https://nikitabobko.github.io/AeroSpace/guide"
+            }
+          ],
+          "custom": {
+            "label": "devkit AeroSpace Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/aerospace.md"
+          },
+          "file": "aerospace.md"
+        },
+        {
+          "slug": "hammerspoon",
+          "name": "Hammerspoon",
+          "desc": "Lua 기반 macOS 자동화와 윈도우 관리.",
+          "official": [
+            {
+              "label": "Hammerspoon documentation",
+              "url": "https://www.hammerspoon.org/docs/"
+            }
+          ],
+          "custom": {
+            "label": "devkit Hammerspoon Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/hammerspoon.md"
+          },
+          "file": "hammerspoon.md"
+        }
+      ]
+    },
+    {
+      "title": "데이터",
+      "items": [
+        {
+          "slug": "elasticsearch",
+          "name": "Elasticsearch",
+          "desc": "Query DSL, bulk, _cat API와 운영 확인 명령.",
+          "official": [
+            {
+              "label": "Elasticsearch documentation",
+              "url": "https://www.elastic.co/docs/"
+            }
+          ],
+          "custom": {
+            "label": "devkit Elasticsearch Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/elasticsearch.md"
+          },
+          "file": "elasticsearch.md"
+        }
+      ]
+    },
+    {
+      "title": "Git & 버전 관리",
+      "items": [
+        {
+          "slug": "git",
+          "name": "Git",
+          "desc": "브랜치, commit, rebase, stash 등 일상 버전 관리 명령.",
+          "tldr": "common/git",
+          "official": [
+            {
+              "label": "Git documentation",
+              "url": "https://git-scm.com/docs"
+            }
+          ],
+          "custom": {
+            "label": "devkit Git Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/git.md"
+          },
+          "file": "git.md"
+        },
+        {
+          "slug": "git-delta",
+          "name": "git-delta",
+          "desc": "Git diff와 show 출력을 읽기 쉽게 만드는 syntax-highlighting pager.",
+          "tldr": "common/delta",
+          "official": [
+            {
+              "label": "delta repository",
+              "url": "https://github.com/dandavison/delta"
+            }
+          ],
+          "custom": {
+            "label": "devkit git-delta Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/git-delta.md"
+          },
+          "file": "git-delta.md"
+        },
+        {
+          "slug": "chezmoi",
+          "name": "chezmoi",
+          "desc": "dotfiles를 source/target 모델로 선언적으로 관리한다.",
+          "tldr": "common/chezmoi",
+          "official": [
+            {
+              "label": "chezmoi documentation",
+              "url": "https://www.chezmoi.io/"
+            }
+          ],
+          "custom": {
+            "label": "devkit chezmoi Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/chezmoi.md"
+          },
+          "file": "chezmoi.md"
+        }
+      ]
+    },
+    {
+      "title": "보안 & 비밀정보",
+      "items": [
+        {
+          "slug": "sops",
+          "name": "SOPS",
+          "desc": "age와 함께 설정 파일을 암호화해 Git에서 관리한다.",
+          "tldr": "common/sops",
+          "official": [
+            {
+              "label": "SOPS repository",
+              "url": "https://github.com/getsops/sops"
+            }
+          ],
+          "custom": {
+            "label": "devkit SOPS Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/sops.md"
+          },
+          "file": "sops.md"
+        }
+      ]
+    },
+    {
+      "title": "개발 도구",
+      "items": [
+        {
+          "slug": "mise",
+          "name": "mise",
+          "desc": "여러 언어 런타임 버전과 작업 환경을 통합 관리한다.",
+          "tldr": "common/mise",
+          "official": [
+            {
+              "label": "mise documentation",
+              "url": "https://mise.jdx.dev/"
+            }
+          ],
+          "custom": {
+            "label": "devkit mise Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/mise.md"
+          },
+          "file": "mise.md"
+        },
+        {
+          "slug": "uv",
+          "name": "uv",
+          "desc": "Python 패키지, 가상환경, lockfile, tool 실행을 빠르게 관리한다.",
+          "tldr": "common/uv",
+          "official": [
+            {
+              "label": "uv documentation",
+              "url": "https://docs.astral.sh/uv/"
+            }
+          ],
+          "custom": {
+            "label": "devkit uv Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/uv.md"
+          },
+          "file": "uv.md"
+        },
+        {
+          "slug": "taskwarrior",
+          "name": "Taskwarrior",
+          "desc": "CLI 기반 태스크 관리, 필터, 날짜, JSON export.",
+          "tldr": "common/task",
+          "official": [
+            {
+              "label": "Taskwarrior documentation",
+              "url": "https://taskwarrior.org/docs/"
+            }
+          ],
+          "custom": {
+            "label": "devkit Taskwarrior Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/taskwarrior.md"
+          },
+          "file": "taskwarrior.md"
+        },
+        {
+          "slug": "python-pypi-publishing",
+          "name": "Python PyPI Publishing",
+          "desc": "uv 빌드, GitHub OIDC, Trusted Publishing 배포 흐름.",
+          "official": [
+            {
+              "label": "PyPI Trusted Publishers",
+              "url": "https://docs.pypi.org/trusted-publishers/"
+            },
+            {
+              "label": "Python packaging guide",
+              "url": "https://packaging.python.org/"
+            }
+          ],
+          "custom": {
+            "label": "devkit PyPI Publishing Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/python-pypi-publishing.md"
+          },
+          "file": "python-pypi-publishing.md"
+        },
+        {
+          "slug": "claude-code",
+          "name": "Claude Code",
+          "desc": "Anthropic의 터미널 AI 코딩 에이전트 사용 흐름.",
+          "official": [
+            {
+              "label": "Claude Code documentation",
+              "url": "https://docs.anthropic.com/en/docs/claude-code"
+            }
+          ],
+          "custom": {
+            "label": "devkit Claude Code Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/claude-code.md"
+          },
+          "file": "claude-code.md"
+        },
+        {
+          "slug": "ccusage",
+          "name": "ccusage",
+          "desc": "Claude Code 사용량 집계와 임계치 경보.",
+          "official": [
+            {
+              "label": "ccusage repository",
+              "url": "https://github.com/ryoppippi/ccusage"
+            }
+          ],
+          "custom": {
+            "label": "devkit ccusage Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/ccusage.md"
+          },
+          "file": "ccusage.md"
+        },
+        {
+          "slug": "opencode",
+          "name": "opencode",
+          "desc": "Provider-agnostic 터미널 AI 코딩 에이전트.",
+          "official": [
+            {
+              "label": "opencode documentation",
+              "url": "https://opencode.ai/docs/"
+            }
+          ],
+          "custom": {
+            "label": "devkit opencode Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/opencode.md"
+          },
+          "file": "opencode.md"
+        }
+      ]
+    },
+    {
+      "title": "도구 사전",
+      "items": [
+        {
+          "slug": "tools-dictionary",
+          "name": "tools-dictionary",
+          "desc": "CLI 도구/개념 사전 + 핵심 명령어 (curl, docker, nginx, systemctl 등)",
+          "file": "tools-dictionary.md",
+          "official": [],
+          "custom": {
+            "label": "devkit tools-dictionary",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tools-dictionary.md"
+          }
+        }
+      ]
+    }
+  ]
+}

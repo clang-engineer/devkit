@@ -46,9 +46,9 @@ test('tldr renders aliases and placeholders without leaking markup', () => {
 });
 
 test('local and deployed pages load their configured shared data paths', () => {
-  assert.equal(setup([], '../commands.json').requests[0], '../commands.json');
-  assert.equal(setup([], './commands.json').requests[0], './commands.json');
-  assert.equal(setup([]).requests[0], './commands.json');
+  assert.equal(setup([], '../catalog.json').requests[0], '../catalog.json');
+  assert.equal(setup([], './catalog.json').requests[0], './catalog.json');
+  assert.equal(setup([]).requests[0], './catalog.json');
 });
 
 test('tree escapes data and uses one delegated click listener', () => {
@@ -164,3 +164,4 @@ test('selection preserves tree DOM and search hides details', () => {
   assert.equal(elements.get('[data-detail]').hidden, true);
   assert.ok(tree.innerHTML.includes('검색 결과가 없습니다'));
 });
+
