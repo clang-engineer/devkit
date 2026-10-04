@@ -35,8 +35,6 @@ cmdtreemap/
 ├── internal/
 │   ├── model/                 # 공통 JSON을 읽는 Go 데이터 구조
 │   └── tui/                   # Bubble Tea 기반 터미널 UI
-├── scripts/
-│   └── sync-blog.sh           # 블로그 데이터 가져오기 호출
 └── web/
     ├── index.html             # Web 진입점
     ├── app.js                 # DOM 생성·tree·상세 화면·검색
@@ -110,42 +108,14 @@ Web UI의 1차 범위:
 - tldr fetch
 - 공식 문서 링크
 
-## 블로그 배포
+## 블로그 연결
 
-독립 웹 화면은 `web/`, 공통 데이터 원본은 `../reference/cli/catalog.json`에 둔다. 블로그의 화면은 블로그 저장소에서 관리하며, devkit에서는 데이터만 가져간다.
+블로그는 공개된 원본 JSON을 브라우저에서 직접 읽는다. 데이터 복사나 동기화 스크립트 없이 블로그 자체의 화면·검색으로 표시한다.
 
-```text
- devkit/reference/{cheatsheets/, cli/}
-          │
-          │ scripts/sync-blog.sh
-          ▼
- clang-engineer.github.io/cmdtreemap/
-```
+- CLI 지도: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/cli/catalog.json`
+- 치트시트 목록: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/cheatsheets/catalog.json`
 
-데이터를 갱신할 때만 sync script를 사용한다. 블로그 화면 수정은 블로그 저장소에서 수행한다.
-
-```bash
-cd /path/to/cmdtreemap
-./scripts/sync-blog.sh
-```
-
-블로그 저장소 경로가 기본값과 다르면 첫 번째 인자로 지정한다.
-
-```bash
-./scripts/sync-blog.sh /path/to/clang-engineer.github.io
-```
-
-동기화 대상은 치트시트 메타와 CLI 관계 데이터만이다.
-
-```text
-_data/cheatsheets.json
-cmdtreemap/catalog.json
-_data/devkit-source.json
-```
-
-블로그의 `tools/sync-devkit.py`가 `reference/cheatsheets/catalog.json`과 `reference/cli/catalog.json`만 가져온다. HTML·JS·CSS는 덮어쓰지 않는다.
-동기화 시 치트시트 경로와 관계의 도구 참조를 검증한다.
-그 외 파일은 삭제하지 않는다.
+원본 변경은 GitHub raw 캐시 갱신 후 다음 페이지 로드에 반영된다. 데이터 변경만으로 블로그를 재배포할 필요는 없다. 네트워크 요청이 실패하면 화면의 다시 시도 버튼을 사용한다. 두 화면은 각자 독립된 카탈로그를 읽는다.
 
 ## 개발 흐름
 
@@ -153,8 +123,7 @@ _data/devkit-source.json
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
 3. 루트에서 `make test`로 Go·웹·배포 테스트를 실행한다.
 4. 로컬 Web 서버에서 tree, 검색, 상세, tldr를 확인한다.
-5. `scripts/sync-blog.sh`로 블로그 배포본을 갱신한다.
-6. 블로그의 `/cmdtreemap/`에서 다시 확인한다.
+5. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/` 또는 `/cmdtreemap/`에서 확인한다.
 
 ## 배포 전 체크리스트
 
@@ -167,7 +136,6 @@ _data/devkit-source.json
 [ ] node --check web/app.js
 [ ] 로컬 Web 서버에서 tree와 상세 화면 확인
 [ ] tldr와 공식 문서 링크 확인
-[ ] scripts/sync-blog.sh 실행
 [ ] 블로그 /cmdtreemap/ 확인
 ```
 
@@ -178,4 +146,4 @@ _data/devkit-source.json
 
 CLI 데이터 원본은 `../reference/cli/catalog.json`이다. 이 디렉터리의 `catalog.json`은 Go 내장용 생성본이다. 테스트와 실행 전 `make prepare`, 직접 빌드 전 `go generate`로 갱신한다. 웹은 원본을 직접 읽는다. 블로그는 자체 화면과 검색을 유지하며 데이터만 가져간다.
 
-블로그 배포 Actions는 실행마다 devkit의 main 커밋을 한 번 확인하고 그 커밋에서 두 데이터를 함께 가져온다. 사용한 커밋은 `_data/devkit-source.json`에 기록한다. devkit 변경은 다음 블로그 빌드에 반영되며, 정기 빌드는 6시간마다 실행한다. 즉시 반영하려면 블로그 Build and Deploy를 수동 실행한다.
+블로그는 devkit main의 원본 JSON을 직접 읽는다. Go 내장용 생성본은 CLI 빌드를 위한 파일이며 블로그 동기화용 복사본이 아니다.
