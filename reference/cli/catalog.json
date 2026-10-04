@@ -14,7 +14,7 @@
           "problem": "긴 파일 읽기 시 구문 구분이 어렵고, 줄번호가 없어 위치 파악이 힘들다",
           "solution": "200+ 언어 구문강조, Git 변경 라인 표시, 자동 페이징, 줄번호, 개인 대화형 shell에서 alias cat='bat --paging=never'로 익숙한 입력 유지",
           "relation": "alternative",
-          "boundary": "대화형 열람의 표현 개선이 중심이다. 비대화형 출력에서는 장식 없는 내용으로 출력하지만, 설치 여부·옵션·설정의 차이가 있으므로 공유 스크립트에서 cat을 일괄 치환하지 않는다. alias는 옵션 호환성을 보장하지 않는다. 기본 외부 cat은 command cat으로 호출할 수 있다",
+          "boundary": "대화형 파일 열람은 대신할 수 있다. 비대화형 출력은 기본적으로 장식 없이 나오지만 설치·옵션·설정까지 cat과 같지는 않다. 개인 shell에서는 alias cat='bat --paging=never'로 이름을 유지할 수 있고, 원래 명령은 command cat으로 호출한다. 기존 공유 스크립트는 동작을 확인한 뒤 전환한다.",
           "install": "brew install bat",
           "tldr": "bat",
           "url": "https://github.com/sharkdp/bat"
@@ -27,7 +27,7 @@
           "problem": "파일 목록에 Git 상태, 아이콘, 트리 뷰가 없어 한눈에 파악이 어렵다",
           "solution": "아이콘, Git 통합, 트리 뷰, 정렬 옵션, 색상 지원, alias ll='eza -l'로 기존 개인 단축 이름 재사용",
           "relation": "alternative",
-          "boundary": "일부 환경에서 기본 ls보다 느릴 수 있음. ll 같은 단축 이름은 유지할 수 있지만 ls와 옵션은 동일하지 않다. 기존 ls는 command ls로 사용한다",
+          "boundary": "개인 터미널에서 파일 목록·상세 정보·트리를 보는 작업은 대신할 수 있다. 옵션과 출력 형식은 ls와 완전히 같지 않아 기존 스크립트의 ls를 그대로 치환하지 않는다. alias ls='eza' 또는 alias ll='eza -l'로 입력 습관을 유지할 수 있고 원래 명령은 command ls로 호출한다.",
           "install": "brew install eza",
           "tldr": "eza",
           "url": "https://github.com/eza-community/eza"
@@ -42,7 +42,8 @@
           "relation": "alternative",
           "install": "brew install lsd",
           "tldr": "lsd",
-          "url": "https://github.com/lsd-rs/lsd"
+          "url": "https://github.com/lsd-rs/lsd",
+          "boundary": "대화형 파일 목록 조회는 대신할 수 있다. 옵션·설정·출력 형식의 완전한 ls 호환을 전제하지 않으며 아이콘에는 지원 폰트가 필요하다. 개인 shell의 alias ls='lsd'는 가능하고 원래 명령은 command ls로 호출한다. 공유 스크립트는 기존 출력 계약을 확인한다."
         },
         {
           "from": "find",
@@ -52,7 +53,7 @@
           "problem": "find의 조건식과 옵션이 직관적이지 않고, 결과 출력 형식이 단조롭다",
           "solution": "단순한 구문, 색상 출력, .gitignore 자동 무시, 기본값이 실용적",
           "relation": "alternative",
-          "boundary": "find의 모든 기능을 대체하지 않음. POSIX 호환성이 필요하면 find 사용. 조건식과 구문이 달라 alias find='fd'로 기존 입력을 그대로 치환하지 않는다",
+          "boundary": "이름·확장자 등으로 파일을 찾는 일상 검색은 대신할 수 있다. 기본적으로 숨김 파일과 ignore 대상이 제외되고 패턴은 정규식으로 해석한다. find의 조건식·옵션과 같지 않으므로 alias find='fd'로 치환하지 않는다. 정밀한 조건식이나 POSIX 이식성이 필요하면 find를 유지한다.",
           "install": "brew install fd",
           "tldr": "fd",
           "url": "https://github.com/sharkdp/fd"
@@ -67,7 +68,8 @@
           "relation": "alternative",
           "install": "brew install dust",
           "tldr": "dust",
-          "url": "https://github.com/bootandy/dust"
+          "url": "https://github.com/bootandy/dust",
+          "boundary": "디렉토리별 용량 분포를 사람이 살펴보는 작업은 대신할 수 있다. 정렬·표시와 옵션은 du와 달라 수치나 출력 형식을 사용하는 자동화에는 그대로 치환하지 않는다. 기존 du 명령은 유지하고 dust를 별도로 호출한다."
         },
         {
           "from": "tree",
@@ -79,7 +81,8 @@
           "relation": "alternative",
           "install": "brew install broot",
           "tldr": "broot",
-          "url": "https://github.com/Canop/broot"
+          "url": "https://github.com/Canop/broot",
+          "boundary": "큰 디렉토리 구조를 검색하고 탐색하는 작업을 대신하거나 확장한다. 정적인 트리 텍스트를 생성하는 tree와 달리 대화형 탐색이 중심이다. 문서·파이프라인에 고정된 트리 출력을 넣으려면 tree를 유지한다. alias tree='broot'는 같은 동작이 아니다."
         },
         {
           "from": "cp",
@@ -91,7 +94,8 @@
           "relation": "alternative",
           "install": "brew install xcp",
           "tldr": "xcp",
-          "url": "https://github.com/tarka/xcp"
+          "url": "https://github.com/tarka/xcp",
+          "boundary": "지원하는 파일 복사 작업을 진행률·병렬 처리와 함께 수행할 수 있다. cp의 모든 옵션, 링크·권한·메타데이터 처리까지 동일하다고 가정하지 않는다. 백업·공유 스크립트는 필요한 보존 속성과 종료 상태를 확인한 뒤 전환하고 cp alias로 일괄 치환하지 않는다."
         },
         {
           "from": "rm",
@@ -101,8 +105,8 @@
           "problem": "rm은 실수로 삭제하면 복구가 어렵고, 완전히 제거된다",
           "solution": "안전한 삭제, 휴지통 이동, 복구 가능, 진행률 표시",
           "relation": "alternative",
-          "boundary": "rip은 휴지통으로 이동. 완전한 삭제가 필요하면 rm 사용",
-          "install": "brew install rip",
+          "boundary": "복구 가능한 삭제가 필요한 개인 파일 정리에서 대신 사용할 수 있다. 파일을 보관 위치로 옮기는 동작이므로 즉시 제거하는 rm과 디스크 공간 회수·옵션이 다르다. alias rm='rip'로 의미를 숨기기보다 rip을 명시적으로 사용하며 자동화의 삭제는 별도로 판단한다.",
+          "install": "brew install rm-improved",
           "tldr": "rip",
           "url": "https://github.com/nivekuil/rip"
         }
@@ -197,7 +201,7 @@
           "problem": "grep은 .gitignore 규칙을 자동 적용하지 않아 코드베이스 검색 시 제외 대상을 별도로 지정해야 한다",
           "solution": "병렬 재귀 검색, .gitignore 규칙 기본 적용, 바이너리 파일 기본 제외, 색상 지원",
           "relation": "alternative",
-          "boundary": "스크립트에서 grep은 여전히 포터블. ripgrep은 인터랙티브 검색에 최적화. 재귀 검색·ignore·숨김 파일 기본값과 옵션이 달라 alias grep='rg'로 일괄 치환하기보다 rg를 명시적으로 사용한다",
+          "boundary": "코드베이스의 재귀 텍스트 검색은 대신할 수 있다. ignore 규칙·숨김 파일·바이너리 제외 기본값과 옵션이 grep과 다르며 자동화에도 검색 범위를 명시하면 사용할 수 있다. alias grep='rg'로 일괄 치환하지 않는다. 기존 grep 스크립트와 POSIX 호환 작업은 별도로 유지한다.",
           "install": "brew install ripgrep",
           "tldr": "rg",
           "url": "https://github.com/BurntSushi/ripgrep"
@@ -210,7 +214,7 @@
           "problem": "sed의 정규식과 치환 구문은 배우기 어렵고 실수가 잦다",
           "solution": "직관적인 find & replace 구문, 예시 기반 설명",
           "relation": "alternative",
-          "boundary": "sed의 스트리밍 처리, 복잡한 정규식은 sd로 대체 어려움",
+          "boundary": "문자열·정규식 치환은 대신할 수 있다. 구문과 정규식 규칙이 sed와 다르고 sed의 주소 지정·여러 처리 명령을 그대로 실행하지 못한다. alias sed='sd'는 기존 입력을 보존하지 않는다. 복잡한 sed 프로그램이나 이식성이 필요한 스크립트는 유지한다.",
           "install": "brew install sd",
           "tldr": "sd",
           "url": "https://github.com/chmln/sd"
@@ -222,10 +226,11 @@
           "group": "diff-chain",
           "problem": "기본 diff 출력은 읽기 어렵고, 구문 강조가 없다",
           "solution": "구문 강조, 사이드바 비교, 줄 번호, Git 통합",
-          "relation": "alternative",
+          "relation": "complement",
           "install": "brew install git-delta",
           "tldr": "delta",
-          "url": "https://github.com/dandavison/delta"
+          "url": "https://github.com/dandavison/delta",
+          "boundary": "diff가 만든 차이의 표시를 보완하는 pager다. 두 입력의 차이를 계산하는 diff 자체를 대체하지 않는다. diff -u 결과를 delta로 넘기며 patch나 자동화에 사용할 원본 diff 출력은 유지한다. alias diff='delta'로 연결하지 않는다."
         }
       ],
       "commands": [
@@ -275,19 +280,21 @@
           "relation": "alternative",
           "install": "brew install goawk",
           "tldr": "goawk",
-          "url": "https://github.com/benhoyt/goawk"
+          "url": "https://github.com/benhoyt/goawk",
+          "boundary": "POSIX AWK 프로그램과 CSV·TSV 처리에 사용할 수 있다. GNU awk 같은 구현의 확장 기능, 옵션, 수치·로케일 동작까지 같다고 전제하지 않는다. 기존 AWK 프로그램의 기능과 결과를 확인한 뒤 실행기를 전환하고 alias만으로 호환성을 가정하지 않는다."
         },
         {
           "from": "sort",
           "to": "ssort",
           "why": "대용량 처리 느림",
           "group": "sort-chain",
-          "problem": "대용량 파일 정렬 시 메모리 부족과 느린 속도",
-          "solution": "병렬 처리, 외부 정렬, 대용량 파일 최적화",
+          "problem": "대용량 정렬 도구 후보의 기능·호환성을 확인해야 한다",
+          "solution": "등록된 프로젝트·설치 명령의 검증 필요",
           "relation": "alternative",
-          "install": "cargo install ssort",
+          "install": "확인 필요",
           "tldr": "ssort",
-          "url": "https://github.com/ssort/ssort"
+          "url": "https://github.com/ssort/ssort",
+          "boundary": "현재 등록된 프로젝트 주소와 대용량 텍스트 정렬 도구의 정체를 확인하지 못해 sort 대체 가능 여부를 판단 보류한다. 옵션·로케일·수치 정렬·출력 호환을 확인하기 전에는 설치나 alias 치환의 근거로 사용하지 않는다."
         },
         {
           "from": "jq",
@@ -297,7 +304,7 @@
           "problem": "jq 필터 구문은 배우기 어렵고, 대화형 사용이 불편하다",
           "solution": "직관적인 인터페이스, 대화형 모드, JSON 미리보기",
           "relation": "alternative",
-          "boundary": "jq는 여전히 스크립트와 파이프라인에서 강력",
+          "boundary": "JSON을 대화형으로 펼쳐 보거나 별도 구문으로 처리하는 작업은 대신할 수 있다. jq 필터 언어와 명령행 옵션의 호환 도구는 아니므로 alias jq='fx'로 기존 필터를 넘기지 않는다. 기존 jq 스크립트는 유지하고 fx 처리식으로 옮길 때 결과를 확인한다.",
           "install": "brew install fx",
           "tldr": "fx",
           "url": "https://github.com/antonmedv/fx"
@@ -312,7 +319,8 @@
           "relation": "specialized",
           "install": "brew install jiq",
           "tldr": "jiq",
-          "url": "https://github.com/fiatjaf/jiq"
+          "url": "https://github.com/fiatjaf/jiq",
+          "boundary": "jq 표현식을 입력하며 결과를 미리 보는 대화형 탐색을 보완한다. 일반 jq 실행의 모든 옵션·배치 동작을 대신하는 도구로 취급하지 않는다. 완성한 필터를 스크립트에서 실행할 때는 jq를 유지한다."
         },
         {
           "from": "jq",
@@ -324,7 +332,8 @@
           "relation": "complement",
           "install": "brew install gron",
           "tldr": "gron",
-          "url": "https://github.com/tomnomnom/gron"
+          "url": "https://github.com/tomnomnom/gron",
+          "boundary": "중첩 JSON을 경로-값 형태로 풀어 grep 등과 조합하는 작업을 보완한다. jq의 필터 언어·변환 기능 전체를 대체하지 않으며 출력 형식도 JSON 원문과 다르다. jq alias로 치환하지 않고 gron의 변환·복원 흐름을 명시적으로 사용한다."
         }
       ],
       "commands": [
@@ -345,7 +354,7 @@
         },
         {
           "name": "ssort",
-          "description": "구조화된 데이터나 특정 키 기준 정렬을 돕는 도구",
+          "description": "정렬 도구로 등록되어 있으나 프로젝트·기능 확인이 필요한 항목",
           "tldr": "ssort"
         },
         {
@@ -384,7 +393,8 @@
           "relation": "alternative",
           "install": "brew install tailspin",
           "tldr": "tspin",
-          "url": "https://github.com/bensadeh/tailspin"
+          "url": "https://github.com/bensadeh/tailspin",
+          "boundary": "로그를 읽거나 추적하며 패턴을 강조하는 작업은 대신할 수 있다. 강조·pager와 tail의 줄·바이트 선택, 추적 옵션은 동일하지 않다. 원문을 그대로 전달하는 파이프라인이나 기존 tail 스크립트는 유지하며 alias tail='tspin'로 치환하지 않는다."
         },
         {
           "from": "less",
@@ -394,7 +404,7 @@
           "problem": "less는 구문강조 없이 텍스트만 표시한다",
           "solution": "200+ 언어 구문강조, 자동 페이징, Git 통합",
           "relation": "complement",
-          "boundary": "bat은 파일 열람에 특화. less는 파이프라인 출력에 여전히 유용",
+          "boundary": "bat은 구문 강조한 내용을 pager에 넘겨 파일 열람을 보완하며 기본 pager로 less를 사용할 수 있다. less의 탐색 기능 전체를 대체하는 관계가 아니다. 기존 less 사용과 pager 설정을 유지하며 alias less='bat'로 치환하지 않는다.",
           "install": "brew install bat",
           "tldr": "bat",
           "url": "https://github.com/sharkdp/bat"
@@ -435,7 +445,7 @@
           "problem": "cd는 자주 가는 경로를 기억하지 못하고, 매번 전체 경로를 입력해야 한다",
           "solution": "방문 기반 학습, 부분 경로로 점프, fzf 통합",
           "relation": "alternative",
-          "boundary": "zoxide는 cd를 완전히 대체하지 않음. 새로운 디렉토리에는 cd 사용",
+          "boundary": "자주 가는 경로를 찾는 대화형 이동을 대신하거나 보완한다. 기존 경로로 이동하는 기능도 있지만 학습 DB와 shell 초기화가 추가되며 부분 이름은 후보를 선택하는 의미다. 이름을 유지하려면 zoxide init의 --cmd cd 통합을 사용한다. 독립 실행 파일 alias만으로 부모 shell의 디렉토리를 바꾸지는 못하며 공유 스크립트에는 shell의 cd를 유지한다.",
           "install": "brew install zoxide",
           "tldr": "zoxide",
           "url": "https://github.com/ajeetdsouza/zoxide"
@@ -448,7 +458,7 @@
           "problem": "cd는 목적 경로를 이미 알고 있을 때 유리하지만, 낯선 디렉토리 구조를 보며 탐색하기 어렵다",
           "solution": "터미널 파일 매니저, 파일 미리보기, 디렉토리 탐색, 종료 시 cwd handoff wrapper 구성 가능",
           "relation": "complement",
-          "boundary": "목적지를 알고 있으면 zoxide가 빠르고, 파일 구조를 보며 고를 때 yazi가 적합",
+          "boundary": "디렉토리 구조를 보고 파일을 탐색·선택하는 작업을 보완한다. 종료 후 부모 shell의 경로를 바꾸려면 cwd handoff용 shell wrapper가 필요하다. cd의 경로 인자나 스크립트 동작을 그대로 대신하지 않으므로 cd alias로 치환하지 않는다.",
           "install": "brew install yazi",
           "tldr": "yazi",
           "url": "https://yazi-rs.github.io/docs/"
@@ -461,7 +471,7 @@
           "problem": "find, history, branch, directory 목록을 눈으로 훑고 고르는 작업은 순수 파이프라인만으로 반복 사용성이 낮다",
           "solution": "퍼지 검색, 미리보기, 키 바인딩, 셸 통합으로 파일·디렉토리·브랜치 선택을 공통 UX로 처리",
           "relation": "complement",
-          "boundary": "fzf는 선택 UI다. 검색·목록 생성은 fd, rg, git 같은 도구와 조합한다",
+          "boundary": "목록에서 대상을 대화형으로 고르는 단계를 보완한다. 파일 검색·목록 생성은 fd·rg·git 등 다른 도구가 맡는다. Bash select 구문이나 무인 실행의 입력 계약을 그대로 대체하지 않으며 기존 목록 명령의 alias로 연결하지 않는다.",
           "install": "brew install fzf",
           "tldr": "fzf",
           "url": "https://github.com/junegunn/fzf"
@@ -509,7 +519,8 @@
           "relation": "alternative",
           "install": "brew install tmux",
           "tldr": "tmux",
-          "url": "https://github.com/tmux/tmux"
+          "url": "https://github.com/tmux/tmux",
+          "boundary": "터미널 세션 유지·분할·재접속 작업은 대신할 수 있다. 키 바인딩·설정·명령·기존 세션은 screen과 호환되지 않는다. 새 세션부터 별도로 도입하고 screen용 운영 스크립트는 변환한다. alias screen='tmux'는 기존 사용법을 보존하지 않는다."
         },
         {
           "from": "tmux",
@@ -519,7 +530,7 @@
           "problem": "tmux는 설정이 복잡하고, 학습 곡선이 높다",
           "solution": "화면 내 키 안내, 레이아웃 관리, 플러그인 지원",
           "relation": "alternative",
-          "boundary": "tmux는 여전히 강력한 기능과 안정성. zellij는 최신 UX 중시",
+          "boundary": "대화형 터미널 세션·화면 분할 작업은 대신할 수 있다. tmux의 명령·설정·플러그인·세션을 그대로 가져오는 호환 실행기는 아니다. 기존 tmux 자동화는 유지하거나 따로 전환하며 alias tmux='zellij'로 치환하지 않는다.",
           "install": "brew install zellij",
           "tldr": "zellij",
           "url": "https://github.com/zellij-org/zellij"
@@ -532,7 +543,7 @@
           "problem": "tmux 기본 세션 목록은 프로젝트 디렉토리와 Git repository를 빠르게 찾아 새 세션으로 진입하기 불편하다",
           "solution": "tmux 세션 매니저, fzf·zoxide 연동, 디렉토리와 repository 기반 세션 생성·전환",
           "relation": "complement",
-          "boundary": "sesh는 tmux를 대체하지 않고 세션 선택과 진입 UX를 보완한다",
+          "boundary": "tmux 세션의 선택·생성·진입을 보완하며 tmux 자체는 계속 필요하다. 화면 분할·pane 제어를 포함한 tmux 명령을 모두 대신하지 않는다. sesh를 명시적으로 호출하고 기존 tmux 자동화는 유지한다.",
           "install": "brew install sesh",
           "tldr": "sesh",
           "url": "https://github.com/joshmedeski/sesh"
@@ -575,7 +586,8 @@
           "relation": "alternative",
           "install": "brew install htop",
           "tldr": "htop",
-          "url": "https://htop.dev"
+          "url": "https://htop.dev",
+          "boundary": "프로세스 상태를 대화형으로 보고 선택하는 작업은 대신할 수 있다. top의 옵션·batch 출력 형식은 동일하지 않아 자동 수집 스크립트는 그대로 치환하지 않는다. 개인 대화형 shell에서 alias top='htop'로 이름을 유지할 수 있고 원래 명령은 command top으로 호출한다."
         },
         {
           "from": "htop",
@@ -587,7 +599,8 @@
           "relation": "specialized",
           "install": "brew install btop",
           "tldr": "btop",
-          "url": "https://github.com/aristocratos/btop"
+          "url": "https://github.com/aristocratos/btop",
+          "boundary": "CPU·메모리·디스크·네트워크를 대화형으로 보는 작업은 대신하거나 확장한다. 인터페이스·설정·지원 플랫폼과 프로세스 제어는 htop과 같다고 전제하지 않는다. 기존 htop 옵션을 alias로 전달하기보다 btop을 별도 명령으로 도입한다."
         },
         {
           "from": "ps",
@@ -599,7 +612,8 @@
           "relation": "alternative",
           "install": "brew install procs",
           "tldr": "procs",
-          "url": "https://github.com/dalance/procs"
+          "url": "https://github.com/dalance/procs",
+          "boundary": "프로세스 목록을 사람이 검색하고 읽는 작업은 대신할 수 있다. 필터·컬럼·정렬·출력 형식은 ps와 달라 PID 등 출력을 사용하는 스크립트는 일괄 치환하지 않는다. alias ps='procs'보다 별도 명령으로 사용하고 자동화의 출력 계약을 유지한다."
         },
         {
           "from": "df",
@@ -611,7 +625,8 @@
           "relation": "alternative",
           "install": "brew install duf",
           "tldr": "duf",
-          "url": "https://github.com/muesli/duf"
+          "url": "https://github.com/muesli/duf",
+          "boundary": "마운트된 파일시스템의 사용량·여유 공간을 사람이 확인하는 작업은 대신할 수 있다. 분류·표시·옵션·출력 형식은 df와 같지 않다. df 출력을 파싱하는 자동화나 기본 도구만 있는 서버에서는 기존 df를 유지하며 alias 치환을 전제로 하지 않는다."
         },
         {
           "from": "free",
@@ -623,7 +638,8 @@
           "relation": "specialized",
           "install": "brew install smem",
           "tldr": "smem",
-          "url": "https://github.com/smem/smem"
+          "url": "https://www.selenic.com/smem/",
+          "boundary": "프로세스별 PSS·USS를 살펴보는 메모리 분석을 보완한다. 시스템 전체 메모리·swap 요약을 확인하는 free와 측정 대상이 다르며 다른 프로세스의 상세 정보는 접근 권한에 영향을 받는다. free를 smem alias로 치환하지 않고 분석 목적에 따라 함께 쓴다."
         },
         {
           "from": "docker",
@@ -633,7 +649,7 @@
           "problem": "docker와 docker compose 명령만으로는 컨테이너, 로그, 이미지, 볼륨 상태를 반복적으로 확인하기 번거롭다",
           "solution": "컨테이너·서비스·로그·이미지·볼륨을 한 화면에서 탐색하고 기본 작업을 TUI로 실행",
           "relation": "complement",
-          "boundary": "자동화와 스크립트에는 docker CLI를 사용하고, 수동 운영·점검에는 lazydocker가 적합하다",
+          "boundary": "컨테이너·로그·이미지 등을 대화형으로 점검하고 조작하는 화면을 보완한다. Docker 실행 환경을 대신하지 않으며 docker CLI·Compose 옵션을 그대로 받는 실행기도 아니다. 무인 배포·빌드·운영 스크립트에는 기존 CLI를 유지한다.",
           "install": "brew install lazydocker",
           "tldr": "lazydocker",
           "url": "https://github.com/jesseduffield/lazydocker"
@@ -711,7 +727,8 @@
           "relation": "alternative",
           "install": "brew install gping",
           "tldr": "gping",
-          "url": "https://github.com/orf/gping"
+          "url": "https://github.com/orf/gping",
+          "boundary": "호스트의 지연 시간 변화를 사람이 그래프로 보는 작업은 대신할 수 있다. ping의 옵션·텍스트 출력·종료 상태와 동일한 자동화 인터페이스를 전제하지 않는다. 연결 판정 스크립트와 기본 환경의 진단에는 ping을 유지하며 alias로 일괄 치환하지 않는다."
         },
         {
           "from": "netstat",
@@ -723,19 +740,21 @@
           "relation": "alternative",
           "install": "시스템에 이미 포함됨",
           "tldr": "ss",
-          "url": "https://man7.org/linux/man-pages/man8/ss.8.html"
+          "url": "https://man7.org/linux/man-pages/man8/ss.8.html",
+          "boundary": "Linux의 소켓 상태 조회는 대신할 수 있다. netstat의 모든 역할을 대신하는 것은 아니며 라우팅·인터페이스 정보는 ip 등 다른 명령을 함께 사용한다. 옵션·필터·출력이 달라 alias netstat='ss'로 치환하지 않는다. 다른 OS에서는 사용 가능한 도구를 따로 확인한다."
         },
         {
           "from": "dig",
           "to": "dog",
           "why": "UX 부족",
           "group": "dns-chain",
-          "problem": "dig 출력은 복잡하고, DNSSEC 검증이 불편하다",
-          "solution": "현대적 CLI, 색상 지원, DNSSEC 검증, 직관적 출력",
+          "problem": "일상적인 DNS 질의 결과를 더 간결하게 읽고 싶다",
+          "solution": "색상 출력, 간결한 질의 구문, DNS over TLS·HTTPS 지원",
           "relation": "alternative",
           "install": "brew install dog",
           "tldr": "dog",
-          "url": "https://github.com/ogham/dog"
+          "url": "https://github.com/ogham/dog",
+          "boundary": "지원하는 DNS 질의와 결과 열람은 대신할 수 있다. dig의 옵션·출력·진단 기능 전체와 같다고 가정하지 않는다. DNSSEC 레코드를 조회하는 것과 응답의 신뢰 체인을 검증하는 것은 구분한다. 기존 dig 진단 절차·스크립트는 유지하며 alias로 일괄 치환하지 않는다."
         },
         {
           "from": "wget",
@@ -745,7 +764,7 @@
           "problem": "wget은 단일 연결로 다운로드하고, 재개 기능이 제한적이다",
           "solution": "병렬 다운로드, 세그먼트, 재개 지원, 프로토콜 다양",
           "relation": "alternative",
-          "boundary": "wget은 여전히 간단한 다운로드에 유용. aria2c는 대용량에 최적화",
+          "boundary": "파일 다운로드·재개와 지원 프로토콜의 병렬 전송은 대신할 수 있다. 옵션·인증·저장 방식은 wget과 다르며 웹사이트 재귀 수집·미러링까지 같은 역할은 아니다. 기존 wget 스크립트는 전송 조건을 확인한 뒤 전환하고 alias 치환을 전제로 하지 않는다.",
           "install": "brew install aria2",
           "tldr": "aria2c",
           "url": "https://aria2.github.io"
@@ -758,7 +777,7 @@
           "problem": "SSH는 네트워크 불안정 시 연결이 끊긴다",
           "solution": "연결 지속, 로컬 예측, 빠른 반응, 대역폭 절약",
           "relation": "specialized",
-          "boundary": "mosh는 대화형 세션에 특화. 스크립트와 포트 포워딩은 SSH 사용",
+          "boundary": "불안정한 네트워크의 대화형 원격 터미널은 대신할 수 있다. 접속 초기 인증에는 SSH를 사용하고 이후 통신에는 서버의 mosh-server와 UDP 연결이 필요하다. SSH 포트 포워딩·파일 전송·비대화형 원격 명령은 대체하지 않으므로 alias ssh='mosh'로 치환하지 않는다.",
           "install": "brew install mosh",
           "tldr": "mosh",
           "url": "https://mosh.org"
@@ -829,7 +848,7 @@
           "problem": "bash은 자동 완성과 구문 강조가 제한적이다",
           "solution": "스마트 자동 완성, 구문 강조, 히스토리 검색, 웹 기반 설정",
           "relation": "alternative",
-          "boundary": "fish는 POSIX 호환성이 없음. 스크립트는 bash/zsh 사용",
+          "boundary": "개인 대화형 로그인 shell로 선택할 수 있다. Bash·POSIX shell의 문법과 설정 파일을 그대로 실행하는 호환 shell은 아니다. 기존 Bash 스크립트는 shebang에 맞는 Bash로 실행하고 alias bash='fish'로 치환하지 않는다.",
           "install": "brew install fish",
           "tldr": "fish",
           "url": "https://fishshell.com"
@@ -840,11 +859,12 @@
           "why": "플러그인 생태계 부족",
           "group": "shell-hub",
           "problem": "bash은 커스터마이징이 제한적이고, 플러그인이 부족하다",
-          "solution": "플러그인 시스템, 테마, 자동 완성 강화, POSIX 호환",
+          "solution": "자동 완성·glob·shell 확장 기능, 설정과 플러그인 활용",
           "relation": "alternative",
           "install": "시스템에 이미 포함됨 (macOS)",
           "tldr": "zsh",
-          "url": "https://www.zsh.org"
+          "url": "https://www.zsh.org",
+          "boundary": "개인 대화형 shell로 선택할 수 있다. 기본 모드의 문법·배열·단어 분리·옵션·설정은 Bash와 같지 않으며 POSIX emulation 지원이 기본 Bash 호환을 뜻하지 않는다. 기존 Bash 스크립트는 Bash로 실행하고 alias bash='zsh'로 치환하지 않는다."
         },
         {
           "from": "history",
@@ -856,7 +876,8 @@
           "relation": "alternative",
           "install": "brew install atuin",
           "tldr": "atuin",
-          "url": "https://github.com/atuinsh/atuin"
+          "url": "https://github.com/atuinsh/atuin",
+          "boundary": "shell에 통합해 과거 명령을 검색하는 작업은 대신하거나 확장한다. shell history 내장 명령의 모든 옵션·출력·저장 방식을 그대로 대신하지 않으며 동기화는 별도 설정이다. 검색 위젯으로 연결하고 alias history='atuin'로 일괄 치환하지 않는다."
         }
       ],
       "commands": [
@@ -899,7 +920,7 @@
           "problem": "인터랙티브 리베이스, 스테이징, 브랜치 관리가 터미널에서 어렵다",
           "solution": "대화형 Git 화면, 줄·변경 묶음 단위 스테이징, 인터랙티브 리베이스, 브랜치 관리",
           "relation": "complement",
-          "boundary": "lazygit은 git을 대체하지 않고 보완. 단순 명령은 git 사용",
+          "boundary": "스테이징·브랜치·리베이스 등 수동 Git 작업을 대화형으로 보완한다. Git 자체와 git 명령의 전체 옵션·자동화 인터페이스를 대체하지 않는다. 기존 Git 스크립트는 유지하며 alias git='lazygit'로 치환하지 않는다.",
           "install": "brew install lazygit",
           "tldr": "lazygit",
           "url": "https://github.com/jesseduffield/lazygit"
@@ -914,7 +935,8 @@
           "relation": "alternative",
           "install": "brew install tig",
           "tldr": "tig",
-          "url": "https://github.com/jonas/tig"
+          "url": "https://github.com/jonas/tig",
+          "boundary": "커밋·변경 내용을 대화형으로 탐색하는 작업은 대신할 수 있다. Git 위에서 동작하는 화면이며 git log의 모든 옵션·텍스트 출력을 그대로 대체하지 않는다. 히스토리의 자동 추출에는 git log를 유지하고 tig를 별도로 실행한다."
         },
         {
           "from": "git diff",
@@ -923,10 +945,11 @@
           "group": "diff-chain",
           "problem": "git diff 출력은 읽기 어렵고, 구문 강조가 없다",
           "solution": "구문 강조, 사이드바 비교, 줄 번호, 하이라이팅",
-          "relation": "alternative",
+          "relation": "complement",
           "install": "brew install git-delta",
           "tldr": "delta",
-          "url": "https://github.com/dandavison/delta"
+          "url": "https://github.com/dandavison/delta",
+          "boundary": "Git이 만든 차이를 읽는 화면을 보완한다. Git의 비교·인덱스·patch 생성 자체는 계속 git diff가 맡는다. git config의 core.pager로 연결하며 alias git='delta'로 치환하지 않는다. 원본 출력이 필요하면 git --no-pager diff를 사용한다."
         }
       ],
       "commands": [
@@ -974,7 +997,7 @@
           "problem": "curl 옵션이 많고, JSON 요청/응답 처리가 번거롭다",
           "solution": "간결한 HTTP 요청 구문, JSON 요청·응답 지원, 색상 출력, 세션 유지",
           "relation": "alternative",
-          "boundary": "curl은 여전히 스크립트와 포터블 환경에서 필수",
+          "boundary": "HTTP API 요청을 만들고 응답을 읽는 작업은 대신할 수 있다. 요청 구문·기본 동작·옵션이 curl과 다르고 curl의 다양한 프로토콜·전송 기능 전체를 대체하지 않는다. 기존 curl 스크립트는 요청·응답 조건을 확인한 뒤 전환하며 alias curl='http'로 치환하지 않는다.",
           "install": "brew install httpie",
           "tldr": "http",
           "url": "https://httpie.io"
@@ -1007,7 +1030,8 @@
           "relation": "alternative",
           "install": "cargo install ouch",
           "tldr": "ouch",
-          "url": "https://github.com/ouch-org/ouch"
+          "url": "https://github.com/ouch-org/ouch",
+          "boundary": "지원하는 포맷의 일반적인 압축·해제는 대신할 수 있다. 포맷별 기능·옵션·메타데이터 처리와 tar의 백업·스트리밍 사용법 전체가 같지는 않다. 기존 tar 백업이나 공유 스크립트는 필요한 보존 속성을 확인하고 alias tar='ouch'로 치환하지 않는다."
         },
         {
           "from": "gzip",
@@ -1016,7 +1040,7 @@
           "group": "gzip-chain",
           "problem": "gzip은 단일 스레드로 압축하여 대용량 파일에서 느리다",
           "solution": "멀티코어 병렬 압축, gzip 호환 형식",
-          "boundary": "일반적인 gzip 스트림의 압축 해제는 압축처럼 병렬화되지 않는다",
+          "boundary": "gzip 호환 형식으로 압축하는 작업은 대신할 수 있다. 주요 사용법이 겹쳐도 모든 옵션·메타데이터·출력 결과가 동일하다고 전제하지 않으며 일반 gzip 스트림의 해제는 압축처럼 병렬화되지 않는다. 기존 gzip 스크립트는 사용 옵션과 결과를 확인한 뒤 실행기를 전환한다.",
           "relation": "alternative",
           "install": "brew install pigz",
           "tldr": "pigz",
@@ -1032,7 +1056,8 @@
           "relation": "alternative",
           "install": "brew install p7zip",
           "tldr": "7z",
-          "url": "https://www.7-zip.org"
+          "url": "https://www.7-zip.org",
+          "boundary": "지원하는 ZIP 작업이나 별도 7z 형식의 압축·해제는 수행할 수 있다. 명령 구문·출력·암호화 지원은 zip과 다르고 7z 파일을 만들면 상대 도구의 해제 지원도 필요하다. ZIP 호환·자동화 요건을 확인하며 alias zip='7z'로 치환하지 않는다."
         }
       ],
       "commands": [
@@ -1080,7 +1105,7 @@
           "problem": "make를 단순 작업 실행에 사용하면 파일 타깃과 갱신 시각 규칙, .PHONY 선언까지 고려해야 한다",
           "solution": "레시피 기반 작업 실행, 인자와 기본값 지원, 크로스 플랫폼",
           "relation": "specialized",
-          "boundary": "just는 빌드 시스템이 아니다. 파일 의존성과 갱신 시각에 따른 증분 빌드는 make 등으로 처리한다",
+          "boundary": "개발용 명령을 이름 붙여 실행하는 작업은 대신할 수 있다. just는 빌드 시스템이 아니다. 파일 의존성과 갱신 시각에 따른 증분 빌드는 make 등으로 처리한다. Makefile 문법·타깃을 그대로 실행하지 않으므로 alias make='just'로 치환하지 않는다.",
           "install": "brew install just",
           "tldr": "just",
           "url": "https://github.com/casey/just"
@@ -1095,7 +1120,8 @@
           "relation": "alternative",
           "install": "시스템에 이미 포함됨 (macOS)",
           "tldr": "clang",
-          "url": "https://clang.llvm.org"
+          "url": "https://clang.llvm.org",
+          "boundary": "지원하는 C·C++ 코드를 컴파일하는 작업은 대신할 수 있다. 진단·최적화·확장·플래그·링커·런타임 조합은 GCC와 같지 않으며 프로젝트의 빌드·실행 결과를 확인해야 한다. alias gcc='clang'보다 빌드 설정의 CC·CXX를 명시적으로 선택한다."
         },
         {
           "from": "gdb",
@@ -1107,7 +1133,8 @@
           "relation": "alternative",
           "install": "시스템에 이미 포함됨 (macOS)",
           "tldr": "lldb",
-          "url": "https://lldb.llvm.org"
+          "url": "https://lldb.llvm.org",
+          "boundary": "지원하는 프로그램의 중단점·상태 확인 등 디버깅 작업은 대신할 수 있다. 명령·스크립팅 API·플러그인·플랫폼 지원은 GDB와 다르다. 기존 GDB 자동화는 별도로 변환하고 alias gdb='lldb'로 사용법을 치환하지 않는다."
         },
         {
           "from": "pre-commit",
@@ -1117,7 +1144,7 @@
           "problem": "프로젝트마다 hook 설치와 실행 시간이 부담되고, dotfiles·스크립트·설정 파일의 공통 검사를 반복 정의하기 쉽다",
           "solution": "빠른 pre-commit 호환 runner, 전역 hook 위임, repository별 config와 공통 검사 분리",
           "relation": "alternative",
-          "boundary": "개별 언어의 lint/test 정책은 각 repository config에 두고, prek는 hook 실행 계층을 담당한다",
+          "boundary": "지원하는 pre-commit 설정의 hook 실행을 대신할 수 있다. 사용 중인 hook·실행 환경과 pre-commit 차이를 확인한 뒤 전환한다. 언어별 lint·test 정책 자체는 repository 설정이 계속 맡으며 CI와 전역 hook의 실행기를 함께 명시한다.",
           "install": "brew install prek",
           "tldr": "prek",
           "url": "https://github.com/j178/prek"
@@ -1129,8 +1156,8 @@
           "group": "python-tooling",
           "problem": "pip, venv, pip-tools를 따로 조합하면 설치 속도와 환경 재현, 명령 흐름이 분산된다",
           "solution": "빠른 패키지 설치, venv 생성, lockfile, tool 실행, 프로젝트 관리 통합",
-          "relation": "alternative",
-          "boundary": "Python 런타임 자체를 다른 버전 매니저가 관리하는 구성에서는 역할 경계를 명확히 둔다",
+          "relation": "complement",
+          "boundary": "pip·venv·의존성 잠금·tool 실행 등 Python 환경 관리 작업을 대신하거나 통합한다. uv는 Python 인터프리터 자체가 아니며 프로그램 실행에는 관리하거나 선택한 Python을 사용한다. alias python='uv'로 치환하지 않고 uv run python 등으로 실행 환경을 명시한다.",
           "install": "brew install uv",
           "tldr": "uv",
           "url": "https://docs.astral.sh/uv/"
