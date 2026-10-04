@@ -12,9 +12,9 @@
           "why": "구문강조 없음",
           "group": "file-viewer",
           "problem": "긴 파일 읽기 시 구문 구분이 어렵고, 줄번호가 없어 위치 파악이 힘들다",
-          "solution": "200+ 언어 구문강조, Git 변경 라인 표시, 자동 페이징, 줄번호",
+          "solution": "200+ 언어 구문강조, Git 변경 라인 표시, 자동 페이징, 줄번호, 개인 대화형 shell에서 alias cat='bat --paging=never'로 익숙한 입력 유지",
           "relation": "alternative",
-          "boundary": "대화형 열람의 표현 개선이 중심이다. 비대화형 출력에서는 장식 없는 내용으로 출력하지만, 설치 여부·옵션·설정의 차이가 있으므로 공유 스크립트에서 cat을 일괄 치환하지 않는다",
+          "boundary": "대화형 열람의 표현 개선이 중심이다. 비대화형 출력에서는 장식 없는 내용으로 출력하지만, 설치 여부·옵션·설정의 차이가 있으므로 공유 스크립트에서 cat을 일괄 치환하지 않는다. alias는 옵션 호환성을 보장하지 않는다. 기본 외부 cat은 command cat으로 호출할 수 있다",
           "install": "brew install bat",
           "tldr": "bat",
           "url": "https://github.com/sharkdp/bat"
@@ -25,9 +25,9 @@
           "why": "Git 정보와 아이콘 없음",
           "group": "ls-tree",
           "problem": "파일 목록에 Git 상태, 아이콘, 트리 뷰가 없어 한눈에 파악이 어렵다",
-          "solution": "아이콘, Git 통합, 트리 뷰, 정렬 옵션, 색상 지원",
+          "solution": "아이콘, Git 통합, 트리 뷰, 정렬 옵션, 색상 지원, alias ll='eza -l'로 기존 개인 단축 이름 재사용",
           "relation": "alternative",
-          "boundary": "일부 환경에서 기본 ls보다 느릴 수 있음",
+          "boundary": "일부 환경에서 기본 ls보다 느릴 수 있음. ll 같은 단축 이름은 유지할 수 있지만 ls와 옵션은 동일하지 않다. 기존 ls는 command ls로 사용한다",
           "install": "brew install eza",
           "tldr": "eza",
           "url": "https://github.com/eza-community/eza"
@@ -52,7 +52,7 @@
           "problem": "find의 조건식과 옵션이 직관적이지 않고, 결과 출력 형식이 단조롭다",
           "solution": "단순한 구문, 색상 출력, .gitignore 자동 무시, 기본값이 실용적",
           "relation": "alternative",
-          "boundary": "find의 모든 기능을 대체하지 않음. POSIX 호환성이 필요하면 find 사용",
+          "boundary": "find의 모든 기능을 대체하지 않음. POSIX 호환성이 필요하면 find 사용. 조건식과 구문이 달라 alias find='fd'로 기존 입력을 그대로 치환하지 않는다",
           "install": "brew install fd",
           "tldr": "fd",
           "url": "https://github.com/sharkdp/fd"
@@ -197,7 +197,7 @@
           "problem": "grep은 .gitignore 규칙을 자동 적용하지 않아 코드베이스 검색 시 제외 대상을 별도로 지정해야 한다",
           "solution": "병렬 재귀 검색, .gitignore 규칙 기본 적용, 바이너리 파일 기본 제외, 색상 지원",
           "relation": "alternative",
-          "boundary": "스크립트에서 grep은 여전히 포터블. ripgrep은 인터랙티브 검색에 최적화",
+          "boundary": "스크립트에서 grep은 여전히 포터블. ripgrep은 인터랙티브 검색에 최적화. 재귀 검색·ignore·숨김 파일 기본값과 옵션이 달라 alias grep='rg'로 일괄 치환하기보다 rg를 명시적으로 사용한다",
           "install": "brew install ripgrep",
           "tldr": "rg",
           "url": "https://github.com/BurntSushi/ripgrep"
