@@ -27,18 +27,18 @@ cat
 
 ```text
 cmdtreemap/
-├── catalog.json              # CLI·Web 공통 데이터 원본
+├── catalog.json              # Go 내장용 생성본 (직접 수정 금지)
 ├── Makefile                   # 루트에서 web / cli / test 실행
 ├── main.go                    # CLI 진입점
 ├── internal/
 │   ├── model/                 # 공통 JSON을 읽는 Go 데이터 구조
 │   └── tui/                   # Bubble Tea 기반 터미널 UI
 ├── scripts/
-│   └── sync-blog.sh           # 정적 Web 파일·블로그 동기화
+│   └── sync-blog.sh           # 블로그 데이터 가져오기 호출
 └── web/
     ├── index.html             # Web 진입점
     ├── app.js                 # DOM 생성·tree·상세 화면·검색
-    └── app.css                # 독립 Web·블로그 공통 스타일
+    └── app.css                # 독립 Web 스타일
 ```
 
 ## 구현 역할
@@ -46,11 +46,11 @@ cmdtreemap/
 - `internal/model`: CLI에서 공통 JSON을 읽는 Go 데이터 구조다.
 - `internal/tui`: TTY와 Bubble Tea를 사용하는 CLI 화면을 담당한다.
 - `web/app.js`: mount point 내부의 markup, tree, 검색, 상세 화면을 담당한다.
-- `web/app.css`: 독립 Web 페이지와 블로그 탭이 함께 사용하는 스타일이다.
-- `catalog.json`: CLI·Web 공통 데이터의 유일한 원본이다. 로컬 Web은 루트의 JSON을 직접 읽고 CLI는 `main.go`의 `go:embed`로 빌드에 포함한다. 내장용 `catalog.json`은 `go generate` 또는 `make prepare`로 원본에서 생성하며 직접 수정하지 않는다.
+- `web/app.css`: 독립 Web 페이지의 스타일이다. 블로그 스타일은 블로그에서 별도로 관리한다.
+- `../reference/cli/catalog.json`: CLI·Web 공통 데이터의 유일한 원본이다. 로컬 Web은 원본을 직접 읽고 CLI는 생성된 복사본을 `main.go`의 `go:embed`로 빌드에 포함한다. 내장용 `catalog.json`은 `go generate` 또는 `make prepare`로 원본에서 생성하며 직접 수정하지 않는다.
 
 공통화 대상은 데이터 원본이다. CLI는 Go·Bubble Tea, Web은 JavaScript·DOM으로 화면을 구현한다.
-독립 Web 페이지와 블로그는 같은 `app.js`·`app.css`를 사용한다. Web에는 Go 런타임이나 별도 빌드가 필요 없다.
+독립 Web 페이지와 블로그는 각자 `app.js`·`app.css`를 관리하며 데이터만 공유한다. Web에는 Go 런타임이나 별도 빌드가 필요 없다.
 
 ## CLI 실행
 
@@ -83,7 +83,7 @@ go build -o cmdtreemap .
 
 ## Web 개발 실행
 
-프로젝트 루트에서 빌드 없이 정적 서버를 실행한다. 데이터는 루트의 `catalog.json`을 그대로 사용한다.
+프로젝트 루트에서 빌드 없이 정적 서버를 실행한다. 데이터는 `../reference/cli/catalog.json`을 그대로 사용한다.
 필요 도구는 Make·Python 3이며, CLI·테스트에는 Go·Node.js도 필요하다.
 `file://`로 직접 열면 JSON을 읽는 `fetch`가 제한될 수 있다.
 
@@ -113,7 +113,7 @@ Web UI의 1차 범위:
 독립 웹 화면은 `web/`, 공통 데이터 원본은 `../reference/cli/catalog.json`에 둔다. 블로그의 화면은 블로그 저장소에서 관리하며, devkit에서는 데이터만 가져간다.
 
 ```text
- devkit/cmdtreemap/{web/, catalog.json}
+ devkit/reference/{cheatsheets/, cli/}
           │
           │ scripts/sync-blog.sh
           ▼
@@ -133,13 +133,12 @@ cd /path/to/cmdtreemap
 ./scripts/sync-blog.sh /path/to/clang-engineer.github.io
 ```
 
-동기화 대상은 치트시트 메타와 CLI 관계 데이터만이다. 아래 웹 파일 목록은 독립 웹 도구의 구성이다.
+동기화 대상은 치트시트 메타와 CLI 관계 데이터만이다.
 
 ```text
-index.html
-app.js
-app.css
-catalog.json
+_data/cheatsheets.json
+cmdtreemap/catalog.json
+_data/devkit-source.json
 ```
 
 블로그의 `tools/sync-devkit.py`가 `reference/cheatsheets/catalog.json`과 `reference/cli/catalog.json`만 가져온다. HTML·JS·CSS는 덮어쓰지 않는다.
@@ -162,7 +161,7 @@ catalog.json
 [ ] go vet ./...
 [ ] node --test web/*.test.cjs scripts/*.test.cjs
 [ ] go generate
-go build -o cmdtreemap .
+[ ] go build -o cmdtreemap .
 [ ] node --check web/app.js
 [ ] 로컬 Web 서버에서 tree와 상세 화면 확인
 [ ] tldr와 공식 문서 링크 확인
@@ -176,3 +175,5 @@ go build -o cmdtreemap .
 ## 원본 경로
 
 CLI 데이터 원본은 `../reference/cli/catalog.json`이다. 이 디렉터리의 `catalog.json`은 Go 내장용 생성본이다. 테스트와 실행 전 `make prepare`, 직접 빌드 전 `go generate`로 갱신한다. 웹은 원본을 직접 읽는다. 블로그는 자체 화면과 검색을 유지하며 데이터만 가져간다.
+
+블로그 배포 Actions는 실행마다 devkit의 main 커밋을 한 번 확인하고 그 커밋에서 두 데이터를 함께 가져온다. 사용한 커밋은 `_data/devkit-source.json`에 기록한다. devkit 변경은 다음 블로그 빌드에 반영되며, 정기 빌드는 6시간마다 실행한다. 즉시 반영하려면 블로그 Build and Deploy를 수동 실행한다.
