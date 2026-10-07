@@ -291,32 +291,48 @@ move-window -s 3 -t 1    # 윈도우를 특정 인덱스로 이동
 
 ### 타겟 형식 (`-s`, `-t` 공통)
 
+기본 모양은 `session:window.pane`이다. 단, tmux 명령마다 필요한 target 타입이 다르다.
+
+| 명령이 요구하는 타입 | 기본 형식 | 예 |
+|---|---|---|
+| `target-session` | `session` | `attach -t work` |
+| `target-window` | `session:window` | `select-window -t work:2` |
+| `target-pane` | `session:window.pane` | `select-pane -t work:2.1` |
+
+#### 생략과 구분자
+
+- session을 생략하면 현재 세션, 없으면 최근 세션을 사용한다.
+- window를 생략하면 해당 세션의 현재 윈도우를 사용한다.
+- pane을 생략하면 해당 윈도우의 active pane을 사용한다.
+- `:`는 session/window 경계, `.`은 window/pane 경계다.
+
+| 표기 | 의미 |
+|------|------|
+| `mysess:2.1` | `mysess` 세션의 2번 윈도우, 1번 pane |
+| `:2.1` | 현재 세션의 2번 윈도우, 1번 pane |
+| `:.1` | 현재 세션/현재 윈도우의 1번 pane |
+| `:2` | 현재 세션의 2번 윈도우 또는 그 윈도우의 active pane |
+| `mysess:` | `mysess` 세션의 현재 윈도우 또는 빈 윈도우 슬롯이 필요한 명령에서는 다음 빈 index |
+
+#### 단일 값 `-t 1`의 함정
+
+`-t 1`처럼 `:`, `.`, `%`로 명시하지 않으면 **명령이 요구하는 target 타입**과 현재 상태에 따라 tmux가 가장 그럴듯한 대상을 고른다.
+
+```bash
+tmux select-pane -t 1    # 보통 현재 window의 pane 1. 없으면 window/session 쪽으로도 해석 시도
+tmux select-window -t 1  # window 1
+tmux attach -t 1         # session 1 또는 이름/접두어가 1인 session
 ```
-[session:][window.]pane    ← [ ]는 선택
+
+스크립트나 자동화에서는 모호한 단일 숫자를 피한다.
+
+```bash
+tmux select-pane -t :.1  # 현재 window의 pane 1로 명시
+tmux select-window -t :1 # 현재 session의 window 1로 명시
+tmux send-keys -t %12    # pane ID 12로 명시
 ```
 
-구분자(`:`, `.`)는 **"앞 레벨이 존재한다"는 신호**. 생략하면 현재 컨텍스트가 채워짐.
-
-**생략 규칙**: 왼쪽(상위)부터 순서대로 떨어진다. 중간만 빼는 건 불가.
-
-| 생략 | 결과 표기 |
-|------|-----------|
-| 없음 | `session:window.pane` |
-| session 생략 | `window.pane` |
-| session + window 생략 | `pane` |
-
-| 표기 | 의미 | 비고 |
-|------|------|------|
-| `1` | 현재 윈도우의 페인 1 | 가장 짧은 형태 |
-| `2.1` | 현재 세션, 윈도우 2의 페인 1 | `.`이 있으니 앞 숫자는 윈도우 |
-| `:2.1` | 〃 | `:`을 명시한 형태 — `2.1`과 동일 |
-| `:2` | 현재 세션의 윈도우 2 (활성 페인) | 윈도우만 지정 |
-| `mysess:2.1` | 다른 세션 `mysess`의 윈도우 2, 페인 1 | 풀 경로 |
-| `mysess:` | 세션 자체 | 뒤가 빈 형태 |
-
-> 단일 숫자 `2`는 명령어에 따라 페인/윈도우/세션 중 어디로 해석될지 모호함(`select-pane` vs `select-window`). 의도를 명확히 하려면 `.`이나 `:`을 붙여 레벨을 명시.
-
-> **index vs id**: 위 `window.pane` 번호(`pane_index`)는 **위치 기반이라 페인 추가/삭제 시 재정렬**된다. 반면 `pane_id`(`%0`, `%12` — `$TMUX_PANE`에 들어있는 값)는 페인 생존 동안 **불변**. 스크립트로 특정 페인을 조준할 땐 index가 아니라 `%id`로 쏴야 중간에 안 엉킨다. 매핑은 `tmux list-panes -F '#{pane_id} #{window_index}.#{pane_index}'`.
+> **index vs id**: `window.pane` 번호(`pane_index`)는 위치 기반이라 pane 추가/삭제 시 재정렬된다. 반면 `pane_id`(`%0`, `%12` — `$TMUX_PANE`에 들어있는 값)는 pane 생존 동안 불변이다. 스크립트로 특정 pane을 조준할 땐 index보다 `%id`가 안전하다. 매핑은 `tmux list-panes -F '#{pane_id} #{window_index}.#{pane_index}'`.
 
 ### join-pane 옵션
 
