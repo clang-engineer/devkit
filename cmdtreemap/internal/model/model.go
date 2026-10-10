@@ -7,7 +7,7 @@ type Relation struct {
 	Group    string `json:"group"`
 	Problem  string `json:"problem"`
 	Solution string `json:"solution"`
-	Relation string `json:"relation"` // alternative, specialized, complement, successor
+	Relation string `json:"relation"` // alternative, replacement, complement, wrapper, specialized
 	Boundary string `json:"boundary,omitempty"`
 	Install  string `json:"install,omitempty"`
 	Tldr     string `json:"tldr,omitempty"`
