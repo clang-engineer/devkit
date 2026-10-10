@@ -75,6 +75,7 @@
 | 파일 | 설명 |
 |------|------|
 | [git.md](git.md) | Git 명령어 (브랜치, stash, rebase, tag 등) |
+| [jj.md](jj.md) | Jujutsu(jj) — change, revision, operation log 및 Git 원격 연동 |
 | [git-delta.md](git-delta.md) | git-delta — Git diff pager |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 |
 
