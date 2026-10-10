@@ -1288,6 +1288,19 @@
           "boundary": "Doom Emacs는 독립 편집기 엔진이 아니라 Emacs 위에 설치하는 설정 프레임워크다. Emacs를 먼저 설치해야 한다.",
           "tldr": "doom-emacs",
           "url": "https://github.com/doomemacs/doomemacs"
+        },
+        {
+          "from": "neovim",
+          "to": "zed",
+          "why": "터미널 기반 편집기와 GUI 기반 통합 개발 환경 중 작업 방식을 선택한다",
+          "group": "code-editor",
+          "problem": "터미널 기반 편집기와 GUI 기반 통합 개발 환경 중 작업 방식을 선택한다",
+          "solution": "고성능 GUI 편집, 코드 인텔리전스, 협업 및 AI 에이전트 통합",
+          "relation": "alternative",
+          "boundary": "Zed는 Neovim의 후계나 완전한 호환 구현이 아니다. Vim·Helix식 키 바인딩을 일부 지원하지만 확장 방식, 실행 환경과 플러그인이 다르다.",
+          "install": "brew install --cask zed",
+          "tldr": "zed",
+          "url": "https://zed.dev/"
         }
       ],
       "commands": [
@@ -1320,6 +1333,11 @@
           "name": "doom-emacs",
           "description": "Emacs에 모듈과 Vim식 사용 환경을 제공하는 구성 프레임워크",
           "tldr": "doom-emacs"
+        },
+        {
+          "name": "zed",
+          "description": "Rust 기반 고성능 GUI 코드 편집기와 협업·AI 기능",
+          "tldr": "zed"
         }
       ]
     },
