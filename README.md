@@ -26,7 +26,7 @@ Tool introductions and operational references. Full index with descriptions:
 
 **Containers & build** · [kubectl](reference/cheatsheets/kubectl.md) · [docker](reference/cheatsheets/docker.md) · [make](reference/cheatsheets/make.md)
 
-**Git & version control** · [git](reference/cheatsheets/git.md) · [gh](reference/cheatsheets/gh.md) · [code review glossary](reference/cheatsheets/code-review-glossary.md) · [chezmoi](reference/cheatsheets/chezmoi.md)
+**Git & version control** · [git](reference/cheatsheets/git.md) · [gh](reference/cheatsheets/gh.md) · [code review glossary](reference/cheatsheets/code-review-glossary.md) · [chezmoi](reference/cheatsheets/chezmoi.md) · [jujutsu/jj](reference/cheatsheets/jj.md)
 
 **Security & secrets** · [sops](reference/cheatsheets/sops.md)
 
