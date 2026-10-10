@@ -346,6 +346,23 @@
           "file": "git.md"
         },
         {
+          "slug": "jj",
+          "name": "Jujutsu (jj)",
+          "desc": "Change ID, working-copy commit, operation log 및 Git 백엔드 기반의 버전 관리.",
+          "tldr": "common/jj",
+          "official": [
+            {
+              "label": "Jujutsu documentation",
+              "url": "https://docs.jj-vcs.dev/latest/"
+            }
+          ],
+          "custom": {
+            "label": "devkit jj Cheatsheet",
+            "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/jj.md"
+          },
+          "file": "jj.md"
+        },
+        {
           "slug": "git-delta",
           "name": "git-delta",
           "desc": "Git diff와 show 출력을 읽기 쉽게 만드는 syntax-highlighting pager.",
