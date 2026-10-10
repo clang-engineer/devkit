@@ -547,6 +547,19 @@
           "install": "brew install sesh",
           "tldr": "sesh",
           "url": "https://github.com/joshmedeski/sesh"
+        },
+        {
+          "from": "tmux",
+          "to": "herdr",
+          "why": "여러 코딩 에이전트의 세션 상태와 원격 작업을 별도로 추적해야 한다",
+          "group": "agent-sessions",
+          "problem": "여러 코딩 에이전트의 세션 상태와 원격 작업을 별도로 추적해야 한다",
+          "solution": "백그라운드 터미널 유지, 코딩 에이전트 상태 표시, 여러 머신의 세션 관리",
+          "relation": "specialized",
+          "boundary": "Herdr는 tmux 일반 기능의 완전한 후계가 아니다. 에이전트 중심 터미널 워크스페이스에 특화되며 tmux 설정·키·스크립트와 호환을 가정하지 않는다.",
+          "install": "brew install herdr",
+          "tldr": "herdr",
+          "url": "https://github.com/herdrdev/herdr"
         }
       ],
       "commands": [
@@ -569,6 +582,11 @@
           "name": "sesh",
           "description": "tmux 세션을 검색·생성·전환하는 세션 관리자",
           "tldr": "sesh"
+        },
+        {
+          "name": "herdr",
+          "description": "코딩 에이전트의 백그라운드 터미널·상태·원격 세션을 관리하는 멀티플렉서",
+          "tldr": "herdr"
         }
       ]
     },
@@ -1213,6 +1231,240 @@
           "name": "uv",
           "description": "Python 패키지·가상환경·프로젝트 실행을 빠르게 처리하는 도구",
           "tldr": "uv"
+        }
+      ]
+    },
+    {
+      "name": "Terminal Editors",
+      "why": "키보드 중심 편집기의 계보와 편집 모델, 배포판을 비교한다",
+      "relations": [
+        {
+          "from": "vim",
+          "to": "neovim",
+          "why": "전통적 Vim 기반 편집 환경의 확장 방식을 선택해야 한다",
+          "group": "modal-editor",
+          "problem": "전통적 Vim 기반 편집 환경의 확장 방식을 선택해야 한다",
+          "solution": "Lua API, 비동기 플러그인 생태계",
+          "relation": "alternative",
+          "boundary": "Neovim은 Vim의 모든 플러그인·설정을 무조건 동일하게 실행하는 완전한 호환 대체가 아니다.",
+          "install": "brew install neovim",
+          "tldr": "neovim",
+          "url": "https://neovim.io/"
+        },
+        {
+          "from": "vim",
+          "to": "kakoune",
+          "why": "Vim의 동사→대상 조합과 다른 모달 편집 방식을 탐색하고 싶다",
+          "group": "modal-editor",
+          "problem": "Vim의 동사→대상 조합과 다른 모달 편집 방식을 탐색하고 싶다",
+          "solution": "선택 먼저(select-first) 편집 모델, 다중 선택",
+          "relation": "alternative",
+          "boundary": "Kakoune은 Vim 키 조작의 호환 구현이 아니다. 익숙한 명령을 그대로 사용할 수 없으며 편집 철학이 다르다.",
+          "install": "brew install kakoune",
+          "tldr": "kakoune",
+          "url": "https://kakoune.org/"
+        },
+        {
+          "from": "kakoune",
+          "to": "helix",
+          "why": "선택 중심 편집과 현대적인 개발 기능을 함께 쓰고 싶다",
+          "group": "modal-editor",
+          "problem": "선택 중심 편집과 현대적인 개발 기능을 함께 쓰고 싶다",
+          "solution": "선택 우선 모델, 내장 Tree-sitter·LSP 지원",
+          "relation": "alternative",
+          "boundary": "Helix는 Kakoune의 포크나 호환 구현이 아니다. 플러그인과 키 조작의 동일성을 기대하지 않는다.",
+          "install": "brew install helix",
+          "tldr": "helix",
+          "url": "https://helix-editor.com/"
+        },
+        {
+          "from": "emacs",
+          "to": "doom-emacs",
+          "why": "Emacs를 직접 처음부터 구성하는 진입 비용이 있다",
+          "group": "emacs-distribution",
+          "problem": "Emacs를 직접 처음부터 구성하는 진입 비용이 있다",
+          "solution": "Vim식 모달 편집 선택, 사전 구성된 모듈과 설정",
+          "relation": "specialized",
+          "boundary": "Doom Emacs는 독립 편집기 엔진이 아니라 Emacs 위에 설치하는 설정 프레임워크다. Emacs를 먼저 설치해야 한다.",
+          "tldr": "doom-emacs",
+          "url": "https://github.com/doomemacs/doomemacs"
+        }
+      ],
+      "commands": [
+        {
+          "name": "vim",
+          "description": "모달 편집의 대표적인 텍스트 편집기",
+          "tldr": "vim"
+        },
+        {
+          "name": "neovim",
+          "description": "Vim 계열의 확장 가능한 편집기",
+          "tldr": "neovim"
+        },
+        {
+          "name": "kakoune",
+          "description": "선택 우선 편집 모델을 사용하는 모달 편집기",
+          "tldr": "kakoune"
+        },
+        {
+          "name": "helix",
+          "description": "Tree-sitter와 LSP를 기본 지원하는 선택 중심 편집기",
+          "tldr": "helix"
+        },
+        {
+          "name": "emacs",
+          "description": "확장 가능한 텍스트 편집 환경",
+          "tldr": "emacs"
+        },
+        {
+          "name": "doom-emacs",
+          "description": "Emacs에 모듈과 Vim식 사용 환경을 제공하는 구성 프레임워크",
+          "tldr": "doom-emacs"
+        }
+      ]
+    },
+    {
+      "name": "Window Managers",
+      "why": "창 배치와 가상 작업공간 관리의 플랫폼별 대안을 구분한다",
+      "relations": [
+        {
+          "from": "i3",
+          "to": "sway",
+          "why": "i3식 타일링 워크플로를 Wayland 환경에서 사용하고 싶다",
+          "group": "linux-tiling",
+          "problem": "i3식 타일링 워크플로를 Wayland 환경에서 사용하고 싶다",
+          "solution": "Wayland 기반 타일링, i3와 유사한 설정 및 키 조작",
+          "relation": "alternative",
+          "boundary": "Sway는 Wayland용으로 설계됐으며 i3/X11의 모든 설정과 외부 도구가 그대로 호환되지는 않는다.",
+          "tldr": "sway",
+          "url": "https://swaywm.org/"
+        },
+        {
+          "from": "i3",
+          "to": "aerospace",
+          "why": "macOS에서도 키보드 중심 창 타일링과 작업공간 전환이 필요하다",
+          "group": "tiling-platforms",
+          "problem": "macOS에서도 키보드 중심 창 타일링과 작업공간 전환이 필요하다",
+          "solution": "macOS의 작업공간·창 타일링, 키보드 중심 조작",
+          "relation": "alternative",
+          "boundary": "AeroSpace는 macOS용 별도 구현이며 i3의 포트가 아니다. Linux/X11 워크플로와 직접 호환되지 않는다.",
+          "install": "brew install --cask aerospace",
+          "tldr": "aerospace",
+          "url": "https://github.com/nikitabobko/AeroSpace"
+        },
+        {
+          "from": "aerospace",
+          "to": "yabai",
+          "why": "macOS의 서로 다른 타일링·공간 제어 접근을 비교하고 싶다",
+          "group": "macos-tiling",
+          "problem": "macOS의 서로 다른 타일링·공간 제어 접근을 비교하고 싶다",
+          "solution": "BSP 기반 창 배치, macOS Spaces와의 통합",
+          "relation": "alternative",
+          "boundary": "둘은 대안이지 계승 관계가 아니다. yabai의 고급 Spaces 제어는 macOS 버전 및 추가 권한·설정의 영향을 받는다.",
+          "install": "brew install koekeishiya/formulae/yabai",
+          "tldr": "yabai",
+          "url": "https://github.com/koekeishiya/yabai"
+        }
+      ],
+      "commands": [
+        {
+          "name": "i3",
+          "description": "X11 기반의 수동 타일링 윈도 매니저",
+          "tldr": "i3"
+        },
+        {
+          "name": "sway",
+          "description": "Wayland 기반 i3 스타일 타일링 컴포지터",
+          "tldr": "sway"
+        },
+        {
+          "name": "aerospace",
+          "description": "macOS용 타일링 창·작업공간 관리자",
+          "tldr": "aerospace"
+        },
+        {
+          "name": "yabai",
+          "description": "macOS용 BSP 기반 타일링 윈도 매니저",
+          "tldr": "yabai"
+        }
+      ]
+    },
+    {
+      "name": "Terminal Applications",
+      "why": "터미널 에뮬레이터와 AI 통합형 개발 터미널의 경계를 비교한다",
+      "relations": [
+        {
+          "from": "ghostty",
+          "to": "warp",
+          "why": "전통적인 고성능 터미널과 AI 기반 인터페이스 중 사용 흐름을 선택해야 한다",
+          "group": "terminal-ui",
+          "problem": "전통적인 고성능 터미널과 AI 기반 인터페이스 중 사용 흐름을 선택해야 한다",
+          "solution": "AI 보조 기능, 명령 블록·워크플로 통합",
+          "relation": "alternative",
+          "boundary": "Warp와 Ghostty는 서로 다른 설계 우선순위의 터미널이다. Warp를 Ghostty의 후계나 완전한 대체로 보지 않으며 계정·서비스 기능과 플랫폼 지원을 확인한다.",
+          "tldr": "warp",
+          "url": "https://www.warp.dev/"
+        }
+      ],
+      "commands": [
+        {
+          "name": "ghostty",
+          "description": "GPU 가속과 네이티브 경험에 중점을 둔 터미널 에뮬레이터",
+          "tldr": "ghostty"
+        },
+        {
+          "name": "warp",
+          "description": "AI 보조와 명령 실행 워크플로를 결합한 터미널",
+          "tldr": "warp"
+        }
+      ]
+    },
+    {
+      "name": "Programming Languages",
+      "why": "언어의 용도와 메모리·빌드 모델을 비교하며 도구 지도와 구분한다",
+      "relations": [
+        {
+          "from": "c",
+          "to": "zig",
+          "why": "C 기반 시스템 개발에서 빌드·교차 컴파일·안전성 검사를 어떻게 개선할지 고민한다",
+          "group": "systems-language",
+          "problem": "C 기반 시스템 개발에서 빌드·교차 컴파일·안전성 검사를 어떻게 개선할지 고민한다",
+          "solution": "명시적인 메모리 관리, 교차 컴파일, 빌드 시스템",
+          "relation": "alternative",
+          "boundary": "Zig는 C의 바이너리·소스 수준 완전 대체재가 아니다. 언어 문법·ABI·런타임·생태계의 차이를 검토해야 한다.",
+          "install": "brew install zig",
+          "tldr": "zig",
+          "url": "https://ziglang.org/"
+        },
+        {
+          "from": "rust",
+          "to": "zig",
+          "why": "시스템 프로그래밍에서 안전성의 보장 방식과 제어권을 비교하고 싶다",
+          "group": "systems-language",
+          "problem": "시스템 프로그래밍에서 안전성의 보장 방식과 제어권을 비교하고 싶다",
+          "solution": "컴파일 시점 검사와 명시적 제어, C 상호운용성",
+          "relation": "alternative",
+          "boundary": "Rust의 소유권·차용 검사를 Zig가 동일하게 보장하지 않는다. 이 관계는 우열이나 계보가 아니라 시스템 언어 선택지 비교다.",
+          "install": "brew install zig",
+          "tldr": "zig",
+          "url": "https://ziglang.org/"
+        }
+      ],
+      "commands": [
+        {
+          "name": "c",
+          "description": "저수준 시스템 프로그래밍에 널리 쓰이는 언어",
+          "tldr": "c"
+        },
+        {
+          "name": "rust",
+          "description": "소유권과 차용 검사를 통해 메모리 안전성을 강화하는 언어",
+          "tldr": "rust"
+        },
+        {
+          "name": "zig",
+          "description": "명시적인 제어와 교차 컴파일을 강조하는 시스템 프로그래밍 언어",
+          "tldr": "zig"
         }
       ]
     }
