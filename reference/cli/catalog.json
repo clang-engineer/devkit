@@ -968,6 +968,32 @@
           "tldr": "delta",
           "url": "https://github.com/dandavison/delta",
           "boundary": "Git이 만든 차이를 읽는 화면을 보완한다. Git의 비교·인덱스·patch 생성 자체는 계속 git diff가 맡는다. git config의 core.pager로 연결하며 alias git='delta'로 치환하지 않는다. 원본 출력이 필요하면 git --no-pager diff를 사용한다."
+        },
+        {
+          "from": "git",
+          "to": "jj",
+          "why": "Git의 스테이징·브랜치·리베이스 모델과 다른 변경 이력 관리 방식이 필요함",
+          "group": "version-control",
+          "problem": "복잡한 히스토리 수정·작업 전환에서 명시적인 스테이징과 브랜치 관리가 번거로울 수 있다",
+          "solution": "작업 복사본 자동 스냅샷, 변경 ID 중심 히스토리, 자동 리베이스, 충돌을 기록하는 작업 모델",
+          "relation": "alternative",
+          "boundary": "Jujutsu(jj)는 독립적인 버전 관리 인터페이스이며 Git 저장소와 함께 사용할 수 있지만 Git 명령의 완전한 drop-in replacement가 아니다. GitHub 등 호스팅 서비스는 Git 백엔드 연동을 활용한다.",
+          "install": "brew install jj",
+          "tldr": "jj",
+          "url": "https://github.com/jj-vcs/jj"
+        },
+        {
+          "from": "jj",
+          "to": "jjui",
+          "why": "jj 명령을 반복 입력하며 변경 이력을 탐색·조작하기 불편함",
+          "group": "version-control-tui",
+          "problem": "jj의 변경 이력과 작업을 CLI만으로 탐색할 때 여러 명령을 오가야 한다",
+          "solution": "Jujutsu 변경 이력·리비전·작업 관리를 위한 대화형 TUI",
+          "relation": "complement",
+          "boundary": "jjui는 jj 위에서 작동하는 사용자 인터페이스다. jj 버전 관리 엔진의 대체재가 아니며 Git용 lazygit과도 백엔드와 작업 모델이 다르다.",
+          "install": "brew install jjui",
+          "tldr": "jjui",
+          "url": "https://github.com/idursun/jjui"
         }
       ],
       "commands": [
@@ -1000,6 +1026,16 @@
           "name": "delta",
           "description": "Git diff와 diff 출력을 구문 강조와 레이아웃으로 보기 좋게 표시하는 도구",
           "tldr": "delta"
+        },
+        {
+          "name": "jj",
+          "description": "변경 ID와 자동 스냅샷 중심의 Jujutsu 버전 관리 CLI",
+          "tldr": "jj"
+        },
+        {
+          "name": "jjui",
+          "description": "Jujutsu 변경 이력과 작업을 탐색하는 터미널 UI",
+          "tldr": "jjui"
         }
       ]
     },
