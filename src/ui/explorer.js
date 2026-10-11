@@ -1,5 +1,7 @@
 import { escapeHtml as esc, fetchCatalog } from '../core/reference-data.js';
-import { RELATIONS, buildModel, filterModel, readHash, safeUrl, validateCatalog } from '../core/catalog.js';
+import { RELATIONS, buildModel, safeUrl, validateCatalog } from '../core/catalog.js';
+import { navigationGroups, explorerFilter, readExplorerHash } from '../core/navigation.js';
+import { overviewHtml } from '../graph/overview.js';
 import { layoutCategory } from '../graph/layout.js';
 import { parseTldr, tldrPaths } from '../integrations/tldr.js';
 
@@ -8,34 +10,35 @@ export function mount(root) {
   root.dataset.devkitMounted = 'true';
   const base = 'https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/';
   const defaults = root.dataset.defaultView === 'sheet' ? 'sheet' : 'map';
-  const state = { model: null, view: defaults, tool: '', category: 'all', query: '', tab: 'about', zoom: 1, error: '', edge: '' };
+  const state = { model: null, groups: [], expanded: new Set(), tool: '', category: 'all', query: '', tab: 'about', zoom: 1, error: '', edge: '' };
   const tldrCache = new Map();
   let tldrRequest = 0, loadRequest = 0;
   root.classList.add('dk-app');
   root.innerHTML = `
     <div class="dk-heading"><div><p class="dk-eyebrow">DEVKIT / TOOL EXPLORER</p><p class="dk-intro">도구의 관계를 살펴보고, 필요한 사용법으로 이어집니다.</p></div>
       <button type="button" data-fullscreen hidden aria-label="Devkit 전체 화면">전체 화면 ⛶</button></div>
-    <div class="dk-topbar"><div class="dk-views" role="group" aria-label="보기 방식">
-      <button type="button" data-view="map">도구 지도</button><button type="button" data-view="sheet">치트시트</button></div>
-      <label class="dk-search"><span class="dk-sr">도구 검색</span><input type="search" data-search placeholder="도구 검색 · fd, tmux, Helix…" autocomplete="off" disabled></label></div>
-    <div class="dk-categories" data-categories role="group" aria-label="분야 선택"></div>
     <div class="dk-statusbar"><p data-status role="status">Devkit 데이터를 불러오는 중…</p><button type="button" data-retry hidden>다시 시도</button></div>
     <p class="dk-sr" data-announcement role="status"></p>
-    <div class="dk-layout"><section class="dk-explorer" aria-label="도구 탐색">
-      <div class="dk-maptools" data-maptools><span>배경을 드래그해 이동 · 도구와 연결선 선택</span><div>
+    <div class="dk-layout"><aside class="dk-sidebar" aria-label="도구 검색과 분야">
+      <label class="dk-search"><span>도구 검색</span><input type="search" data-search placeholder="fd, tmux, Helix…" autocomplete="off" aria-controls="devkit-search-results" disabled></label>
+      <section class="dk-search-results" data-results hidden><p class="dk-search-hint">전체 분야에서 검색 · Enter로 사용법 열기</p><div id="devkit-search-results" data-list></div></section>
+      <nav class="dk-navigation" data-categories aria-label="전체와 세부 분류"></nav>
+    </aside><section class="dk-explorer" aria-label="도구 탐색">
+      <nav class="dk-breadcrumb" data-breadcrumb aria-label="지도 위치"></nav>
+      <div class="dk-maptools" data-maptools><span data-overview-actions><button type="button" data-expand-all>모두 펼치기</button><button type="button" data-collapse-all>모두 접기</button></span><div>
         <button type="button" data-zoom="out" aria-label="지도 축소">−</button><output data-scale>100%</output>
         <button type="button" data-zoom="in" aria-label="지도 확대">+</button><button type="button" data-zoom="fit">맞춤</button><button type="button" data-zoom="reset">초기화</button></div></div>
       <div class="dk-viewport" data-viewport tabindex="0" aria-label="도구 지도. 방향키로 이동하고 Tab으로 도구를 선택합니다."><div class="dk-stage" data-stage></div></div>
-      <div class="dk-list" data-list hidden aria-label="치트시트 도구 목록"></div>
       <p class="dk-legend" data-legend>실선: 대안·대체·특화 / 점선: 보완·래퍼. 연결선은 학습 순서나 출시 연대를 뜻하지 않습니다.</p>
     </section><aside class="dk-detail" data-detail aria-label="선택한 도구 상세"><div class="dk-placeholder"><span>↖</span><h2>궁금한 도구를 골라보세요</h2><p>소개와 관계, tldr 빠른 예시, 긴 치트시트와 공식 문서를 한곳에서 찾습니다.</p></div></aside></div>`;
   const $ = selector => root.querySelector(selector);
   const viewport = $('[data-viewport]'), stage = $('[data-stage]'), panel = $('[data-detail]');
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
   function remember() {
-    const hash = new URLSearchParams({ view: state.view });
+    const scope = state.model.categories.find(category => category.id === state.category)?.name || state.category;
+    const hash = new URLSearchParams({ scope, tab: state.tab });
+    if (state.expanded.size) hash.set('open', [...state.expanded].join(','));
     if (state.tool) hash.set('tool', state.tool);
-    if (state.category !== 'all') hash.set('category', state.category);
     if (state.query) hash.set('q', state.query);
     history.replaceState(null, '', '#' + hash);
   }
@@ -46,27 +49,37 @@ export function mount(root) {
   function linksHtml(links, empty) {
     return links.length ? `<ul class="dk-links">${links.map(link => `<li>${linkHtml(link)}</li>`).join('')}</ul>` : `<p class="dk-muted">${esc(empty)}</p>`;
   }
+  function renderNavigation() {
+    const active = state.groups.find(group => group.id === state.category || group.categories.some(category => category.id === state.category));
+    $('[data-categories]').innerHTML = `<button type="button" class="dk-nav-all" data-category="all" aria-pressed="${state.category === 'all' && !state.query}">◎ 전체 조망 <small>${state.model.tools.size}</small></button>` + state.groups.map(group => {
+      const open = state.expanded.has(group.id);
+      return `<section class="dk-nav-group"><div class="dk-nav-heading"><button type="button" data-category="${group.id}" aria-pressed="${group.id === state.category}">${group.name}<small>${group.tools.size}</small></button><button type="button" data-expand="${group.id}" aria-expanded="${open}" aria-label="${group.name} 세부 분류 ${open ? '접기' : '펼치기'}">${open ? '−' : '+'}</button></div><div class="dk-nav-children"${open ? '' : ' hidden'}>${group.categories.map(category => `<button type="button" data-category="${esc(category.id)}" aria-pressed="${category.id === state.category}">${esc(category.name)}<small>${category.count}</small></button>`).join('')}</div></section>`;
+    }).join('');
+    const category = state.model.categories.find(category => category.id === state.category);
+    $('[data-breadcrumb]').innerHTML = `<button type="button" data-category="all">전체 조망</button>` + (state.query ? '<span> / 전체 검색 결과</span>' : active ? `<span> / </span><button type="button" data-category="${active.id}">${active.name}</button>${category ? `<span> / ${esc(category.name)}</span>` : ''}` : '<span> / 분야를 펼쳐보세요</span>');
+  }
   function render() {
     if (!state.model) return;
-    const { model } = state, filtered = filterModel(model, state.category, state.query);
-    root.dataset.currentView = state.view;
-    root.querySelectorAll('[data-view]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.view === state.view)));
-    $('[data-categories]').innerHTML = [{ id: 'all', name: '전체' }, ...model.categories].map(category =>
-      `<button type="button" data-category="${esc(category.id)}" aria-pressed="${category.id === state.category}">${esc(category.name)}</button>`).join('');
-    const count = filtered.matches.size;
-    $('[data-status]').textContent = state.error || `${count}개 항목${state.view === 'map' ? ` · ${filtered.edges.length}개 관계` : ' · 같은 목록을 사용법 중심으로 보기'}`;
+    const filtered = explorerFilter(state.model, state.groups, state.category, state.query);
+    const overview = state.category === 'all' && !state.query.trim();
+    root.dataset.currentView = 'explorer';
+    renderNavigation();
+    $('[data-status]').textContent = state.error || (overview ? `${state.model.tools.size}개 도구 · ${state.model.edges.length}개 관계 · 분야를 펼치거나 검색하세요` : `${filtered.matches.size}개 도구 · ${filtered.edges.length}개 관계${state.query ? ' · 모든 분야 검색' : ''}`);
     $('[data-retry]').hidden = !state.error;
-    viewport.hidden = state.view !== 'map';
-    $('[data-maptools]').hidden = state.view !== 'map';
-    $('[data-legend]').hidden = state.view !== 'map';
-    $('[data-list]').hidden = state.view !== 'sheet';
-    if (state.view === 'map') renderMap(filtered); else renderList(filtered);
+    $('[data-results]').hidden = !state.query.trim();
+    $('[data-overview-actions]').hidden = !overview;
+    if (state.query.trim()) renderList(filtered); else $('[data-list]').innerHTML = '';
+    if (overview) stage.innerHTML = overviewHtml(state.groups, state.expanded, state.zoom, viewport.clientWidth < 560 ? 2 : 3);
+    else renderMap(filtered);
+    $('[data-legend]').textContent = overview ? '전체 조망의 선은 분류를 뜻합니다. +로 세부 분류를 펼치고 관계도로 들어가세요.' : '실선: 대안·대체·특화 / 점선: 보완·래퍼. 관계는 학습 순서나 출시 연대가 아닙니다. 배경을 드래그하거나 스크롤해 이동하세요.';
+    $('[data-scale]').textContent = Math.round(state.zoom * 100) + '%';
     highlight();
   }
   function renderMap(filtered) {
     stage.innerHTML = '';
     for (const category of state.model.categories) {
-      if (state.category !== 'all' && category.id !== state.category) continue;
+      const group = state.groups.find(group => group.id === state.category);
+      if (!state.query.trim() && state.category !== 'all' && (group ? !group.categories.some(item => item.id === category.id) : category.id !== state.category)) continue;
       const ids = [...filtered.visible].filter(id => state.model.tools.get(id).categories.includes(category.id));
       if (!ids.length) continue;
       const edges = filtered.edges.filter(edge => edge.category === category.id);
@@ -95,9 +108,11 @@ export function mount(root) {
     if (!stage.children.length) stage.innerHTML = '<p class="dk-empty">검색 결과가 없습니다. 검색어 또는 분야를 바꿔보세요.</p>';
   }
   function renderList(filtered) {
-    $('[data-list]').innerHTML = [...filtered.matches].map(id => {
+    const query = state.query.trim().toLowerCase();
+    const ids = [...filtered.matches].sort((a, b) => Number(state.model.tools.get(b).aliases.has(query)) - Number(state.model.tools.get(a).aliases.has(query)));
+    $('[data-list]').innerHTML = ids.map(id => {
       const tool = state.model.tools.get(id);
-      return `<button type="button" class="dk-tool-row" data-tool="${esc(id)}" aria-pressed="false"><span class="dk-row-title">${esc(tool.name)}</span><span class="dk-row-desc">${esc(tool.description || '도구 설명과 참고 자료 보기')}</span><span class="dk-row-resources">${[tool.tldr && 'tldr', tool.custom.length && '내 치트시트', tool.official.length && '공식 문서'].filter(Boolean).join(' · ') || '소개·관계'}</span></button>`;
+      return `<div class="dk-search-row"><button type="button" class="dk-tool-row" data-search-tool="${esc(id)}"><strong>${esc(tool.name)}</strong><span>${esc(tool.description || '소개와 자료 보기')}</span></button><button type="button" data-quick="${esc(id)}" aria-label="${esc(tool.name)} 사용법 바로 보기">사용법 ↗</button></div>`;
     }).join('') || '<p class="dk-empty">검색 결과가 없습니다.</p>';
   }
   function highlight() {
@@ -114,7 +129,6 @@ export function mount(root) {
     });
   }
   function centerSelected() {
-    if (state.view !== 'map') return;
     const node = [...stage.querySelectorAll('[data-tool]')].find(item => item.dataset.tool === state.tool);
     if (!node) return;
     const box = node.getBoundingClientRect(), frame = viewport.getBoundingClientRect();
@@ -131,7 +145,7 @@ export function mount(root) {
   function renderDetail() {
     tldrRequest++;
     const tool = state.model.tools.get(state.tool);
-    if (!tool) { panel.innerHTML = '<div class="dk-placeholder"><h2>도구를 선택하세요</h2><p>지도와 치트시트는 같은 도구 목록을 사용합니다.</p></div>'; return; }
+    if (!tool) { panel.innerHTML = '<div class="dk-placeholder"><h2>도구를 선택하세요</h2><p>분야를 펼치거나 검색하면 소개·사용법·문서 링크를 확인할 수 있습니다.</p></div>'; return; }
     const edges = state.model.edges.filter(edge => edge.from === tool.id || edge.to === tool.id);
     const tab = state.tab;
     panel.innerHTML = `<header class="dk-detail-head"><p class="dk-eyebrow">${esc(tool.categories.map(id => state.model.categories.find(category => category.id === id)?.name).join(' / '))}</p><h2>${esc(tool.name)}</h2><p>${esc(tool.description || '연결된 관계와 참고 자료에서 도구의 역할을 확인하세요.')}</p></header>
@@ -186,47 +200,77 @@ export function mount(root) {
     viewport.scrollLeft = (viewport.scrollLeft + viewport.clientWidth / 2) * state.zoom / before - viewport.clientWidth / 2;
     $('[data-scale]').textContent = Math.round(state.zoom * 100) + '%';
   }
+  function goToScope(scope) {
+    state.category = scope; state.query = ''; $('[data-search]').value = ''; state.zoom = 1;
+    const parent = state.groups.find(group => group.id === scope || group.categories.some(category => category.id === scope));
+    if (parent) state.expanded.add(parent.id);
+    render(); remember(); viewport.scrollTop = 0; viewport.scrollLeft = 0;
+    if (scope === 'all') fitOverview();
+  }
+  function findTool(id, tab = state.tab) {
+    const tool = state.model.tools.get(id);
+    if (!tool) return;
+    state.tab = tab;
+    goToScope(tool.categories[0] || 'all');
+    choose(id); centerSelected();
+  }
+  function fitOverview() {
+    const svg = stage.querySelector('svg');
+    if (svg && state.category === 'all' && !state.query.trim()) {
+      setZoom(Math.min(1, Math.max(.6, (viewport.clientWidth - 32) / Number(svg.dataset.width))));
+      viewport.scrollLeft = 0;
+    }
+  }
   function activate(event) {
-    const element = event.target.closest('button, [data-tool], [data-edge]');
+    const element = event.target.closest('button, [data-tool], [data-edge], [data-category], [data-expand]');
     if (!element || !root.contains(element)) return;
     const data = element.dataset;
     if ('retry' in data) { start(); return; }
     if (!state.model) return;
-    if (data.view) {
-      state.view = data.view; state.tab = data.view === 'sheet' ? 'usage' : 'about';
-      render(); renderDetail(); centerSelected(); remember();
-    } else if (data.category) {
-      state.category = data.category; state.zoom = 1;
-      render(); setZoom(1); viewport.scrollTop = 0; viewport.scrollLeft = 0; remember();
-      if (event.detail === 0) $('[data-category="' + data.category + '"]').focus();
-    } else if (data.tool) choose(data.tool);
+    if (data.category) {
+      goToScope(data.category);
+      if (event.detail === 0) $('[data-categories]').querySelector(`[data-category="${data.category}"]`)?.focus();
+    } else if (data.expand || 'expandAll' in data || 'collapseAll' in data) {
+      if ('expandAll' in data) state.expanded = new Set(state.groups.map(group => group.id));
+      else if ('collapseAll' in data) state.expanded.clear();
+      else if (!state.expanded.delete(data.expand)) state.expanded.add(data.expand);
+      render(); remember();
+      if (data.expand) {
+        const area = element.closest('svg') ? stage : $('[data-categories]');
+        area.querySelector(`[data-expand="${data.expand}"]`)?.focus({ preventScroll: true });
+      }
+    } else if (data.quick || data.searchTool) findTool(data.quick || data.searchTool, data.quick ? 'usage' : 'about');
+    else if (data.tool) choose(data.tool);
     else if (data.edge) {
       const edge = state.model.edges.find(item => item.id === data.edge);
       if (edge) { state.tab = 'about'; choose(edge.to); state.edge = edge.id; renderDetail(); }
-    } else if (data.related) {
-      state.category = 'all'; state.query = ''; $('[data-search]').value = '';
-      render(); choose(data.related, false);
-      const node = [...stage.querySelectorAll('[data-tool]')].find(item => item.dataset.tool === data.related);
-      node?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced() ? 'auto' : 'smooth' });
-    } else if (data.tab) { state.tab = data.tab; renderDetail(); if (event.detail === 0) $('[data-tab="' + data.tab + '"]').focus(); }
+    } else if (data.related) findTool(data.related, 'about');
+    else if (data.tab) { state.tab = data.tab; remember(); renderDetail(); if (event.detail === 0) $('[data-tab="' + data.tab + '"]').focus(); }
     else if (data.zoom) {
       if (data.zoom === 'fit') {
         const width = Math.max(1, ...[...stage.querySelectorAll('svg')].map(svg => Number(svg.dataset.width)));
         setZoom(Math.min(1, (viewport.clientWidth - 36) / width)); viewport.scrollLeft = 0;
       } else setZoom(data.zoom === 'reset' ? 1 : state.zoom + (data.zoom === 'in' ? .15 : -.15));
-    } else if ('retry' in data) start();
-    else if ('tldrRetry' in data) loadTldr(state.model.tools.get(state.tool), $('[data-tldr]'), ++tldrRequest);
+    } else if ('tldrRetry' in data && state.tool) loadTldr(state.model.tools.get(state.tool), $('[data-tldr]'), ++tldrRequest);
   }
   root.addEventListener('click', activate);
   root.addEventListener('keydown', event => {
-    if (event.target.matches('[data-tool], [data-edge]') && event.target.tagName.toLowerCase() === 'g' && ['Enter', ' '].includes(event.key)) { event.preventDefault(); activate(event); }
+    if (event.target.matches('[data-tool], [data-edge], [data-category], [data-expand]') && event.target.tagName.toLowerCase() === 'g' && ['Enter', ' '].includes(event.key)) { event.preventDefault(); activate(event); }
   });
   $('[data-search]').addEventListener('input', event => {
     state.query = event.target.value; render(); remember(); viewport.scrollTop = 0; viewport.scrollLeft = 0;
   });
+  $('[data-search]').addEventListener('keydown', event => {
+    if (!state.model) return;
+    if (event.key === 'Escape') { state.query = ''; event.target.value = ''; render(); remember(); }
+    if (event.key === 'Enter') {
+      const first = $('[data-list]').querySelector('[data-quick]');
+      if (first) { event.preventDefault(); findTool(first.dataset.quick, 'usage'); }
+    }
+  });
   let drag = null;
   viewport.addEventListener('pointerdown', event => {
-    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('[data-tool], [data-edge]')) return;
+    if (event.pointerType !== 'mouse' || event.button !== 0 || event.target.closest('[data-tool], [data-edge], [data-category], [data-expand]')) return;
     drag = { x: event.clientX, y: event.clientY, left: viewport.scrollLeft, top: viewport.scrollTop };
     viewport.setPointerCapture(event.pointerId); viewport.classList.add('is-dragging'); event.preventDefault();
   });
@@ -244,10 +288,10 @@ export function mount(root) {
     document.addEventListener('fullscreenchange', () => { $('[data-fullscreen]').textContent = document.fullscreenElement ? '전체 화면 닫기' : '전체 화면 ⛶'; });
   }
   function restore() {
-    Object.assign(state, readHash(location.hash, state.model, defaults));
-    state.tab = state.view === 'sheet' ? 'usage' : 'about';
-    $('[data-search]').value = state.query; render(); if (state.tool) choose(state.tool, false); else renderDetail(); centerSelected();
+    Object.assign(state, readExplorerHash(location.hash, state.model, state.groups, defaults));
+    $('[data-search]').value = state.query; render(); if (state.tool) choose(state.tool, false); else renderDetail(); centerSelected(); fitOverview();
   }
+  window.addEventListener('resize', () => { if (state.model && state.category === 'all' && !state.query.trim()) { render(); fitOverview(); } });
   window.addEventListener('hashchange', () => { if (state.model) restore(); });
   async function start() {
     const request = ++loadRequest;
@@ -265,6 +309,7 @@ export function mount(root) {
     }
     try {
       state.model = buildModel(map.status === 'fulfilled' ? map.value : undefined, sheets.status === 'fulfilled' ? sheets.value : undefined);
+      state.groups = navigationGroups(state.model);
       state.error = map.status === 'rejected' ? '관계 데이터를 불러오지 못했습니다. 치트시트 목록은 이용할 수 있습니다.' : sheets.status === 'rejected' ? '치트시트 데이터를 불러오지 못했습니다. 지도와 tldr는 이용할 수 있습니다.' : '';
       $('[data-search]').disabled = false; restore();
     } catch {

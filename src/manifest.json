@@ -4,8 +4,10 @@
   "style": "styles/explorer.css",
   "files": [
     "core/catalog.js",
+    "core/navigation.js",
     "core/reference-data.js",
     "graph/layout.js",
+    "graph/overview.js",
     "index.js",
     "integrations/tldr.js",
     "styles/explorer.css",

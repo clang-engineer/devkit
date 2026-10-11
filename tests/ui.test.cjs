@@ -1,5 +1,6 @@
 // Run the shared explorer and its view model, not the retired page renderers.
 require('./model.test.cjs');
+require('./navigation.test.cjs');
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
@@ -7,7 +8,7 @@ const vm = require('node:vm');
 const { resolve } = require('node:path');
 const base = resolve(__dirname, '..');
 const source = name => readFileSync(resolve(base, 'src', name), 'utf8');
-const bundle = ['core/reference-data.js', 'core/catalog.js', 'graph/layout.js', 'integrations/tldr.js'].map(file => source(file).replace(/^export /gm, '')).join('\n') + '\nconst esc = escapeHtml;\n' + source('ui/explorer.js').replace(/^import .*;\n/gm, '').replace(/^export /gm, '') + 
+const bundle = ['core/reference-data.js', 'core/catalog.js', 'core/navigation.js', 'graph/layout.js', 'graph/overview.js', 'integrations/tldr.js'].map(file => source(file).replace(/^import .*;\n/gm, '').replace(/^export /gm, '')).join('\n') + '\nconst esc = escapeHtml;\n' + source('ui/explorer.js').replace(/^import .*;\n/gm, '').replace(/^export /gm, '') + 
   '\nconst root = document.querySelector(\'[data-devkit]\'); if (root) mount(root);';
 const remote = 'https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/';
 
@@ -23,7 +24,7 @@ function node() {
     classList: { add() {}, remove() {}, toggle() {} },
     addEventListener(type, fn) { this.listeners[type] = fn; },
     querySelectorAll() { return []; },
-    setAttribute() {}, focus() {}, scrollIntoView() {},
+    querySelector() { return null; }, setAttribute() {}, focus() {}, scrollIntoView() {},
     append(child) { this.children.push(child); }, contains() { return true; },
   };
 }
@@ -77,11 +78,13 @@ test('both-source failure exposes retry and successful retry restores the map', 
   const s = await setup(async url => { if (fail) throw Error('offline'); return response(url); });
   assert.equal(s.get('[data-retry]').hidden, false);
   assert.equal(s.get('[data-search]').disabled, true);
-  await s.click({ view: 'sheet' }); // navigation cannot crash before the model exists
+  await s.click({ category: 'all' }); // navigation cannot crash before the model exists
   fail = false;
   await s.click({ retry: '' });
   assert.equal(s.get('[data-retry]').hidden, true);
   assert.equal(s.get('[data-search]').disabled, false);
+  assert.match(s.get('[data-stage]').innerHTML, /Developer Tools/);
+  await s.click({ category: 'map-0' });
   assert.ok(s.get('[data-stage]').children.some(board => board.innerHTML.includes('bat')));
 });
 test('one-source failure keeps other content available and retry removes the warning', async () => {
@@ -89,7 +92,7 @@ test('one-source failure keeps other content available and retry removes the war
   const s = await setup(async url => { if (fail && url.endsWith('/cheatsheets/catalog.json')) throw Error('offline'); return response(url); });
   assert.equal(s.get('[data-search]').disabled, false);
   assert.equal(s.get('[data-retry]').hidden, false);
-  assert.ok(s.get('[data-stage]').children.length > 0);
+  assert.match(s.get('[data-stage]').innerHTML, /Developer Tools/);
   fail = false; await s.click({ retry: '' });
   assert.equal(s.get('[data-retry]').hidden, true);
 });
@@ -104,15 +107,32 @@ test('invalid and duplicate source entries report errors rather than a blank suc
   assert.match(s.get('[data-status]').textContent, /치트시트 데이터를 불러오지 못/);
   assert.equal(s.get('[data-search]').disabled, false); // valid map is still useful
 });
-test('the same selected tool survives map/sheet switching and deep links', async () => {
-  const s = await setup(async url => response(url), '#cat');
-  await s.click({ view: 'sheet' });
-  assert.match(s.location.hash, /view=sheet/); assert.match(s.location.hash, /tool=cat/);
+test('legacy sheet links open usage in the unified graph; selection survives returning to overview', async () => {
+  const s = await setup(async url => response(url), '#view=sheet&tool=cat');
+  assert.ok(!s.root.innerHTML.includes('data-view='));
   assert.match(s.get('[data-detail]').innerHTML, /&lt;cat&gt;/);
-  assert.match(s.get('[data-list]').innerHTML, /data-tool="bat"/);
-  await s.click({ view: 'map' });
-  assert.match(s.location.hash, /view=map/); assert.match(s.location.hash, /tool=cat/);
+  assert.match(s.location.hash, /tab=usage/);
+  assert.match(s.location.hash, /tool=cat/);
+  await s.click({ category: 'all' });
+  assert.match(s.location.hash, /scope=all/);
+  assert.match(s.get('[data-stage]').innerHTML, /Developer Tools/);
   assert.match(s.get('[data-detail]').innerHTML, /&lt;cat&gt;/);
+});
+test('global search works from any category and offers direct usage', async () => {
+  const s = await setup(async url => response(url));
+  await s.click({ category: 'map-0' });
+  s.get('[data-search]').listeners.input({ target: { value: 'bat' } });
+  assert.equal(s.get('[data-results]').hidden, false);
+  assert.match(s.get('[data-list]').innerHTML, /data-quick="bat"/);
+  assert.match(s.get('[data-status]').textContent, /모든 분야 검색/);
+});
+test('overview expansion and collapse preserve all existing subcategories', async () => {
+  const s = await setup(async url => response(url));
+  assert.ok(!s.get('[data-stage]').innerHTML.includes('data-category="map-0"'));
+  await s.click({ expandAll: '' });
+  assert.match(s.get('[data-stage]').innerHTML, /data-category="map-0"/);
+  await s.click({ collapseAll: '' });
+  assert.ok(!s.get('[data-stage]').innerHTML.includes('data-category="map-0"'));
 });
 test('tldr retains placeholders, escapes content and falls back from common to platform pages', async () => {
   const requests = [];
