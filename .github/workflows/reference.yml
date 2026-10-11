@@ -4,12 +4,22 @@ on:
     paths:
       - 'reference/**'
       - 'cmdtreemap/**'
+      - 'src/**'
+      - 'web/**'
+      - 'tests/**'
+      - 'Makefile'
       - '.github/workflows/reference.yml'
   pull_request:
     paths:
       - 'reference/**'
       - 'cmdtreemap/**'
+      - 'src/**'
+      - 'web/**'
+      - 'tests/**'
+      - 'Makefile'
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   validate:
     runs-on: ubuntu-latest
@@ -18,7 +28,10 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: cmdtreemap/go.mod
-      - name: Validate and test cmdtreemap
+      - name: Validate shared JavaScript modules
+        run: |
+          for file in $(find src -name '*.js'); do node --input-type=module --check < "$file"; done
+      - name: Validate and test cmdtreemap and shared explorer
         working-directory: cmdtreemap
         run: |
           make test

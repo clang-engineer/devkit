@@ -5,13 +5,14 @@ Curated dev cheatsheets and templates I keep handy while working.
 **31 cheatsheets** across 9 categories · **6 templates** — generic,
 reusable references and starting points, not machine- or project-specific config.
 
-
 ## Shared explorer
 
 도구 데이터와 웹 UI의 원본은 이 저장소가 소유한다. 블로그는 빌드할 때
 이 저장소의 `src/manifest.json`에 명시된 파일을 가져와 정적 자산으로 배포한다.
 블로그에 두 번째 렌더러나 수동 동기화용 복사본을 두지 않는다.
 데이터는 지금처럼 브라우저에서 Devkit 원본 JSON을 직접 읽는다.
+JSON 변경은 다음 조회에, UI 코드 변경은 블로그의 다음 빌드·배포에 반영된다.
+Devkit 커밋만으로 블로그 배포를 자동 실행하지는 않는다.
 
 ```text
 reference/cli/catalog.json         관계·명령 데이터 (기존 경로 유지)
@@ -60,7 +61,7 @@ Tool introductions and operational references. Full index with descriptions:
 
 ## cmdtreemap
 
-CLI 도구의 대안·진화 관계를 터미널 TUI와 Web tree로 탐색합니다. 구조, 개발, 실행, 빌드와 데이터 배포 방법은 [cmdtreemap/README.md](cmdtreemap/README.md)를 참고하세요.
+CLI 도구의 대안·보완 관계를 터미널 TUI와 공통 웹 지도로 탐색합니다. 구조, 개발, 실행, 빌드와 데이터 배포 방법은 [cmdtreemap/README.md](cmdtreemap/README.md)를 참고하세요.
 
 ## Templates
 
