@@ -5,6 +5,36 @@ Curated dev cheatsheets and templates I keep handy while working.
 **31 cheatsheets** across 9 categories · **6 templates** — generic,
 reusable references and starting points, not machine- or project-specific config.
 
+
+## Shared explorer
+
+도구 데이터와 웹 UI의 원본은 이 저장소가 소유한다. 블로그는 빌드할 때
+이 저장소의 `src/manifest.json`에 명시된 파일을 가져와 정적 자산으로 배포한다.
+블로그에 두 번째 렌더러나 수동 동기화용 복사본을 두지 않는다.
+데이터는 지금처럼 브라우저에서 Devkit 원본 JSON을 직접 읽는다.
+
+```text
+reference/cli/catalog.json         관계·명령 데이터 (기존 경로 유지)
+reference/cheatsheets/catalog.json  치트시트 목록·문서 링크
+reference/cheatsheets/*.md          긴 문서 원본
+src/core/                         로딩·검증·공통 도구 ID·검색
+src/graph/                        관계도 배치
+src/integrations/                 tldr 페이지·예시 처리
+src/ui/                           탐색·상세 패널
+src/styles/                       블로그 테마와 독립적인 UI 스타일
+web/                              독립 웹 진입점
+cmdtreemap/                       Go TUI (데이터 계약 유지)
+tests/                            공통 UI·데이터 보존 테스트
+```
+
+`make web` 후 `/web/`을 연다. 기존 `/cmdtreemap/web/`도 같은 UI를 사용한다.
+`make test`는 Go 테스트와 공통 웹 테스트를 실행한다. 새 필드를 추가하기 전에는
+공통 도구 모델과 두 기존 카탈로그의 호환성을 먼저 확인한다.
+
+현재 두 JSON은 **기능별 원본을 유지**한다. 공통 모델에서 도구 ID로 연결하며,
+모든 필드를 단일 JSON으로 물리적으로 이전한 상태는 아니다. 기존 CLI, 문서 링크,
+외부 소비자와의 호환성을 유지한 채 단계적으로 정리한다.
+
 ## Cheatsheets
 
 Tool introductions and operational references. Full index with descriptions:

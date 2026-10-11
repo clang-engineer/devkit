@@ -1,0 +1,14 @@
+{
+  "api_version": 1,
+  "entry": "index.js",
+  "style": "styles/explorer.css",
+  "files": [
+    "core/catalog.js",
+    "core/reference-data.js",
+    "graph/layout.js",
+    "index.js",
+    "integrations/tldr.js",
+    "styles/explorer.css",
+    "ui/explorer.js"
+  ]
+}

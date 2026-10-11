@@ -25,32 +25,16 @@ cat
 - 이유나 개선점을 독립 노드로 만들지 않는다. 트리 깊이나 펼치기 단계를 추가하지 않고 도구를 선택한다.
 - 이 표시는 데이터에 정의된 대안·보완 관계이며, 실제 탄생 배경이나 계보를 입증하는 것은 아니다.
 
-## 디렉터리 구조
+## 구조와 소유권
 
-```text
-cmdtreemap/
-├── catalog.json              # Go 내장용 생성본 (직접 수정 금지)
-├── Makefile                   # 루트에서 web / cli / test 실행
-├── main.go                    # CLI 진입점
-├── internal/
-│   ├── model/                 # 공통 JSON을 읽는 Go 데이터 구조
-│   └── tui/                   # Bubble Tea 기반 터미널 UI
-└── web/
-    ├── index.html             # Web 진입점
-    ├── app.js                 # DOM 생성·tree·상세 화면·검색
-    └── app.css                # 독립 Web 스타일
-```
+Go 모델과 터미널 UI는 `internal/`에서 관리한다. 웹 화면은 저장소 루트의
+`src/`를 독립 웹과 블로그가 함께 사용한다. `web/`의 이전 자산 주소는
+공통 UI로 이어지는 호환 진입점이며, 별도 렌더러를 유지하지 않는다.
 
-## 구현 역할
-
-- `internal/model`: CLI에서 공통 JSON을 읽는 Go 데이터 구조다.
-- `internal/tui`: TTY와 Bubble Tea를 사용하는 CLI 화면을 담당한다.
-- `web/app.js`: mount point 내부의 markup, tree, 검색, 상세 화면을 담당한다.
-- `web/app.css`: 독립 Web 페이지의 스타일이다. 블로그 스타일은 블로그에서 별도로 관리한다.
-- `../reference/cli/catalog.json`: CLI·Web 공통 데이터의 유일한 원본이다. 로컬 Web은 원본을 직접 읽고 CLI는 생성된 복사본을 `main.go`의 `go:embed`로 빌드에 포함한다. 내장용 `catalog.json`은 `go generate` 또는 `make prepare`로 원본에서 생성하며 직접 수정하지 않는다.
-
-공통화 대상은 데이터 원본이다. CLI는 Go·Bubble Tea, Web은 JavaScript·DOM으로 화면을 구현한다.
-독립 Web 페이지와 블로그는 각자 `app.js`·`app.css`를 관리하며 데이터만 공유한다. Web에는 Go 런타임이나 별도 빌드가 필요 없다.
+CLI·웹 데이터 원본은 `../reference/cli/catalog.json`이다. Go 내장용
+`catalog.json`은 `go generate` 또는 `make prepare`로 생성한다.
+치트시트와 문서 링크는 `../reference/cheatsheets/catalog.json`에서 연결한다.
+전체 디렉터리와 개발 방법은 [저장소 README](../README.md)를 참고한다.
 
 ## CLI 실행
 
@@ -83,30 +67,15 @@ go build -o cmdtreemap .
 
 ## Web 개발 실행
 
-프로젝트 루트에서 빌드 없이 정적 서버를 실행한다. 데이터는 `../reference/cli/catalog.json`을 그대로 사용한다.
-필요 도구는 Make·Python 3이며, CLI·테스트에는 Go·Node.js도 필요하다.
-`file://`로 직접 열면 JSON을 읽는 `fetch`가 제한될 수 있다.
-
 ```bash
 make web
-# 포트 변경: make web PORT=8081
+# http://localhost:8080/cmdtreemap/web/
 ```
 
-브라우저에서 [http://localhost:8080/cmdtreemap/web/](http://localhost:8080/cmdtreemap/web/)을 연다.
-서버는 로컬 루프백 주소에만 바인딩된다. 루트 디렉터리를 제공하므로 외부 공개용 서버로 사용하지 않는다.
-`cat` 아래 `bat` 옆에 핵심 개선점이 표시되는지 확인한다. `bat`을 선택하면 상세에 `cat의 문제`, `bat의 개선점`, `남은 한계`가 함께 표시되어야 한다.
-JS·CSS·데이터 수정은 Web 재빌드 없이 새로고침하면 된다. 이전 화면이 남아 있으면 강력 새로고침한다. CLI 바이너리에 반영하려면 다시 빌드한다.
-
-Web UI의 1차 범위:
-
-- 카테고리별 시작 도구 → 대안·후속 도구의 중첩 tree
-- 분기·공유 목적지 지원, 순환 관계는 반복 도구에서 종료(`↩`)
-- 검색 결과의 상위 경로를 유지해 관계 맥락 표시
-- 중간 도구·말단 도구의 관계 선택과 상세 정보
-- 문제·해결·경계·설치 정보
-- 검색
-- tldr fetch
-- 공식 문서 링크
+저장소 루트에서는 `make web`으로 `/web/`을 열 수도 있다. 두 페이지가
+같은 `src/index.js`와 스타일을 사용하며, 별도 프레임워크 빌드는 필요 없다.
+지도·검색·확대·축소·상세 패널·tldr·전체 치트시트 링크를 제공한다.
+연결선은 정의된 관계이며 출시 순서나 학습 순서가 아니다.
 
 ## 블로그 연결
 
@@ -115,7 +84,7 @@ Web UI의 1차 범위:
 - CLI 지도: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/cli/catalog.json`
 - 치트시트 목록: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/cheatsheets/catalog.json`
 
-원본 변경은 GitHub raw 캐시 갱신 후 다음 페이지 로드에 반영된다. 데이터 변경만으로 블로그를 재배포할 필요는 없다. 네트워크 요청이 실패하면 화면의 다시 시도 버튼을 사용한다. 두 화면은 각자 독립된 카탈로그를 읽는다.
+원본 변경은 GitHub raw 캐시 갱신 후 다음 페이지 로드에 반영된다. 데이터 변경만으로 블로그를 재배포할 필요는 없다. 네트워크 요청이 실패하면 화면의 다시 시도 버튼을 사용한다. 공통 UI는 두 카탈로그를 하나의 도구 모델로 연결한다. UI 코드는 Devkit에서 관리하며 블로그 빌드가 동일한 소스를 가져간다.
 
 ## 개발 흐름
 
@@ -144,6 +113,6 @@ Web UI의 1차 범위:
 
 ## 원본 경로
 
-CLI 데이터 원본은 `../reference/cli/catalog.json`이다. 이 디렉터리의 `catalog.json`은 Go 내장용 생성본이다. 테스트와 실행 전 `make prepare`, 직접 빌드 전 `go generate`로 갱신한다. 웹은 원본을 직접 읽는다. 블로그는 자체 화면과 검색을 유지하며 데이터만 가져간다.
+CLI 데이터 원본은 `../reference/cli/catalog.json`이다. 이 디렉터리의 `catalog.json`은 Go 내장용 생성본이다. 테스트와 실행 전 `make prepare`, 직접 빌드 전 `go generate`로 갱신한다. 웹은 원본을 직접 읽는다. 블로그는 공통 UI를 재사용하고 데이터는 원본에서 직접 읽는다.
 
 블로그는 devkit main의 원본 JSON을 직접 읽는다. Go 내장용 생성본은 CLI 빌드를 위한 파일이며 블로그 동기화용 복사본이 아니다.

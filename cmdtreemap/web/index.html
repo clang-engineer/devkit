@@ -1,24 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>cmdtreemap</title>
-  <link rel="stylesheet" href="app.css">
-  <style>
-    :root { color-scheme: dark; }
-    body { margin: 0; background: #17191f; color: #e5e7eb; }
-    main { width: min(1180px, calc(100% - 2rem)); margin: 2rem auto; }
-    h1 { margin-bottom: 1rem; font: 700 2rem/1.25 system-ui, sans-serif; }
-    @media (max-width: 767px) { main { width: min(100% - 1rem, 680px); margin: 1rem auto; } }
-  </style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Devkit · 도구 탐색기</title>
+  <link rel="stylesheet" href="../../src/styles/explorer.css">
+  <style>body {margin:0;padding:24px;font-family:system-ui,sans-serif;background:#f8fafc;color:#213047;} main {max-width:1500px;margin:auto;} @media(max-width:850px){body{padding:12px}}</style>
 </head>
-<body>
-  <main>
-    <h1>cmdtreemap</h1>
-    <div id="cmdtreemap-root" data-source="../../reference/cli/catalog.json"></div>
-  </main>
-  <script type="module" src="app.js"></script>
-</body>
-</html>
-
+<body><main>
+  <h1>Devkit</h1>
+  <section data-devkit data-catalog="../../reference/cli/catalog.json" data-cheatsheets="../../reference/cheatsheets/catalog.json" aria-label="Devkit 도구 탐색"><p>데이터를 불러오는 중...</p></section>
+  <noscript><p>JavaScript가 필요합니다. <a href="https://github.com/clang-engineer/devkit/tree/main/reference/cheatsheets">치트시트 원본</a></p></noscript>
+</main><script type="module" src="../../src/index.js"></script></body></html>
