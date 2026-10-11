@@ -10,6 +10,15 @@
 }
 
 .cmdtreemap-status { margin: 0 0 .75rem; color: var(--cmd-muted); }
+.cmdtreemap-status > span:first-child { display: block; }
+.cmdtreemap-legend { display: flex; flex-wrap: wrap; gap: .45rem .8rem; margin-top: .65rem; font-size: .8rem; }
+.cmdtreemap-legend-item { display: inline-flex; align-items: center; gap: .35rem; }
+.cmdtreemap-relation-badge { display: inline-flex; align-items: center; margin-left: .45rem; padding: .08rem .4rem; border: 1px solid var(--cmd-line); border-radius: 999px; color: var(--cmd-muted); font-size: .72rem; font-weight: 700; line-height: 1.4; vertical-align: .08rem; white-space: nowrap; }
+.cmdtreemap-relation-badge--replacement { border-style: double; color: var(--cmd-text); }
+.cmdtreemap-relation-badge--complement { border-style: dashed; }
+.cmdtreemap-relation-badge--wrapper { border-style: dotted; }
+.cmdtreemap-relation-badge--specialized { border-radius: 4px; }
+.cmdtreemap-relation-description { color: var(--cmd-muted); }
 .cmdtreemap-search { width: 100%; padding: .7rem .85rem; border: 1px solid var(--cmd-line); border-radius: 6px; background: var(--cmd-panel); color: var(--cmd-text); font: inherit; }
 .cmdtreemap-layout { display: grid; grid-template-columns: minmax(240px, .8fr) minmax(0, 1.5fr); gap: 1.5rem; margin-top: 1.5rem; align-items: start; }
 .cmdtreemap-tree, .cmdtreemap-detail { min-width: 0; }

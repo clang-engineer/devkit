@@ -66,16 +66,39 @@ func (i treeItem) String() string {
 	}
 	if i.rel != nil && i.isDestination {
 		toStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDefault))
+		relation := relationTypeLabel(i.rel.Relation)
+		relationText := ""
+		if relation != "" {
+			relationStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
+			relationText = relationStyle.Render(" [" + relation + "]")
+		}
 		if summary := improvementSummary(i.rel.Solution); summary != "" {
 			summaryStyle := lipgloss.NewStyle().Foreground(lipgloss.Color(colorDim))
-			return toStyle.Render(name) + summaryStyle.Render(" — "+summary)
+			return toStyle.Render(name) + relationText + summaryStyle.Render(" — "+summary)
 		}
-		return toStyle.Render(name)
+		return toStyle.Render(name) + relationText
 	}
 	return name
 }
 
 // Keep the tree compact; the detail panel retains the complete solution.
+func relationTypeLabel(relation string) string {
+	switch relation {
+	case "alternative":
+		return "대안"
+	case "replacement":
+		return "대체"
+	case "complement":
+		return "보완"
+	case "wrapper":
+		return "래퍼"
+	case "specialized":
+		return "특화"
+	default:
+		return relation
+	}
+}
+
 func improvementSummary(solution string) string {
 	var parts []string
 	for _, part := range strings.Split(solution, ",") {
@@ -1260,6 +1283,9 @@ func (m *Model) buildPreviewContent(cmd *model.Command, d *model.Relation) strin
 	if d != nil {
 		b.WriteString(labelStyle.Render("관계"))
 		b.WriteString("\n  " + valueStyle.Render(d.From+" → "+d.To))
+		if relation := relationTypeLabel(d.Relation); relation != "" {
+			b.WriteString("\n  " + dimStyle.Render("유형: "+relation))
+		}
 		problem := d.Problem
 		if problem == "" {
 			problem = d.Why
