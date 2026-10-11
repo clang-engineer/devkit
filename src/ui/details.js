@@ -26,13 +26,13 @@ export function createDetailPanel(panel, { fetchImpl = globalThis.fetch, clipboa
     const tool = state.model.tools.get(state.tool);
     if (!tool) { panel.innerHTML = '<div class="dk-placeholder"><h2>도구를 선택하세요</h2><p>분야를 펼치거나 검색하면 소개·사용법·문서 링크를 확인할 수 있습니다.</p></div>'; return; }
     const edges = state.model.edges.filter(edge => edge.from === tool.id || edge.to === tool.id);
-    panel.innerHTML = `<header class="dk-detail-head"><p class="dk-eyebrow">${esc(tool.categories.map(id => state.model.categories.find(category => category.id === id)?.name).join(' / '))}</p><h2>${esc(tool.name)}</h2><p>${esc(tool.description || '연결된 관계와 참고 자료에서 도구의 역할을 확인하세요.')}</p></header>
+    panel.innerHTML = `<div class="dk-detail-actions"><span>도구 상세</span><button type="button" data-close-detail aria-label="상세 닫고 지도로 돌아가기">닫기 ×</button></div><header class="dk-detail-head"><p class="dk-eyebrow">${esc(tool.categories.map(id => state.model.categories.find(category => category.id === id)?.name).join(' / '))}</p><h2>${esc(tool.name)}</h2><p>${esc(tool.description || '연결된 관계와 참고 자료에서 도구의 역할을 확인하세요.')}</p></header>
       <div class="dk-detail-tabs" role="group" aria-label="도구 상세 보기">${[['about', '소개·비교'], ['usage', '사용법'], ['resources', '자료']].map(([id, label]) => `<button type="button" data-tab="${id}" aria-pressed="${tab === id}">${label}</button>`).join('')}</div><div class="dk-detail-body" data-body></div>`;
     const body = $('[data-body]');
     if (tab === 'about') {
       body.innerHTML = `<h3>연결된 도구 <small>${edges.length}</small></h3>` + (edges.length ? edges.map(edge => {
         const other = edge.from === tool.id ? edge.to : edge.from;
-        return `<details class="dk-relation" ${edge.id === state.edge ? 'open' : ''}><summary><span>${esc(state.model.tools.get(edge.from).name)} → ${esc(state.model.tools.get(edge.to).name)}</span><span class="dk-badge">${esc(RELATIONS[edge.relation] || edge.relation || '관계')}</span></summary><dl>${[['기존 문제', edge.problem || edge.why], ['개선점', edge.solution], ['선택할 때 주의할 점', edge.boundary]].filter(([, value]) => value).map(([label, value]) => `<dt>${label}</dt><dd>${esc(value)}</dd>`).join('')}</dl><button type="button" data-related="${esc(other)}">${esc(state.model.tools.get(other).name)} 살펴보기 →</button></details>`;
+        return `<details class="dk-relation" ${edge.id === state.edge || edges.length === 1 ? 'open' : ''}><summary><span>${esc(state.model.tools.get(edge.from).name)} → ${esc(state.model.tools.get(edge.to).name)}</span><span class="dk-badge">${esc(RELATIONS[edge.relation] || edge.relation || '관계')}</span></summary><dl>${[['기존 문제', edge.problem || edge.why], ['개선점', edge.solution], ['선택할 때 주의할 점', edge.boundary]].filter(([, value]) => value).map(([label, value]) => `<dt>${label}</dt><dd>${esc(value)}</dd>`).join('')}</dl><button type="button" data-related="${esc(other)}">${esc(state.model.tools.get(other).name)} 살펴보기 →</button></details>`;
       }).join('') : '<p class="dk-muted">아직 등록된 관계가 없습니다. 사용법과 자료는 계속 볼 수 있습니다.</p>');
       if (tool.install) body.innerHTML += `<h3>설치 예시</h3><pre><code>${esc(tool.install)}</code></pre>`;
     } else if (tab === 'usage') {
