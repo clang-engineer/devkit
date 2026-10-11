@@ -29,35 +29,33 @@ tests/                            공통 UI·데이터 보존 테스트
 ```
 
 `make web` 후 `/web/`을 연다. 기존 `/cmdtreemap/web/`도 같은 UI를 사용한다.
-`make test`는 Go 테스트와 공통 웹 테스트를 실행한다. 새 필드를 추가하기 전에는
+`make test`는 `tests/*.test.cjs`를 한 번씩 실행한 뒤 Go 테스트를 실행한다.
+웹만 확인할 때는 `make test-web`, TUI만 확인할 때는 `make test-cli`를 사용한다. 새 필드를 추가하기 전에는
 공통 도구 모델과 두 기존 카탈로그의 호환성을 먼저 확인한다.
 
 현재 두 JSON은 **기능별 원본을 유지**한다. 공통 모델에서 도구 ID로 연결하며,
 모든 필드를 단일 JSON으로 물리적으로 이전한 상태는 아니다. 기존 CLI, 문서 링크,
 외부 소비자와의 호환성을 유지한 채 단계적으로 정리한다.
 
+### UI 수정 위치
+
+- `src/ui/explorer.js`: 선택·검색·이벤트·화면 생명주기. `mount()`의 반환값에서
+  `ready`로 초기 로딩을 기다리고 `destroy()`로 이벤트와 요청을 해제한다.
+- `src/ui/views.js`: 검색·분류·관계도 마크업. 외부 요청이나 URL 상태를 변경하지 않는다.
+- `src/ui/details.js`: 소개·사용법·자료 패널과 클립보드, 현재 선택의 요청 취소.
+- `src/integrations/tldr.js`: tldr 조회·플랫폼 fallback·캐시. DOM에 접근하지 않는다.
+
+테스트는 실제 ES module을 import한다. 소스의 import/export를 삭제해 평가하지 않는다.
+`src/package.json`은 Node 테스트의 module 경계를 지정하며 브라우저 배포 자산은 아니다.
+
+기존 `cmdtreemap/web/app.js`·`app.css`는 캐시된 옛 페이지의 URL을 위한 짧은 호환
+진입점으로 유지한다. 새 화면 코드는 그곳에 추가하지 않는다. Go의 내장용
+`cmdtreemap/catalog.json`도 빌드에 필요하므로 유지하고 `make prepare`로 갱신한다.
+
 ## Cheatsheets
 
 Tool introductions and operational references. Full index with descriptions:
 [reference/cheatsheets/README.md](reference/cheatsheets/README.md).
-
-**Editors & TUI** · [vim](reference/cheatsheets/vim.md) · [lazyvim](reference/cheatsheets/lazyvim.md) · [lazygit](reference/cheatsheets/lazygit.md) · [tmux](reference/cheatsheets/tmux.md) · [yazi](reference/cheatsheets/yazi.md) · [ghostty](reference/cheatsheets/ghostty.md) · [terminal TUI](reference/cheatsheets/terminal-tui.md)
-
-**Shell** · [bash](reference/cheatsheets/shell.md) · [zsh](reference/cheatsheets/zsh.md) · [atuin](reference/cheatsheets/atuin.md) · [fzf](reference/cheatsheets/fzf.md) · [zoxide](reference/cheatsheets/zoxide.md) · [powershell](reference/cheatsheets/powershell.md)
-
-**System & servers** · [ssh](reference/cheatsheets/ssh.md) · [systemd](reference/cheatsheets/systemd.md)
-
-**macOS** · [aerospace](reference/cheatsheets/aerospace.md) · [hammerspoon](reference/cheatsheets/hammerspoon.md)
-
-**Data** · [elasticsearch](reference/cheatsheets/elasticsearch.md)
-
-**Git & version control** · [git](reference/cheatsheets/git.md) · [jujutsu/jj](reference/cheatsheets/jj.md) · [git-delta](reference/cheatsheets/git-delta.md) · [chezmoi](reference/cheatsheets/chezmoi.md)
-
-**Security & secrets** · [sops](reference/cheatsheets/sops.md)
-
-**Dev tools** · [mise](reference/cheatsheets/mise.md) · [uv](reference/cheatsheets/uv.md) · [taskwarrior](reference/cheatsheets/taskwarrior.md) · [Python PyPI publishing](reference/cheatsheets/python-pypi-publishing.md) · [claude-code](reference/cheatsheets/claude-code.md) · [ccusage](reference/cheatsheets/ccusage.md) · [opencode](reference/cheatsheets/opencode.md)
-
-**Tools dictionary** · [CLI concepts and quick commands](reference/cheatsheets/tools-dictionary.md)
 
 ## cmdtreemap
 

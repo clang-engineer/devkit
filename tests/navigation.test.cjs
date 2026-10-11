@@ -3,8 +3,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const base = path.resolve(__dirname, '..');
-const source = ['core/reference-data.js', 'core/catalog.js', 'core/navigation.js', 'graph/overview.js'].map(file => fs.readFileSync(path.join(base, 'src', file), 'utf8').replace(/^import .*;\n/gm, '')).join('\n');
-const modules = import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
+const modules = Promise.all([
+  import('../src/core/catalog.js'),
+  import('../src/core/navigation.js'),
+  import('../src/graph/overview.js'),
+]).then(parts => Object.assign({}, ...parts));
 const cli = JSON.parse(fs.readFileSync(path.join(base, 'reference/cli/catalog.json')));
 const sheets = JSON.parse(fs.readFileSync(path.join(base, 'reference/cheatsheets/catalog.json')));
 

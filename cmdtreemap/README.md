@@ -70,10 +70,10 @@ go build -o cmdtreemap .
 
 ```bash
 make web
-# http://localhost:8080/cmdtreemap/web/
+# http://localhost:8080/web/
 ```
 
-저장소 루트에서는 `make web`으로 `/web/`을 열 수도 있다. 두 페이지가
+`make web`은 루트 Makefile에 위임한다. 기존 `/cmdtreemap/web/` 주소도 유지하며 두 페이지가
 같은 `src/index.js`와 스타일을 사용하며, 별도 프레임워크 빌드는 필요 없다.
 지도·검색·확대·축소·상세 패널·tldr·전체 치트시트 링크를 제공한다.
 연결선은 정의된 관계이며 출시 순서나 학습 순서가 아니다.
@@ -92,7 +92,7 @@ make web
 1. 공통 원본인 `../reference/cli/catalog.json`을 수정한다.
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
 3. 루트에서 `make test`로 Go·웹·배포 테스트를 실행한다.
-4. 로컬 Web 서버에서 tree, 검색, 상세, tldr를 확인한다.
+4. 로컬 Web 서버에서 관계도, 검색, 상세, tldr를 확인한다.
 5. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/` 또는 `/cmdtreemap/`에서 확인한다.
 
 ## 배포 전 체크리스트
@@ -100,19 +100,13 @@ make web
 ```text
 [ ] go test ./...
 [ ] go vet ./...
-[ ] node --test web/*.test.cjs scripts/*.test.cjs
+[ ] make -C .. test-web
 [ ] go generate
 [ ] go build -o cmdtreemap .
-[ ] node --check web/app.js
+[ ] 공통 src/ 모듈 검사 (CI)
 [ ] 로컬 Web 서버에서 tree와 상세 화면 확인
 [ ] tldr와 공식 문서 링크 확인
 [ ] 블로그 /cmdtreemap/ 확인
 ```
 
 이 문서는 일반 명령어 cheatsheet가 아니라 `cmdtreemap`의 구조, 개발 방법, 실행 방법, 배포 흐름을 기록하는 프로젝트 문서다.
-
-## 원본 경로
-
-CLI 데이터 원본은 `../reference/cli/catalog.json`이다. 이 디렉터리의 `catalog.json`은 Go 내장용 생성본이다. 테스트와 실행 전 `make prepare`, 직접 빌드 전 `go generate`로 갱신한다. 웹은 원본을 직접 읽는다. 블로그는 공통 UI를 재사용하고 데이터는 원본에서 직접 읽는다.
-
-블로그는 devkit main의 원본 JSON을 직접 읽는다. Go 내장용 생성본은 CLI 빌드를 위한 파일이며 블로그 동기화용 복사본이 아니다.

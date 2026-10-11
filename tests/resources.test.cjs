@@ -3,8 +3,10 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const base = path.resolve(__dirname, '..');
-const source = ['core/catalog.js', 'graph/layout.js', 'integrations/tldr.js'].map(file => fs.readFileSync(path.join(base, 'src', file), 'utf8')).join('\n');
-const modules = import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
+const modules = Promise.all([
+  import('../src/core/catalog.js'),
+  import('../src/graph/layout.js'),
+]).then(parts => Object.assign({}, ...parts));
 const cli = JSON.parse(fs.readFileSync(path.join(base, 'reference/cli/catalog.json')));
 const sheets = JSON.parse(fs.readFileSync(path.join(base, 'reference/cheatsheets/catalog.json')));
 test('real catalogs retain every CLI category, command and relation', async () => {
@@ -57,4 +59,9 @@ test('manifest is closed over local module imports and contains no host-specific
     }
   }
   assert.ok(!fs.readFileSync(path.join(base,'src/styles/explorer.css'),'utf8').includes('#panel-wrapper'));
+});
+
+test('Go embedded catalog remains byte-identical to its canonical source', () => {
+  assert.deepEqual(fs.readFileSync(path.join(base, 'cmdtreemap/catalog.json')),
+    fs.readFileSync(path.join(base, 'reference/cli/catalog.json')));
 });

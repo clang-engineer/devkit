@@ -32,9 +32,9 @@ jobs:
         run: |
           for file in $(find src -name '*.js'); do node --input-type=module --check < "$file"; done
       - name: Validate and test cmdtreemap and shared explorer
-        working-directory: cmdtreemap
         run: |
           make test
+          cd cmdtreemap
           go vet ./...
           go build -o /tmp/cmdtreemap .
       - name: Validate cheatsheet catalog

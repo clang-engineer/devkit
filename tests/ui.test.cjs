@@ -1,19 +1,11 @@
-// Run the shared explorer and its view model, not the retired page renderers.
-require('./model.test.cjs');
-require('./navigation.test.cjs');
-const { test } = require('node:test');
+// Native module integration tests; the DOM double only supplies host APIs.
+const { test, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const { readFileSync } = require('node:fs');
-const vm = require('node:vm');
-const { resolve } = require('node:path');
-const base = resolve(__dirname, '..');
-const source = name => readFileSync(resolve(base, 'src', name), 'utf8');
-const bundle = ['core/reference-data.js', 'core/catalog.js', 'core/navigation.js', 'graph/layout.js', 'graph/overview.js', 'integrations/tldr.js'].map(file => source(file).replace(/^import .*;\n/gm, '').replace(/^export /gm, '')).join('\n') + '\nconst esc = escapeHtml;\n' + source('ui/explorer.js').replace(/^import .*;\n/gm, '').replace(/^export /gm, '') + 
-  '\nconst root = document.querySelector(\'[data-devkit]\'); if (root) mount(root);';
+const explorerModule = import('../src/ui/explorer.js');
+const mounted = new Set();
+afterEach(() => { for (const api of mounted) api.destroy(); mounted.clear(); });
 const remote = 'https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/';
 
-// Small DOM doubles for network/error/escaping contracts; real-browser layout
-// and interaction tests are separate. Never evaluate fetched Markdown or HTML.
 function node() {
   let html = '';
   return {
@@ -22,7 +14,13 @@ function node() {
     get innerHTML() { return html; },
     set innerHTML(value) { html = value; this.children = []; },
     classList: { add() {}, remove() {}, toggle() {} },
-    addEventListener(type, fn) { this.listeners[type] = fn; },
+    addEventListener(type, fn, { signal } = {}) {
+      if (signal?.aborted) return;
+      this.listeners[type] = fn;
+      signal?.addEventListener('abort', () => {
+        if (this.listeners[type] === fn) delete this.listeners[type];
+      }, { once: true });
+    },
     querySelectorAll() { return []; },
     querySelector() { return null; }, setAttribute() {}, focus() {}, scrollIntoView() {},
     append(child) { this.children.push(child); }, contains() { return true; },
@@ -30,19 +28,29 @@ function node() {
 }
 const settle = () => new Promise(resolve => setImmediate(resolve));
 async function setup(fetch, hash = '', view = 'map') {
+  const { mount } = await explorerModule;
   const elements = new Map();
-  const get = selector => { if (!elements.has(selector)) elements.set(selector, node()); return elements.get(selector); };
-  const root = node(); root.querySelector = get; root.dataset.defaultView = view;
   const location = { hash };
-  const context = vm.createContext({
-    document: { querySelector: () => root, createElement: node, fullscreenEnabled: false },
-    window: { addEventListener() {} }, location,
+  const host = Object.assign(node(), {
+    location, fetch, AbortController,
+    matchMedia: () => ({ matches: false }),
     history: { replaceState(_state, _title, hash) { location.hash = hash; } },
-    matchMedia: () => ({ matches: false }), fetch, URL, URLSearchParams, AbortSignal,
   });
-  vm.runInContext(bundle, context);
-  await settle();
-  return { get, root, context, location,
+  const document = Object.assign(node(), { defaultView: host, fullscreenEnabled: false });
+  const get = selector => {
+    if (!elements.has(selector)) {
+      const element = node(); element.ownerDocument = document;
+      elements.set(selector, element);
+    }
+    return elements.get(selector);
+  };
+  document.createElement = () => Object.assign(node(), { ownerDocument: document });
+  const root = node(); root.ownerDocument = document; root.querySelector = get;
+  root.dataset.defaultView = view;
+  get('[data-detail]').querySelector = get;
+  const api = mount(root); mounted.add(api);
+  await api.ready; await settle();
+  return { get, root, host, api, location,
     async click(dataset) {
       const button = { dataset }; button.closest = () => button;
       root.listeners.click({ target: button, detail: 1 });
@@ -147,4 +155,36 @@ test('tldr retains placeholders, escapes content and falls back from common to p
   assert.match(html, /CC BY 4.0/);
   assert.ok(requests.some(([url]) => url.includes('/common/bat.md')));
   assert.ok(requests.some(([url]) => url.includes('/linux/bat.md')));
+});
+
+test('mount is idempotent; destroy removes subscriptions and allows a fresh mount', async () => {
+  const { mount } = await explorerModule;
+  const s = await setup(async url => response(url));
+  assert.equal(mount(s.root), s.api);
+  assert.equal(typeof s.host.listeners.resize, 'function');
+  s.api.destroy(); mounted.delete(s.api);
+  assert.equal(s.host.listeners.resize, undefined);
+  assert.equal(s.host.listeners.hashchange, undefined);
+  assert.equal(s.root.listeners.click, undefined);
+  const fresh = mount(s.root); mounted.add(fresh);
+  assert.notEqual(fresh, s.api); await fresh.ready;
+  s.api.destroy(); // a stale handle must not unmount the fresh instance
+  assert.equal(mount(s.root), fresh);
+  assert.equal(s.root.dataset.devkitMounted, 'true');
+});
+test('switching away from usage aborts the old request and cannot overwrite new details', async () => {
+  let signal, finish;
+  const s = await setup(async (url, options) => {
+    if (url.includes('/tldr/')) {
+      signal = options.signal;
+      return new Promise(resolve => { finish = resolve; });
+    }
+    return response(url);
+  }, '#view=sheet&tool=bat');
+  assert.equal(signal.aborted, false);
+  await s.click({ tab: 'resources' });
+  assert.equal(signal.aborted, true);
+  finish({ ok: true, text: async () => '# old\n- OLD:\n`old-command`' });
+  await settle();
+  assert.ok(!s.get('[data-body]').innerHTML.includes('old-command'));
 });

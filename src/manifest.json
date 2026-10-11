@@ -11,6 +11,8 @@
     "index.js",
     "integrations/tldr.js",
     "styles/explorer.css",
-    "ui/explorer.js"
+    "ui/details.js",
+    "ui/explorer.js",
+    "ui/views.js"
   ]
 }

@@ -1,9 +1,10 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
-const path = require('node:path');
-const source = ['core/catalog.js', 'graph/layout.js', 'integrations/tldr.js'].map(file => fs.readFileSync(path.join(__dirname, '../src', file), 'utf8')).join('\n');
-const modelModule = import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
+const modelModule = Promise.all([
+  import('../src/core/catalog.js'),
+  import('../src/graph/layout.js'),
+  import('../src/integrations/tldr.js'),
+]).then(parts => Object.assign({}, ...parts));
 const map = { categories: [
   { name: 'File Operations', commands: [{ name: 'ls', tldr: 'ls' }, { name: 'lonely', description: '관계 없는 도구' }], relations: [
     { from: 'ls', to: 'eza', relation: 'alternative', solution: '색상 출력', url: 'https://example.org/eza', tldr: 'eza' },
@@ -71,4 +72,11 @@ test('one failed catalog can be omitted without losing the other source', async 
   assert.equal(buildModel(undefined, cheats).tools.size, 3);
   assert.equal(buildModel(map, undefined).tools.size, 6);
   assert.throws(() => buildModel({ categories: [{}] }), /Invalid category/);
+});
+
+test('unregistered tool names cannot resolve through Object.prototype aliases', async () => {
+  const { toolId, buildModel } = await modelModule;
+  for (const name of ['__proto__', 'constructor', 'tostring']) assert.equal(toolId(name), name);
+  const model = buildModel({ categories: [{ name: 'Tools', commands: [{ name: 'constructor' }], relations: [] }] });
+  assert.ok(model.tools.has('constructor'));
 });

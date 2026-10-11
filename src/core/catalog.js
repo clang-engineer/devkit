@@ -6,7 +6,7 @@ export const RELATIONS = {
 const aliases = { nvim: 'neovim', rg: 'ripgrep', 'git-delta': 'delta', jujutsu: 'jj' };
 export function toolId(value = '') {
   const key = String(value).trim().toLowerCase().replace(/\s+/g, '-');
-  return aliases[key] || key;
+  return Object.hasOwn(aliases, key) ? aliases[key] : key;
 }
 export function safeUrl(value) {
   try {
