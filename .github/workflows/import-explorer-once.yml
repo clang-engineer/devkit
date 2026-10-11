@@ -1,0 +1,59 @@
+name: Import shared explorer once
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/import-explorer-once.yml', 'tools/import_explorer.py']
+permissions:
+  contents: write
+concurrency:
+  group: import-explorer-once
+  cancel-in-progress: false
+jobs:
+  import:
+    if: github.repository == 'clang-engineer/devkit'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Checkout verified blog source
+        uses: actions/checkout@v7
+        with:
+          repository: clang-engineer/clang-engineer.github.io
+          ref: 28bb1f6f8ea9a64a9e4a4378a29b4b4dbef1267b
+          path: _import_source
+          persist-credentials: false
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: cmdtreemap/go.mod
+      - name: Import and split shared code
+        run: python3 tools/import_explorer.py _import_source
+      - name: Validate modules and resources
+        run: |
+          for file in $(find src -name '*.js'); do node --input-type=module --check < "$file"; done
+          make test
+          (cd cmdtreemap && go vet ./... && go build -o /tmp/cmdtreemap .)
+          git diff --exit-code -- reference cmdtreemap/catalog.json
+          git diff --check
+      - name: Save validated source for independent inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-explorer-source
+          path: |
+            src/
+            tests/
+            web/
+            reference/
+            cmdtreemap/
+            README.md
+            Makefile
+          retention-days: 7
+      - name: Publish only validated refactor
+        run: |
+          git add src tests web README.md Makefile cmdtreemap/web cmdtreemap/README.md
+          git diff --cached --stat
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'refactor(devkit): own shared explorer modules and retire duplicate web renderer'
+          git push origin HEAD:main
+          git log -1 --format='%H %s'
