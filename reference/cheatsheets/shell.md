@@ -1,6 +1,8 @@
 # Shell Cheatsheet
 
-> Bash/Zsh 공통 — 스크립트 안정성, 연산자·확장 문법, 잡 관리. 매번 검색하는 heredoc·`${...}` 확장·`<(cmd)`·배열·반복 표 한 곳에.
+> Bash 기준 — 스크립트 안정성, 연산자·확장 문법, 잡 관리. 매번 검색하는 heredoc·`${...}` 확장·`<(cmd)`·배열·반복 표 한 곳에.
+
+예제는 Bash에서 실행한다. 공통 문법도 있지만 Zsh는 배열 인덱스·파라미터 확장·단어 분리 규칙이 다르므로 그대로 복사하지 않는다. Zsh 고유 기능은 [zsh.md](zsh.md)를 참고한다.
 
 ## 개념 흐름
 
@@ -137,8 +139,10 @@ grep "pattern" <<<"$LINE"
 | `${var//l/L}` | `heLLo/worLd.txt` | 모든 매치 치환 |
 | `${var/#hello/HI}` | `HI/world.txt` | 시작 매치만 |
 | `${var/%txt/md}` | `hello/world.md` | 끝 매치만 |
-| `${var^^}` | `HELLO/WORLD.TXT` | 대문자 |
-| `${var,,}` | (소문자) | 소문자 |
+| `${var^^}` | `HELLO/WORLD.TXT` | 대문자 (Bash 4+) |
+| `${var,,}` | (소문자) | 소문자 (Bash 4+) |
+
+Zsh의 대소문자 변환은 `${(U)var}` / `${(L)var}`를 사용한다. macOS 기본 Bash 3.2에서는 위 Bash 4+ 문법을 사용할 수 없다.
 
 ```sh
 file=/path/to/log.txt
@@ -178,6 +182,8 @@ mkdir -p project/{src,tests,docs}
 
 ## 배열
 
+Bash 배열은 0부터 시작한다. 기본 Zsh 배열은 1부터 시작하며 `${!arr[@]}`도 지원하지 않는다. 아래 인덱스·슬라이스·삭제 예제는 Bash 전용이다.
+
 ```sh
 # 정의
 arr=(apple banana cherry)
@@ -203,7 +209,7 @@ for item in "${arr[@]}"; do
 done
 ```
 
-연관 배열 (Bash 4+, Zsh):
+연관 배열 (Bash 4+; 기본 Zsh의 선언은 `typeset -A`, 키 목록은 `${(k)user}`):
 
 ```sh
 declare -A user
@@ -282,7 +288,7 @@ esac
 | `(( a > b ))` | 산술 비교 (C스타일) |
 
 ```sh
-# 정규식 매치 + 캡처
+# 정규식 매치 + 캡처 (Bash; Zsh는 기본적으로 $match 배열 사용)
 if [[ "user42" =~ ^([a-z]+)([0-9]+)$ ]]; then
     echo "${BASH_REMATCH[1]} / ${BASH_REMATCH[2]}"
 fi
@@ -412,8 +418,8 @@ nohup ./run.sh > /tmp/job.log 2>&1 & tail -F /tmp/job.log
 ```sh
 nohup npm run dev -- --host 0.0.0.0 --port 9000 \
   </dev/null \
-  >/tmp/rexnova-dev.log 2>&1 &
-tail -f /tmp/rexnova-dev.log
+  >/tmp/app-dev.log 2>&1 &
+tail -f /tmp/app-dev.log
 ```
 
 실행 점검:
@@ -444,7 +450,7 @@ trap 'echo interrupted; exit 130' INT TERM
 # 명령 존재 확인
 command -v jq >/dev/null || { echo "jq required" >&2; exit 1; }
 
-# 스크립트 자신의 경로
+# 스크립트 자신의 경로 (Bash 전용: BASH_SOURCE)
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ```
 

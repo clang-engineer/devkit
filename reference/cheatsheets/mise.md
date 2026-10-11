@@ -38,7 +38,7 @@ eval "$(mise activate zsh)"             # ~/.zshrc 에 추가 (bash면 activate 
 ```
 
 - `activate`는 셸 훅(precmd/chpwd)을 심어, 프롬프트가 뜰 때·디렉토리를 옮길 때 PATH를 재계산한다.
-- **이 한 줄이 없으면 config.toml은 무력** — 버전 선언만 있고 PATH가 안 바뀐다.
+- 대화형 셸에서 `node` 등을 직접 호출하려면 activation 또는 shims가 필요하다. `mise exec`·`mise run`은 activation 없이도 config의 도구와 환경변수를 적용한다.
 
 ## 일상 명령어
 
@@ -67,7 +67,7 @@ eval "$(mise activate zsh)"             # ~/.zshrc 에 추가 (bash면 activate 
 
 ```toml
 [tools]
-node = "22"                          # 22.x 최신 (패치 자동 추적)
+node = "22"                          # 22.x 범위 지정 (업데이트는 mise upgrade)
 ruby = "3.4.2"                       # 정확히 고정
 java = ["temurin-21", "temurin-17"]  # 배열이면 첫 항목이 PATH 기본, 나머지는 대기
 python = "3.12"
@@ -85,9 +85,15 @@ run = "npm run build"
 ## config 우선순위 (가까운 것이 이김)
 
 `mise.local.toml` > `mise.toml` / `.mise.toml` > `~/.config/mise/config.toml`(글로벌).
-레거시 파일도 그대로 읽는다: `.tool-versions`(asdf) · `.nvmrc` · `.ruby-version` · `.python-version`.
+`.tool-versions`(asdf)는 기본적으로 읽는다. `.nvmrc`·`.ruby-version`·`.python-version` 같은 언어별 파일은 기본적으로 비활성화되어 있으므로 필요한 도구만 글로벌 설정에서 켠다.
 
-→ 글로벌은 기본값, 프로젝트 디렉토리에 파일을 두면 cd 하는 순간 그 디렉토리에서만 덮어쓴다 (`nvm use` 수동 호출 불필요).
+```sh
+mise settings add idiomatic_version_file_enable_tools node
+mise settings add idiomatic_version_file_enable_tools ruby
+mise settings add idiomatic_version_file_enable_tools python
+```
+
+→ 글로벌은 기본값이다. activation을 설정한 대화형 셸에서는 프로젝트 디렉토리로 이동할 때 해당 config가 적용된다 (`nvm use` 수동 호출 불필요).
 
 ## Apple Silicon에서 레거시 x64 Node 설치
 
@@ -109,7 +115,7 @@ ARM64 `mise` 바이너리를 `arch -x86_64 mise ...`로 감싸는 방식은 실�
 
 ## 함정
 
-- **activate 없으면 아무 일도 안 일어난다.** config는 데이터일 뿐. `eval "$(mise activate zsh)"`가 엔진.
+- **activation은 대화형 셸 통합 수단이지 필수 실행 조건은 아니다.** 스크립트·CI에서는 `mise exec -- <명령>`이나 `mise run <태스크>`를 사용할 수 있다.
 - **IDE·GUI 앱은 셸 rc를 안 거친다** → activate가 안 먹는다. 이 경우 shim 방식 필요: `~/.local/share/mise/shims`를 PATH에 넣거나 `mise activate --shims`.
 - **ruby 등 일부는 소스 컴파일**이라 설치가 느리다 (수 분). `mise settings ruby.compile=false`로 프리컴파일 바이너리 사용.
 - **프로젝트 config는 신뢰가 필요**하다 — 낯선 디렉토리의 `mise.toml`을 자동 실행하지 않는다(보안). `mise trust`로 허용.
@@ -118,5 +124,7 @@ ARM64 `mise` 바이너리를 `arch -x86_64 mise ...`로 감싸는 방식은 실�
 ## 참고
 
 - [mise 공식 문서](https://mise.jdx.dev/)
+- [Activation·shims·exec 비교](https://mise.jdx.dev/dev-tools/shims.html)
+- [언어별 버전 파일 활성화 설정](https://mise.jdx.dev/configuration/settings.html#idiomatic_version_file_enable_tools)
 - 관련 치트시트: `chezmoi.md` (dotfiles로 config.toml 배치 + `mise install` 부트스트랩)
 - Python은 mise보다 `uv`가 낫다는 평이 많다 — 통합할지 언어별 최적을 쓸지는 취사선택.

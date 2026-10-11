@@ -1,6 +1,6 @@
 # Zsh Cheatsheet
 
-> Zsh **고유** 기능 중심. 일반 라인 편집 단축키와 셸 공통 패턴(`set -e`, job 제어, 프로세스 조회 등)은 [shell.md](shell.md), [linux-process.md](linux-process.md) 참고.
+> Zsh **고유** 기능 중심. 스크립트·job 제어의 Bash 기준 예제는 [shell.md](shell.md), 프로세스 조회 명령은 [tools-dictionary.md](tools-dictionary.md#linux시스템) 참고. Bash 예제를 옮길 때는 배열·파라미터 확장 차이를 확인한다.
 
 ## 개념 흐름
 

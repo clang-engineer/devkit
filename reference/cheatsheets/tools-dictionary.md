@@ -67,7 +67,7 @@
 | 도구 | 설명 | 핵심 명령어 |
 |------|------|------------|
 | systemctl | 서비스 관리 | `systemctl start/stop/restart/enable/disable x`, `systemctl status x`, `systemctl list-units --type=service` |
-| journalctl | 로그 조회 | `journalctl -u x -f`(follow), `-since "1h"`, `--priority=err`, `-b`(부팅 후) |
+| journalctl | 로그 조회 | `journalctl -u x -f`(follow), `--since "1 hour ago"`, `--priority=err`, `-b`(부팅 후) |
 | pgrep/pkill | 프로세스 검색/종료 | `pgrep -x nginx`, `pkill -f "python app"`, `pgrep -l`(이름 출력) |
 | lsof | 열린 파일/포트 | `lsof -i :80`, `lsof -u alice`, `lsof +D /path`(재귀) |
 | fuser | 포트 점유 프로세스 | `fuser 8080/tcp`, `-k`(kill) |
@@ -114,7 +114,7 @@
 
 | 항목 | 설명 | 참고 |
 |------|------|------|
-| Regex | 정규표현식 문법 + 플레이버 | BRE(`grep`), ERE(`grep -E`), PCRE(`rg --pcre2`). `\d \w lookaround`는 PCRE만 |
+| Regex | 정규표현식 문법 + 플레이버 | BRE(`grep`), ERE(`grep -E`), Rust regex(기본 `rg`), PCRE2(`rg --pcre2`). `\d`·`\w`는 기본 `rg`도 지원하며, lookaround·backreference는 `rg --pcre2` 필요 |
 | TOML | 설정 파일 형식 | `key = 값`, `[table]`(객체), `[[array]]`(객체 배열). toml.io |
 | Code Review | PR/MR 약어 | LGTM(승인), PTAL(확인요청), nit:(사소한), blocker(머지차단) |
 
@@ -148,4 +148,4 @@ source <(fzf --zsh)
 - git-delta → git-delta.md (Git diff pager)
 - uv → uv.md (Python package/project manager)
 - vim/tmux/lazyvim/lazygit/ghostty/yazi → 에디터 & TUI 그룹
-- aerospace/hammerspoon/macos-admin → macOS 그룹
+- aerospace/hammerspoon → macOS 그룹

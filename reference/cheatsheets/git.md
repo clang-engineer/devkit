@@ -253,7 +253,7 @@ git switch main
 
 ```bash
 git ls-files <file>       # 출력 있으면 = 추적 중
-git check-ignore <file>   # 출력 있으면 = 이미 무시됨
+git check-ignore -v --no-index <file>  # 추적 여부와 무관하게 적용되는 ignore 규칙 확인
 
 git rm --cached <file>    # 인덱스에서만 제거 (로컬 파일 유지) — .gitignore 추가 후
 git rm -r --cached path/  # 디렉토리 전체
@@ -266,7 +266,7 @@ git rm -r --cached path/  # 디렉토리 전체
 
 | 명령어 | 설명 | 주의사항 |
 |--------|------|---------|
-| `git reset --hard` | 변경사항 완전 삭제 | 복구 불가 |
+| `git reset --hard` | HEAD·인덱스·작업 트리 초기화 | 커밋된 내용은 reflog로 복구 가능할 수 있지만, 미커밋 작업 트리 변경은 Git으로 복구가 보장되지 않음 |
 | `git push --force` | 강제 푸시 | 팀 히스토리 파괴 |
 | `git push --force-with-lease` | 안전한 강제 푸시 | 원격 변경 확인 후 푸시 |
 | `git filter-branch` | 히스토리 재작성 | 전체 히스토리 변경 |
