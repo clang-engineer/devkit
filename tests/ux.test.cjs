@@ -1,9 +1,9 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const modules = Promise.all([
-  import('../src/ui/inspector.js'),
-  import('../src/graph/overview.js'),
-  import('../src/ui/views.js'),
+  import('../explorer/ui/inspector.js'),
+  import('../explorer/graph/overview.js'),
+  import('../explorer/ui/views.js'),
 ]).then(parts => Object.assign({}, ...parts));
 
 function presentation(width) {

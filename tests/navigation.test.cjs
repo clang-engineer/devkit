@@ -4,9 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const base = path.resolve(__dirname, '..');
 const modules = Promise.all([
-  import('../src/core/catalog.js'),
-  import('../src/core/navigation.js'),
-  import('../src/graph/overview.js'),
+  import('../explorer/core/catalog.js'),
+  import('../explorer/core/navigation.js'),
+  import('../explorer/graph/overview.js'),
 ]).then(parts => Object.assign({}, ...parts));
 const reference = JSON.parse(fs.readFileSync(path.join(base, 'reference/catalog.json')));
 const cli = reference.tool_map;

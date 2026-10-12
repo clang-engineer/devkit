@@ -1,7 +1,7 @@
 // Native module integration tests; the DOM double only supplies host APIs.
 const { test, afterEach } = require('node:test');
 const assert = require('node:assert/strict');
-const explorerModule = import('../src/ui/explorer.js');
+const explorerModule = import('../explorer/ui/explorer.js');
 const mounted = new Set();
 afterEach(() => { for (const api of mounted) api.destroy(); mounted.clear(); });
 const remote = 'https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/';

@@ -4,8 +4,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const base = path.resolve(__dirname, '..');
 const modules = Promise.all([
-  import('../src/core/catalog.js'),
-  import('../src/graph/layout.js'),
+  import('../explorer/core/catalog.js'),
+  import('../explorer/graph/layout.js'),
 ]).then(parts => Object.assign({}, ...parts));
 const reference = JSON.parse(fs.readFileSync(path.join(base, 'reference/catalog.json')));
 const cli = reference.tool_map;
@@ -47,7 +47,7 @@ test('real catalog layout terminates with finite unique positions in every categ
   }
 });
 test('manifest is closed over local module imports and contains no host-specific layout',()=>{
-  const manifest=JSON.parse(fs.readFileSync(path.join(base,'src/manifest.json')));
+  const manifest=JSON.parse(fs.readFileSync(path.join(base,'explorer/manifest.json')));
   assert.equal(manifest.api_version,1);
   assert.ok(manifest.files.includes(manifest.entry));
   assert.ok(manifest.files.includes(manifest.style));
@@ -59,7 +59,7 @@ test('manifest is closed over local module imports and contains no host-specific
       assert.ok(manifest.files.includes(target),file+' -> '+target);
     }
   }
-  assert.ok(!fs.readFileSync(path.join(base,'src/styles/explorer.css'),'utf8').includes('#panel-wrapper'));
+  assert.ok(!fs.readFileSync(path.join(base,'explorer/styles/explorer.css'),'utf8').includes('#panel-wrapper'));
 });
 
 test('Go embedded catalog remains equivalent to the tool map in the canonical source', () => {

@@ -1,9 +1,6 @@
-.PHONY: web cli test test-web test-cli
+.PHONY: cli test test-web test-cli
 PORT ?= 8080
 
-web:
-	@echo "http://localhost:$(PORT)/web/"
-	python3 -m http.server $(PORT) --bind 127.0.0.1
 
 cli:
 	$(MAKE) -C cmdtreemap cli

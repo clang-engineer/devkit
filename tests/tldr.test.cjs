@@ -1,6 +1,6 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const modulePromise = import('../src/integrations/tldr.js');
+const modulePromise = import('../explorer/integrations/tldr.js');
 const page = { ok: true, text: async () => '# fd\n- Search:\n`fd {{pattern}}`' };
 
 test('successful and missing tldr responses are cached per client', async () => {

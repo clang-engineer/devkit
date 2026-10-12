@@ -29,8 +29,8 @@ cat
 ## 구조와 소유권
 
 Go 모델과 터미널 UI는 `internal/`에서 관리한다. 웹 화면은 저장소 루트의
-`src/`를 독립 웹과 블로그가 함께 사용한다. `web/`의 이전 자산 주소는
-공통 UI로 이어지는 호환 진입점이며, 별도 렌더러를 유지하지 않는다.
+`explorer/`를 로컬 preview와 블로그가 함께 사용한다. cmdtreemap 아래에는
+별도 웹 렌더러를 유지하지 않는다.
 
 CLI·웹 데이터 원본은 `../reference/catalog.json`이다. Go 내장용
 `catalog.json`은 `go generate` 또는 `make prepare`로 생성한다.
@@ -66,18 +66,6 @@ go build -o cmdtreemap .
 | `b`, `Esc` | 뒤로 가기 |
 | `q`, `Ctrl+C` | 종료 |
 
-## Web 개발 실행
-
-```bash
-make web
-# http://localhost:8080/web/
-```
-
-`make web`은 루트 Makefile에 위임한다. 기존 `/cmdtreemap/web/` 주소도 유지하며 두 페이지가
-같은 `src/index.js`와 스타일을 사용하며, 별도 프레임워크 빌드는 필요 없다.
-지도·검색·확대·축소·상세 패널·tldr·전체 치트시트 링크를 제공한다.
-연결선은 정의된 관계이며 출시 순서나 학습 순서가 아니다.
-
 ## 블로그 연결
 
 블로그는 공개된 원본 JSON을 브라우저에서 직접 읽는다. 데이터를 블로그에 복제하지 않고 공통 UI의 화면·검색으로 표시한다.
@@ -91,19 +79,16 @@ make web
 1. 공통 원본인 `../reference/catalog.json`을 수정한다.
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
 3. 루트에서 `make test`로 Go·웹·배포 테스트를 실행한다.
-4. 로컬 Web 서버에서 관계도, 검색, 상세, tldr를 확인한다.
-5. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/`에서 확인한다.
+4. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/`에서 확인한다.
 
 ## 배포 전 체크리스트
 
 ```text
 [ ] go test ./...
 [ ] go vet ./...
-[ ] make -C .. test-web
 [ ] go generate
 [ ] go build -o cmdtreemap .
-[ ] 공통 src/ 모듈 검사 (CI)
-[ ] 로컬 Web 서버에서 tree와 상세 화면 확인
+[ ] 공통 explorer/ 모듈 검사 (CI)
 [ ] tldr와 공식 문서 링크 확인
 [ ] 블로그 /command-map/ 확인
 ```

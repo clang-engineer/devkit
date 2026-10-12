@@ -1,9 +1,9 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const modelModule = Promise.all([
-  import('../src/core/catalog.js'),
-  import('../src/graph/layout.js'),
-  import('../src/integrations/tldr.js'),
+  import('../explorer/core/catalog.js'),
+  import('../explorer/graph/layout.js'),
+  import('../explorer/integrations/tldr.js'),
 ]).then(parts => Object.assign({}, ...parts));
 const map = { categories: [
   { name: 'File Operations', commands: [{ name: 'ls', tldr: 'ls' }, { name: 'lonely', description: '관계 없는 도구' }], relations: [
