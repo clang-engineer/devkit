@@ -12,7 +12,7 @@ import (
 	"github.com/clang/cmdtreemap/internal/tui"
 )
 
-//go:generate cp ../reference/cli/catalog.json catalog.json
+//go:generate node -e "const fs=require('fs'); const data=JSON.parse(fs.readFileSync('../reference/catalog.json','utf8')).tool_map; fs.writeFileSync('catalog.json', JSON.stringify(data, null, 2)+'\n');"
 //go:embed catalog.json
 var commandsJSON []byte
 

@@ -1,5 +1,5 @@
 import { fetchCatalog } from '../core/reference-data.js';
-import { buildModel, validateCatalog } from '../core/catalog.js';
+import { buildModel, splitReference, validateCatalog } from '../core/catalog.js';
 import { navigationGroups, explorerFilter, readExplorerHash } from '../core/navigation.js';
 import { overviewHtml } from '../graph/overview.js';
 import { shellHtml, renderNavigation, renderMap, renderList } from './views.js';
@@ -258,23 +258,19 @@ export function mount(root) {
     const options = { fetchImpl, signal: catalogRequest.signal };
     $('[data-retry]').hidden = true; $('[data-search]').disabled = true;
     $('[data-status]').textContent = 'Devkit 데이터를 불러오는 중…';
-    const sources = await Promise.allSettled([
-      fetchCatalog(root.dataset.catalog || base + 'cli/catalog.json', options).then(data => validateCatalog(data, 'categories')),
-      fetchCatalog(root.dataset.cheatsheets || base + 'cheatsheets/catalog.json', options).then(data => validateCatalog(data, 'groups')),
-    ]);
-    if (request !== loadRequest) return;
-    const [map, sheets] = sources;
-    if (sources.every(source => source.status === 'rejected')) {
-      $('[data-status]').textContent = 'Devkit 데이터를 불러오지 못했습니다. 네트워크 연결을 확인하고 다시 시도하세요.';
-      $('[data-retry]').hidden = false; return;
-    }
     try {
-      state.model = buildModel(map.status === 'fulfilled' ? map.value : undefined, sheets.status === 'fulfilled' ? sheets.value : undefined);
+      const reference = splitReference(await fetchCatalog(root.dataset.catalog || base + 'catalog.json', options));
+      if (request !== loadRequest) return;
+      validateCatalog(reference.catalog, 'categories');
+      validateCatalog(reference.cheats, 'groups');
+      state.model = buildModel(reference.catalog, reference.cheats);
       state.groups = navigationGroups(state.model);
-      state.error = map.status === 'rejected' ? '관계 데이터를 불러오지 못했습니다. 치트시트 목록은 이용할 수 있습니다.' : sheets.status === 'rejected' ? '치트시트 데이터를 불러오지 못했습니다. 지도와 tldr는 이용할 수 있습니다.' : '';
+      state.error = '';
       $('[data-search]').disabled = false; restore();
     } catch {
-      $('[data-status]').textContent = '카탈로그 형식을 확인하지 못했습니다. 다시 시도하세요.'; $('[data-retry]').hidden = false;
+      if (request !== loadRequest) return;
+      $('[data-status]').textContent = 'Devkit 데이터를 불러오지 못했습니다. 네트워크 연결과 카탈로그 형식을 확인하고 다시 시도하세요.';
+      $('[data-retry]').hidden = false;
     }
   }
   const api = {

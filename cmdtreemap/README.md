@@ -10,7 +10,7 @@
 기본 명령어 → 대안 도구 → 문제 → 해결 → 경계 → tldr → 공식 문서
 ```
 
-도구 변화의 관점, 환경별 선택과 자료 보강 기준은 [CLI reference](../reference/cli/README.md)를 참고한다.
+도구 변화의 관점, 환경별 선택과 자료 보강 기준은 [CLI reference](../reference/tool-map.md)를 참고한다.
 
 ## 관계 이유 표시 원칙
 
@@ -32,9 +32,9 @@ Go 모델과 터미널 UI는 `internal/`에서 관리한다. 웹 화면은 저�
 `src/`를 독립 웹과 블로그가 함께 사용한다. `web/`의 이전 자산 주소는
 공통 UI로 이어지는 호환 진입점이며, 별도 렌더러를 유지하지 않는다.
 
-CLI·웹 데이터 원본은 `../reference/cli/catalog.json`이다. Go 내장용
+CLI·웹 데이터 원본은 `../reference/catalog.json`이다. Go 내장용
 `catalog.json`은 `go generate` 또는 `make prepare`로 생성한다.
-치트시트와 문서 링크는 `../reference/cheatsheets/catalog.json`에서 연결한다.
+치트시트와 문서 링크는 `../reference/catalog.json`에서 연결한다.
 전체 디렉터리와 개발 방법은 [저장소 README](../README.md)를 참고한다.
 
 ## CLI 실행
@@ -82,18 +82,17 @@ make web
 
 블로그는 공개된 원본 JSON을 브라우저에서 직접 읽는다. 데이터를 블로그에 복제하지 않고 공통 UI의 화면·검색으로 표시한다.
 
-- CLI 지도: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/cli/catalog.json`
-- 치트시트 목록: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/cheatsheets/catalog.json`
+- 공통 카탈로그: `https://raw.githubusercontent.com/clang-engineer/devkit/main/reference/catalog.json`
 
-원본 변경은 GitHub raw 캐시 갱신 후 다음 페이지 로드에 반영된다. 데이터 변경만으로 블로그를 재배포할 필요는 없다. 네트워크 요청이 실패하면 화면의 다시 시도 버튼을 사용한다. 공통 UI는 두 카탈로그를 하나의 도구 모델로 연결한다. UI 코드는 Devkit에서 관리하며 블로그 빌드가 동일한 소스를 가져간다. JSON 수정은 다음 데이터 조회에 반영되고, JavaScript·CSS 수정은 블로그의 다음 배포에 반영된다. Devkit 커밋만으로 블로그 배포를 자동 실행하지는 않는다.
+원본 변경은 GitHub raw 캐시 갱신 후 다음 페이지 로드에 반영된다. 데이터 변경만으로 블로그를 재배포할 필요는 없다. 네트워크 요청이 실패하면 화면의 다시 시도 버튼을 사용한다. 공통 UI는 `tool_map`과 `cheatsheets`를 하나의 도구 모델로 연결한다. UI 코드는 Devkit에서 관리하며 블로그 빌드가 동일한 소스를 가져간다. JSON 수정은 다음 데이터 조회에 반영되고, JavaScript·CSS 수정은 블로그의 다음 배포에 반영된다. Devkit 커밋만으로 블로그 배포를 자동 실행하지는 않는다.
 
 ## 개발 흐름
 
-1. 공통 원본인 `../reference/cli/catalog.json`을 수정한다.
+1. 공통 원본인 `../reference/catalog.json`을 수정한다.
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
 3. 루트에서 `make test`로 Go·웹·배포 테스트를 실행한다.
 4. 로컬 Web 서버에서 관계도, 검색, 상세, tldr를 확인한다.
-5. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/` 또는 `/cmdtreemap/`에서 확인한다.
+5. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/`에서 확인한다.
 
 ## 배포 전 체크리스트
 
@@ -106,7 +105,7 @@ make web
 [ ] 공통 src/ 모듈 검사 (CI)
 [ ] 로컬 Web 서버에서 tree와 상세 화면 확인
 [ ] tldr와 공식 문서 링크 확인
-[ ] 블로그 /cmdtreemap/ 확인
+[ ] 블로그 /command-map/ 확인
 ```
 
 이 문서는 일반 명령어 cheatsheet가 아니라 `cmdtreemap`의 구조, 개발 방법, 실행 방법, 배포 흐름을 기록하는 프로젝트 문서다.

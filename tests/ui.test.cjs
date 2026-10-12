@@ -65,12 +65,13 @@ const sheets = { groups: [{ title: '도구', items: [{ slug: 'cat', name: '<cat>
   official: [{ url: 'javascript:alert(1)', label: 'bad' }, { url: 'https://example.com/?a=1&b=2', label: 'Docs' }],
   custom: { url: 'https://github.com/clang-engineer/devkit', label: '긴 원본' },
 }] }] };
-function response(url) { return { ok: true, json: async () => url.endsWith('/cli/catalog.json') ? map : sheets }; }
+const reference = { version: 1, tool_map: map, cheatsheets: sheets };
+function response() { return { ok: true, json: async () => reference }; }
 
-test('shared explorer fetches both originals without cache and safely renders document links', async () => {
+test('shared explorer fetches the canonical catalog without cache and safely renders document links', async () => {
   const requests = [];
   const s = await setup(async (url, options) => { requests.push([url, options.cache]); return response(url); }, '#cat', 'sheet');
-  assert.deepEqual(requests, [[remote + 'cli/catalog.json', 'no-store'], [remote + 'cheatsheets/catalog.json', 'no-store']]);
+  assert.deepEqual(requests, [[remote + 'catalog.json', 'no-store']]);
   assert.equal(s.get('[data-search]').disabled, false);
   assert.match(s.get('[data-detail]').innerHTML, /&lt;cat&gt;/);
   assert.match(s.get('[data-detail]').innerHTML, /a &amp; b/);
@@ -81,7 +82,7 @@ test('shared explorer fetches both originals without cache and safely renders do
   assert.ok(html.includes('https://github.com/clang-engineer/devkit'));
   assert.ok(html.includes('target="_blank" rel="noopener noreferrer"'));
 });
-test('both-source failure exposes retry and successful retry restores the map', async () => {
+test('catalog failure exposes retry and successful retry restores the map', async () => {
   let fail = true;
   const s = await setup(async url => { if (fail) throw Error('offline'); return response(url); });
   assert.equal(s.get('[data-retry]').hidden, false);
@@ -95,25 +96,15 @@ test('both-source failure exposes retry and successful retry restores the map', 
   await s.click({ category: 'map-0' });
   assert.ok(s.get('[data-stage]').children.some(board => board.innerHTML.includes('bat')));
 });
-test('one-source failure keeps other content available and retry removes the warning', async () => {
-  let fail = true;
-  const s = await setup(async url => { if (fail && url.endsWith('/cheatsheets/catalog.json')) throw Error('offline'); return response(url); });
-  assert.equal(s.get('[data-search]').disabled, false);
-  assert.equal(s.get('[data-retry]').hidden, false);
-  assert.match(s.get('[data-stage]').innerHTML, /Developer Tools/);
-  fail = false; await s.click({ retry: '' });
-  assert.equal(s.get('[data-retry]').hidden, true);
-});
-test('invalid and duplicate source entries report errors rather than a blank success', async () => {
-  const invalid = await setup(async () => ({ ok: true, json: async () => ({ categories: [{}] }) }));
+test('invalid and duplicate catalog entries report errors rather than a blank success', async () => {
+  const invalid = await setup(async () => ({ ok: true, json: async () => ({ tool_map: { categories: [{}] }, cheatsheets: sheets }) }));
   assert.equal(invalid.get('[data-retry]').hidden, false);
   assert.equal(invalid.get('[data-search]').disabled, true);
   const duplicate = structuredClone(sheets);
   duplicate.groups[0].items.push(duplicate.groups[0].items[0]);
-  const s = await setup(async url => ({ ok: true, json: async () => url.endsWith('/cli/catalog.json') ? map : duplicate }));
+  const s = await setup(async () => ({ ok: true, json: async () => ({ version: 1, tool_map: map, cheatsheets: duplicate }) }));
   assert.equal(s.get('[data-retry]').hidden, false);
-  assert.match(s.get('[data-status]').textContent, /치트시트 데이터를 불러오지 못/);
-  assert.equal(s.get('[data-search]').disabled, false); // valid map is still useful
+  assert.equal(s.get('[data-search]').disabled, true);
 });
 test('legacy sheet links open usage in the unified graph; selection survives returning to overview', async () => {
   const s = await setup(async url => response(url), '#view=sheet&tool=cat');

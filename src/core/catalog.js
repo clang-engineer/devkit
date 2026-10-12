@@ -14,6 +14,13 @@ export function safeUrl(value) {
     return ['https:', 'http:'].includes(url.protocol) ? url.href : '';
   } catch { return ''; }
 }
+export function splitReference(data) {
+  if (!data || typeof data !== 'object') throw new Error('Invalid reference catalog');
+  return {
+    catalog: data.tool_map || data,
+    cheats: data.cheatsheets || data,
+  };
+}
 export function validateCatalog(data, key) {
   if (!data || !Array.isArray(data[key])) throw new Error('Invalid ' + key + ' catalog');
   const slugs = new Set();
@@ -31,6 +38,7 @@ export function validateCatalog(data, key) {
   return data;
 }
 export function buildModel(catalog = { categories: [] }, cheats = { groups: [] }) {
+  if (arguments.length === 1 && catalog?.tool_map) ({ catalog, cheats } = splitReference(catalog));
   validateCatalog(catalog, 'categories'); validateCatalog(cheats, 'groups');
   const tools = new Map(), categories = [], edges = [];
   function ensure(name, explicitId) {

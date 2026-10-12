@@ -1,6 +1,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const data = require('../reference/cli/catalog.json');
+const reference = require('../reference/catalog.json');
+const data = reference.tool_map;
 const relations = data.categories.flatMap(category => category.relations);
 
 test('display names use executable names while retaining package installation names', () => {

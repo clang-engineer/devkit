@@ -15,27 +15,27 @@ JSON 변경은 다음 조회에, UI 코드 변경은 블로그의 다음 빌드�
 Devkit 커밋만으로 블로그 배포를 자동 실행하지는 않는다.
 
 ```text
-reference/cli/catalog.json         관계·명령 데이터 (기존 경로 유지)
-reference/cheatsheets/catalog.json  치트시트 목록·문서 링크
+reference/catalog.json              관계·명령 데이터와 치트시트 목록을 담는 공통 원본
+reference/tool-map.md               CLI 도구 관계 지도 해설
 reference/cheatsheets/*.md          긴 문서 원본
-src/core/                         로딩·검증·공통 도구 ID·검색
-src/graph/                        관계도 배치
-src/integrations/                 tldr 페이지·예시 처리
-src/ui/                           탐색·상세 패널
-src/styles/                       블로그 테마와 독립적인 UI 스타일
-web/                              독립 웹 진입점
-cmdtreemap/                       Go TUI (데이터 계약 유지)
-tests/                            공통 UI·데이터 보존 테스트
+src/core/                           로딩·검증·공통 도구 ID·검색
+src/graph/                          관계도 배치
+src/integrations/                   tldr 페이지·예시 처리
+src/ui/                             탐색·상세 패널
+src/styles/                         블로그 테마와 독립적인 UI 스타일
+web/                                독립 웹 진입점
+cmdtreemap/                         Go TUI
+tests/                              공통 UI·데이터 보존 테스트
 ```
 
 `make web` 후 `/web/`을 연다. 기존 `/cmdtreemap/web/`도 같은 UI를 사용한다.
 `make test`는 `tests/*.test.cjs`를 한 번씩 실행한 뒤 Go 테스트를 실행한다.
 웹만 확인할 때는 `make test-web`, TUI만 확인할 때는 `make test-cli`를 사용한다. 새 필드를 추가하기 전에는
-공통 도구 모델과 두 기존 카탈로그의 호환성을 먼저 확인한다.
+공통 도구 모델과 `reference/catalog.json`의 호환성을 먼저 확인한다.
 
-현재 두 JSON은 **기능별 원본을 유지**한다. 공통 모델에서 도구 ID로 연결하며,
-모든 필드를 단일 JSON으로 물리적으로 이전한 상태는 아니다. 기존 CLI, 문서 링크,
-외부 소비자와의 호환성을 유지한 채 단계적으로 정리한다.
+현재 JSON 원본은 `reference/catalog.json` 하나다. `tool_map`은 도구 관계 지도,
+`cheatsheets`는 치트시트 목록과 문서 링크를 소유한다. 긴 사용법 본문은
+`reference/cheatsheets/*.md`에 둔다.
 
 ### UI 수정 위치
 

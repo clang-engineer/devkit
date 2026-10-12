@@ -8,8 +8,9 @@ const modules = Promise.all([
   import('../src/core/navigation.js'),
   import('../src/graph/overview.js'),
 ]).then(parts => Object.assign({}, ...parts));
-const cli = JSON.parse(fs.readFileSync(path.join(base, 'reference/cli/catalog.json')));
-const sheets = JSON.parse(fs.readFileSync(path.join(base, 'reference/cheatsheets/catalog.json')));
+const reference = JSON.parse(fs.readFileSync(path.join(base, 'reference/catalog.json')));
+const cli = reference.tool_map;
+const sheets = reference.cheatsheets;
 
 test('every original category belongs to exactly one navigation group; all tools remain reachable', async () => {
   const { buildModel, navigationGroups } = await modules;

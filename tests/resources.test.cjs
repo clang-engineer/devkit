@@ -7,8 +7,9 @@ const modules = Promise.all([
   import('../src/core/catalog.js'),
   import('../src/graph/layout.js'),
 ]).then(parts => Object.assign({}, ...parts));
-const cli = JSON.parse(fs.readFileSync(path.join(base, 'reference/cli/catalog.json')));
-const sheets = JSON.parse(fs.readFileSync(path.join(base, 'reference/cheatsheets/catalog.json')));
+const reference = JSON.parse(fs.readFileSync(path.join(base, 'reference/catalog.json')));
+const cli = reference.tool_map;
+const sheets = reference.cheatsheets;
 test('real catalogs retain every CLI category, command and relation', async () => {
   const {buildModel,toolId} = await modules;
   const model = buildModel(cli,sheets);
@@ -61,7 +62,7 @@ test('manifest is closed over local module imports and contains no host-specific
   assert.ok(!fs.readFileSync(path.join(base,'src/styles/explorer.css'),'utf8').includes('#panel-wrapper'));
 });
 
-test('Go embedded catalog remains byte-identical to its canonical source', () => {
-  assert.deepEqual(fs.readFileSync(path.join(base, 'cmdtreemap/catalog.json')),
-    fs.readFileSync(path.join(base, 'reference/cli/catalog.json')));
+test('Go embedded catalog remains equivalent to the tool map in the canonical source', () => {
+  const embedded = JSON.parse(fs.readFileSync(path.join(base, 'cmdtreemap/catalog.json')));
+  assert.deepEqual(embedded, cli);
 });
