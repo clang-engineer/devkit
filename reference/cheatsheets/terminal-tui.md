@@ -23,7 +23,7 @@
 | Kubernetes | [k9s](https://github.com/derailed/k9s) | 클러스터 리소스 탐색·관찰·관리 | Kubernetes를 쓸 때만 |
 | 파일 관리 | [Yazi](https://github.com/sxyazi/yazi) | 빠른 파일 탐색과 미리보기 | 대표 선택 |
 | 시스템 모니터링 | [btop](https://github.com/aristocratos/btop) | CPU·메모리·디스크·프로세스 확인 | 대표 선택 |
-| DB | [Harlequin](https://github.com/tconbeer/harlequin) / [Rainfrog](https://github.com/achristmascarl/rainfrog) | SQL 작성과 결과 탐색 | 커넥터와 편집 UX로 선택 |
+| DB | [Harlequin](https://github.com/tconbeer/harlequin) / [Rainfrog](https://github.com/achristmascarl/rainfrog) / [vim-dadbod-ui](https://github.com/kristijanhusak/vim-dadbod-ui) | SQL 작성과 결과 탐색 | 커넥터, PostgreSQL 특화, 편집기 통합 기준으로 선택 |
 | HTTP/API | [Posting](https://github.com/darrenburns/posting) / [ATAC](https://github.com/Julien-cpsn/ATAC) | 터미널 기반 API 요청 | Postman 대체가 필요할 때 |
 | GitHub | [gh-dash](https://github.com/dlvhdr/gh-dash) | PR·이슈 대시보드 | gh CLI를 자주 쓸 때 |
 | JSON | [fx](https://github.com/antonmedv/fx) | JSON 탐색·필터링 | jq 결과를 대화형으로 볼 때 |

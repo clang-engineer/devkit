@@ -87,6 +87,8 @@
 | 도구 | 설명 | 핵심 명령어 |
 |------|------|------------|
 | harlequin | 터미널 SQL IDE | `harlequin --profile x`, `--config-path`, `hsql -P x -c "select 1"`, `--keys`(키맵 확인) |
+| rainfrog | PostgreSQL TUI | `rainfrog`, 연결 정보 설정 후 schema/table 탐색, 쿼리 실행 |
+| vim-dadbod-ui | Vim/Neovim DB UI | `:DBUI`, `:DBUIToggle`, SQL 버퍼에서 쿼리 실행, 연결 정보는 비밀 저장소로 분리 |
 | PostgreSQL | 모니터링 쿼리 | `pg_stat_activity`(세션), `pg_size_pretty(pg_database_size())`, `pg_locks`(락) |
 | elasticsearch | 검색 엔진 API | `_cat/health`, `_cat/indices`, `_search`, `_count`, `_delete_by_query` |
 | kibana | ES 시각화 UI | KQL: `field:value`, `message:"exact"`, `bytes >= 1000`, `not field:x`. Dev Tools: `Ctrl+Enter` |
