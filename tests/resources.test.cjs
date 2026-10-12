@@ -53,7 +53,7 @@ test('manifest is closed over local module imports and contains no host-specific
   assert.ok(manifest.files.includes(manifest.style));
   for(const file of manifest.files){
     assert.ok(!file.includes('..')&&!path.isAbsolute(file));
-    const src=fs.readFileSync(path.join(base,'src',file),'utf8');
+    const src=fs.readFileSync(path.join(base,'explorer',file),'utf8');
     if(file.endsWith('.js')) for(const match of src.matchAll(/from\s+['"](\.[^'"]+)['"]/g)) {
       const target=path.posix.normalize(path.posix.join(path.posix.dirname(file),match[1]));
       assert.ok(manifest.files.includes(target),file+' -> '+target);
