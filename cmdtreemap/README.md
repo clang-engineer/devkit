@@ -1,8 +1,7 @@
 # cmdtreemap
 
-`cmdtreemap`은 CLI 도구의 관계와 변화 흐름을 탐색하는 도구다.
-터미널은 tree, 웹은 공통 Devkit 관계도를 사용한다.
-같은 `catalog.json`을 기반으로 터미널 TUI와 브라우저 UI를 제공한다.
+`cmdtreemap`은 CLI 도구의 관계와 변화 흐름을 터미널에서 탐색하는 도구다.
+같은 `reference/catalog.json`의 `tool_map`은 블로그의 웹 지도에서도 사용한다.
 핵심은 목록이 아니라 `top → htop → btop` 같은 관계 흐름에서 문제·개선점·남은 한계를 파악하는 것이다.
 화살표는 데이터에 정의된 대안·보완 등의 관계이며, 실제 출시 연대순을 뜻하지 않는다.
 
@@ -14,7 +13,7 @@
 
 ## 관계 이유 표시 원칙
 
-터미널 트리에는 도구 이름 뒤에 핵심 개선점을 표시한다. 웹 지도는 도구와 관계를 선택하면 상세 패널에서 기존 문제·개선점·한계를 확인할 수 있다.
+터미널 트리에는 도구 이름 뒤에 핵심 개선점을 표시한다.
 
 ```text
 cat
@@ -28,11 +27,10 @@ cat
 
 ## 구조와 소유권
 
-Go 모델과 터미널 UI는 `internal/`에서 관리한다. 웹 화면은 저장소 루트의
-`explorer/`를 로컬 preview와 블로그가 함께 사용한다. cmdtreemap 아래에는
-별도 웹 렌더러를 유지하지 않는다.
+Go 모델과 터미널 UI는 `internal/`에서 관리한다. 웹 지도는 별도 npm 패키지
+`@clang.engineer/reference-explorer`가 담당하므로 cmdtreemap 아래에는 웹 렌더러를 두지 않는다.
 
-CLI·웹 데이터 원본은 `../reference/catalog.json`이다. Go 내장용
+CLI 데이터 원본은 `../reference/catalog.json`이다. Go 내장용
 `catalog.json`은 `go generate` 또는 `make prepare`로 생성한다.
 치트시트와 문서 링크는 `../reference/catalog.json`에서 연결한다.
 전체 디렉터리와 개발 방법은 [저장소 README](../README.md)를 참고한다.
@@ -78,7 +76,7 @@ go build -o cmdtreemap .
 
 1. 공통 원본인 `../reference/catalog.json`을 수정한다.
 2. CLI TUI에서 관계와 상세 화면을 확인한다.
-3. 루트에서 `make test`로 Go·웹·배포 테스트를 실행한다.
+3. 루트에서 `make test`로 reference 데이터와 Go TUI 테스트를 실행한다.
 4. 원본 변경을 devkit에 반영한 뒤 블로그의 `/command-map/`에서 확인한다.
 
 ## 배포 전 체크리스트
@@ -88,7 +86,6 @@ go build -o cmdtreemap .
 [ ] go vet ./...
 [ ] go generate
 [ ] go build -o cmdtreemap .
-[ ] 공통 explorer/ 모듈 검사 (CI)
 [ ] tldr와 공식 문서 링크 확인
 [ ] 블로그 /command-map/ 확인
 ```

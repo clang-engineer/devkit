@@ -1,13 +1,11 @@
-.PHONY: cli test test-web test-cli
-PORT ?= 8080
-
+.PHONY: cli test test-reference test-cli
 
 cli:
 	$(MAKE) -C cmdtreemap cli
 
-test: test-web test-cli
+test: test-reference test-cli
 
-test-web:
+test-reference:
 	node --test tests/*.test.cjs
 
 test-cli:
