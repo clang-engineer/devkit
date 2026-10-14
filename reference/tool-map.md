@@ -1,10 +1,10 @@
-# Tool map
+# Developer tools map
 
-`reference/catalog.json`의 `tool_map`은 명령어 정의·사용 예시·도구 사이의 관계를 관리하는 원본이다. [cmdtreemap](../cmdtreemap/)의 터미널과 독립 웹 도구, 블로그 CLI 지도가 사용한다. 치트시트 목록은 같은 JSON의 `cheatsheets`에 둔다.
+`reference/catalog.json`의 `tool_map`은 명령어 정의·사용 예시·도구 사이의 관계를 관리하는 원본이다. [cmdtreemap](../cmdtreemap/)의 터미널과 블로그 도구 탐색기가 사용한다. 치트시트 목록은 같은 JSON의 `cheatsheets`에 둔다.
 
 ## 지도의 목적
 
-CLI 지도는 새로운 도구를 모아 놓는 목록을 넘어, 같은 작업이 어떤 방식으로 개선되고 어떤 환경에서 다른 선택이 유용해지는지 설명한다. 치트시트가 “어떻게 쓰는가”를 빠르게 찾아보는 자료라면, 지도는 “왜 이 도구를 선택하고 기존 도구는 언제 유지하는가”를 살펴보는 자료다.
+도구 지도는 CLI·셸·터미널·에디터·플러그인의 역할과 사용 환경을 구분하고, 실제 비교·연동 관계를 설명한다. 치트시트가 “어떻게 쓰는가”를 빠르게 찾아보는 자료라면, 지도는 “왜 이 도구를 선택하고 기존 도구는 언제 유지하는가”를 살펴보는 자료다.
 
 ## 관계와 변화는 다른 축이다
 
@@ -112,3 +112,16 @@ cat alias는 [bat 공식 문서의 예](https://github.com/sharkdp/bat#automatic
 ## 참고 자료
 
 - [모던 리눅스 도구 모음](https://ikrima.dev/dev-notes/linux/linux-modern-tools/)
+
+## 분류와 도구 소개
+
+도구를 선택하면 그 도구 자체의 역할을 먼저 읽는다. 다른 도구와의 비교는 relation의 problem·solution·boundary에서 설명한다. 같은 도구가 여러 분야에 등장할 때 commands에는 이름만 참조할 수 있으며 소개·공식 문서·사용 예시의 정의는 한 곳에 둔다.
+
+- Shell: 셸 구현체·설정 프레임워크·프롬프트
+- CLI의 Command History: history·atuin·fzf를 이용한 기록·검색
+- Editors와 Editor Configurations: 편집기와 그 위의 설정 배포판
+- Plugins: Neovim·tmux·Zsh 확장. 기반 도구의 대안처럼 연결하지 않는다.
+- Database: DB별 CLI와 독립 클라이언트. 에디터 DB 플러그인은 Plugins에서도 같은 항목으로 찾는다.
+- 주제별 자료: 개별 도구가 아닌 비교·작업 절차 문서. cheatsheets.guides에서 관리한다.
+
+플러그인 목록은 2026-10-14 dotfiles main의 명시적 설정, LazyVim Extras와 lazy-lock.json을 확인한 목록이다. 실행 중인 개인 머신을 조사한 설치 현황은 아니다. vim/의 이전 설정과 주석 처리된 tmux 후보는 현재 사용 목록에 포함하지 않았다. 각 플러그인의 내 설정 링크가 근거이며 설정이 바뀌면 재검토한다.

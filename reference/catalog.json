@@ -2,8 +2,8 @@
   "version": 1,
   "title": "Devkit Reference",
   "tool_map": {
-    "title": "Modern CLI Tools Map",
-    "philosophy": "거시에서 미시로: 명령어의 진화 과정을 이해하고 탐색하기",
+    "title": "Developer Tools Map",
+    "philosophy": "개발 도구의 역할·사용 환경과 실제 비교·연동 관계를 탐색한다. 분류는 용도를, 선은 명시된 도구 관계를 뜻하며 발전 순서를 강제하지 않는다.",
     "categories": [
       {
         "name": "File Operations",
@@ -132,12 +132,12 @@
           },
           {
             "name": "eza",
-            "description": "색상·아이콘·Git 정보·트리 출력을 강화한 ls 대안",
+            "description": "파일과 디렉터리 목록을 표시하는 CLI 도구다. 색상·아이콘·Git 상태·트리 출력을 제공해 목록을 읽기 쉽게 하며, ls와는 일부 옵션과 출력 동작이 다르다.",
             "tldr": "eza"
           },
           {
             "name": "lsd",
-            "description": "아이콘과 색상으로 파일 유형을 보기 쉽게 표시하는 ls 대안",
+            "description": "파일과 디렉터리 목록을 색상·아이콘·트리 형태로 표시하는 CLI 도구다. 아이콘 표현에는 지원 폰트가 필요하며 ls와 옵션·출력의 완전한 호환을 전제하지 않는다.",
             "tldr": "lsd"
           },
           {
@@ -194,7 +194,7 @@
       },
       {
         "name": "Text Search",
-        "why": "텍스트 검색 도구는 속도와 실용적 기본값이 중요하다",
+        "why": "텍스트 패턴을 찾는 검색 도구의 범위와 기본 동작을 비교한다.",
         "relations": [
           {
             "from": "grep",
@@ -208,32 +208,6 @@
             "install": "brew install ripgrep",
             "tldr": "rg",
             "url": "https://github.com/BurntSushi/ripgrep"
-          },
-          {
-            "from": "sed",
-            "to": "sd",
-            "why": "구문 난이도",
-            "group": "sed-chain",
-            "problem": "sed의 정규식과 치환 구문은 배우기 어렵고 실수가 잦다",
-            "solution": "직관적인 find & replace 구문, 예시 기반 설명",
-            "relation": "alternative",
-            "boundary": "문자열·정규식 치환은 대신할 수 있다. 구문과 정규식 규칙이 sed와 다르고 sed의 주소 지정·여러 처리 명령을 그대로 실행하지 못한다. alias sed='sd'는 기존 입력을 보존하지 않는다. 복잡한 sed 프로그램이나 이식성이 필요한 스크립트는 유지한다.",
-            "install": "brew install sd",
-            "tldr": "sd",
-            "url": "https://github.com/chmln/sd"
-          },
-          {
-            "from": "diff",
-            "to": "delta",
-            "why": "가독성 부족",
-            "group": "diff-chain",
-            "problem": "기본 diff 출력은 읽기 어렵고, 구문 강조가 없다",
-            "solution": "구문 강조, 사이드바 비교, 줄 번호, Git 통합",
-            "relation": "complement",
-            "install": "brew install git-delta",
-            "tldr": "delta",
-            "url": "https://github.com/dandavison/delta",
-            "boundary": "diff가 만든 차이의 표시를 보완하는 pager다. 두 입력의 차이를 계산하는 diff 자체를 대체하지 않는다. diff -u 결과를 delta로 넘기며 patch나 자동화에 사용할 원본 diff 출력은 유지한다. alias diff='delta'로 연결하지 않는다."
           }
         ],
         "commands": [
@@ -246,26 +220,6 @@
             "name": "rg",
             "description": "코드베이스 검색에 최적화된 빠른 grep 계열 도구",
             "tldr": "rg"
-          },
-          {
-            "name": "sed",
-            "description": "스트림 텍스트를 줄 단위로 치환·삭제·변환하는 기본 도구",
-            "tldr": "sed"
-          },
-          {
-            "name": "sd",
-            "description": "간단한 문자열·정규식 치환에 초점을 둔 sed 대안",
-            "tldr": "sd"
-          },
-          {
-            "name": "diff",
-            "description": "두 파일이나 디렉터리의 차이를 비교하는 기본 도구",
-            "tldr": "diff"
-          },
-          {
-            "name": "delta",
-            "description": "Git diff와 diff 출력을 구문 강조와 레이아웃으로 보기 좋게 표시하는 도구",
-            "tldr": "delta"
           }
         ]
       },
@@ -337,6 +291,32 @@
             "tldr": "gron",
             "url": "https://github.com/tomnomnom/gron",
             "boundary": "중첩 JSON을 경로-값 형태로 풀어 grep 등과 조합하는 작업을 보완한다. jq의 필터 언어·변환 기능 전체를 대체하지 않으며 출력 형식도 JSON 원문과 다르다. jq alias로 치환하지 않고 gron의 변환·복원 흐름을 명시적으로 사용한다."
+          },
+          {
+            "from": "sed",
+            "to": "sd",
+            "why": "구문 난이도",
+            "group": "sed-chain",
+            "problem": "sed의 정규식과 치환 구문은 배우기 어렵고 실수가 잦다",
+            "solution": "직관적인 find & replace 구문, 예시 기반 설명",
+            "relation": "alternative",
+            "boundary": "문자열·정규식 치환은 대신할 수 있다. 구문과 정규식 규칙이 sed와 다르고 sed의 주소 지정·여러 처리 명령을 그대로 실행하지 못한다. alias sed='sd'는 기존 입력을 보존하지 않는다. 복잡한 sed 프로그램이나 이식성이 필요한 스크립트는 유지한다.",
+            "install": "brew install sd",
+            "tldr": "sd",
+            "url": "https://github.com/chmln/sd"
+          },
+          {
+            "from": "diff",
+            "to": "delta",
+            "why": "가독성 부족",
+            "group": "diff-chain",
+            "problem": "기본 diff 출력은 읽기 어렵고, 구문 강조가 없다",
+            "solution": "구문 강조, 사이드바 비교, 줄 번호, Git 통합",
+            "relation": "complement",
+            "install": "brew install git-delta",
+            "tldr": "delta",
+            "url": "https://github.com/dandavison/delta",
+            "boundary": "diff가 만든 차이의 표시를 보완하는 pager다. 두 입력의 차이를 계산하는 diff 자체를 대체하지 않는다. diff -u 결과를 delta로 넘기며 patch나 자동화에 사용할 원본 diff 출력은 유지한다. alias diff='delta'로 연결하지 않는다."
           }
         ],
         "commands": [
@@ -379,6 +359,26 @@
             "name": "gron",
             "description": "JSON을 grep하기 쉬운 할당문 형태로 펼치는 도구",
             "tldr": "gron"
+          },
+          {
+            "name": "sed",
+            "description": "스트림 텍스트를 줄 단위로 치환·삭제·변환하는 기본 도구",
+            "tldr": "sed"
+          },
+          {
+            "name": "sd",
+            "description": "간단한 문자열·정규식 치환에 초점을 둔 sed 대안",
+            "tldr": "sd"
+          },
+          {
+            "name": "diff",
+            "description": "두 파일이나 디렉터리의 차이를 비교하는 기본 도구",
+            "tldr": "diff"
+          },
+          {
+            "name": "delta",
+            "description": "Git diff와 diff 출력을 구문 강조와 레이아웃으로 보기 좋게 표시하는 도구",
+            "tldr": "delta"
           }
         ]
       },
@@ -430,9 +430,7 @@
             "tldr": "less"
           },
           {
-            "name": "bat",
-            "description": "구문 강조·줄번호·Git 표시를 제공하는 파일 뷰어",
-            "tldr": "bat"
+            "name": "bat"
           }
         ]
       },
@@ -503,7 +501,7 @@
           },
           {
             "name": "fzf",
-            "description": "목록을 퍼지 검색으로 고르는 범용 대화형 필터",
+            "description": "표준 입력 등의 목록을 퍼지 검색으로 좁혀 대화형으로 선택하는 CLI 필터다. 파일·명령 이력·브랜치 등 여러 작업에 조합할 수 있으며 목록 생성은 다른 도구가 맡는다.",
             "tldr": "fzf"
           }
         ]
@@ -612,7 +610,7 @@
       },
       {
         "name": "System Monitoring",
-        "why": "기본 모니터링 도구는 정보 밀도와 인터페이스가 부족하다",
+        "why": "현재 시스템과 프로세스의 자원 사용량·상태를 관찰한다.",
         "relations": [
           {
             "from": "top",
@@ -678,43 +676,6 @@
             "tldr": "smem",
             "url": "https://www.selenic.com/smem/",
             "boundary": "프로세스별 PSS·USS를 살펴보는 메모리 분석을 보완한다. 시스템 전체 메모리·swap 요약을 확인하는 free와 측정 대상이 다르며 다른 프로세스의 상세 정보는 접근 권한에 영향을 받는다. free를 smem alias로 치환하지 않고 분석 목적에 따라 함께 쓴다."
-          },
-          {
-            "from": "docker",
-            "to": "lazydocker",
-            "why": "컨테이너 상태 탐색 불편",
-            "group": "container-monitor",
-            "problem": "docker와 docker compose 명령만으로는 컨테이너, 로그, 이미지, 볼륨 상태를 반복적으로 확인하기 번거롭다",
-            "solution": "컨테이너·서비스·로그·이미지·볼륨을 한 화면에서 탐색하고 기본 작업을 TUI로 실행",
-            "relation": "complement",
-            "boundary": "컨테이너·로그·이미지 등을 대화형으로 점검하고 조작하는 화면을 보완한다. Docker 실행 환경을 대신하지 않으며 docker CLI·Compose 옵션을 그대로 받는 실행기도 아니다. 무인 배포·빌드·운영 스크립트에는 기존 CLI를 유지한다.",
-            "install": "brew install lazydocker",
-            "tldr": "lazydocker",
-            "url": "https://github.com/jesseduffield/lazydocker"
-          },
-          {
-            "from": "time",
-            "to": "hyperfine",
-            "why": "반복 실행의 분산과 워밍업을 포함해 명령 성능을 비교하고 싶다",
-            "group": "benchmark",
-            "problem": "반복 실행의 분산과 워밍업을 포함해 명령 성능을 비교하고 싶다",
-            "solution": "반복 실행 통계·워밍업·명령 간 성능 비교",
-            "relation": "alternative",
-            "boundary": "hyperfine은 단순 time 명령의 모든 셸별 측정·출력 의미와 동일하지 않다.",
-            "tldr": "hyperfine",
-            "url": "https://github.com/sharkdp/hyperfine"
-          },
-          {
-            "from": "time",
-            "to": "zsh-bench",
-            "why": "Zsh 프롬프트·초기화 체감 속도를 비교하고 싶다",
-            "group": "shell-startup",
-            "problem": "Zsh 프롬프트·초기화 체감 속도를 비교하고 싶다",
-            "solution": "Zsh 시작·프롬프트 지연에 특화된 벤치마크",
-            "relation": "specialized",
-            "boundary": "zsh-bench는 일반 명령 실행 벤치마크를 대체하지 않는다. 측정 조건을 통일해야 한다.",
-            "tldr": "zsh-bench",
-            "url": "https://github.com/romkatv/zsh-bench"
           }
         ],
         "commands": [
@@ -762,31 +723,6 @@
             "name": "smem",
             "description": "프로세스별 메모리 사용량을 USS/PSS/RSS 기준으로 분석하는 도구",
             "tldr": "smem"
-          },
-          {
-            "name": "docker",
-            "description": "컨테이너와 이미지를 관리하는 Docker CLI",
-            "tldr": "docker"
-          },
-          {
-            "name": "lazydocker",
-            "description": "Docker 컨테이너·이미지·로그를 터미널 UI로 관리하는 도구",
-            "tldr": "lazydocker"
-          },
-          {
-            "name": "time",
-            "description": "time",
-            "tldr": "time"
-          },
-          {
-            "name": "hyperfine",
-            "description": "명령 실행 벤치마크 도구",
-            "tldr": "hyperfine"
-          },
-          {
-            "name": "zsh-bench",
-            "description": "Zsh 초기화 성능 벤치마크",
-            "tldr": "zsh-bench"
           }
         ]
       },
@@ -915,7 +851,7 @@
       },
       {
         "name": "Shell",
-        "why": "셸은 인터랙티브 사용과 자동화에 중요하다",
+        "why": "명령을 해석·실행하는 셸의 문법과 대화형 사용 모델을 비교한다.",
         "relations": [
           {
             "from": "bash",
@@ -944,91 +880,6 @@
             "boundary": "개인 대화형 shell로 선택할 수 있다. 기본 모드의 문법·배열·단어 분리·옵션·설정은 Bash와 같지 않으며 POSIX emulation 지원이 기본 Bash 호환을 뜻하지 않는다. 기존 Bash 스크립트는 Bash로 실행하고 alias bash='zsh'로 치환하지 않는다."
           },
           {
-            "from": "history",
-            "to": "atuin",
-            "why": "검색 기능 부족",
-            "group": "history-chain",
-            "problem": "bash history는 검색이 불편하고, 동기화가 안 된다",
-            "solution": "동기화, 고급 검색, 스냅샷, 위젯, SQLite 기반",
-            "relation": "alternative",
-            "install": "brew install atuin",
-            "tldr": "atuin",
-            "url": "https://github.com/atuinsh/atuin",
-            "boundary": "shell에 통합해 과거 명령을 검색하는 작업은 대신하거나 확장한다. shell history 내장 명령의 모든 옵션·출력·저장 방식을 그대로 대신하지 않으며 동기화는 별도 설정이다. 검색 위젯으로 연결하고 alias history='atuin'로 일괄 치환하지 않는다."
-          },
-          {
-            "from": "zsh",
-            "to": "oh-my-zsh",
-            "why": "Zsh의 플러그인·테마·설정을 직접 구성해야 한다",
-            "group": "zsh-config",
-            "problem": "Zsh의 플러그인·테마·설정을 직접 구성해야 한다",
-            "solution": "플러그인·테마·업데이트를 묶어 제공하는 설정 프레임워크",
-            "relation": "specialized",
-            "boundary": "Oh My Zsh는 독립 셸이 아닌 Zsh 설정 프레임워크이며 설치된 플러그인·환경에 따라 시작 지연이 달라진다.",
-            "tldr": "oh-my-zsh",
-            "url": "https://ohmyz.sh/"
-          },
-          {
-            "from": "oh-my-zsh",
-            "to": "zimfw",
-            "why": "Oh My Zsh 외에 모듈 중심의 Zsh 구성 방식을 원한다",
-            "group": "zsh-framework",
-            "problem": "Oh My Zsh 외에 모듈 중심의 Zsh 구성 방식을 원한다",
-            "solution": "모듈 기반 Zsh 설정과 플러그인 로딩",
-            "relation": "alternative",
-            "boundary": "Zimfw는 독립 셸이 아니다. 기능·테마 구성과 실제 시작 속도는 환경별로 비교해야 한다.",
-            "tldr": "zimfw",
-            "url": "https://zimfw.sh/"
-          },
-          {
-            "from": "oh-my-zsh",
-            "to": "prezto",
-            "why": "Oh My Zsh와 다른 Zsh 설정 프레임워크가 필요하다",
-            "group": "zsh-framework",
-            "problem": "Oh My Zsh와 다른 Zsh 설정 프레임워크가 필요하다",
-            "solution": "모듈 중심 Zsh 환경 구성",
-            "relation": "alternative",
-            "boundary": "Prezto도 독립 셸이 아니며 Oh My Zsh의 설정 파일과 플러그인이 동일하게 동작하지 않는다.",
-            "tldr": "prezto",
-            "url": "https://github.com/sorin-ionescu/prezto"
-          },
-          {
-            "from": "oh-my-zsh",
-            "to": "zsh4humans",
-            "why": "설정을 최소화한 Zsh 사용 환경이 필요하다",
-            "group": "zsh-framework",
-            "problem": "설정을 최소화한 Zsh 사용 환경이 필요하다",
-            "solution": "사전 구성된 사용자 친화적 Zsh 환경",
-            "relation": "alternative",
-            "boundary": "Zsh 자체를 대체하지 않는다. 프로젝트의 유지보수 상태와 설치 지원을 확인해야 한다.",
-            "tldr": "zsh4humans",
-            "url": "https://github.com/romkatv/zsh4humans"
-          },
-          {
-            "from": "zsh",
-            "to": "starship",
-            "why": "셸별로 프롬프트를 직접 구성하기 번거롭다",
-            "group": "shell-prompt",
-            "problem": "셸별로 프롬프트를 직접 구성하기 번거롭다",
-            "solution": "여러 셸에서 공유하는 프롬프트 구성, Git·언어 환경 정보 표시",
-            "relation": "complement",
-            "boundary": "Starship은 프롬프트 도구이지 Oh My Zsh 전체 플러그인·설정 기능의 대체가 아니다.",
-            "tldr": "starship",
-            "url": "https://starship.rs/"
-          },
-          {
-            "from": "history",
-            "to": "fzf",
-            "why": "기본 이력 검색은 선택지가 많을 때 탐색하기 불편하다",
-            "group": "shell-history",
-            "problem": "기본 이력 검색은 선택지가 많을 때 탐색하기 불편하다",
-            "solution": "Ctrl-R와 결합 가능한 대화형 fuzzy 검색",
-            "relation": "complement",
-            "boundary": "fzf는 범용 선택기로 history의 저장·동기화 기능 자체를 제공하지 않는다. Atuin과의 기능 중첩은 검색 UI 수준이다.",
-            "tldr": "fzf",
-            "url": "https://github.com/junegunn/fzf"
-          },
-          {
             "from": "fish",
             "to": "nushell",
             "why": "문자열 파이프라인 외의 구조화된 데이터 처리가 필요하다",
@@ -1039,30 +890,6 @@
             "boundary": "Nushell은 POSIX 셸 문법과 호환되지 않으며 Fish와도 스크립트·환경 설정이 다르다.",
             "tldr": "nushell",
             "url": "https://www.nushell.sh/"
-          },
-          {
-            "from": "zsh",
-            "to": "zsh-autosuggestions",
-            "why": "이전에 입력한 명령을 다시 타이핑해야 한다",
-            "group": "zsh-plugins",
-            "problem": "이전에 입력한 명령을 다시 타이핑해야 한다",
-            "solution": "입력 중 명령 이력 기반 제안",
-            "relation": "complement",
-            "boundary": "프롬프트나 셸 자체를 대체하는 도구가 아닌 Zsh 플러그인이다.",
-            "tldr": "zsh-autosuggestions",
-            "url": "https://github.com/zsh-users/zsh-autosuggestions"
-          },
-          {
-            "from": "zsh",
-            "to": "zsh-autocomplete",
-            "why": "기본 완성 결과 탐색을 개선하고 싶다",
-            "group": "zsh-plugins",
-            "problem": "기본 완성 결과 탐색을 개선하고 싶다",
-            "solution": "대화형 완성 후보 표시·선택",
-            "relation": "complement",
-            "boundary": "Zsh 플러그인이며 초기화 성능은 구성에 따라 달라진다.",
-            "tldr": "zsh-autocomplete",
-            "url": "https://github.com/marlonrichert/zsh-autocomplete"
           }
         ],
         "commands": [
@@ -1082,59 +909,9 @@
             "tldr": "zsh"
           },
           {
-            "name": "history",
-            "description": "셸에서 실행한 명령 기록을 조회하는 기본 기능",
-            "tldr": "history"
-          },
-          {
-            "name": "atuin",
-            "description": "셸 히스토리를 검색·동기화·구조화하는 도구",
-            "tldr": "atuin"
-          },
-          {
-            "name": "oh-my-zsh",
-            "description": "Zsh 설정 프레임워크",
-            "tldr": "oh-my-zsh"
-          },
-          {
-            "name": "zimfw",
-            "description": "모듈 기반 Zsh 설정 프레임워크",
-            "tldr": "zimfw"
-          },
-          {
-            "name": "prezto",
-            "description": "Zsh 설정 프레임워크",
-            "tldr": "prezto"
-          },
-          {
-            "name": "zsh4humans",
-            "description": "사전 구성된 Zsh 환경",
-            "tldr": "zsh4humans"
-          },
-          {
-            "name": "starship",
-            "description": "크로스셸 프롬프트",
-            "tldr": "starship"
-          },
-          {
-            "name": "fzf",
-            "description": "범용 fuzzy finder",
-            "tldr": "fzf"
-          },
-          {
             "name": "nushell",
             "description": "구조화된 데이터 파이프라인을 사용하는 셸",
             "tldr": "nushell"
-          },
-          {
-            "name": "zsh-autosuggestions",
-            "description": "Zsh 입력 자동 제안 플러그인",
-            "tldr": "zsh-autosuggestions"
-          },
-          {
-            "name": "zsh-autocomplete",
-            "description": "Zsh 자동 완성 플러그인",
-            "tldr": "zsh-autocomplete"
           }
         ]
       },
@@ -1235,9 +1012,7 @@
             "tldr": "git-diff"
           },
           {
-            "name": "delta",
-            "description": "Git diff와 diff 출력을 구문 강조와 레이아웃으로 보기 좋게 표시하는 도구",
-            "tldr": "delta"
+            "name": "delta"
           },
           {
             "name": "jj",
@@ -1287,11 +1062,11 @@
         "why": "데이터베이스 작업은 접속, 스키마 탐색, 쿼리 작성, 결과 확인 UX가 중요하다",
         "relations": [
           {
-            "from": "sql shell",
+            "from": "psql",
             "to": "Harlequin",
             "why": "SQL 작성과 결과 탐색을 한 화면에서 하고 싶다",
             "group": "db-tui",
-            "problem": "psql, sqlite3 같은 DB별 셸은 가볍지만 스키마 탐색, 편집, 결과 확인을 오가야 한다",
+            "problem": "PostgreSQL의 기본 SQL 클라이언트와 대화형 스키마·결과 탐색 화면을 비교하고 싶다.",
             "solution": "터미널 기반 SQL IDE, 어댑터 기반 DB 연결, 쿼리 편집과 결과 탐색",
             "relation": "alternative",
             "boundary": "대화형 쿼리 작성·탐색 UX를 제공하지만 각 DB 공식 CLI의 모든 메타 명령과 운영 옵션을 대체하지 않는다. 자동화·백업·마이그레이션 스크립트에는 DB별 CLI를 유지한다.",
@@ -1299,35 +1074,33 @@
             "url": "https://github.com/tconbeer/harlequin"
           },
           {
-            "from": "sql shell",
+            "from": "psql",
             "to": "Rainfrog",
             "why": "PostgreSQL을 빠른 TUI로 탐색하고 싶다",
             "group": "db-tui",
-            "problem": "반복적인 테이블 조회와 쿼리 실행을 psql 명령만으로 수행하면 컨텍스트 전환이 많다",
+            "problem": "PostgreSQL의 기본 SQL 클라이언트와 대화형 스키마·결과 탐색 화면을 비교하고 싶다.",
             "solution": "PostgreSQL 중심 TUI, 스키마 탐색, 쿼리 실행, 결과 테이블 확인",
             "relation": "alternative",
             "boundary": "PostgreSQL 대화형 탐색을 보완한다. psql의 스크립팅, 백슬래시 메타 명령, dump/restore 계열 운영 도구를 대신하지 않는다.",
             "tldr": "rainfrog",
             "url": "https://github.com/achristmascarl/rainfrog"
-          },
-          {
-            "from": "vim",
-            "to": "vim-dadbod-ui",
-            "why": "편집기 안에서 DB 탐색과 쿼리 실행을 처리하고 싶다",
-            "group": "editor-db",
-            "problem": "SQL 파일 편집과 DB 클라이언트를 따로 오가면 쿼리 수정·실행 흐름이 끊긴다",
-            "solution": "vim-dadbod 기반 DB UI, 연결 목록, 스키마 브라우징, 쿼리 실행 결과 버퍼",
-            "relation": "complement",
-            "boundary": "Vim/Neovim 내부 워크플로를 보완하는 플러그인이다. 독립 DB 클라이언트나 DB 공식 CLI의 운영 기능을 대체하지 않는다.",
-            "tldr": "vim-dadbod-ui",
-            "url": "https://github.com/kristijanhusak/vim-dadbod-ui"
           }
         ],
         "commands": [
           {
-            "name": "sql shell",
-            "description": "psql, sqlite3, mysql 등 DB별 기본 대화형 SQL 클라이언트",
+            "name": "psql",
+            "description": "PostgreSQL에 접속해 SQL과 메타 명령을 실행하는 명령행 클라이언트다.",
             "tldr": "psql"
+          },
+          {
+            "name": "sqlite3",
+            "description": "SQLite 데이터베이스 파일에서 SQL을 실행하고 결과를 확인하는 명령행 클라이언트다.",
+            "tldr": "sqlite3"
+          },
+          {
+            "name": "mysql",
+            "description": "MySQL 서버에 접속해 SQL을 실행하는 명령행 클라이언트다.",
+            "tldr": "mysql"
           },
           {
             "name": "Harlequin",
@@ -1340,9 +1113,16 @@
             "tldr": "rainfrog"
           },
           {
-            "name": "vim-dadbod-ui",
-            "description": "Vim/Neovim에서 DB 연결, 스키마 탐색, 쿼리 실행 UI를 제공하는 플러그인",
-            "tldr": "vim-dadbod-ui"
+            "name": "vim-dadbod"
+          },
+          {
+            "name": "vim-dadbod-ui"
+          },
+          {
+            "name": "vim-dadbod-completion"
+          },
+          {
+            "name": "dadbod-vertica.nvim"
           }
         ]
       },
@@ -1547,8 +1327,8 @@
         ]
       },
       {
-        "name": "Terminal Editors",
-        "why": "키보드 중심 편집기의 계보와 편집 모델, 배포판을 비교한다",
+        "name": "Editors",
+        "why": "터미널·GUI 편집기의 편집 모델과 사용 환경을 비교한다.",
         "relations": [
           {
             "from": "vim",
@@ -1590,18 +1370,6 @@
             "url": "https://helix-editor.com/"
           },
           {
-            "from": "emacs",
-            "to": "doom-emacs",
-            "why": "Emacs를 직접 처음부터 구성하는 진입 비용이 있다",
-            "group": "emacs-distribution",
-            "problem": "Emacs를 직접 처음부터 구성하는 진입 비용이 있다",
-            "solution": "Vim식 모달 편집 선택, 사전 구성된 모듈과 설정",
-            "relation": "specialized",
-            "boundary": "Doom Emacs는 독립 편집기 엔진이 아니라 Emacs 위에 설치하는 설정 프레임워크다. Emacs를 먼저 설치해야 한다.",
-            "tldr": "doom-emacs",
-            "url": "https://github.com/doomemacs/doomemacs"
-          },
-          {
             "from": "neovim",
             "to": "zed",
             "why": "터미널 기반 편집기와 GUI 기반 통합 개발 환경 중 작업 방식을 선택한다",
@@ -1618,12 +1386,12 @@
         "commands": [
           {
             "name": "vim",
-            "description": "모달 편집의 대표적인 텍스트 편집기",
+            "description": "모드·motion·operator를 조합해 텍스트를 편집하는 프로그램이다. 플러그인으로 기능을 확장할 수 있으며 개별 플러그인과 편집기 자체를 구분한다.",
             "tldr": "vim"
           },
           {
             "name": "neovim",
-            "description": "Vim 계열의 확장 가능한 편집기",
+            "description": "Vim 계열의 모달 편집기로 Lua 설정과 플러그인을 통해 개발 환경을 확장한다. 현재 dotfiles는 Neovim 위에 LazyVim 구성을 사용한다.",
             "tldr": "neovim"
           },
           {
@@ -1640,11 +1408,6 @@
             "name": "emacs",
             "description": "확장 가능한 텍스트 편집 환경",
             "tldr": "emacs"
-          },
-          {
-            "name": "doom-emacs",
-            "description": "Emacs에 모듈과 Vim식 사용 환경을 제공하는 구성 프레임워크",
-            "tldr": "doom-emacs"
           },
           {
             "name": "zed",
@@ -1784,24 +1547,1050 @@
           {
             "name": "c",
             "description": "저수준 시스템 프로그래밍에 널리 쓰이는 언어",
-            "tldr": "c"
+            "kind": "language"
           },
           {
             "name": "rust",
             "description": "소유권과 차용 검사를 통해 메모리 안전성을 강화하는 언어",
-            "tldr": "rust"
+            "kind": "language"
           },
           {
             "name": "zig",
             "description": "명시적인 제어와 교차 컴파일을 강조하는 시스템 프로그래밍 언어",
-            "tldr": "zig"
+            "kind": "language"
+          }
+        ]
+      },
+      {
+        "name": "Command History",
+        "why": "실행한 명령을 기록·검색·재사용하는 CLI 도구와 대화형 선택 기능을 비교한다.",
+        "commands": [
+          {
+            "name": "history",
+            "description": "현재 셸에 기록된 명령 이력을 표시·검색하는 내장 명령이다. CLI 기록 작업으로 분류하지만 독립 실행 파일은 아니며 옵션과 저장 방식은 사용하는 셸에 따라 다르다.",
+            "tldr": "history"
+          },
+          {
+            "name": "atuin",
+            "description": "명령 이력을 데이터베이스로 저장하고 검색·필터링·선택을 제공하는 CLI 도구다. 셸에 통합해서 사용하며 선택적인 동기화 기능도 제공한다.",
+            "tldr": "atuin"
+          },
+          {
+            "name": "fzf"
+          }
+        ],
+        "relations": [
+          {
+            "from": "history",
+            "to": "atuin",
+            "why": "검색 기능 부족",
+            "group": "history-chain",
+            "problem": "bash history는 검색이 불편하고, 동기화가 안 된다",
+            "solution": "동기화, 고급 검색, 스냅샷, 위젯, SQLite 기반",
+            "relation": "alternative",
+            "install": "brew install atuin",
+            "tldr": "atuin",
+            "url": "https://github.com/atuinsh/atuin",
+            "boundary": "shell에 통합해 과거 명령을 검색하는 작업은 대신하거나 확장한다. shell history 내장 명령의 모든 옵션·출력·저장 방식을 그대로 대신하지 않으며 동기화는 별도 설정이다. 검색 위젯으로 연결하고 alias history='atuin'로 일괄 치환하지 않는다."
+          },
+          {
+            "from": "history",
+            "to": "fzf",
+            "why": "기본 이력 검색은 선택지가 많을 때 탐색하기 불편하다",
+            "group": "shell-history",
+            "problem": "기본 이력 검색은 선택지가 많을 때 탐색하기 불편하다",
+            "solution": "Ctrl-R와 결합 가능한 대화형 fuzzy 검색",
+            "relation": "complement",
+            "boundary": "fzf는 범용 선택기로 history의 저장·동기화 기능 자체를 제공하지 않는다. Atuin과의 기능 중첩은 검색 UI 수준이다.",
+            "tldr": "fzf",
+            "url": "https://github.com/junegunn/fzf"
+          }
+        ]
+      },
+      {
+        "name": "Shell Frameworks",
+        "why": "Zsh에 설정·모듈·플러그인 구성을 제공하는 프레임워크를 비교한다.",
+        "commands": [
+          {
+            "name": "zsh"
+          },
+          {
+            "name": "oh-my-zsh",
+            "description": "Zsh 설정 프레임워크",
+            "tldr": "oh-my-zsh"
+          },
+          {
+            "name": "zimfw",
+            "description": "모듈 기반 Zsh 설정 프레임워크",
+            "tldr": "zimfw"
+          },
+          {
+            "name": "prezto",
+            "description": "Zsh 설정 프레임워크",
+            "tldr": "prezto"
+          },
+          {
+            "name": "zsh4humans",
+            "description": "사전 구성된 Zsh 환경",
+            "tldr": "zsh4humans"
+          }
+        ],
+        "relations": [
+          {
+            "from": "zsh",
+            "to": "oh-my-zsh",
+            "why": "Zsh의 플러그인·테마·설정을 직접 구성해야 한다",
+            "group": "zsh-config",
+            "problem": "Zsh의 플러그인·테마·설정을 직접 구성해야 한다",
+            "solution": "플러그인·테마·업데이트를 묶어 제공하는 설정 프레임워크",
+            "relation": "complement",
+            "boundary": "Zsh에 설치하는 설정 프레임워크이며 별도의 셸 구현체가 아니다. Zsh의 문법·실행 기능은 계속 Zsh가 맡는다.",
+            "tldr": "oh-my-zsh",
+            "url": "https://ohmyz.sh/"
+          },
+          {
+            "from": "oh-my-zsh",
+            "to": "zimfw",
+            "why": "Oh My Zsh 외에 모듈 중심의 Zsh 구성 방식을 원한다",
+            "group": "zsh-framework",
+            "problem": "Oh My Zsh 외에 모듈 중심의 Zsh 구성 방식을 원한다",
+            "solution": "모듈 기반 Zsh 설정과 플러그인 로딩",
+            "relation": "alternative",
+            "boundary": "Zimfw는 독립 셸이 아니다. 기능·테마 구성과 실제 시작 속도는 환경별로 비교해야 한다.",
+            "tldr": "zimfw",
+            "url": "https://zimfw.sh/"
+          },
+          {
+            "from": "oh-my-zsh",
+            "to": "prezto",
+            "why": "Oh My Zsh와 다른 Zsh 설정 프레임워크가 필요하다",
+            "group": "zsh-framework",
+            "problem": "Oh My Zsh와 다른 Zsh 설정 프레임워크가 필요하다",
+            "solution": "모듈 중심 Zsh 환경 구성",
+            "relation": "alternative",
+            "boundary": "Prezto도 독립 셸이 아니며 Oh My Zsh의 설정 파일과 플러그인이 동일하게 동작하지 않는다.",
+            "tldr": "prezto",
+            "url": "https://github.com/sorin-ionescu/prezto"
+          },
+          {
+            "from": "oh-my-zsh",
+            "to": "zsh4humans",
+            "why": "설정을 최소화한 Zsh 사용 환경이 필요하다",
+            "group": "zsh-framework",
+            "problem": "설정을 최소화한 Zsh 사용 환경이 필요하다",
+            "solution": "사전 구성된 사용자 친화적 Zsh 환경",
+            "relation": "alternative",
+            "boundary": "Zsh 자체를 대체하지 않는다. 프로젝트의 유지보수 상태와 설치 지원을 확인해야 한다.",
+            "tldr": "zsh4humans",
+            "url": "https://github.com/romkatv/zsh4humans"
+          }
+        ]
+      },
+      {
+        "name": "Shell Prompt",
+        "why": "명령 입력 줄의 프롬프트 표현을 확장한다.",
+        "commands": [
+          {
+            "name": "zsh"
+          },
+          {
+            "name": "starship",
+            "description": "크로스셸 프롬프트",
+            "tldr": "starship"
+          }
+        ],
+        "relations": [
+          {
+            "from": "zsh",
+            "to": "starship",
+            "why": "셸별로 프롬프트를 직접 구성하기 번거롭다",
+            "group": "shell-prompt",
+            "problem": "셸별로 프롬프트를 직접 구성하기 번거롭다",
+            "solution": "여러 셸에서 공유하는 프롬프트 구성, Git·언어 환경 정보 표시",
+            "relation": "complement",
+            "boundary": "Starship은 프롬프트 도구이지 Oh My Zsh 전체 플러그인·설정 기능의 대체가 아니다.",
+            "tldr": "starship",
+            "url": "https://starship.rs/"
+          }
+        ]
+      },
+      {
+        "name": "Shell Plugins",
+        "why": "Zsh 대화형 입력을 확장하는 플러그인으로 셸 구현체와 구분한다.",
+        "commands": [
+          {
+            "name": "zsh-autosuggestions",
+            "description": "Zsh 입력 자동 제안 플러그인",
+            "tldr": "zsh-autosuggestions"
+          },
+          {
+            "name": "zsh-autocomplete",
+            "description": "Zsh 자동 완성 플러그인",
+            "tldr": "zsh-autocomplete"
+          }
+        ],
+        "relations": []
+      },
+      {
+        "name": "Benchmarking",
+        "why": "프로세스의 현재 상태 관찰과 실행 시간·시작 비용 측정을 구분한다.",
+        "commands": [
+          {
+            "name": "time",
+            "description": "time",
+            "tldr": "time"
+          },
+          {
+            "name": "hyperfine",
+            "description": "명령 실행 벤치마크 도구",
+            "tldr": "hyperfine"
+          },
+          {
+            "name": "zsh-bench",
+            "description": "Zsh 초기화 성능 벤치마크",
+            "tldr": "zsh-bench"
+          }
+        ],
+        "relations": [
+          {
+            "from": "time",
+            "to": "hyperfine",
+            "why": "반복 실행의 분산과 워밍업을 포함해 명령 성능을 비교하고 싶다",
+            "group": "benchmark",
+            "problem": "반복 실행의 분산과 워밍업을 포함해 명령 성능을 비교하고 싶다",
+            "solution": "반복 실행 통계·워밍업·명령 간 성능 비교",
+            "relation": "alternative",
+            "boundary": "hyperfine은 단순 time 명령의 모든 셸별 측정·출력 의미와 동일하지 않다.",
+            "tldr": "hyperfine",
+            "url": "https://github.com/sharkdp/hyperfine"
+          },
+          {
+            "from": "time",
+            "to": "zsh-bench",
+            "why": "Zsh 프롬프트·초기화 체감 속도를 비교하고 싶다",
+            "group": "shell-startup",
+            "problem": "Zsh 프롬프트·초기화 체감 속도를 비교하고 싶다",
+            "solution": "Zsh 시작·프롬프트 지연에 특화된 벤치마크",
+            "relation": "specialized",
+            "boundary": "zsh-bench는 일반 명령 실행 벤치마크를 대체하지 않는다. 측정 조건을 통일해야 한다.",
+            "tldr": "zsh-bench",
+            "url": "https://github.com/romkatv/zsh-bench"
+          }
+        ]
+      },
+      {
+        "name": "Containers",
+        "why": "컨테이너 실행·관리와 수동 점검용 화면을 구분한다.",
+        "commands": [
+          {
+            "name": "docker",
+            "description": "컨테이너와 이미지를 관리하는 Docker CLI",
+            "tldr": "docker"
+          },
+          {
+            "name": "lazydocker",
+            "description": "Docker 컨테이너·이미지·로그를 터미널 UI로 관리하는 도구",
+            "tldr": "lazydocker"
+          }
+        ],
+        "relations": [
+          {
+            "from": "docker",
+            "to": "lazydocker",
+            "why": "컨테이너 상태 탐색 불편",
+            "group": "container-monitor",
+            "problem": "docker와 docker compose 명령만으로는 컨테이너, 로그, 이미지, 볼륨 상태를 반복적으로 확인하기 번거롭다",
+            "solution": "컨테이너·서비스·로그·이미지·볼륨을 한 화면에서 탐색하고 기본 작업을 TUI로 실행",
+            "relation": "complement",
+            "boundary": "컨테이너·로그·이미지 등을 대화형으로 점검하고 조작하는 화면을 보완한다. Docker 실행 환경을 대신하지 않으며 docker CLI·Compose 옵션을 그대로 받는 실행기도 아니다. 무인 배포·빌드·운영 스크립트에는 기존 CLI를 유지한다.",
+            "install": "brew install lazydocker",
+            "tldr": "lazydocker",
+            "url": "https://github.com/jesseduffield/lazydocker"
+          }
+        ]
+      },
+      {
+        "name": "Editor Configurations",
+        "why": "편집기 위에서 사용하는 설정 배포판·프레임워크를 편집기 엔진과 구분한다.",
+        "commands": [
+          {
+            "name": "emacs"
+          },
+          {
+            "name": "doom-emacs",
+            "description": "Emacs에 모듈과 키맵·패키지 구성을 제공하는 설정 프레임워크다. 독립 편집기 엔진이 아니며 Emacs 위에 설치한다.",
+            "tldr": "doom-emacs"
+          },
+          {
+            "name": "neovim"
+          },
+          {
+            "name": "LazyVim",
+            "description": "Neovim에 기본 키맵·플러그인 구성과 선택형 Extras를 제공하는 설정 배포판이다. 현재 dotfiles가 사용하는 기반이며 Neovim 자체를 대체하지 않는다.",
+            "url": "https://www.lazyvim.org/",
+            "links": [
+              {
+                "label": "내 LazyVim 구성",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/config/lazy.lua"
+              }
+            ]
+          }
+        ],
+        "relations": [
+          {
+            "from": "emacs",
+            "to": "doom-emacs",
+            "why": "Emacs를 직접 처음부터 구성하는 진입 비용이 있다",
+            "group": "emacs-distribution",
+            "problem": "Emacs를 직접 처음부터 구성하는 진입 비용이 있다",
+            "solution": "Vim식 모달 편집 선택, 사전 구성된 모듈과 설정",
+            "relation": "complement",
+            "boundary": "Doom Emacs는 독립 편집기 엔진이 아니라 Emacs 위에 설치하는 설정 프레임워크다. Emacs를 먼저 설치해야 한다.",
+            "tldr": "doom-emacs",
+            "url": "https://github.com/doomemacs/doomemacs"
+          },
+          {
+            "from": "neovim",
+            "to": "LazyVim",
+            "relation": "complement",
+            "group": "editor-configuration",
+            "problem": "Neovim의 개발 환경을 처음부터 모두 설정해야 한다.",
+            "solution": "플러그인 구성·키맵·언어별 Extra를 제공한다.",
+            "boundary": "Neovim에 설치하는 설정 배포판이며 Neovim 엔진과 실행 기반을 유지한다."
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · 탐색",
+        "why": "Neovim 안에서 탐색·이동·명령 발견을 확장하는 플러그인. 에디터 자체의 대안과 구분한다.",
+        "relations": [],
+        "commands": [
+          {
+            "name": "snacks.nvim",
+            "description": "파일 탐색기·picker·대시보드·스크롤 등을 제공하는 Neovim 편의 기능 모음이다. dotfiles에서는 탐색기 상태 유지, 대시보드와 cmdtreemap picker를 설정한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/folke/snacks.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/explorer.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              },
+              {
+                "label": "대시보드 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/dashboard.lua"
+              }
+            ],
+            "examples": [
+              "<leader>ft — 내 Cmd TreeMap picker"
+            ]
+          },
+          {
+            "name": "vim-tmux-navigator",
+            "description": "Vim/Neovim 분할창과 tmux pane 사이를 같은 방향키로 이동하게 하는 연동 플러그인이다. 에디터와 tmux 양쪽 설정이 필요하며 에디터나 tmux 자체를 대체하지 않는다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/christoomey/vim-tmux-navigator"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/vim-tmux-navigator.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              },
+              {
+                "label": "내 tmux 쪽 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/chezmoi/dot_tmux.conf.local"
+              }
+            ],
+            "examples": [
+              "Ctrl+h/j/k/l — 왼쪽/아래/위/오른쪽 이동",
+              "Ctrl+\\ — 이전 분할창"
+            ]
+          },
+          {
+            "name": "flash.nvim",
+            "description": "Neovim 버퍼의 위치를 검색하고 화면의 라벨로 빠르게 이동하는 플러그인이다. LazyVim 기본 구성과 잠금 목록에서 확인하며 별도 개인 설정은 없다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/folke/flash.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "outline.nvim",
+            "description": "현재 파일의 심볼 구조를 별도 창으로 보여주고 해당 위치로 이동하는 Neovim 플러그인이다. dotfiles에서 editor.outline Extra를 선택한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/hedyhli/outline.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "which-key.nvim",
+            "description": "입력 중인 키 조합에서 이어서 누를 수 있는 명령과 설명을 보여주는 Neovim 플러그인이다. LazyVim의 키맵을 발견하는 데 사용하며 잠금 목록에 등록되어 있다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/folke/which-key.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "trouble.nvim",
+            "description": "진단·참조·검색 결과 등을 목록으로 모아 탐색하는 Neovim 플러그인이다. LSP 서버 자체가 아니라 결과를 읽고 이동하는 UI이며 LazyVim 잠금 목록에서 확인한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/folke/trouble.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · 편집",
+        "why": "텍스트 편집·레지스터·완성 기능을 확장한다.",
+        "relations": [],
+        "commands": [
+          {
+            "name": "vim-visual-multi",
+            "description": "여러 단어·위치에 커서를 만들어 동시에 편집하는 Vim/Neovim 플러그인이다. dotfiles는 Ctrl+n으로 단어 선택을 시작하도록 등록한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/mg979/vim-visual-multi"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/editing.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": [
+              "Ctrl+n — 현재 단어와 다음 일치 항목 선택"
+            ]
+          },
+          {
+            "name": "nvim-nocut",
+            "description": "삭제·변경·붙여넣기로 기존 레지스터 내용이 덮어써지는 것을 막는 Neovim 플러그인이다. dotfiles는 no-cut.setup()의 기본 설정을 사용한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/maarutan/nvim-nocut"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/editing.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "mini.comment",
+            "description": "선택한 줄과 텍스트의 주석을 전환하는 Neovim 편집 플러그인이다. dotfiles에서 coding.mini-comment Extra로 선택한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/nvim-mini/mini.comment"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "mini.surround",
+            "description": "괄호·따옴표·태그 같은 둘러싸는 문자를 추가·삭제·변경하는 Neovim 플러그인이다. dotfiles에서 coding.mini-surround Extra로 선택한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/nvim-mini/mini.surround"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "yanky.nvim",
+            "description": "yank 기록을 보관하고 과거 내용을 다시 붙여넣게 하는 Neovim 플러그인이다. dotfiles에서 coding.yanky Extra로 선택한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/gbprod/yanky.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "blink.cmp",
+            "description": "Neovim 입력 중 LSP·버퍼·스니펫 등의 완성 후보를 제공하는 플러그인이다. 현재 LazyVim 잠금 목록의 완성 구성으로 확인하며 개별 데이터 소스는 별도로 연결된다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/Saghen/blink.cmp"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · 언어·디버깅",
+        "why": "언어 서버·포매터·디버거의 기능을 Neovim에 연결한다.",
+        "relations": [],
+        "commands": [
+          {
+            "name": "nvim-lspconfig",
+            "description": "Neovim의 LSP 클라이언트에서 사용할 언어 서버 설정을 제공하는 플러그인이다. 언어 서버 실행 파일은 별도로 필요하며 dotfiles는 clangd와 Kotlin 서버 설정을 보완한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/neovim/nvim-lspconfig"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/lsp.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "conform.nvim",
+            "description": "파일 유형에 맞는 외부 포매터를 실행하도록 연결하는 Neovim 플러그인이다. 포매터 자체는 별도 도구이며 dotfiles에서는 Markdown 포매터를 비워 둔다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/stevearc/conform.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/lsp.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "nvim-jdtls",
+            "description": "Java 언어 서버 jdtls를 Neovim에 연결하는 플러그인이다. dotfiles는 jvm-env가 정한 JDK로 서버를 실행하고 Gradle 실행용 JDK는 따로 전달한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/mfussenegger/nvim-jdtls"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/java.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "jvm-env.nvim",
+            "description": "Neovim의 Java 개발 환경에 필요한 JDK 경로와 환경 변수를 설정하는 플러그인이다. dotfiles는 jdtls용 Java 21과 Gradle용 Java 11을 지정하며 설치된 JDK가 필요하다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/clang-engineer/jvm-env.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/jvm-env.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "nvim-dap",
+            "description": "Debug Adapter Protocol을 통해 Neovim에서 중단점·실행 제어·상태 조회를 수행하는 디버깅 클라이언트다. 실제 디버그 어댑터는 별도로 필요하며 dotfiles에 Kotlin launch/attach 구성이 있다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/mfussenegger/nvim-dap"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/kotlin-dap.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "nvim-dap-ui",
+            "description": "nvim-dap의 변수·호출 스택·중단점 등을 창으로 표시하는 Neovim 플러그인이다. 디버깅 엔진을 대신하지 않으며 dap.core Extra와 잠금 목록에서 확인한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/rcarriga/nvim-dap-ui"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · 문서",
+        "why": "Markdown을 편집기와 브라우저에서 읽는 기능을 확장한다.",
+        "relations": [],
+        "commands": [
+          {
+            "name": "render-markdown.nvim",
+            "description": "Markdown 제목·코드·표 등을 Neovim 버퍼 안에서 꾸며 읽게 하는 플러그인이다. 현재 dotfiles는 전역 렌더링을 끄고 읽기 전용 Docs 뷰어에서 버퍼 단위로 활성화한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/markdown.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "markdown-preview.nvim",
+            "description": "Vim/Neovim의 Markdown 문서를 브라우저에서 미리 보는 플러그인이다. dotfiles는 Markdown 파일에 로드하며 편집기 종료 시 미리보기 자동 닫기를 끈다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/iamcco/markdown-preview.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/markdown.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": [
+              ":MarkdownPreview — 브라우저 미리보기"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · DB",
+        "why": "SQL 실행·연결 탐색·완성을 에디터 안에서 수행한다. 독립 DB 클라이언트와 구분한다.",
+        "relations": [
+          {
+            "from": "vim-dadbod",
+            "to": "vim-dadbod-ui",
+            "relation": "wrapper",
+            "group": "editor-db",
+            "problem": "SQL 실행만으로는 여러 DB 연결과 스키마를 화면에서 탐색하기 어렵다.",
+            "solution": "vim-dadbod에 연결 목록·스키마 탐색·질의 버퍼 UI를 추가한다.",
+            "boundary": "Vim/Neovim과 vim-dadbod를 사용 기반으로 하는 플러그인이다. 독립 DB 클라이언트를 대체하지 않는다."
+          },
+          {
+            "from": "vim-dadbod",
+            "to": "vim-dadbod-completion",
+            "relation": "complement",
+            "group": "editor-db",
+            "solution": "SQL 편집 중 DB 기반 완성 후보를 제공한다.",
+            "boundary": "완성 엔진과 함께 사용하며 DB 실행·탐색 UI와 역할이 다르다."
+          },
+          {
+            "from": "vim-dadbod",
+            "to": "dadbod-vertica.nvim",
+            "relation": "complement",
+            "group": "editor-db",
+            "solution": "Vertica용 vsql 어댑터를 추가한다.",
+            "boundary": "vim-dadbod와 vsql이 필요하며 다른 DB용 일반 어댑터를 대체하지 않는다."
+          }
+        ],
+        "commands": [
+          {
+            "name": "vim-dadbod",
+            "description": "Vim/Neovim 안에서 DB 클라이언트를 통해 SQL을 실행하는 플러그인이다. DB별 명령행 클라이언트와 연결 정보가 필요하며 dotfiles에서는 lang.sql Extra로 구성한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/tpope/vim-dadbod"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": [
+              ":DB — DB 질의 명령"
+            ]
+          },
+          {
+            "name": "vim-dadbod-ui",
+            "description": "vim-dadbod 위에 연결 목록·테이블/스키마 탐색·SQL 버퍼와 결과 화면을 제공하는 Vim/Neovim 플러그인이다. 사용 기반은 Vim/Neovim과 vim-dadbod이며 독립 실행되는 DB 프로그램이 아니다. dotfiles에서는 연결 선택기와 결과 창 읽기 설정을 추가한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/kristijanhusak/vim-dadbod-ui"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/dadbod.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": [
+              ":DBUIToggle — DB UI 열기/닫기"
+            ]
+          },
+          {
+            "name": "vim-dadbod-completion",
+            "description": "vim-dadbod의 DB 연결 정보를 이용해 SQL 완성 후보를 제공하는 플러그인이다. DB 실행 UI 자체가 아니며 완성 엔진과 함께 사용한다. dotfiles의 lang.sql Extra와 잠금 목록에서 확인한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/kristijanhusak/vim-dadbod-completion"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "dadbod-vertica.nvim",
+            "description": "vim-dadbod에 Vertica 연결을 추가하는 Neovim 어댑터 플러그인이다. vim-dadbod와 vsql이 필요하며 dotfiles는 ~/bin/vsql 경로를 지정한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/clang-engineer/dadbod-vertica.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/dadbod-vertica.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · AI",
+        "why": "Neovim 안에서 AI 완성과 대화를 제공한다.",
+        "relations": [],
+        "commands": [
+          {
+            "name": "copilot.lua",
+            "description": "GitHub Copilot의 코드 제안을 Neovim에 연결하는 플러그인이다. dotfiles는 ai.copilot Extra로 선택하며 서비스 인증과 사용 권한은 별도로 필요하다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/zbirenbaum/copilot.lua"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazyvim.json"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          },
+          {
+            "name": "CopilotChat.nvim",
+            "description": "Neovim 안에서 GitHub Copilot과 대화하며 코드에 대한 질문과 편집을 수행하는 플러그인이다. dotfiles는 ai.copilot-chat Extra와 별도 모델 설정을 사용한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/CopilotC-Nvim/CopilotChat.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/copilotchat.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          }
+        ]
+      },
+      {
+        "name": "Neovim Plugins · 테마",
+        "why": "편집기 표현을 바꾸는 테마로 도구 기능과 구분한다.",
+        "relations": [],
+        "commands": [
+          {
+            "name": "cyberdream.nvim",
+            "description": "Neovim 화면 색상과 연동 플러그인의 표현을 설정하는 색상 테마다. dotfiles에서 현재 선택한 colorscheme은 cyberdream이며 별도로 등록한 후보 테마와 구분한다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/scottmckendry/cyberdream.nvim"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/colorscheme.lua"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
+          }
+        ]
+      },
+      {
+        "name": "tmux Plugins",
+        "why": "tmux 세션 저장·복원과 에디터 간 이동을 확장하는 현재 설정의 플러그인이다.",
+        "relations": [
+          {
+            "from": "tmux-resurrect",
+            "to": "tmux-continuum",
+            "relation": "complement",
+            "group": "session-restore",
+            "solution": "주기적인 저장과 tmux 서버 시작 시 자동 복원을 추가한다.",
+            "boundary": "저장·복원 기반은 tmux-resurrect이며 status line의 실행 hook을 사용한다."
+          }
+        ],
+        "commands": [
+          {
+            "name": "vim-tmux-navigator"
+          },
+          {
+            "name": "tmux-resurrect",
+            "description": "tmux 세션·창·pane 배치와 작업 경로를 저장하고 복원하는 플러그인이다. 모든 프로세스의 메모리 상태를 복구하는 것은 아니며 현재 dotfiles에서는 pane 출력 내용 저장을 끈다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/tmux-plugins/tmux-resurrect"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/chezmoi/dot_tmux.conf.local"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": [
+              "prefix + Ctrl+s — 세션 상태 저장",
+              "prefix + Ctrl+r — 세션 상태 복원"
+            ]
+          },
+          {
+            "name": "tmux-continuum",
+            "description": "tmux-resurrect의 저장을 주기적으로 실행하고 tmux 서버 시작 시 마지막 상태를 복원하는 플러그인이다. resurrect와 활성 status line이 필요하며 dotfiles는 자동 복원을 켠다.",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/tmux-plugins/tmux-continuum"
+              }
+            ],
+            "links": [
+              {
+                "label": "내 설정",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/chezmoi/dot_tmux.conf.local"
+              },
+              {
+                "label": "dotfiles 플러그인 잠금 목록",
+                "url": "https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lazy-lock.json"
+              }
+            ],
+            "examples": []
           }
         ]
       }
     ]
   },
   "cheatsheets": {
-    "intro": "도구를 바로 GitHub로 보내기 전에 블로그 안에서 짧은 설명, tldr 빠른 예시, 공식 문서, devkit 커스텀 치트시트를 순서대로 확인한다.",
+    "intro": "도구 자체의 소개를 먼저 읽고, 사용 예시·공식 문서·상세 치트시트로 이어진다. 주제별 문서는 개별 도구와 구분한다.",
     "source_repo": "https://github.com/clang-engineer/devkit/tree/main/reference/cheatsheets",
     "groups": [
       {
@@ -1910,39 +2699,12 @@
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/yazi.md"
             },
             "file": "yazi.md"
-          },
-          {
-            "slug": "terminal-tui",
-            "name": "terminal-tui",
-            "desc": "현대적 TUI 도구 지도와 선택 기준 (lazy 계열, 영역별 대안, 도입 우선순위)",
-            "file": "terminal-tui.md",
-            "official": [],
-            "custom": {
-              "label": "devkit terminal-tui",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/terminal-tui.md"
-            }
           }
         ]
       },
       {
         "title": "셸",
         "items": [
-          {
-            "slug": "shell",
-            "name": "Shell",
-            "desc": "Bash set 옵션, 리다이렉션, job 관리처럼 셸 공통 흐름을 정리한다.",
-            "official": [
-              {
-                "label": "Bash manual",
-                "url": "https://www.gnu.org/software/bash/manual/bash.html"
-              }
-            ],
-            "custom": {
-              "label": "devkit Shell Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/shell.md"
-            },
-            "file": "shell.md"
-          },
           {
             "slug": "zsh",
             "name": "Zsh",
@@ -1960,6 +2722,28 @@
             },
             "file": "zsh.md"
           },
+          {
+            "slug": "powershell",
+            "name": "PowerShell",
+            "desc": "Bash와 다른 객체 Pipeline, 서비스 관리, Windows 운영 명령.",
+            "tldr": "common/powershell",
+            "official": [
+              {
+                "label": "PowerShell documentation",
+                "url": "https://learn.microsoft.com/powershell/"
+              }
+            ],
+            "custom": {
+              "label": "devkit PowerShell Cheatsheet",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/powershell.md"
+            },
+            "file": "powershell.md"
+          }
+        ]
+      },
+      {
+        "title": "CLI 기록·탐색",
+        "items": [
           {
             "slug": "atuin",
             "name": "Atuin",
@@ -2010,23 +2794,6 @@
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/zoxide.md"
             },
             "file": "zoxide.md"
-          },
-          {
-            "slug": "powershell",
-            "name": "PowerShell",
-            "desc": "Bash와 다른 객체 Pipeline, 서비스 관리, Windows 운영 명령.",
-            "tldr": "common/powershell",
-            "official": [
-              {
-                "label": "PowerShell documentation",
-                "url": "https://learn.microsoft.com/powershell/"
-              }
-            ],
-            "custom": {
-              "label": "devkit PowerShell Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/powershell.md"
-            },
-            "file": "powershell.md"
           }
         ]
       },
@@ -2124,30 +2891,6 @@
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/elasticsearch.md"
             },
             "file": "elasticsearch.md"
-          },
-          {
-            "slug": "database-tui",
-            "name": "Database TUI",
-            "desc": "Harlequin, Rainfrog, vim-dadbod-ui 등 터미널·편집기 기반 DB 클라이언트 선택 기준.",
-            "official": [
-              {
-                "label": "Harlequin repository",
-                "url": "https://github.com/tconbeer/harlequin"
-              },
-              {
-                "label": "Rainfrog repository",
-                "url": "https://github.com/achristmascarl/rainfrog"
-              },
-              {
-                "label": "vim-dadbod-ui repository",
-                "url": "https://github.com/kristijanhusak/vim-dadbod-ui"
-              }
-            ],
-            "custom": {
-              "label": "devkit Database TUI Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/database-tui.md"
-            },
-            "file": "database-tui.md"
           }
         ]
       },
@@ -2301,26 +3044,6 @@
             "file": "taskwarrior.md"
           },
           {
-            "slug": "python-pypi-publishing",
-            "name": "Python PyPI Publishing",
-            "desc": "uv 빌드, GitHub OIDC, Trusted Publishing 배포 흐름.",
-            "official": [
-              {
-                "label": "PyPI Trusted Publishers",
-                "url": "https://docs.pypi.org/trusted-publishers/"
-              },
-              {
-                "label": "Python packaging guide",
-                "url": "https://packaging.python.org/"
-              }
-            ],
-            "custom": {
-              "label": "devkit PyPI Publishing Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/python-pypi-publishing.md"
-            },
-            "file": "python-pypi-publishing.md"
-          },
-          {
             "slug": "claude-code",
             "name": "Claude Code",
             "desc": "Anthropic의 터미널 AI 코딩 에이전트 사용 흐름.",
@@ -2369,22 +3092,95 @@
             "file": "opencode.md"
           }
         ]
+      }
+    ],
+    "guides": [
+      {
+        "slug": "terminal-tui",
+        "name": "terminal-tui",
+        "desc": "현대적 TUI 도구 지도와 선택 기준 (lazy 계열, 영역별 대안, 도입 우선순위)",
+        "file": "terminal-tui.md",
+        "official": [],
+        "custom": {
+          "label": "devkit terminal-tui",
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/terminal-tui.md"
+        },
+        "kind": "guide"
       },
       {
-        "title": "도구 사전",
-        "items": [
+        "slug": "shell",
+        "name": "Shell",
+        "desc": "Bash set 옵션, 리다이렉션, job 관리처럼 셸 공통 흐름을 정리한다.",
+        "official": [
           {
-            "slug": "tools-dictionary",
-            "name": "tools-dictionary",
-            "desc": "CLI 도구/개념 사전 + 핵심 명령어 (curl, docker, nginx, systemctl 등)",
-            "file": "tools-dictionary.md",
-            "official": [],
-            "custom": {
-              "label": "devkit tools-dictionary",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tools-dictionary.md"
-            }
+            "label": "Bash manual",
+            "url": "https://www.gnu.org/software/bash/manual/bash.html"
           }
-        ]
+        ],
+        "custom": {
+          "label": "devkit Shell Cheatsheet",
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/shell.md"
+        },
+        "file": "shell.md",
+        "kind": "guide"
+      },
+      {
+        "slug": "database-tui",
+        "name": "Database TUI",
+        "desc": "Harlequin, Rainfrog, vim-dadbod-ui 등 터미널·편집기 기반 DB 클라이언트 선택 기준.",
+        "official": [
+          {
+            "label": "Harlequin repository",
+            "url": "https://github.com/tconbeer/harlequin"
+          },
+          {
+            "label": "Rainfrog repository",
+            "url": "https://github.com/achristmascarl/rainfrog"
+          },
+          {
+            "label": "vim-dadbod-ui repository",
+            "url": "https://github.com/kristijanhusak/vim-dadbod-ui"
+          }
+        ],
+        "custom": {
+          "label": "devkit Database TUI Cheatsheet",
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/database-tui.md"
+        },
+        "file": "database-tui.md",
+        "kind": "guide"
+      },
+      {
+        "slug": "python-pypi-publishing",
+        "name": "Python PyPI Publishing",
+        "desc": "uv 빌드, GitHub OIDC, Trusted Publishing 배포 흐름.",
+        "official": [
+          {
+            "label": "PyPI Trusted Publishers",
+            "url": "https://docs.pypi.org/trusted-publishers/"
+          },
+          {
+            "label": "Python packaging guide",
+            "url": "https://packaging.python.org/"
+          }
+        ],
+        "custom": {
+          "label": "devkit PyPI Publishing Cheatsheet",
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/python-pypi-publishing.md"
+        },
+        "file": "python-pypi-publishing.md",
+        "kind": "guide"
+      },
+      {
+        "slug": "tools-dictionary",
+        "name": "tools-dictionary",
+        "desc": "CLI 도구/개념 사전 + 핵심 명령어 (curl, docker, nginx, systemctl 등)",
+        "file": "tools-dictionary.md",
+        "official": [],
+        "custom": {
+          "label": "devkit tools-dictionary",
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tools-dictionary.md"
+        },
+        "kind": "guide"
       }
     ]
   }

@@ -28,9 +28,6 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version-file: cmdtreemap/go.mod
-      - name: Validate shared JavaScript modules
-        run: |
-          for file in $(find src -name '*.js'); do node --input-type=module --check < "$file"; done
       - name: Validate and test cmdtreemap and shared explorer
         run: |
           make test
@@ -43,8 +40,8 @@ jobs:
           import json
           from pathlib import Path
           root = Path('reference/cheatsheets')
-          data = json.loads((root / 'catalog.json').read_text())
-          items = [item for group in data['groups'] for item in group['items']]
+          data = json.loads(Path('reference/catalog.json').read_text())['cheatsheets']
+          items = [item for group in data['groups'] for item in group['items']] + data.get('guides', [])
           assert len({item['slug'] for item in items}) == len(items)
           assert all((root / item['file']).is_file() for item in items)
           PY
