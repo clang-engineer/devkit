@@ -83,7 +83,7 @@ brew install --cask nikitabobko/tap/aerospace
 
 ## 서비스 모드
 
-저빈도·위험(되돌리기 번거로운) 동작을 메인 키맵에서 격리한 서브모드. `Alt + Shift + ;` 로 진입하며, 각 키는 동작 후 **자동으로 메인 모드로 복귀**한다. 키는 **소문자 그대로**(Shift 불필요) 누른다.
+저빈도·위험(되돌리기 번거로운) 동작을 메인 키맵에서 격리한 서브모드. `Alt + Shift + ;` 로 진입하며, 각 키는 동작 후 **자동으로 메인 모드로 복귀**한다. 키는 **소문자 그대로**(Shift 불필요) 누른다. 설계 의도와 모드형 키맵 관점은 [AeroSpace 서비스 모드 글](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/)에서 따로 정리한다.
 
 | 키 | 명령 | 설명 |
 |---|---|---|
@@ -130,6 +130,10 @@ aerospace workspace 3          # workspace 3으로 전환
 | macOS 업데이트 | 깨질 수 있음 | 안정적 |
 | 스타일 | BSP 기본 | i3 스타일 |
 | 커뮤니티 | 오래됨, 자료 많음 | 신생, 빠르게 성장 |
+
+## 관련 글
+
+- [AeroSpace 서비스 모드 — 저빈도·위험 동작을 별도 모드로 격리하는 설계](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/)
 
 ## 관련 도구
 
