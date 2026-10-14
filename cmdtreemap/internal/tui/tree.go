@@ -13,6 +13,7 @@ type TreeNode struct {
 func buildCategoryTrees(cat model.Category) []*TreeNode {
 	outgoing := make(map[string][]int)
 	incoming := make(map[string]bool)
+	connected := make(map[string]bool)
 	var order []string
 	for i, rel := range cat.Relations {
 		if _, ok := outgoing[rel.From]; !ok {
@@ -20,6 +21,8 @@ func buildCategoryTrees(cat model.Category) []*TreeNode {
 		}
 		outgoing[rel.From] = append(outgoing[rel.From], i)
 		incoming[rel.To] = true
+		connected[rel.From] = true
+		connected[rel.To] = true
 	}
 	visited := make([]bool, len(cat.Relations))
 	var expand func(string, map[string]bool) []*TreeNode
@@ -51,6 +54,13 @@ func buildCategoryTrees(cat model.Category) []*TreeNode {
 	for i, rel := range cat.Relations {
 		if !visited[i] {
 			addRoot(rel.From)
+		}
+	}
+	// Standalone definitions are valid map nodes, even without a relation.
+	for _, command := range cat.Commands {
+		if !connected[command.Name] {
+			addRoot(command.Name)
+			connected[command.Name] = true
 		}
 	}
 	return roots
