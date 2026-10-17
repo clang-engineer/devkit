@@ -1413,6 +1413,17 @@
             "name": "zed",
             "description": "Rust 기반 고성능 GUI 코드 편집기와 협업·AI 기능",
             "tldr": "zed"
+          },
+          {
+            "name": "Sublime Text",
+            "description": "빠른 실행과 다중 선택·확장 패키지를 지원하는 GUI 텍스트·코드 편집기",
+            "url": "https://www.sublimetext.com/",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://www.sublimetext.com/docs/"
+              }
+            ]
           }
         ]
       },
@@ -1509,6 +1520,61 @@
             "name": "warp",
             "description": "AI 보조와 명령 실행 워크플로를 결합한 터미널",
             "tldr": "warp"
+          },
+          {
+            "name": "alacritty",
+            "description": "GPU 가속 기반의 크로스플랫폼 터미널 에뮬레이터",
+            "url": "https://alacritty.org/",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://alacritty.org/"
+              }
+            ]
+          },
+          {
+            "name": "kitty",
+            "description": "GPU 가속·확장 기능과 원격 제어를 지원하는 터미널 에뮬레이터",
+            "url": "https://sw.kovidgoyal.net/kitty/",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://sw.kovidgoyal.net/kitty/"
+              }
+            ]
+          },
+          {
+            "name": "iTerm2",
+            "description": "macOS용 터미널 에뮬레이터로 분할 창·프로파일·검색 기능을 제공한다",
+            "url": "https://iterm2.com/",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://iterm2.com/"
+              }
+            ]
+          },
+          {
+            "name": "Windows Terminal",
+            "description": "Windows에서 PowerShell·명령 프롬프트·WSL 등을 탭과 창으로 실행하는 터미널 앱",
+            "url": "https://github.com/microsoft/terminal",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/microsoft/terminal"
+              }
+            ]
+          },
+          {
+            "name": "foot",
+            "description": "Wayland 환경을 위한 경량 터미널 에뮬레이터",
+            "url": "https://codeberg.org/dnkl/foot",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://codeberg.org/dnkl/foot"
+              }
+            ]
           }
         ]
       },
