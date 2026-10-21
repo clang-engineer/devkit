@@ -2936,6 +2936,22 @@
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/hammerspoon.md"
             },
             "file": "hammerspoon.md"
+          },
+          {
+            "slug": "chrome",
+            "name": "Google Chrome",
+            "desc": "macOS Chrome 창 미표시 복구와 headless 테스트 프로세스 정리.",
+            "official": [
+              {
+                "label": "Chrome Headless documentation",
+                "url": "https://developer.chrome.com/docs/chromium/headless"
+              }
+            ],
+            "custom": {
+              "label": "devkit Chrome Cheatsheet",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/chrome.md"
+            },
+            "file": "chrome.md"
           }
         ]
       },

@@ -61,6 +61,7 @@
 
 | 파일 | 설명 |
 |------|------|
+| [chrome.md](chrome.md) | Chrome 창 미표시 복구·headless 테스트 프로세스 정리 |
 | [aerospace.md](aerospace.md) | macOS 타일링 WM |
 | [hammerspoon.md](hammerspoon.md) | macOS 자동화/윈도우 관리 (Lua) |
 
