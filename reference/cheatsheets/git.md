@@ -16,16 +16,6 @@ Working Tree ── add ──> Index ── commit ──> Local Repository
 - `restore <file>`은 기본적으로 **Index의 내용으로 Working Tree를 복원**한다. `restore --staged`는 Index를 복원한다. 덮어쓰는 변경은 복구가 어려울 수 있다.
 - `switch -c <name>`의 `-c`는 새 브랜치를 생성한 뒤 전환한다. `branch -d`는 브랜치 참조를 삭제한다.
 
-## 연결 도구
-
-| 도구 | 역할 |
-|---|---|
-| gh | GitHub PR·이슈·Actions CLI |
-| lazygit | Git TUI |
-| delta | diff 출력 pager |
-| git-filter-repo | 이력 재작성 |
-| chezmoi | Git 기반 dotfiles 관리 |
-
 ## 상태 확인 & 변경 비교
 
 | 명령어 | 설명 |
@@ -218,41 +208,9 @@ git restore --source=HEAD~3 path/to/file.txt
 | `git config --global pull.rebase true` | Pull 시 기본 rebase |
 | `git config --list` | 설정 확인 |
 
-## 자주 쓰는 패턴
+## 추적 상태와 무시 규칙
 
-```bash
-# 작업 시작 루틴
-git status
-git pull --ff-only
-git switch -c feature/new-feature
-
-# 커밋 후 실수했을 때
-git add forgotten-file
-git commit --amend --no-edit
-
-# 변경사항 임시 저장
-git stash
-git stash pop
-
-# 브랜치 전환 전 확인
-git status
-git switch main
-```
-
-## 이미 추적 중인 파일을 .gitignore로 무시하기
-
-`.gitignore`는 **아직 추적 안 된** 파일에만 적용. 이미 커밋된 파일은 캐시에서 명시 제거해야 한다.
-
-```bash
-git ls-files <file>       # 출력 있으면 = 추적 중
-git check-ignore -v --no-index <file>  # 추적 여부와 무관하게 적용되는 ignore 규칙 확인
-
-git rm --cached <file>    # 인덱스에서만 제거 (로컬 파일 유지) — .gitignore 추가 후
-git rm -r --cached path/  # 디렉토리 전체
-```
-
-- `--cached` 없이 `git rm`하면 **로컬 파일까지 삭제**되니 주의.
-- 이후 `status`에 `D`로 잡히고, 커밋하면 추적이 끊긴다. 로컬 파일은 남고 `.gitignore` 덕에 재추가 안 됨.
+`.gitignore`는 기본적으로 **추적되지 않은 파일**을 제외하는 규칙이다. 이미 추적 중인 파일은 `git rm --cached <file>`로 Index에서 추적을 해제해야 하며, 이때 로컬 파일은 유지된다. `git rm`과 혼동하지 않는다.
 
 ## 위험한 명령어 (주의)
 
