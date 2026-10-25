@@ -4,48 +4,29 @@
 > 재작성된 것은 아니며, 3.x에서는 Rust 라이브러리 **TaskChampion**이 저장·동기화
 > 코어를 담당한다.
 
-## 개념 흐름
+## 명령 문법과 태스크 상태
 
 ```text
-태스크 추가 → 목록/검색 → 완료/수정
-     ↓            ↓           ↓
-task add       task next    task done
-     ↓            ↓           ↓
-project/due   +PENDING     task undo
+task [filter] <command> [attributes]
+       │         │            └─ project:work / due:tomorrow / +tag
+       │         ├─ add / modify / done / delete
+       │         └─ list / next / info / undo
+       └─ ID / status:pending / project:work / +tag
+
+Pending ── start ──> Active ── done ──> Completed
+   │                                  (완료)
+   └────────────── delete ──────────> Deleted
 ```
 
-핵심 명령어:
+`filter`는 **어떤 태스크에**, `command`는 **무엇을**, `attributes`는 **어떤 값으로** 적용할지를 나타낸다. 모든 명령이 모든 필터·속성을 받는 것은 아니다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 추가 | `task add "작업" project:home` | 태스크 추가 |
-| 목록 | `task next` | 다음 할 작업 |
-| 완료 | `task 3 done` | 태스크 완료 |
-| 수정 | `task 3 modify due:fri` | 마감일 변경 |
-| 복구 | `task undo` | 실수 복구 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| TaskChampion | 저장/동기화 코어 (Rust) |
-| todoist | 클라우드 기반 대안 |
-| vim/tmux | 터미널에서 태스크 관리 |
-
-## 30초만 본다면
-
-| 상황 | 명령 / 핵심 |
-|---|---|
-| 추가 | `task add "우유 사기" project:home due:tomorrow` |
-| 지금 볼 목록 | `task` = `task next`; `task list`와는 다른 리포트 |
-| 완료 / 수정 | `task 3 done` / `task 3 modify due:fri +urgent` |
-| 검색 | `task project:home +PENDING list` |
-| 실수 복구 | `task undo` (변경 내용을 보여 주고 확인을 요구함) |
-| 자동화 식별자 | 숫자 ID 대신 UUID 사용; 생성 시 `rc.verbose=new-uuid` |
-| 백업·연동용 출력 | `task <filter> export` → JSON 배열 |
-| 보류 | `wait:날짜`는 그때까지 대부분의 기본 리포트에서 숨김 |
-| 예정 | 미래 `scheduled:`는 `+READY`/`task ready`에 영향; 기본 `next`에서 숨기는 기능은 아님 |
-| 동기화 | v3는 `taskd` 미지원; SQLite 디렉터리를 파일 동기화하지 말 것 |
+```sh
+task add "문서 검토" project:dev due:tomorrow
+task project:dev list          # 대상 필터
+task 3 modify priority:H      # ID 3의 속성 변경
+task 3 done                   # ID 3 완료
+task undo                     # 마지막 변경 취소
+```
 
 ## 설치와 최초 실행
 
