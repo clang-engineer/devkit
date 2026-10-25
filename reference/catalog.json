@@ -3178,18 +3178,6 @@
     ],
     "guides": [
       {
-        "slug": "terminal-tui",
-        "name": "terminal-tui",
-        "desc": "현대적 TUI·DB 도구 지도와 선택 기준 (역할, 대안, 사용 환경)",
-        "file": "terminal-tui.md",
-        "official": [],
-        "custom": {
-          "label": "devkit terminal-tui",
-          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/terminal-tui.md"
-        },
-        "kind": "guide"
-      },
-      {
         "slug": "shell",
         "name": "Shell",
         "desc": "Bash set 옵션, 리다이렉션, job 관리처럼 셸 공통 흐름을 정리한다.",
@@ -3230,7 +3218,7 @@
       {
         "slug": "tools-dictionary",
         "name": "CLI 도구 발견 지도",
-        "desc": "작업 목적에 따라 CLI 도구를 찾고, 역할·대체/보완 관계와 파이프라인을 이해하는 지도",
+        "desc": "CLI·TUI 도구 발견 지도: 작업 목적별 도구 선택·대체/보완·파이프라인",
         "file": "tools-dictionary.md",
         "official": [],
         "custom": {
