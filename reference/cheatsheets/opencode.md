@@ -1,75 +1,54 @@
-# opencode Cheatsheet
+# OpenCode — 명령 체계 치트시트
 
-> [opencode](https://opencode.ai) — 터미널용 오픈소스 AI 코딩 에이전트(sst/Anomaly). provider-agnostic(75+ provider)라 모델을 골라 붙인다. `curl -fsSL https://opencode.ai/install | bash` 후 `opencode` 실행.
+> 코딩 에이전트의 **실행 방식·모델 공급자·외부 도구**를 구분한다. 상세한 모델 지원과 인증 정책은 버전·계정에 따라 달라지므로 공식 문서에서 확인한다.
 
-## 실행·인증·모델 선택
+## 세 가지 제어 층
 
 ```text
-opencode [CLI command] → TUI / 단일 실행
-       │
-       ├─ /connect  → Provider 인증
-       ├─ /models   → Model 선택
-       └─ MCP       → 외부 도구 연결
-
-Provider (인증·과금 경로) ≠ Model (실제 추론 모델)
+Shell CLI                      OpenCode TUI                 Config
+opencode                       /connect                     provider / model
+opencode run "요청"             /models                      mcp
+opencode auth login            대화·작업                     프로젝트 / 사용자 설정
+opencode mcp list
+       │                            │                            │
+       └──────── 실행·관리 ─────────┴──────── 선택·지속 설정 ────┘
 ```
 
-`opencode`는 TUI를 열고 `opencode run`은 요청을 단일 실행한다. `/connect`와 `/models`는 TUI 안에서 사용하는 명령으로, 셸에서 실행하는 CLI 명령과 구분한다.
+**셸의 `opencode auth login`과 TUI의 `/connect`는 입력하는 위치가 다르다.** `opencode`는 대화형 화면을 열고, `opencode run`은 단일 요청을 실행한다.
 
-## 인증 (provider 연결)
+## Provider와 Model은 다르다
 
-opencode의 모델 목록 = **인증/등록한 provider들이 주는 모델의 합집합**. 통로를 열수록 선택지가 는다.
+```text
+Provider ── 인증·접근 권한 ──> Model ── 추론
+   │                            │
+   └─ auth login / /connect     └─ /models 또는 --model
+```
 
-| 명령 | 설명 |
-|------|------|
-| `/connect` | TUI 안에서 provider 검색·인증 (가장 쉬움) |
-| `opencode auth login` | CLI로 provider 골라 인증 |
-| `opencode auth list` | 현재 인증된 provider 목록 |
-| `opencode auth logout` | provider 선택해 인증 해제 (다른 인증은 유지) |
+`provider/model`은 모델 식별 방식이다. **Provider에 인증했다고 모든 모델이 사용 가능한 것은 아니다.** 실제 목록·요금·조직 정책은 공급자 설정에 따른다.
 
-인증 방식 2종:
-- **OAuth device flow** (GitHub Copilot·Anthropic 등): 안내 페이지(`github.com/login/device` 등)에서 **코드 입력**.
-- **API 키** (OpenAI·DeepSeek 등): 발급 키를 붙여넣기.
+```sh
+opencode auth login                    # Provider 인증
+opencode auth list                     # 인증 상태 확인
+opencode run --model provider/model "요청"
+```
 
-저장 위치: `~/.local/share/opencode/auth.json` (전체 초기화하려면 이 파일 삭제)
+TUI에서는 `/connect`로 Provider를 연결하고 `/models`로 모델을 선택한다. 기본 모델은 OpenCode 설정의 `model` 필드로 지정할 수 있다.
 
-## 모델 선택
+## MCP — 모델과 외부 도구의 연결
 
-| 방법 | 명령 |
-|------|------|
-| TUI 피커 | `/models` → provider 아래 모델 선택 |
-| 기본 모델 고정 | config에 `"model": "<provider>/<model>"` |
-| 단발 실행 | `opencode run --model <provider>/<model> "프롬프트"` |
+```text
+OpenCode
+   └─ MCP Client
+       ├─ Local Server  → 로컬 프로세스 실행
+       └─ Remote Server → URL로 연결
+```
 
-모델 id는 `provider/model` 형식 (예: `github-copilot/gpt-5.3-codex`).
-
-config 위치: `.opencode/opencode.json`(프로젝트) 또는 글로벌 config.
 ```json
-{ "model": "github-copilot/gpt-5.3-codex" }
-```
-
-## GitHub Copilot으로 붙이기
-
-Copilot 유료 구독(Pro/Pro+/Business/Enterprise)으로 opencode 인증 가능 — **GitHub 공식 지원**(2026-01), 추가 AI 라이선스 불필요.
-
-1. `/connect` → GitHub Copilot 선택 → 코드 입력(device flow)
-2. `/models`에 Copilot 카탈로그 모델이 뜸
-
-주의:
-- 모델 목록은 **Copilot entitlement**를 따름 → 조직에서 안 켠 모델(예: Gemini)은 안 뜬다. admin이 Copilot 정책에서 켜야 함.
-- 조직 정책 바꾼 뒤 반영하려면 **재인증**: `opencode auth logout`(Copilot) → `/connect` 다시.
-- base 모델(Business에선 GPT-5.3-Codex)은 프리미엄 요청 안 씀. premium 모델(Opus·Gemini 등)은 모델별 배수만큼 소모되므로 `/models`의 제공 범위와 배수를 확인한다.
-
-## MCP 서버
-
-**MCP(Model Context Protocol)** 는 모델과 외부 도구를 연결하는 프로토콜. 글로벌 config의 `mcp`에 local 또는 remote 서버를 등록한다.
-
-```jsonc
 {
   "mcp": {
     "local-server": {
       "type": "local",
-      "command": ["{env:HOME}/.local/bin/my-mcp-server"],
+      "command": ["my-mcp-server"],
       "enabled": true
     },
     "remote-server": {
@@ -81,18 +60,17 @@ Copilot 유료 구독(Pro/Pro+/Business/Enterprise)으로 opencode 인증 가능
 }
 ```
 
-| 명령 | 설명 |
-|------|------|
-| `opencode mcp list` | 서버별 연결 상태 확인 |
-| `opencode mcp auth <name>` | OAuth 인증 시작 |
-| `opencode mcp logout <name>` | 저장된 OAuth 인증 제거 |
-| `opencode mcp debug <name>` | 원격 연결·OAuth 진단 |
+```sh
+opencode mcp list           # 등록 서버 확인
+opencode mcp auth <name>    # 인증 지원 서버의 인증
+```
 
-- local `command`는 문자열이 아니라 배열이다.
-- 설정 문자열에서 `{env:VAR}`로 환경변수를 치환한다. `${VAR}` 형식이 아니다.
-- config는 시작할 때 한 번 읽으므로 변경 후 OpenCode를 재시작한다.
+`command`는 인자 배열, `url`은 원격 서버 주소다. MCP 연결은 **모델 선택이나 Provider 인증을 대신하지 않는다.**
 
-## 참고 링크
-- [opencode Providers 문서](https://opencode.ai/docs/providers/)
-- [opencode Models 문서](https://opencode.ai/docs/models/)
-- [opencode MCP servers 문서](https://opencode.ai/docs/mcp-servers/)
+## 기억할 경계
+
+- **CLI / TUI / Config**는 명령을 입력하는 위치와 적용 범위가 다르다.
+- 인증 정보 파일을 직접 삭제해 초기화하기보다 공식 인증 관리 명령을 사용한다.
+- 모델 ID·권한·사용량·설정 경로는 현재 버전에서 확인한다.
+
+공식 문서: [Providers](https://opencode.ai/docs/providers/) · [Models](https://opencode.ai/docs/models/) · [MCP](https://opencode.ai/docs/mcp-servers/)
