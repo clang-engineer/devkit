@@ -22,7 +22,7 @@
 블로그는 내부 원리와 심화 학습, dotfiles는 실제 설정과 재현을 담당한다.
 도구 선택과 대체·보완 관계는 Devkit의 공통 도구 지도에서 관리한다.
 
-## 도구 사전
+## 도구 발견 지도
 
 | 파일 | 설명 |
 |------|------|
@@ -38,7 +38,6 @@
 | [tmux.md](tmux.md) | tmux 대상 계층·명령 문법·세션 유지 |
 | [ghostty.md](ghostty.md) | Ghostty 창·탭·분할의 관계 |
 | [yazi.md](yazi.md) | Yazi — Rust TUI 파일 매니저 |
-| [terminal-tui.md](terminal-tui.md) | 현대적 TUI·DB 도구 지도와 선택 기준 |
 
 ## 셸
 
