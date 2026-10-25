@@ -31,6 +31,8 @@ TUI만 확인할 때는 `make test-cli`를 사용한다. 새 필드를 추가하
 
 ## Cheatsheets
 
+작성 기준: [이해 중심 치트시트 작성 원칙](reference/CHEATSHEET_GUIDELINES.md) — 문법·약어·대상·패턴을 짧게 구조화해 자연스럽게 숙지하도록 한다.
+
 Tool introductions and operational references. Full index with descriptions:
 [reference/cheatsheets/README.md](reference/cheatsheets/README.md).
 
