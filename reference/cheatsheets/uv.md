@@ -2,17 +2,21 @@
 
 Rust 기반 Python package/project manager. `pip`, `venv`, `pip-tools`, `pipx` 역할 일부를 빠른 단일 CLI로 묶는다.
 
-## 30초 요약
+## 명령 구조
 
-```sh
-brew install uv
-uv init
-uv add requests
-uv run python main.py
-uv sync
-uv lock
-uv tool run ruff --version
+```text
+uv <동작> [대상]
+│
+├─ 프로젝트   init → add/remove → lock → sync → run
+├─ pip 호환   pip install / uninstall / freeze
+└─ 도구 실행  tool run (= uvx) / tool install / tool list
 ```
+
+- `init`: 프로젝트 시작, `add/remove`: 의존성 변경
+- `lock`: 잠금 파일 갱신, `sync`: 환경을 잠금 상태에 맞춤, `run`: 프로젝트 환경에서 실행
+- `tool run`: 도구를 실행, `tool install`: 도구를 설치해 지속 사용
+
+프로젝트 의존성을 기록하는 `uv add`와 현재 환경에 직접 설치하는 `uv pip install`은 동일하지 않다.
 
 ## Mental model
 
