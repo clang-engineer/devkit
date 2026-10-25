@@ -8,34 +8,27 @@
 
 편집은 **source를 고치고 `apply`** 하는 게 정석. destination(`~/.zshrc` 등)을 직접 고치면 다음 `apply`에서 덮인다.
 
-## 개념 흐름
+## 세 상태와 명령의 방향
 
 ```text
-source state (git 추적) → target state (계산) → destination (실제 ~)
-         ↓                      ↓                    ↓
-    ~/.local/share/chezmoi   템플릿/스크립트 적용    ~/.zshrc 등
-         ↓                      ↓
-      edit → apply (실제 적용)
+Source State (Git 추적 원본)
+   │  chezmoi edit / add
+   ▼
+Target State (템플릿·속성 해석 결과)
+   │  chezmoi diff → 적용 전 비교
+   │  chezmoi apply
+   ▼
+Destination (실제 홈 디렉터리)
 ```
 
-핵심 명령어:
+`edit`는 관리 원본을 수정하고 `apply`는 실제 홈에 반영한다. `add`는 기존 홈 파일을 관리 대상으로 가져온다. **Source와 Destination을 혼동하면 다음 apply에서 수동 수정이 덮일 수 있다.**
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 초기화 | `chezmoi init` | source 디렉토리 생성 |
-| 편집 | `chezmoi edit ~/.zshrc` | source 파일 편집 |
-| 적용 | `chezmoi apply` | destination에 반영 |
-| 미리보기 | `chezmoi diff` | 적용 전 차이 확인 |
-| 상태 확인 | `chezmoi managed` | 추적 중인 파일 목록 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| git | source state를 git으로 추적 |
-| SSH | 여러 머신에 dotfiles 배포 |
-| tmux | chezmoi로 tmux 설정 관리 |
-| zsh | chezmoi로 .zshrc 관리 |
+```sh
+chezmoi add ~/.zshrc
+chezmoi edit ~/.zshrc
+chezmoi diff
+chezmoi apply
+```
 
 ## 일상 명령어
 
