@@ -2,31 +2,20 @@
 
 macOS 자동화 런타임. Lua로 창 관리·키바인딩·알림·이벤트 반응을 스크립팅.
 
-## 개념 흐름
+## 자동화의 입력과 동작
 
 ```text
-init.lua → 모듈 로드 → 이벤트 반응
-     ↓           ↓           ↓
-  hs.reload   require()    hs.timer
-     ↓           ↓           ↓
-  리로드      기능 확장     자동 실행
+~/.hammerspoon/init.lua
+         │
+         ├─ hs.hotkey → 키 입력 이벤트
+         ├─ hs.timer  → 시간 이벤트
+         ├─ hs.window → 창 조회·조작
+         └─ hs.alert  → 알림 출력
+                 │
+              Lua Callback
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 리로드 | 메뉴바 → Reload Config | 설정 반영 |
-| 콘솔 | 메뉴바 → Console | 즉석 디버깅 |
-| CLI | `hs -c "hs.reload()"` | 터미널에서 리로드 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| Aerospace | 타일링 윈도우 매니저와 보완 |
-| tmux | Hammerspoon으로 tmux 윈도우 관리 |
-| skhd | 키바인딩 보조 |
+Hammerspoon은 고정된 키맵을 외우는 도구가 아니라 **이벤트 → Lua 함수 → macOS 동작**을 조합하는 런타임이다. `hs.reload()`는 설정 재로드, `hs.ipc.cliInstall()`은 CLI 접근을 설치한다.
 
 ## 필수 조작
 
