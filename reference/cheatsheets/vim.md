@@ -21,10 +21,11 @@ Vim은 키를 하나씩 암기하기보다 **동작(operator) × 범위(motion/t
 
 ```text
 Normal ── i/a/o ──> Insert
-   │                  │
-   ├── v/V/Ctrl+v → Visual
-   └── :          → Command-line
-          Esc / Ctrl+[ → Normal 복귀
+   │
+   ├── v/V/Ctrl+v ──> Visual
+   └── : ───────────> Command-line
+
+Insert / Visual / Command-line ── Esc → Normal
 ```
 
 - `i`는 insert, `a`는 append, `o`는 아래 줄을 열고 입력한다.
