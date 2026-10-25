@@ -2,14 +2,24 @@
 
 `git diff`와 `git show` 출력을 읽기 쉽게 만드는 syntax-highlighting pager. 실행 파일 이름은 `delta`, Homebrew 패키지는 `git-delta`다.
 
-## 30초 요약
+## Git과 pager의 역할
+
+```text
+git diff / git show
+       │ 텍스트·색상 정보
+       ▼
+     delta (pager)
+       ├─ syntax highlighting
+       ├─ line numbers
+       └─ side-by-side / navigation
+```
+
+`git`이 변경 내용을 계산하고 `delta`는 그 출력을 읽기 좋게 표시한다. 따라서 Git 명령을 delta 명령으로 바꿔 외울 필요가 없다.
 
 ```sh
-brew install git-delta
 git config --global core.pager delta
 git config --global interactive.diffFilter 'delta --color-only'
 git diff
-git show HEAD
 ```
 
 ## 기본 설정
