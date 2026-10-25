@@ -5,52 +5,38 @@
 > **Prefix Key**: `Ctrl+b` (기본 설정 기준)  
 > 아래 명령어에서 `Prefix`는 `Ctrl+b`를 의미합니다.
 
-## 개념 흐름
+## 명령을 읽는 법
 
 ```text
-Session → Window → Pane
-  ↑          ↑       ↑
- new        c      %
- ls         n/p    방향키
- attach     w      s
+Server
+└─ Session
+   └─ Window
+      └─ Pane
+
+tmux <동작> [-s source] [-t target]
+                        └─ session:window.pane
 ```
 
-핵심 명령어:
+- `new-session` / `list-sessions` / `kill-session`: 같은 **session** 대상에 동사를 적용한다.
+- `-s`와 `-t`의 의미는 명령마다 다르다. `new-session -s work`의 `-s`는 **session name**, `join-pane -s ...`의 `-s`는 **source**다.
+- `-t`는 대체로 **target**이다. `work:2.1`은 work 세션의 2번 window, 1번 pane이다. 상세한 생략 규칙은 아래 **타겟 형식** 참고.
+- `Prefix`는 기본 `Ctrl+b`다. `Prefix d`(detach)는 세션을 종료하지 않고 연결만 분리한다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 새 세션 | `tmux new -s work` | 이름 지정 세션 시작 |
-| 세션 목록 | `tmux ls` | 살아있는 세션 확인 |
-| 세션 붙기 | `tmux a -t work` | 세션에 다시 연결 |
-| 세션 떠나기 | `Prefix d` | 세션 유지하고 나오기 |
-| 새 윈도우 | `Prefix c` | 새 탭 생성 |
-| 분할 | `Prefix "` / `Prefix %` | 가로/세로 분할 |
-| 복사 모드 | `Prefix [` | vi 키로 선택, `y`로 yank |
+```sh
+tmux new -s work       # 세션 생성 (new-session)
+tmux ls                # 세션 목록 (list-sessions)
+tmux attach -t work    # 세션 재연결 (attach-session)
+```
+
+윈도우·pane 조작과 복사 모드의 키 바인딩은 아래 대상별 표에서 확인한다.
 
 ## 연결 도구
 
-| 도구 | 관계 |
-|------|------|
-| sesh | tmux 세션 빠른 선택/전환 |
-| smug | YAML로 tmux 세션 선언형 관리 |
-| oh-my-tmux | tmux 설정 프레임워크 |
-| zsh | tmux 안에서 셸 사용 |
-| SSH | tmux로 SSH 세션 유지 (연결 끊겨도 보존) |
-
-## 30초만 본다면
-
-| 상황 | 명령 |
+| 도구 | 역할 |
 |---|---|
-| 새 세션 시작 | `tmux new -s work` |
-| 세션에서 나오기 (남겨두기) | `Prefix d` (detach) |
-| 살아있는 세션 목록 | `tmux ls` |
-| 세션 다시 붙기 | `tmux a -t work` (없으면 `tmux a`) |
-| 새 윈도우 | `Prefix c` |
-| 다음/이전 윈도우 | `Prefix n` / `Prefix p` |
-| 가로/세로 분할 | `Prefix "` / `Prefix %` |
-| 패널 이동 | `Prefix 방향키` |
-| 복사 모드 | `Prefix [` (vi 키로 선택, `y`로 yank) |
-| 세션 죽이기 | `tmux kill-session -t work` |
+| sesh | 세션 선택·전환 |
+| smug | 선언형 세션 구성 |
+| oh-my-tmux | 설정 프레임워크 |
 
 ## smug — 선언형 tmux 세션 부팅
 
