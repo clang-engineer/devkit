@@ -92,15 +92,13 @@
 | [mise.md](mise.md) | mise — 다언어 런타임 버전 관리 |
 | [uv.md](uv.md) | uv — Python package/project manager |
 | [taskwarrior.md](taskwarrior.md) | Taskwarrior 3.5 — 태스크 관리 |
-| [python-pypi-publishing.md](python-pypi-publishing.md) | Python PyPI Trusted Publishing |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
-| [ccusage.md](ccusage.md) | ccusage 사용 기록과 별도 예산 정책의 구분 |
 | [opencode.md](opencode.md) | opencode — 터미널 AI 코딩 에이전트 |
 
 
 ## 문서 경계
 
-명령어 목록을 다시 만들지 않는다. **고유한 문법·상태 모델·조합 규칙**이 없는 내용은 공식 문서나 해당 도구의 개별 문서로 연결한다. Chrome은 범용 치트시트가 아니라 실제 문제 해결 기록으로 유지한다.
+명령어 목록을 다시 만들지 않는다. **고유한 문법·상태 모델·조합 규칙**이 없는 내용은 공식 문서나 해당 도구의 개별 문서로 연결한다. Chrome 창 미표시 문제와 PyPI Trusted Publishing 절차는 블로그의 문제 해결·운영 가이드에서 관리한다. ccusage의 상세 명령은 공식 문서를 참고한다.
 
 ## 목록 원본
 
