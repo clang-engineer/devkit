@@ -22,15 +22,6 @@ LazyVim (Plugin + 기본 설정)
 
 `<leader>ff`처럼 **접두 키 → 기능 그룹 → 동작** 순으로 읽는다. 하지만 실제 키는 설치된 Plugin·Extras·사용자 설정에 따라 달라진다. `<leader>sk`로 현재 Keymap을 검색하고 `:LazyExtras`로 활성 Extras를 확인한다. 전체 키 목록을 외우기보다 그룹을 먼저 익힌다.
 
-## 목차
-
-1. [Leader 그룹 인덱스](#leader-그룹-인덱스)
-2. [기억할 만한 기본 키 (비-Leader)](#기억할-만한-기본-키-비-leader)
-3. [Flash · mini-surround · Treesitter 모션](#flash--mini-surround--treesitter-모션)
-4. [부록: 스톡 개념 레퍼런스](#부록-스톡-개념-레퍼런스)
-
----
-
 ## Leader 그룹 인덱스
 
 `<leader>` prefix를 누르면 which-key 팝업이 하위 키를 보여준다. 개별 키를 전부 외울 필요 없이 그룹만 기억하면 된다.
