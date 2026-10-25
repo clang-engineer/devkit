@@ -2,14 +2,17 @@
 
 범용 fuzzy finder. 직접 검색 도구라기보다 `fd`, `rg`, `git`, `zoxide` 같은 명령이 만든 목록을 대화형으로 고르게 해주는 선택 UI다.
 
-## 30초 요약
+## 명령 구조
 
-```sh
-brew install fzf
-source <(fzf --zsh)
-find . -type f | fzf
-rg -n "TODO" | fzf
+```text
+목록 생성 명령 | fzf [선택 옵션] → 선택 결과(stdout)
+fd --type f   | fzf -m       → 여러 파일 선택
+rg -n TODO    | fzf          → 검색 결과 중 선택
 ```
+
+`|`는 앞 명령의 출력을 다음 명령의 입력으로 전달한다. `-m`은 `--multi`(다중 선택)의 축약형이다.
+
+셸 통합(zsh): `source <(fzf --zsh)`
 
 기본 shell integration:
 
