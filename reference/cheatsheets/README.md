@@ -39,6 +39,15 @@
 | [ghostty.md](ghostty.md) | Ghostty 창·탭·분할의 관계 |
 | [yazi.md](yazi.md) | Yazi — Rust TUI 파일 매니저 |
 
+## 검색·HTTP·작업 실행·측정
+
+| 파일 | 설명 |
+|---|---|
+| [rg.md](rg.md) | ripgrep 검색 범위·패턴·출력의 조합 |
+| [httpie.md](httpie.md) | HTTPie 요청 구분자·헤더·JSON 필드 |
+| [just.md](just.md) | just Recipe·인자·의존성 |
+| [hyperfine.md](hyperfine.md) | hyperfine 반복 측정·워밍업·비교 |
+
 ## 셸
 
 | 파일 | 설명 |
