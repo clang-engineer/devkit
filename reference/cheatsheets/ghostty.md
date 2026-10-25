@@ -120,27 +120,3 @@ macos-option-as-alt = left   # 왼쪽 Option만 Alt, 오른쪽은 특수문자 �
 
 > 적용은 config 리로드(`⌘ ⇧ ,`)로 부족할 수 있고 **완전 재시작(`⌘ Q`)이 필요한 경우가 많다**.
 
-## 테마
-
-```sh
-ghostty +list-themes       # (resources)=번들 내장 / (user)=~/.config/ghostty/themes/ 커스텀
-```
-
-```conf
-# ~/.config/ghostty/config
-theme = cyberdream         # 내장 이름 또는 user 테마 이름
-```
-
-커스텀 테마는 `~/.config/ghostty/themes/<name>` 파일로 넣으면 `(user)`로 잡힌다:
-
-```conf
-# ~/.config/ghostty/themes/<name>
-palette = 0=#16181a        # ANSI 0~15
-palette = 15=#ffffff
-background = #16181a
-foreground = #ffffff
-```
-
-> 내장 테마(`(resources)`)는 `mbadolato/iTerm2-Color-Schemes`에서 온다. 거기 없는 테마는 위처럼 `themes/`에 직접 넣어야 이름으로 선언 가능. 리로드: `⌘ ⇧ ,`.
-
-> **색이 안 바뀔 때:** ① `+show-config`/`+list-themes`로 파일 유효성 먼저 증명 → ② 유효하면 `⌘ ⇧ ,` 리로드(Ghostty는 시작 시 1회만 읽음, 자동 감지 X) → ③ 그래도면 tmux가 자체 팔레트로 덮는 것일 수 있으니 tmux 밖 새 창(`⌘ N`)에서 확인.
