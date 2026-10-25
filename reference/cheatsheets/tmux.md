@@ -5,6 +5,10 @@
 > **Prefix Key**: `Ctrl+b` (기본 설정 기준)  
 > 아래 명령어에서 `Prefix`는 `Ctrl+b`를 의미합니다.
 
+## 문서 범위
+
+이 문서는 **tmux 기본 명령의 대상·상태·키 조합**만 설명한다. smug·sesh·Oh My Tmux·플러그인의 설치 및 개인 설정은 [도구 발견 지도](tools-dictionary.md)와 각 공식 문서에서 확인한다.
+
 ## 명령을 읽는 법
 
 ```text
@@ -29,63 +33,6 @@ tmux attach -t work    # 세션 재연결 (attach-session)
 ```
 
 윈도우·pane 조작과 복사 모드의 키 바인딩은 아래 대상별 표에서 확인한다.
-
-## 연결 도구
-
-| 도구 | 역할 |
-|---|---|
-| sesh | 세션 선택·전환 |
-| smug | 선언형 세션 구성 |
-| oh-my-tmux | 설정 프레임워크 |
-
-## smug — 선언형 tmux 세션 부팅
-
-`smug`는 tmux session/window/pane 구성을 YAML로 선언하고 즉시 실행한다.
-
-| 명령 | 동작 |
-|---|---|
-| `smug start <이름>` | 세션 생성 + attach (있으면 기존 세션에 붙음) |
-| `smug start <이름> --detach` | 세션만 생성/업데이트, attach 안 함 |
-| `smug start <이름> --attach` | tmux 안에서 세션으로 switch-client 전환 |
-| `smug start <이름> -w win1` | 특정 window만 시작 |
-| `smug stop <이름>` | 세션 종료 |
-| `smug start <이름> -f <경로>` | 커스텀 config 파일 지정 |
-| `smug list` | `~/.config/smug/`의 config 목록 |
-| `smug switch <이름>` | 기존 세션으로 `switch-client` 전환 |
-
-주의: `smug start`는 tmux 안에서 새 세션으로 화면 전환을 항상 만들지 않는다.
-`switch <이름>`(=`start -a`)이 전환까지 책임진다.
-
-검증: `smug start x --detach && tmux list-panes -t x:server`
-
-설정 파일 예시(`~/.config/smug/<이름>.yml`):
-
-```yaml
-session: workspace1
-root: ~/
-windows:
-  - name: server
-    layout: main-vertical
-    panes:
-      - {}
-      - commands:
-          - npm run dev
-```
-
-YAML의 `~`는 `null`이므로 빈 pane은 반드시 `- {}`로 둔다.
-
-## 계층 구조
-
-```
-Session → Window → Pane
-(세션)    (윈도우)   (패널)
-```
-
-- **Session**: 최상위 단위. 여러 window를 묶음
-- **Window**: 탭 같은 개념. 하나의 전체 화면
-- **Pane**: window를 분할한 각 영역
-
-> 세션 중첩(nested session)은 불가. 세션은 같은 tmux 서버 내에서 **병렬로** 존재하며 **전환**하는 구조.
 
 ## 세션 관리
 
@@ -368,17 +315,6 @@ tmux move-window -s 2 -t 1-workspace:1
 
 > **주의**: `join-pane`에서 윈도우 **이름**이 아닌 **번호**를 사용. 현재 윈도우를 source로 지정하면 에러.
 
-## 순정 기본값 검증 (config 지워도 되나?)
-
-"이 `bind`/`set` 줄이 tmux stock 기본값이라 지워도 폴백되나?" 판정은 격리 소켓 단일 호출로:
-
-```sh
-tmux -L iso_$$ -f /dev/null new-session -d \; list-keys -T copy-mode-vi \; kill-server
-tmux -L iso_$$ -f /dev/null new-session -d \; show -gv <option> \; kill-server
-```
-
-> `-L`로 격리한 소켓과 `-f /dev/null`을 함께 써야 실행 중인 서버와 사용자 config의 영향을 받지 않는다. 확인 후 `kill-server`까지 실행해 격리 서버를 정리한다.
-
 ## 기타
 
 | 명령어 | 설명 |
@@ -477,73 +413,6 @@ tmux show-options -gv set-clipboard
 ```
 
 > 함정: `tmux send-keys -X copy-selection-and-cancel`로 detached 윈도우 copy를 자동 trigger하면 OSC52 발사 안 됨. 자동 테스트는 `tmux set-buffer -w`로.
-
-## 추천 플러그인
-
-- **tmux-resurrect**: 세션 저장/복원
-- **tmux-continuum**: 자동 세션 저장
-- **tmux-yank**: 클립보드 통합
-
-```bash
-# TPM (Tmux Plugin Manager) 설치 후 .tmux.conf에 추가
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-resurrect'
-set -g @plugin 'tmux-plugins/tmux-continuum'
-
-# Prefix + I 로 플러그인 설치
-```
-
-## 발견성 메뉴 (`jaclu/tmux-menus`)
-
-tmux **내장 기능**(세션/윈도우/패널 관리)을 팝업 메뉴로 발견·실행. 제로config로 바로 작동.
-which-key처럼 "내 키맵을 미러링"하는 게 아니라 기성 관리 메뉴다. 순수 셸(의존성 0), tmux 3.0+ 네이티브 `display-menu`.
-
-```tmux
-set -g @plugin 'jaclu/tmux-menus'
-set -g @menus_trigger '\'          # 메뉴 열기 (기본 prefix + \)
-set -g @menus_without_prefix 'No'  # Yes면 prefix 없이 트리거
-```
-
-- 트리거: 기본 **`prefix + \`**. `@menus_trigger`로 변경.
-- 커스텀 항목: `custom_items/`에 `templates/custom_item_template.sh` 복사 → `menu_key`/`menu_name` 설정 →
-  플러그인이 자동 감지해 Main 메뉴에 "Custom items"로 주입. 항목은 셸 DSL(`priority type key "label" action`). YAML 아님.
-- tmux <3.0에서만 `whiptail`/`dialog` 폴백(macOS는 `brew install newt`) — 모던 tmux면 불필요.
-- 순수 셸이라 chezmoi apply + TPM clone만으로 끝(바이너리 wizard·별도 연동 없음).
-
-## Oh my tmux! (OMT, `gpakosz/.tmux`)
-
-인기 tmux 설정 프레임워크. `.tmux.conf.local`만 편집. 편의를 위해 **stock prefix 키맵 일부를 재배치**한다.
-
-### OMT가 바꾼 stock 키
-
-| 키 | stock | OMT | 의도 |
-|---|---|---|---|
-| `l` | last-window | select-pane 오른쪽 | vim `hjkl` 패널 |
-| `L` | switch-client -l | resize-pane 오른쪽 | `HJKL` 리사이즈 |
-| `p` | 이전 창 | paste-buffer | `p`=paste 니모닉 |
-| `m` | select-pane -m (마크) | 마우스 토글 | 마우스 우선 |
-| `-` | delete-buffer | split-window | 니모닉 split (`-`/`_`) |
-| `<` `>` | `<` 창 메뉴 / `>` 패널 메뉴 | swap-pane | 패널 순서 이동 |
-| `r` | refresh-client | 설정 리로드 | 편의 |
-| `n` | 다음 창 | (언바운드) | 창 이동은 `C-h`/`C-l`로 |
-
-> 마크(`prefix m`)는 마우스 토글에 덮여 **pane 우클릭 메뉴에만** 남음(대체 키 없음).
-> `"`/`%` split, `c` 새 창, `s`/`w` 트리 등 나머지 stock 키는 유지.
-
-**stock 키맵 그대로 쓰기** (SSH·이식성 우선):
-
-```conf
-# .tmux.conf.local — OMT가 stock 키맵을 건드리지 않고 확장만 추가
-tmux_conf_preserve_stock_bindings=true
-```
-
-> 함정: vim-tmux-navigator가 `prefix C-l`(clear-screen)을 재매핑해 OMT의 `prefix C-l = next-window`를 밟음 → **`C-h`는 되는데 `C-l`만 안 먹는 비대칭**이 증상. `set -g @vim_navigator_prefix_mapping_clear_screen ''`로 복구.
-
-### 상태줄 색을 터미널 ANSI 팔레트에 위임
-
-OMT 상태줄을 hex 절대색 대신 `colour0~15`(ANSI 팔레트 참조) 블록으로 스위치하면, 터미널 테마 한 줄이 tmux 상태줄까지 재테마.
-
-> `colour0~15`는 터미널 ANSI 팔레트를 따르지만 hex 색은 고정된다. standalone 테마 플러그인이 상태줄 색을 다시 설정하면 이 위임이 덮어써질 수 있다.
 
 ## 훅 (hooks)
 
