@@ -34,6 +34,36 @@ tmux attach -t work    # 세션 재연결 (attach-session)
 
 윈도우·pane 조작과 복사 모드의 키 바인딩은 아래 대상별 표에서 확인한다.
 
+## 전체 기능 지도
+
+```text
+tmux Server
+├─ Client       : attach / detach (접속 상태)
+├─ Session      : 작업공간 단위
+│   └─ Window   : 화면 단위
+│       └─ Pane : PTY와 실행 프로세스
+├─ Layout       : Pane의 화면 배치·크기·zoom
+├─ Copy Mode    : 화면 이력 탐색·선택
+│   └─ Buffer   : 복사한 텍스트 저장·붙여넣기
+├─ Status Line  : Session·Window 상태 표시
+├─ Format       : #{...}로 상태값 조회·표현
+├─ Hook         : 이벤트 발생 시 tmux 명령 실행
+└─ Config       : Option·Key Binding·Plugin 구성
+```
+
+| 영역 | 핵심 역할 | 확인할 명령·키 |
+|---|---|---|
+| Client | Session에 연결하거나 분리 | `attach`, `Prefix d` |
+| Layout | Pane 배치·확대·크기 변경 | `select-layout`, `Prefix z` |
+| Copy Mode | 출력 이력을 탐색하고 복사 | `Prefix [` |
+| Buffer | 선택 텍스트 저장·붙여넣기 | `Prefix ]`, `list-buffers` |
+| Status Line | 현재·이전·활동 Window 표시 | `*`, `-`, `#` 등의 플래그 |
+| Format | 상태값을 문자열로 표현 | `#{session_name}`, `#{pane_id}` |
+| Hook | 이벤트에 반응해 명령 실행 | `set-hook`, `show-hooks` |
+| Config | 기본 동작·키맵 변경 | `set-option`, `bind-key` |
+
+**Status Line·Hook·Format은 서로 연결된다.** Hook은 상태 변화에 반응하고, Format은 상태를 읽어 표시하거나 명령에서 활용한다. Copy Mode와 Buffer는 복사 흐름의 서로 다른 단계다.
+
 ## 세션 관리
 
 | 명령어 | 설명 |
