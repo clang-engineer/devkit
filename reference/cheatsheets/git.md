@@ -2,37 +2,29 @@
 
 > 분산 버전 관리의 표준. 일상 워크플로 + 자주 망치는 작업을 한 곳에.
 
-## 개념 흐름
+## 상태와 명령의 관계
 
 ```text
-Working Tree → Staging Area → Local Repo → Remote Repo
-     ↑              ↑              ↑              ↑
-  restore        add           commit          push/pull
-                                ↓
-                    branch ← merge/rebase
+Working Tree ── add ──> Index ── commit ──> Local Repository
+     ▲                    │                      │
+     └── restore ─────────┘                      └── push ──> Remote
+          (기본: 작업 트리를 index에 맞춤)          fetch <───┘
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 변경 확인 | `git status -sb` / `git diff` | 어떤 파일이 바뀌었는지 |
-| 스테이징 | `git add -p` | 조각 단위로 선택 (안전) |
-| 커밋 | `git commit -m "msg"` | 이력 남기기 |
-| 브랜치 | `git switch -c feat/x` | 새 작업 가지 만들기 |
-| 병합 | `git merge --no-ff <branch>` | 브랜치 병합 (merge 커밋 유지) |
-| 원격 동기화 | `git pull --ff-only` | fast-forward만 허용 |
-| 되돌리기 | `git restore <file>` | 파일 변경사항 취소 |
+- `git add`는 변경을 **Index(Staging Area)**에 반영하고, `commit`은 Index의 내용을 커밋한다.
+- `fetch`는 원격 참조를 가져오지만 현재 작업 브랜치를 자동 병합하지 않는다. `pull`은 fetch 후 설정에 따라 병합 또는 rebase를 수행한다.
+- `restore <file>`은 기본적으로 **Index의 내용으로 Working Tree를 복원**한다. `restore --staged`는 Index를 복원한다. 덮어쓰는 변경은 복구가 어려울 수 있다.
+- `switch -c <name>`의 `-c`는 새 브랜치를 생성한 뒤 전환한다. `branch -d`는 브랜치 참조를 삭제한다.
 
 ## 연결 도구
 
-| 도구 | 관계 |
-|------|------|
-| gh | GitHub CLI - PR/이슈/Actions/API |
-| lazygit | Git TUI 프론트엔드 |
-| delta | diff 페이저 (syntax highlighting) |
-| git-filter-repo | 히스토리 재작성 |
-| chezmoi | dotfiles 관리 (Git 기반) |
+| 도구 | 역할 |
+|---|---|
+| gh | GitHub PR·이슈·Actions CLI |
+| lazygit | Git TUI |
+| delta | diff 출력 pager |
+| git-filter-repo | 이력 재작성 |
+| chezmoi | Git 기반 dotfiles 관리 |
 
 ## 상태 확인 & 변경 비교
 
