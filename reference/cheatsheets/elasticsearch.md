@@ -2,47 +2,24 @@
 
 > 분산 검색 엔진. 클러스터·인덱스·쿼리·운영 진단을 한 곳에. Kibana Dev Tools와 curl 형태 모두.
 
-## 개념 흐름
+## 리소스와 HTTP 명령 문법
 
 ```text
-클러스터 → 노드 → 인덱스 → 문서
-     ↓         ↓        ↓       ↓
-health     _cat/nodes indices _doc
-     ↓         ↓        ↓       ↓
-health     node info  mapping search
+Cluster
+ ├─ Node          → GET _cat/nodes
+ └─ Index
+     ├─ Mapping   → GET INDEX/_mapping
+     ├─ Document  → GET INDEX/_doc/ID
+     └─ Search    → GET INDEX/_search
+
+METHOD /RESOURCE/_ACTION
+ GET    조회·검색
+ POST   요청 본문을 가진 작업
+ PUT    생성·갱신 등
+ DELETE 삭제 (파괴적)
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 클러스터 | `GET _cluster/health` | 상태 확인 |
-| 노드 | `GET _cat/nodes?v` | 노드 정보 |
-| 인덱스 | `GET _cat/indices?v` | 인덱스 목록 |
-| 검색 | `GET INDEX/_search` | 문서 검색 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| Kibana | Elasticsearch 시각화 UI |
-| Logstash | 데이터 수집/전처리 |
-| Filebeat | 로그 수집 |
-
-## 30초만 본다면
-
-| 상황 | 명령 (Dev Tools 표기) |
-|---|---|
-| 클러스터 상태 | `GET _cluster/health` |
-| 노드 정보 | `GET _cat/nodes?v` |
-| 인덱스 목록 (크기·문서수) | `GET _cat/indices?v&s=store.size:desc` |
-| 매핑 보기 | `GET INDEX/_mapping` |
-| 단일 문서 | `GET INDEX/_doc/<id>` |
-| 전체 검색 (10개) | `GET INDEX/_search` |
-| match 검색 | `GET INDEX/_search { "query": { "match": { "field": "value" }}}` |
-| 조건부 삭제 | `POST INDEX/_delete_by_query { "query": ... }` |
-| 인덱스 삭제 | `DELETE INDEX` |
-| 진행 중 task | `GET _tasks?detailed=true&actions=*delete*` |
+`_cat`은 운영 상태를 사람이 읽기 쉬운 표로 제공하고, `_search`는 문서 검색, `_mapping`은 필드 구조를 확인한다. `DELETE INDEX`와 `_delete_by_query`는 대상·영향 범위가 다르므로 실행 전 확인한다.
 
 ## curl ↔ Kibana Dev Tools 변환 규칙
 
