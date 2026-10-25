@@ -12,7 +12,7 @@
 3단계: 공식 문서 / tldr → 추가 옵션과 실제 예제가 필요한가?
 ```
 
-**"명령어를 몰라서 검색하는데, 검색하려면 명령어를 알아야 하는" 간극**을 tools-dictionary.md가 메운다. 도구 이름은 알지만 명령어를 모를 때 먼저 훑어보는 용도.
+**도구 이름을 모르더라도 작업 목적에서 출발할 수 있도록** tools-dictionary.md가 연결한다. 개별 명령어의 전체 옵션은 공식 문서에서 확인한다.
 
 ## 콘텐츠 소유권
 
@@ -26,7 +26,7 @@
 
 | 파일 | 설명 |
 |------|------|
-| [tools-dictionary.md](tools-dictionary.md) | 50+ CLI 도구/개념 사전 + 핵심 명령어 (도구 발견용; tldr·공식 문서와 역할 분리) |
+| [tools-dictionary.md](tools-dictionary.md) | 작업 목적별 CLI 발견 지도 — 도구 역할·대체/보완·파이프라인 |
 
 ## 에디터 & TUI
 
@@ -62,7 +62,7 @@
 
 | 파일 | 설명 |
 |------|------|
-| [chrome.md](chrome.md) | Chrome 창 미표시 복구·headless 테스트 프로세스 정리 |
+| [chrome.md](chrome.md) | Chrome 창 미표시 문제 해결 기록 (일반 명령 치트시트와 구분) |
 | [aerospace.md](aerospace.md) | macOS 타일링 WM |
 | [hammerspoon.md](hammerspoon.md) | macOS 자동화/윈도우 관리 (Lua) |
 
@@ -96,7 +96,7 @@
 | [taskwarrior.md](taskwarrior.md) | Taskwarrior 3.5 — 태스크 관리 |
 | [python-pypi-publishing.md](python-pypi-publishing.md) | Python PyPI Trusted Publishing |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
-| [ccusage.md](ccusage.md) | ccusage 사용량 집계와 임계치 경보 |
+| [ccusage.md](ccusage.md) | ccusage 사용 기록 집계와 별도 예산 Wrapper의 경계 |
 | [opencode.md](opencode.md) | opencode — 터미널 AI 코딩 에이전트 |
 
 
