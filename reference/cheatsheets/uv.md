@@ -69,4 +69,4 @@ uv run pytest
 - 환경이 선언과 다르다 → `uv sync`로 동기화 상태 확인
 - `requirements.txt` 기반 프로젝트다 → `uv pip install -r requirements.txt` 사용 가능
 
-전체 옵션·버전별 동작: [uv 공식 문서](https://docs.astral.sh/uv/) · 배포 작업: [PyPI Publishing](python-pypi-publishing.md)
+전체 옵션·버전별 동작: [uv 공식 문서](https://docs.astral.sh/uv/) · 배포 작업: [PyPI Trusted Publishing 가이드](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-10-25-pypi-trusted-publishing-github-oidc.md)
