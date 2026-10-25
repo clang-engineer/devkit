@@ -3,49 +3,25 @@
 > Bash 쓰던 사람이 Windows에서 PowerShell 만났을 때 손 안 닿는 부분 위주.
 > 대상: Windows PowerShell 5.1 + PowerShell 7 (PSCore). 차이가 있으면 표기.
 
-## 개념 흐름
+## 객체 파이프라인과 명령 문법
 
 ```text
-Bash → PowerShell
-  var=1       → $var = 1
-  export      → $env:FOO
-  ls -la      → Get-ChildItem
-  grep        → Select-String
-  find        → Get-ChildItem -Recurse
+Verb-Noun [-Parameter Value] | Verb-Noun ...
+Get-Process               | Where-Object ... | Select-Object ...
+
+Bash Pipeline       : 주로 텍스트 스트림
+PowerShell Pipeline : .NET 객체 (속성·메서드)
 ```
 
-핵심 명령어:
+Cmdlet은 보통 **동사-대상**으로 읽는다. `Get-ChildItem`(자식 항목 조회), `Set-Content`(내용 설정), `Where-Object`(객체 필터), `Select-Object`(속성 선택)처럼 계열화한다.
 
-| Bash | PowerShell | 설명 |
-|------|------------|------|
-| `ls -la` | `Get-ChildItem -Force` | 파일 목록 |
-| `grep` | `Select-String` (sls) | 텍스트 검색 |
-| `cat` | `Get-Content` | 파일 내용 |
-| `echo` | `Write-Output` | 출력 |
+```powershell
+Get-Process | Where-Object CPU -gt 10 | Select-Object Name, CPU
+$env:FOO = "1"       # 프로세스 환경변수
+$items = @(1, 2, 3) # 배열
+```
 
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| WSL | Linux에서 PowerShell 사용 |
-| Windows Terminal | PowerShell용 터미널 |
-| Azure | PowerShell로 Azure 관리 |
-
-## 30초만 본다면 (Bash → PowerShell)
-
-| Bash | PowerShell |
-|---|---|
-| `var=1` | `$var = 1` |
-| `$HOME` | `$env:HOME` 또는 `$HOME` |
-| `export FOO=1` | `$env:FOO = "1"` |
-| `ls -la` | `Get-ChildItem -Force` (`ls`/`dir`은 alias) |
-| `grep pattern file` | `Select-String -Pattern pattern file` (`sls`) |
-| `find . -name "*.py"` | `Get-ChildItem -Recurse -Filter *.py` |
-| `cat file` | `Get-Content file` (`gc`) |
-| `which cmd` | `Get-Command cmd` (`gcm`) |
-| `curl URL` | `Invoke-WebRequest URL` (`iwr`) — **PS 5.1 한정** alias라 옵션 다름 (PS 7은 alias 없음 → 진짜 `curl.exe`) |
-| 파이프(텍스트) | 파이프(**객체** — `Select-Object`, `Where-Object`) |
-| `cmd1 && cmd2` | PS 7+: 그대로 / PS 5.1: `cmd1; if ($?) { cmd2 }` |
+`ls`·`cat` 같은 별칭이 있어도 Bash 명령과 옵션·출력 타입이 같지는 않다. PowerShell 5.1과 7의 차이는 아래 버전별 주의사항을 참고한다.
 
 ## Bash와 핵심 차이
 
