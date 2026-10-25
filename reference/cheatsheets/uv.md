@@ -1,85 +1,72 @@
-# uv Cheatsheet
+# uv — 명령 구조 치트시트
 
-Rust 기반 Python package/project manager. `pip`, `venv`, `pip-tools`, `pipx` 역할 일부를 빠른 단일 CLI로 묶는다.
+> Python **프로젝트·환경·도구**를 관리하는 CLI. 명령어는 먼저 **무엇을 관리하는지**로 구분한다.
 
-## 명령 구조
+## 세 가지 대상
 
 ```text
-uv <동작> [대상]
+uv
+├─ 프로젝트 (pyproject.toml / uv.lock)
+│  ├─ init           프로젝트 시작
+│  ├─ add / remove   의존성 선언 변경
+│  ├─ lock           의존성 버전 해석·잠금
+│  ├─ sync           환경을 잠금 상태에 맞춤
+│  └─ run            프로젝트 환경에서 명령 실행
 │
-├─ 프로젝트   init → add/remove → lock → sync → run
-├─ pip 호환   pip install / uninstall / freeze
-└─ 도구 실행  tool run (= uvx) / tool install / tool list
+├─ 직접 환경 조작 (pip 호환)
+│  ├─ venv           가상환경 생성
+│  └─ pip
+│     ├─ install / uninstall
+│     └─ freeze
+│
+└─ 독립 CLI 도구 (tool)
+   ├─ run (= uvx)    도구를 필요할 때 실행
+   ├─ install        도구를 지속 설치
+   └─ list           설치한 도구 조회
 ```
 
-- `init`: 프로젝트 시작, `add/remove`: 의존성 변경
-- `lock`: 잠금 파일 갱신, `sync`: 환경을 잠금 상태에 맞춤, `run`: 프로젝트 환경에서 실행
-- `tool run`: 도구를 실행, `tool install`: 도구를 설치해 지속 사용
+## 프로젝트의 상태 변화
 
-프로젝트 의존성을 기록하는 `uv add`와 현재 환경에 직접 설치하는 `uv pip install`은 동일하지 않다.
+```text
+uv add requests
+     │
+     ├─ pyproject.toml 의존성 선언 변경
+     ├─ uv.lock 갱신
+     └─ 프로젝트 환경 동기화
 
-## Mental model
-
-| 기존 조합 | uv |
-|---|---|
-| `python -m venv` | `uv venv` |
-| `pip install` | `uv pip install` 또는 `uv add` |
-| `pip-tools` lock | `uv lock` |
-| `pipx run` | `uv tool run` / `uvx` |
-| 프로젝트 실행 | `uv run ...` |
-
-## 프로젝트 명령
-
-| 목적 | 명령 |
-|---|---|
-| 새 프로젝트 | `uv init` |
-| 의존성 추가 | `uv add requests` |
-| 개발 의존성 추가 | `uv add --dev pytest` |
-| 의존성 제거 | `uv remove requests` |
-| lockfile 생성/갱신 | `uv lock` |
-| 환경 동기화 | `uv sync` |
-| 프로젝트 명령 실행 | `uv run pytest` |
-| Python 실행 | `uv run python` |
-
-## pip 호환 명령
-
-| 목적 | 명령 |
-|---|---|
-| venv 생성 | `uv venv` |
-| 패키지 설치 | `uv pip install requests` |
-| requirements 설치 | `uv pip install -r requirements.txt` |
-| freeze | `uv pip freeze` |
-| 패키지 제거 | `uv pip uninstall requests` |
-
-## Tool 실행
+uv lock  → lockfile을 갱신 (환경 설치 자체는 아님)
+uv sync  → lockfile에 맞춰 환경 동기화
+uv run   → 프로젝트 환경에서 명령 실행
+```
 
 ```sh
-uv tool run ruff check .
-uvx ruff check .
-uv tool install ruff
-uv tool list
+uv init
+uv add requests
+uv add --dev pytest   # --dev: 개발 의존성 그룹
+uv remove requests
+uv run pytest
 ```
 
-`uvx`는 `uv tool run`의 짧은 alias로 볼 수 있다.
+**구분:** `uv add`는 프로젝트 의존성 선언을 관리한다. `uv pip install`은 선택한 Python 환경에 직접 패키지를 설치한다. 둘을 단순한 동의어로 외우지 않는다.
 
-## Python 버전과 경계
+## 같은 단어, 다른 대상
 
-uv는 Python 설치와 프로젝트 환경 관리도 지원한다. 다만 조직이나 개인 dotfiles에서 `mise`, `pyenv`, 시스템 Python 등 별도 runtime manager를 이미 쓰는 경우에는 다음처럼 역할을 나누면 충돌이 적다.
-
-```text
-runtime version 선택 -> mise/pyenv/시스템 정책
-package, venv, tool 실행 -> uv
-```
-
-## 문제 해결
-
-| 증상 | 확인 |
+| 명령 패턴 | 대상·의미 |
 |---|---|
-| 예상과 다른 Python 사용 | `uv run python --version`, `.python-version`, project 설정 확인 |
-| venv가 꼬임 | `.venv` 삭제 후 `uv sync` |
-| requirements 기반 프로젝트 | `uv pip install -r requirements.txt`부터 사용 |
+| `uv venv` | 가상환경 생성 |
+| `uv pip install -r requirements.txt` | requirements를 환경에 설치 |
+| `uv pip freeze` | 환경에 설치된 패키지 출력 |
+| `uv tool run ruff check .` | 독립 CLI 도구 실행 |
+| `uvx ruff check .` | `uv tool run`의 별칭 |
+| `uv tool install ruff` | CLI 도구를 지속 설치 |
+| `uv tool list` | 설치한 CLI 도구 목록 |
 
-## 관련
+`uv`는 Python 설치·버전 관리도 지원한다. `mise`·`pyenv` 등과 병행한다면 **누가 Python 버전을 선택하는지**를 먼저 정한다.
 
-- 공식 문서: <https://docs.astral.sh/uv/>
-- PyPI 배포: [python-pypi-publishing.md](python-pypi-publishing.md)
+## 문제가 생기면
+
+- 다른 Python이 실행된다 → `uv run python --version`, `.python-version` 및 프로젝트 설정 확인
+- 환경이 선언과 다르다 → `uv sync`로 동기화 상태 확인
+- `requirements.txt` 기반 프로젝트다 → `uv pip install -r requirements.txt` 사용 가능
+
+전체 옵션·버전별 동작: [uv 공식 문서](https://docs.astral.sh/uv/) · 배포 작업: [PyPI Publishing](python-pypi-publishing.md)
