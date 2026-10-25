@@ -13,8 +13,8 @@ Server
    └─ Window
       └─ Pane
 
-tmux <동작> [-s source] [-t target]
-                        └─ session:window.pane
+tmux <command> [command-specific options] [arguments]
+  target을 받는 명령: session:window.pane
 ```
 
 - `new-session` / `list-sessions` / `kill-session`: 같은 **session** 대상에 동사를 적용한다.
