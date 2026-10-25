@@ -62,12 +62,31 @@ curl -s URL | jq '.items[]'     # HTTP 응답 → JSON 구조 추출
 
 `|`는 왼쪽의 표준 출력을 오른쪽 표준 입력으로 전달한다. **생성 → 선택 → 소비**의 순서로 보면 새로운 도구도 쉽게 조합할 수 있다.
 
+## 대화형 TUI를 선택할 때
+
+```text
+Git 변경·이력        → lazygit
+컨테이너·로그        → lazydocker
+Docker 이미지 분석   → dive (레이어 분석, 컨테이너 실행 관리 아님)
+파일 탐색            → Yazi
+서버 로그            → lazyjournal
+Kubernetes 리소스    → k9s
+DB SQL 탐색          → Harlequin (adapter) / Rainfrog (PostgreSQL)
+Neovim 내부 DB 탐색  → vim-dadbod-ui
+HTTP 요청            → Posting / ATAC
+GitHub PR·이슈       → gh-dash
+JSON 대화형 탐색     → fx
+네트워크 경로 진단   → trippy
+```
+
+DB TUI는 드라이버 지원·읽기 전용 여부·SQL 편집 기능을 확인한다. 반복 가능한 배치·백업은 `psql`·`pg_dump` 같은 DB 공식 CLI를 사용한다. `lazy*`라는 이름은 공통 프레임워크나 품질 보증이 아니다.
+
 ## 어디에서 더 배우는가
 
 - [Shell](shell.md) / [Zsh](zsh.md) / [PowerShell](powershell.md): 명령 해석·확장·파이프라인
 - [fzf](fzf.md) / [zoxide](zoxide.md) / [Atuin](atuin.md): 탐색·선택·이력
 - [Git](git.md) / [jj](jj.md) / [git-delta](git-delta.md): 변경 관리·출력
 - [uv](uv.md) / [mise](mise.md) / [chezmoi](chezmoi.md) / [SOPS](sops.md): 환경 재현
-- [systemd](systemd.md) / [SSH](ssh.md) / [Terminal TUI](terminal-tui.md): 운영·접속·도구 선택
+- [systemd](systemd.md) / [SSH](ssh.md): 운영·접속·도구 선택
 
 개별 명령의 정확한 인자·옵션은 `tldr <command>`, `<command> --help`, `man <command>` 또는 공식 문서를 참고한다.
