@@ -3,6 +3,10 @@
 > **모드**: Normal(기본), Insert(입력), Visual(선택), Command(명령)
 > 대부분의 명령 앞에 숫자를 붙이면 반복된다. 예: `5dd` = 5줄 삭제, `3w` = 단어 3개 이동.
 
+## 문서 범위
+
+Vim의 **Operator·Motion·Text Object·Register**와 편집기 내부 명령을 다룬다. 터미널의 Alt 키 설정·Neovim의 swap 파일 위치 같은 환경별 운영 내용은 여기서 관리하지 않는다.
+
 ## 편집 명령의 문법
 
 ```text
@@ -471,50 +475,3 @@ set fileencodings=ucs-bom,utf-8,euc-kr,latin1
 | `fileencodings` | 읽을 때 시도 순서 |
 | `termencoding` | 터미널 입출력 인코딩 |
 
-## 자주 쓰는 조합
-
-```vim
-" 파일 전체 들여쓰기 정리
-gg=G
-
-" 빈 줄 모두 제거
-:g/^$/d
-
-" 빈 줄이 아닌 줄만 남기기
-:v/./d
-
-" 줄 끝 공백 제거
-:%s/\s\+$//g
-
-" 중복 줄 제거 (정렬 후)
-:sort u
-
-" 현재 줄을 N번째 줄 아래로 이동
-:m N
-
-" 현재 파일 다시 읽기
-:e!
-```
-
-## Tip
-
-- `vimtutor` — 내장 튜토리얼
-- `.` 반복 + 텍스트 오브젝트(`ciw`, `da"`, `yi{`) + 매크로(`qa...q` / `@a`) 조합이 vim 생산성의 핵심
-
-## macOS — Option(Alt) 키 활성화
-
-`<A-...>` 매핑이 안 먹히면 터미널이 Option을 Meta로 안 보내는 것. 터미널별 설정:
-
-| 터미널 | 설정 |
-|---|---|
-| Apple Terminal.app | Preferences → Profiles → Keyboard → **Use Option as Meta key** 체크 |
-| iTerm2 | Preferences → Profiles → Keys → **Left/Right Option Key: Esc+** |
-| Ghostty | `macos-option-as-alt = true` + `keybind = alt+left=unbind`(필요 시) |
-
-## Neovim swap 파일 위치 (Linux/macOS)
-
-```
-$HOME/.local/share/nvim/swap/
-```
-
-복구가 필요한데 안 보이면 여기 확인.
