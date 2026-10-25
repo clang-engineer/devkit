@@ -2,33 +2,23 @@
 
 macOS용 i3 스타일 타일링 윈도우 매니저. SIP 비활성화 불필요.
 
-## 개념 흐름
+## 조작 대상과 방향
 
 ```text
-윈도우 자동 타일링
-     ↓
-ctrl+alt+방향키 (포커스 이동)
-ctrl+alt+shift+방향키 (이동)
-     ↓
-워크스페이스 전환 (ctrl+alt+1-9)
+Workspace
+   └─ Window
+       ├─ Focus : 조작할 창 선택
+       ├─ Move  : 창 위치 이동
+       └─ Layout: 타일 배치 방식 변경
+
+기본 바인딩 예
+Alt + H/J/K/L         → Focus 방향 이동
+Alt + Shift + H/J/K/L → Window 방향 이동
+Alt + 1..9            → Workspace 선택
+Alt + Shift + 1..9    → Window를 Workspace로 이동
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 포커스 | `ctrl+alt+방향키` | 윈도우 간 이동 |
-| 이동 | `ctrl+alt+shift+방향키` | 윈도우 위치 변경 |
-| 워크스페이스 | `ctrl+alt+1-9` | 워크스페이스 전환 |
-| 앱 실행 | `ctrl+alt+/` | 앱 러너 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| tmux | Aerospace 안에서 tmux 사용 가능 |
-| skhd | 키바인딩 보조 도구 |
-| Ghostty | 타일링과 함께 터미널 사용 |
+**Shift를 더하면 포커스 이동에서 창 이동으로 바뀌는 패턴**을 먼저 익힌다. 실제 바인딩은 `~/.aerospace.toml` 설정에 따르므로 아래 표와 다를 수 있다.
 
 ## 설치
 
