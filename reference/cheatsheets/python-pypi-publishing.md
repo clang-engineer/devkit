@@ -4,45 +4,28 @@
 > `PYPI_API_TOKEN` 없이, 지정한 저장소·워크플로·환경에서만 짧은 수명의 배포
 > 자격을 받는다.
 
-## 개념 흐름
+## 배포 권한과 아티팩트 흐름
 
 ```text
-PyPI 등록 → GitHub Actions → 배포
-     ↓            ↓            ↓
-  Publishing   OIDC 토큰    twine check
-     ↓            ↓            ↓
-  환경(pypi)   uv build     dist/*
+Source / pyproject.toml
+         │ uv build
+         ▼
+      dist/* ── twine check ──> 검증된 배포물
+                                  │
+GitHub Workflow ── OIDC ──> PyPI Trusted Publisher
+                                  │ 단기 자격 증명
+                                  ▼
+                                PyPI
 ```
 
-핵심 명령어:
+**빌드·검사·인증·업로드는 서로 다른 단계**다. `uv build`는 배포물을 만들고 `twine check`는 메타데이터를 검사한다. Trusted Publishing은 GitHub Actions의 OIDC 신원을 PyPI에 연결하므로 장기 API 토큰을 저장하지 않는다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 빌드 | `uv build --no-sources` | 소스 빌드 |
-| 검사 | `uvx twine check --strict dist/*` | 배포 전 검증 |
-| 배포 | `uvx twine upload dist/*` | PyPI 업로드 |
+```sh
+uv build --no-sources
+uvx twine check --strict dist/*
+```
 
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| uv | Python 패키지 빌드 |
-| GitHub Actions | CI/CD에서 배포 자동화 |
-| twine | PyPI 업로드 도구 |
-
-## 30초만 본다면
-
-| 단계 | 핵심 |
-|---|---|
-| PyPI 연결 | 기존 프로젝트: **Manage → Publishing** / 신규 프로젝트: 계정 **Publishing**에서 pending publisher 등록 |
-| 일치해야 할 값 | GitHub owner, repository, **workflow 파일명**, environment 이름 `pypi` |
-| GitHub 환경 | 저장소 **Settings → Environments → New environment → `pypi`** |
-| 빌드 | `uv build --no-sources` |
-| 배포 전 검사 | `uvx twine check --strict dist/*` |
-| 권한 | publish job에만 `permissions: id-token: write` |
-| 인증 | `pypa/gh-action-pypi-publish` 사용, PyPI token secret은 만들지 않음 |
-| 재배포 | PyPI 파일명은 불변. 수정본은 **버전을 올려** 다시 빌드·배포 |
-| 배포 후 | PyPI JSON 확인 + 깨끗한 격리 환경에서 설치·실행 |
+배포는 아래 GitHub Actions Workflow의 Trusted Publisher 설정으로 수행한다. 수동 `twine upload`와 OIDC 자동 배포를 같은 인증 경로로 혼동하지 않는다.
 
 ## 1. PyPI Trusted Publisher 등록
 
