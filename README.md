@@ -2,7 +2,7 @@
 
 Curated dev cheatsheets and templates I keep handy while working.
 
-**30 cheatsheets** across 9 categories · **6 templates** — generic,
+**28 cheatsheets** across 9 categories · **6 templates** — generic,
 reusable references and starting points, not machine- or project-specific config.
 
 ## Reference catalog
