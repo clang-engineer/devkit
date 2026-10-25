@@ -35,13 +35,15 @@ git diff
     side-by-side = false
 ```
 
-## Mental model
+## 출력과 의미를 구분
 
-| Git 기본 | delta |
-|---|---|
-| 단색 diff | 구문 강조 diff |
-| 라인 위치 파악 어려움 | 줄 번호, 파일 헤더, hunk 강조 |
-| 큰 diff 읽기 어려움 | pager navigation과 테마 지원 |
+```text
+Git이 diff를 계산 → delta가 화면에 표시
+         │                   │
+      변경 내용           구문 강조·줄 번호·레이아웃
+```
+
+`delta`의 `--color-only`는 Git의 interactive diff 필터에서 색상 표현만 적용할 때 유용하다. **pager 설정은 사람이 읽는 출력에 적용**하며, diff를 파싱하는 스크립트의 입력 형식과 혼동하지 않는다.
 
 ## 자주 쓰는 명령
 
