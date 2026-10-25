@@ -30,13 +30,13 @@ a || b        # a 실패 시 b
 ## 스크립트 안전 헤더
 
 ```sh
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
-IFS=$'\n\t'
 ```
 
-- `-e` 오류 시 종료, `-u` 미정의 변수 차단, `-o pipefail` 파이프 중 어디서든 실패 감지.
-- `IFS` 재정의로 공백 분리에서 오는 버그 차단.
+- `-e`(errexit): **일부 실패 상황에서** 종료한다. `if` 조건, `&&`/`||` 목록의 일부, `!` 등 예외가 있어 모든 오류를 잡는 장치가 아니다.
+- `-u`(nounset): 미설정 변수 사용을 오류로 처리한다. `-o pipefail`: 파이프라인에서 마지막이 아닌 명령의 실패도 종료 상태에 반영한다.
+- `IFS`를 전역으로 바꾸는 것은 안전성의 필수 조건이 아니다. 입력 분리는 `read` 등의 필요한 위치에서 명시한다.
 - 디버그: `set -x` (실행 추적).
 
 ## `set` — 셸 동작 제어
@@ -45,9 +45,9 @@ IFS=$'\n\t'
 
 | 옵션 | 이름 | 의미 |
 |---|---|---|
-| `-e` | errexit | 명령 실패 시 즉시 종료 |
+| `-e` | errexit | 예외 문맥을 제외한 명령 실패에서 종료 |
 | `-u` | nounset | 정의되지 않은 변수 접근 시 종료 |
-| `-o pipefail` | pipefail | 파이프라인 중 하나라도 실패하면 전체 실패 |
+| `-o pipefail` | pipefail | 가장 오른쪽의 0이 아닌 종료 상태를 파이프라인 결과로 사용 |
 | `-x` | xtrace | 실행되는 명령 출력 (디버그) |
 | `-v` | verbose | 입력 라인 그대로 출력 |
 | `-n` | noexec | 실행하지 않고 문법 검사만 |
@@ -368,7 +368,7 @@ cmd 2>&1 | tee app.log
 | `fg %n` | n번 job foreground로 |
 | `bg %n` | n번 job background에서 재개 |
 | `kill %n` | n번 job 종료 (`%` 없으면 PID — 주의) |
-| `disown %n` | 셸 종료 시 죽지 않게 detach |
+| `disown %n` | 셸의 job 테이블에서 제거; 프로세스 지속은 SIGHUP·입출력 조건에도 좌우됨 |
 | `nohup cmd &` | hangup 무시 + 백그라운드 |
 | `nohup cmd </dev/null > log 2>&1 &` | tty 입력 분리(백그라운드 정지 방지) + 로그 분리 |
 | `wait` | 모든 백그라운드 job 종료 대기 |
@@ -389,22 +389,19 @@ wait
 nohup ./run.sh > /tmp/job.log 2>&1 & tail -F /tmp/job.log
 ```
 
-- `tail -F`(대문자): 파일이 아직 없어도 기다리고, 로테이션돼도 다시 붙음(`--follow=name --retry`). 백그라운드 직후엔 리다이렉트 파일이 아직 안 생겼을 수 있어 **항상 `-F`**.
+- `tail -F`(대문자): 파일이 아직 없어도 기다리고, 로테이션돼도 다시 붙음(`--follow=name --retry`). 백그라운드 직후엔 리다이렉트 파일이 아직 안 생겼을 수 있어 `-F`가 유용하다.
 - `tail -f`(소문자): 파일이 있어야만 따라감. 없으면 에러, inode 바뀌면 끊김.
 - **Ctrl+C는 포그라운드 `tail`만 죽인다.** 백그라운드 job은 다른 프로세스 그룹이라 SIGINT를 안 받아 계속 떠 있음.
 
-### 셸 종료 시 백그라운드 job 운명 (셸마다 다름)
+### 셸 종료 시 백그라운드 작업
 
-| 셸 | 기본 | 바꾸기 |
-|---|---|---|
-| zsh | 종료 시 job에 `SIGHUP` → **죽음** | `setopt NO_HUP` |
-| bash | `huponexit` off → **살아남음** | `shopt -s huponexit` |
+프로세스가 살아남는지는 셸의 HUP 정책, 로그인 셸 여부, 터미널 입출력, 상위 프로세스·서비스 관리 정책에 따라 달라진다. Bash의 `huponexit`, Zsh의 `HUP` 옵션만으로 생존 여부를 단정하지 않는다.
 
-확실히 살리려면 `nohup`, `disown`, 또는 `tmux new -d -s name 'cmd'`.
+터미널 연결 없이 계속 실행할 작업은 `nohup`과 입출력 분리, `tmux`, 또는 서비스 관리자를 목적에 맞게 선택한다.
 
 ### 함정: `sudo cmd &`
 
-`sudo`를 백그라운드로 보내면 비밀번호 프롬프트가 tty에 못 닿아 `suspended (tty output)`(SIGTTOU)으로 멈춘다. 대부분의 dev 서버는 1024 미만 포트를 안 써 sudo 자체가 불필요.
+`sudo`를 백그라운드로 보내면 인증 입력이 필요할 때 실패하거나 작업 제어로 정지될 수 있다. 정지 원인과 신호는 터미널·sudo 설정에 따라 다르다. 대부분의 dev 서버는 1024 미만 포트를 안 써 sudo 자체가 불필요.
 
 ### `nohup` + 백그라운드 정지(Suspended) 회피
 
