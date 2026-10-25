@@ -9,23 +9,19 @@ SOPS는 password manager나 runtime secret server가 아니다. 사람이 자동
 Vault나 cloud secret manager가 더 적합하다. 설정 파일을 Git에 안전하게 보관하고 배포하는
 용도에는 SOPS가 잘 맞는다.
 
-## 동작 원리
+## 키와 파일의 관계
 
 ```text
-age/KMS 공개키 ── encrypt ──┐
-                            v
-평문 값 ── data key로 암호화 ── SOPS 파일 ── Git
-                            ^
-age/KMS 개인키 ── decrypt ──┘
+평문 값 ── Data Key로 암호화 ──> SOPS 파일 ──> Git
+              │                     │
+              └─ age/KMS recipient ─┘
+                   (Data Key 보호)
+
+암호화된 값 + 공개 가능한 메타데이터 → 저장소
+개인키·KMS 접근 권한               → 저장소 밖
 ```
 
-SOPS는 파일마다 임의의 data key를 만들고 실제 값을 이 키로 암호화한다. data key는 age,
-AWS KMS, GCP KMS, Azure Key Vault 등의 master key로 다시 암호화되어 파일의 `sops`
-metadata에 저장된다. MAC(Message Authentication Code)은 암호문의 위변조를 검증한다.
-
-- Git에 저장: 암호화된 값, key 이름, 암호화 recipient, SOPS metadata
-- 저장소 밖에 보관: age 개인키나 KMS 접근 권한
-- 기본적으로 숨겨지지 않음: 파일명, YAML/JSON key 이름, 전체 구조
+SOPS는 파일별 Data Key로 값을 암호화하고, recipient의 age 공개키나 KMS 키로 Data Key를 보호한다. 파일명·필드 이름·구조는 기본적으로 노출될 수 있다. **recipient 변경과 데이터 키 교체는 다른 작업**이므로 아래 회전 절차를 구분한다.
 
 ## 설치
 
