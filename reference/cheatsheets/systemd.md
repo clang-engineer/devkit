@@ -2,51 +2,29 @@
 
 > Linux 서비스/타이머/로그의 표준. 부팅·자동시작·재시작 정책·로그 조회 한 곳.
 
-## 개념 흐름
+## 관리 대상과 상태
 
 ```text
-서비스 파일 → systemctl 명령 → 로그 조회
-     ↓              ↓            ↓
-/etc/systemd/   start/stop    journalctl
-  system/        status        -f -u <svc>
-     ↓              ↓
- daemon-reload   enable/disable
+Unit 파일 (.service / .timer)
+      │
+      ├─ systemctl daemon-reload  → Unit 정의 다시 읽기
+      ├─ systemctl start/stop     → 현재 실행 상태
+      ├─ systemctl enable/disable → 부팅 시 활성화 설정
+      └─ systemctl status         → 상태 관찰
+                │
+                └─ journalctl -u NAME → 로그 관찰
 ```
 
-핵심 명령어:
+**start와 enable은 다르다.** `start`는 지금 실행하고, `enable`은 자동 시작 연결을 설정한다. `daemon-reload`는 Unit 정의를 다시 읽지만 서비스를 재시작하지 않는다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 서비스 시작 | `systemctl start <svc>` | 서비스 시작 |
-| 상태 확인 | `systemctl status <svc>` | 상태 + 최근 로그 |
-| 무중단 리로드 | `systemctl reload <svc>` | 설정 변경 |
-| 부팅 시 자동 | `systemctl enable <svc>` | 부팅 자동 시작 |
-| 로그 조회 | `journalctl -f -u <svc>` | 실시간 로그 |
+```sh
+systemctl start app.service
+systemctl enable app.service
+systemctl status app.service
+journalctl -u app.service -f  # -u: unit, -f: follow
+```
 
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| journalctl | systemd 로그 조회 |
-| nginx | systemd 서비스로 관리 |
-| Docker | systemd로 Docker 데몬 관리 |
-| SSH | systemd로 sshd 서비스 관리 |
-
-## 30초만 본다면
-
-| 상황 | 명령 |
-|---|---|
-| 서비스 시작·정지·재시작 | `systemctl start/stop/restart <svc>` |
-| 무중단 리로드 | `systemctl reload <svc>` |
-| 상태·최근 로그 | `systemctl status <svc>` |
-| 부팅 자동 시작 | `systemctl enable [--now] <svc>` |
-| 서비스 파일 수정 후 | `systemctl daemon-reload` |
-| 실시간 로그 | `journalctl -f -u <svc>` |
-| 에러만 | `journalctl -p err -u <svc>` |
-| 어제 이후 | `journalctl --since yesterday` |
-| 부팅별 로그 | `journalctl -b` (직전 부팅: `-b -1`) |
-| 사용자 서비스 | `systemctl --user ...` |
-| 등록된 타이머 + 다음 실행 | `systemctl list-timers --all` |
+Timer는 서비스 실행을 예약하는 별도 Unit이다. `systemctl`은 Unit 상태를 제어하고 `journalctl`은 기록을 읽는다.
 
 ## 서비스 파일 위치
 
