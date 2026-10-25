@@ -1,389 +1,100 @@
-# Elasticsearch Cheatsheet
+# Elasticsearch — 데이터·검색·운영 기능 지도
 
-> 분산 검색 엔진. 클러스터·인덱스·쿼리·운영 진단을 한 곳에. Kibana Dev Tools와 curl 형태 모두.
+> Elasticsearch는 **문서를 Index에 저장하고 Query DSL로 검색하는 분산 시스템**이다. REST API의 개별 호출보다 데이터 구조·검색·운영 계층을 먼저 이해한다.
 
-## 리소스와 HTTP 명령 문법
+## 전체 기능 영역
+
+```text
+Elasticsearch Cluster
+├─ 분산 실행     Node / Shard / Replica / Allocation
+├─ 데이터 구조   Index / Mapping / Document / Alias
+├─ 읽기          Get / Search / Count / Aggregation
+├─ 쓰기          Index / Update / Delete / Bulk
+├─ 검색 언어     Query DSL / full-text / term-level / bool
+├─ 데이터 이동   Reindex / Ingest Pipeline
+└─ 운영          Health / Cat / Stats / Recovery / Tasks
+```
+
+## 데이터가 저장되는 계층
 
 ```text
 Cluster
- ├─ Node          → GET _cat/nodes
- └─ Index
-     ├─ Mapping   → GET INDEX/_mapping
-     ├─ Document  → GET INDEX/_doc/ID
-     └─ Search    → GET INDEX/_search
-
-METHOD /RESOURCE/_ACTION
- GET    조회·검색
- POST   요청 본문을 가진 작업
- PUT    생성·갱신 등
- DELETE 삭제 (파괴적)
+  └─ Index (논리적 데이터 집합)
+      ├─ Mapping (필드 타입·분석 방식)
+      ├─ Document (_id, _source)
+      └─ Primary Shards
+           └─ Replica Shards (가용성·읽기 분산)
 ```
 
-`_cat`은 운영 상태를 사람이 읽기 쉬운 표로 제공하고, `_search`는 문서 검색, `_mapping`은 필드 구조를 확인한다. `DELETE INDEX`와 `_delete_by_query`는 대상·영향 범위가 다르므로 실행 전 확인한다.
+Index와 Shard는 같은 단위가 아니다. Shard는 분산 저장·검색의 물리적 단위이며, Alias는 Index를 가리키는 논리적 이름이다. Mapping은 검색·집계에서 필드가 어떻게 해석되는지 결정한다.
 
-## curl ↔ Kibana Dev Tools 변환 규칙
-
-Kibana > Management > Dev Tools > Console.
-
-| curl | Dev Tools |
-|------|-----------|
-| `curl -X GET "http://HOST:9200/INDEX/_search"` | `GET INDEX/_search` |
-| `-H 'Content-Type: application/json'` | 생략 (자동) |
-| `-d '{...}'` | 다음 줄에 JSON 그대로 |
-| `?pretty` | 생략 (자동 포맷) |
-| 응답 헤더 | 우측 패널, status code는 우상단 |
+## 검색은 세 단계
 
 ```text
-# Dev Tools 단축키
-Ctrl/Cmd + Enter   # 현재 요청 실행
-Ctrl/Cmd + I       # 자동 인덴트
-Ctrl + Space       # 자동완성
-우측 스패너        # cURL로 복사
+Query DSL → 조건에 맞는 Document 선택 → 점수·정렬·집계·응답
+               │
+               ├─ Full-text: match / match_phrase (분석기 활용)
+               ├─ Term-level: term / range (정확한 값·범위)
+               └─ Bool: must / filter / should / must_not
 ```
 
-> 아래 각 섹션에 curl과 Dev Tools 두 형태를 함께 적었다. 평소 운영은 curl, 탐색/디버깅은 Dev Tools가 빠르다.
+| Bool 절 | 검색 결과에 미치는 영향 |
+|---|---|
+| `must` | 반드시 일치하며 점수에 반영 |
+| `filter` | 반드시 일치하지만 점수에는 반영하지 않음 |
+| `should` | 선택적 일치·점수 보완; 필수 여부는 조건에 따라 달라짐 |
+| `must_not` | 일치하는 문서를 제외 |
 
-## 클러스터/노드 정보
+`should`는 단순히 항상 OR 조건이 아니다. `must`·`filter` 유무에 따라 기본 `minimum_should_match`가 달라진다.
 
-| curl | Dev Tools | 설명 |
-|------|-----------|------|
-| `curl http://HOST:9200` | `GET /` | 버전 및 노드 정보 확인 |
-| `curl http://HOST:9200/_cluster/health?pretty` | `GET _cluster/health` | 클러스터 상태 (green/yellow/red) |
-| `curl http://HOST:9200/_cluster/stats?pretty` | `GET _cluster/stats` | 클러스터 통계 |
-| `curl http://HOST:9200/_cat/nodes?v` | `GET _cat/nodes?v` | 노드 목록 |
-| `curl http://HOST:9200/_cat/indices?v` | `GET _cat/indices?v` | 인덱스 목록 |
-| `elasticsearch --version` | — | 서버 설치 버전 (쉘에서만) |
-
-## 문서 Count
-
-```bash
-# curl
-curl -X GET "http://HOST:9200/INDEX/_count"
-
-curl -X GET "http://HOST:9200/INDEX/_count" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "range": {
-        "@timestamp": {
-          "gte": "2026-03-01T00:00:00",
-          "lte": "2026-03-01T23:59:59"
-        }
-      }
-    }
-  }'
-```
-
-```text
-# Dev Tools
-GET INDEX/_count
-
-GET INDEX/_count
-{
-  "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "2026-03-01T00:00:00",
-        "lte": "2026-03-01T23:59:59"
-      }
-    }
-  }
-}
-```
-
-> `_search`의 `hits.total.value`는 기본 10,000에서 상한(그 이상이면 `"relation": "gte"`). 정확한 전체 수는 `_count` 사용.
-> `_search`에서 정확한 수가 필요하면 `"track_total_hits": true` 추가 (느림).
-
-## 문서 조회
-
-```bash
-# curl
-curl -X GET "http://HOST:9200/INDEX/_search?pretty"
-
-curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "range": {
-        "@timestamp": {
-          "gte": "2026-03-01T00:00:00",
-          "lte": "2026-03-01T23:59:59"
-        }
-      }
-    }
-  }'
-
-curl -X GET "http://HOST:9200/INDEX/_search?size=5&pretty"
-```
-
-```text
-# Dev Tools
-GET INDEX/_search
-
-GET INDEX/_search
-{
-  "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "2026-03-01T00:00:00",
-        "lte": "2026-03-01T23:59:59"
-      }
-    }
-  }
-}
-
-GET INDEX/_search?size=5
-```
-
-## 검색 쿼리
-
-### match (부분 매칭)
-
-단어 단위로 분석 후 매칭. 순서 무관, OR 조건.
-
-```bash
-# curl
-curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": { "match": { "content": "quick brown" } }
-  }'
-```
-
-```text
-# Dev Tools
-GET INDEX/_search
-{
-  "query": { "match": { "content": "quick brown" } }
-}
-
-GET INDEX/_count
-{
-  "query": { "match": { "content": "quick brown" } }
-}
-```
-
-### match_phrase (정확한 구문 매칭)
-
-단어 순서까지 일치해야 매칭.
-
-```bash
-# curl
-curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": { "match_phrase": { "content": "Quick Brown" } }
-  }'
-```
-
-```text
-# Dev Tools
-GET INDEX/_search
-{
-  "query": { "match_phrase": { "content": "Quick Brown" } }
-}
-```
-
-### match vs match_phrase 비교
-
-| 쿼리 | `"quick brown"` 입력 시 매칭 | 용도 |
-|------|--------------------------|------|
-| `match` | "quick" 또는 "brown" 포함하면 매칭 (OR) | 넓은 검색 |
-| `match` + `"operator": "and"` | "quick"과 "brown" 모두 포함 (순서 무관) | 교집합 검색 |
-| `match_phrase` | "quick brown" 구문 그대로 매칭 (순서 일치) | 정확한 문구 검색 |
-
-### bool 쿼리 (복합 조건)
-
-```bash
-# curl
-curl -X GET "http://HOST:9200/INDEX/_search?pretty" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "bool": {
-        "must": [
-          { "match_phrase": { "content": "Quick Brown" } }
-        ],
-        "filter": [
-          { "range": { "@timestamp": { "gte": "2024-01-01", "lte": "2024-12-31" } } }
-        ]
-      }
-    }
-  }'
-```
-
-```text
-# Dev Tools
-GET INDEX/_search
+```json
 {
   "query": {
     "bool": {
-      "must": [
-        { "match_phrase": { "content": "Quick Brown" } }
-      ],
-      "filter": [
-        { "range": { "@timestamp": { "gte": "2024-01-01", "lte": "2024-12-31" } } }
-      ]
+      "must": [{ "match": { "message": "timeout" } }],
+      "filter": [{ "range": { "@timestamp": { "gte": "now-1d" } } }]
     }
   }
 }
 ```
 
-| bool 절 | 설명 |
-|---------|------|
-| `must` | AND 조건 (스코어 반영) |
-| `should` | OR 조건 (스코어 반영) |
-| `must_not` | NOT 조건 |
-| `filter` | AND 조건 (스코어 무시, 캐싱됨 → 빠름) |
+`_search`는 결과 문서와 점수·집계, `_count`는 조건에 맞는 문서 수를 반환한다. `track_total_hits` 설정에 따라 검색 결과의 총 건수 정확도가 달라진다.
 
-## Bulk 적재
-
-```bash
-# curl (대용량은 curl 권장 — Dev Tools는 한 줄 요청 단위라 파일 스트리밍 불가)
-curl -X POST "http://HOST:9200/_bulk?timeout=1m" \
-  -H 'Content-Type: application/x-ndjson' \
-  --data-binary @bulk_data.json
-```
+## 쓰기·재구성·삭제는 영향 범위가 다르다
 
 ```text
-# Dev Tools (소량 테스트용)
-# 각 액션과 문서는 줄바꿈으로 구분. 마지막 줄도 개행 필수.
-POST _bulk
-{ "index": { "_index": "INDEX", "_id": "1" } }
-{ "field1": "value1" }
-{ "index": { "_index": "INDEX", "_id": "2" } }
-{ "field1": "value2" }
+Document CRUD ── 개별 문서 변경
+Bulk          ── 여러 작업을 NDJSON으로 묶어 실행
+Reindex       ── 기존 문서를 다른 Index로 복사
+Alias swap    ── 애플리케이션이 바라보는 논리적 Index 전환
+Delete Query  ── 조건에 맞는 여러 문서 삭제
+Delete Index  ── Index 자체 삭제
 ```
 
-### Bulk 적재 확인 방법
+Bulk는 각 작업별 성공·실패를 응답에서 확인해야 한다. Reindex와 Alias 전환은 별개 단계이며, Alias 변경만으로 데이터 복사가 일어나지는 않는다. 파괴적 API는 먼저 검색·건수로 대상 범위를 확인한다.
 
-```bash
-# curl
-curl -X GET "http://HOST:9200/INDEX/_count"
+## 운영 관찰: 무엇을 확인하는가?
 
-curl -X GET "http://HOST:9200/INDEX/_count" \
-  -H 'Content-Type: application/json' \
-  -d '{"query":{"range":{"@timestamp":{"gte":"2026-03-01T00:00:00","lte":"2026-03-01T23:59:59"}}}}'
-```
+| 관찰 대상 | 의미 | 대표 API |
+|---|---|---|
+| Cluster health | 전체 할당 상태 | `_cluster/health` |
+| Nodes | 실행 노드 | `_cat/nodes` |
+| Indices | Index 상태·문서 수 | `_cat/indices` |
+| Shards | 분산 배치 상태 | `_cat/shards` |
+| Allocation | 배치·미할당 원인 | `_cluster/allocation/explain` |
+| Recovery | 복구·재배치 진행 | `_cat/recovery` |
+| Tasks | 진행 중인 작업 | `_tasks` |
+
+`_cat`은 사람이 읽는 운영 요약에 적합하다. 자동화에서는 구조화된 JSON 응답을 제공하는 API를 우선한다.
+
+## HTTP API와 Kibana Dev Tools
 
 ```text
-# Dev Tools
-GET INDEX/_count
-
-GET INDEX/_count
-{ "query": { "range": { "@timestamp": { "gte": "2026-03-01T00:00:00", "lte": "2026-03-01T23:59:59" } } } }
+HTTP Client: curl -X GET "HOST/INDEX/_search"
+Kibana Console: GET INDEX/_search
+                { ... JSON body ... }
 ```
 
-## Delete by Query
+둘 다 Elasticsearch REST API를 호출한다. Console은 요청 작성·응답 탐색 UI이며 다른 검색 언어가 아니다. 인증·TLS·권한은 배포 환경에 따라 달라진다.
 
-```bash
-# curl
-curl -X POST "http://HOST:9200/INDEX/_delete_by_query?refresh=true&conflicts=proceed" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "query": {
-      "range": {
-        "@timestamp": {
-          "gte": "2026-03-01T00:00:00",
-          "lte": "2026-03-01T23:59:59"
-        }
-      }
-    }
-  }'
-```
-
-```text
-# Dev Tools
-POST INDEX/_delete_by_query?refresh=true&conflicts=proceed
-{
-  "query": {
-    "range": {
-      "@timestamp": {
-        "gte": "2026-03-01T00:00:00",
-        "lte": "2026-03-01T23:59:59"
-      }
-    }
-  }
-}
-```
-
-| 파라미터 | 설명 |
-|----------|------|
-| `refresh=true` | 삭제 후 즉시 검색 반영 |
-| `conflicts=proceed` | 충돌 무시하고 계속 |
-| `wait_for_completion=true` | 완료까지 대기 |
-| `slices=auto` | 병렬 삭제 (성능 향상) |
-| `timeout=1m` | 타임아웃 설정 |
-
-## 로그 확인
-
-```bash
-# 실시간 로그 (기본 경로)
-tail -f /var/log/elasticsearch/elasticsearch.log
-
-# 에러만 필터
-tail -f /var/log/elasticsearch/elasticsearch.log | grep -i error
-
-# bulk 관련만
-tail -f /var/log/elasticsearch/elasticsearch.log | grep -i bulk
-
-# systemd 서비스 로그
-journalctl -u elasticsearch -f
-
-# Docker 환경
-docker logs -f <container_name>
-
-```
-
-## 인덱스 관리
-
-```bash
-# curl
-curl -X PUT "http://HOST:9200/INDEX"
-curl -X DELETE "http://HOST:9200/INDEX"
-curl -X GET "http://HOST:9200/INDEX/_settings?pretty"
-curl -X GET "http://HOST:9200/INDEX/_mapping?pretty"
-curl -X GET "http://HOST:9200/_cat/indices?v&s=index"
-```
-
-```text
-# Dev Tools
-PUT INDEX
-DELETE INDEX
-GET INDEX/_settings
-GET INDEX/_mapping
-GET _cat/indices?v&s=index
-```
-
-### Reindex · Alias 무중단 교체
-
-```text
-# 매핑을 바꿔 새 인덱스로 재적재
-POST _reindex
-{ "source": { "index": "old" }, "dest": { "index": "new" } }
-
-# alias를 원자적으로 교체 (다운타임 없이 old→new 스위치)
-POST _aliases
-{ "actions": [
-  { "remove": { "index": "old", "alias": "live" } },
-  { "add":    { "index": "new", "alias": "live" } }
-]}
-```
-
-## _cat API (운영 모니터링)
-
-Dev Tools에서는 `GET` 붙이고 그대로 실행.
-
-| 엔드포인트 | 설명 |
-|------------|------|
-| `GET _cat/health?v` | 클러스터 상태 |
-| `GET _cat/nodes?v` | 노드 목록 |
-| `GET _cat/indices?v` | 인덱스 목록 |
-| `GET _cat/shards?v` | 샤드 배치 상태 |
-| `GET _cat/allocation?v` | 디스크 할당 |
-| `GET _cat/thread_pool?v` | 스레드풀 상태 |
-| `GET _cat/pending_tasks?v` | 대기 작업 |
-
-> curl로는 `curl http://HOST:9200/_cat/health?v` 형태. `?format=json` 붙이면 JSON 출력.
-
-> 샤드가 yellow/red면 `GET _cluster/allocation/explain`으로 미할당 원인을, `GET _cat/recovery?v&active_only=true`로 복구 진행을 본다.
+공식 명세: [Elasticsearch Reference](https://www.elastic.co/docs/reference/elasticsearch) · [Query DSL](https://www.elastic.co/docs/reference/query-languages/query-dsl) · [REST APIs](https://www.elastic.co/docs/api/doc/elasticsearch/)
