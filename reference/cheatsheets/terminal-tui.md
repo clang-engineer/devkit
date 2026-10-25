@@ -29,6 +29,23 @@
 | JSON | [fx](https://github.com/antonmedv/fx) | JSON 탐색·필터링 | jq 결과를 대화형으로 볼 때 |
 | 네트워크 진단 | [trippy](https://github.com/fujiapple852/trippy) | ping과 traceroute 통합 분석 | 장애 진단 시 유용 |
 
+## DB TUI — 선택과 실행의 경계
+
+```text
+여러 DB / adapter → Harlequin (SQL IDE)
+PostgreSQL 탐색   → Rainfrog (독립 TUI)
+Neovim 안에서 SQL  → vim-dadbod-ui (편집기 플러그인)
+자동화·백업       → psql / pg_dump 등 공식 CLI
+```
+
+| 도구 | 시작 | 구분할 점 |
+|---|---|---|
+| [Harlequin](https://github.com/tconbeer/harlequin) | `harlequin` | DB별 adapter·연결 설정 |
+| [Rainfrog](https://github.com/achristmascarl/rainfrog) | `rainfrog` | PostgreSQL 중심 탐색·쿼리 |
+| [vim-dadbod-ui](https://github.com/kristijanhusak/vim-dadbod-ui) | `:DBUI` | Vim/Neovim 플러그인; 독립 CLI 아님 |
+
+연결 문자열·비밀번호는 공개 저장소에 넣지 않는다. 배치·백업은 DB 공식 CLI로 남긴다.
+
 ## `lazy*` 이름으로 추가 검토할 만한 것
 
 ### lazyssh
