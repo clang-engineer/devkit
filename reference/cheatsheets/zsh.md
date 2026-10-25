@@ -104,7 +104,7 @@ print -rl -- *.txt~backup.txt # 제외 패턴
 | `popd` | 스택에서 꺼내고 이동 |
 
 ```sh
-setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT   # ~/.zshrc 추천
+setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT   # 필요할 때 선택
 ```
 
 ## 별칭 (alias)
@@ -112,7 +112,7 @@ setopt AUTO_PUSHD PUSHD_IGNORE_DUPS PUSHD_SILENT   # ~/.zshrc 추천
 | 명령 | 동작 |
 |------|------|
 | `alias ll='ls -alh'` | 일반 별칭 |
-| `alias -g G='\| rg'` | 전역 별칭 — 명령줄 어디서나 치환 (`ls G foo`) |
+| `alias -g G='\| rg'` | 전역 별칭 — 명령 위치 외에도 치환 (예: `ls G foo` → `ls \| rg foo`; 검색어와 파이프라인 목적을 확인) |
 | `alias -s pdf=open` | 접미사 별칭 — `foo.pdf`만 쳐도 `open foo.pdf` |
 | `alias -s {md,txt}=nvim` | 접미사 별칭 (여러 확장자) |
 
@@ -137,7 +137,7 @@ zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'   # 대소문자 �
 ## 옵션 (자주 켜는 것들)
 
 ```sh
-setopt extended_glob       # 위 glob qualifier 활성화
+setopt extended_glob       # ^, ~, (#i) 등 확장 패턴 활성화
 setopt auto_cd             # 디렉터리명만 입력해도 cd
 setopt auto_pushd          # cd마다 스택에 push
 setopt hist_ignore_dups    # 중복 히스토리 무시
