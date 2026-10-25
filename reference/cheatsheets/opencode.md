@@ -2,43 +2,19 @@
 
 > [opencode](https://opencode.ai) — 터미널용 오픈소스 AI 코딩 에이전트(sst/Anomaly). provider-agnostic(75+ provider)라 모델을 골라 붙인다. `curl -fsSL https://opencode.ai/install | bash` 후 `opencode` 실행.
 
-## 개념 흐름
+## 실행·인증·모델 선택
 
 ```text
-opencode 실행 → provider 인증 → 모델 선택
-     ↓              ↓              ↓
-  TUI 시작      /connect        /models
-     ↓              ↓              ↓
-  대화 시작      토큰 관리       모델 전환
+opencode [CLI command] → TUI / 단일 실행
+       │
+       ├─ /connect  → Provider 인증
+       ├─ /models   → Model 선택
+       └─ MCP       → 외부 도구 연결
+
+Provider (인증·과금 경로) ≠ Model (실제 추론 모델)
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 시작 | `opencode` | TUI 실행 |
-| 인증 | `/connect` | provider 추가 |
-| 모델 | `/models` | 모델 변경 |
-| 한 번만 | `opencode run --model ...` | 단일 실행 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| claude code | 대안 AI 코딩 에이전트 |
-| ccusage | opencode 사용량 집계 |
-| git | 파일 수정 후 추적 |
-
-## 30초만 본다면
-
-| 상황 | 명령 |
-|------|------|
-| 시작 (TUI) | `opencode` |
-| provider 인증 추가 | TUI에서 `/connect` (또는 `opencode auth login`) |
-| 모델 바꾸기 | TUI에서 `/models` |
-| 한 번만 다른 모델로 실행 | `opencode run --model <provider>/<model> "..."` |
-| 인증된 provider 확인 | `opencode auth list` |
-| 인증 해제 | `opencode auth logout` |
+`opencode`는 TUI를 열고 `opencode run`은 요청을 단일 실행한다. `/connect`와 `/models`는 TUI 안에서 사용하는 명령으로, 셸에서 실행하는 CLI 명령과 구분한다.
 
 ## 인증 (provider 연결)
 
