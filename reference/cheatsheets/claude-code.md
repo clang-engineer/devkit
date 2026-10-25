@@ -69,10 +69,6 @@ Tool / MCP / Hook         → 외부 작업·이벤트 자동화
 | `.claude/settings.json` | 프로젝트 | 프로젝트별 설정 |
 | `~/.claude/keybindings.json` | 홈 디렉토리 | 키바인딩 커스터마이징 |
 
-## 권한 모드
-
-실행 중 권한 모드는 `Shift+Tab`으로 순환한다. 모드별 동작과 별도의 CLI·대화 중 권한 설정 방법은 아래 [권한 모드 (Shift+Tab 순환)](#권한-모드-shifttab-순환)을 참조.
-
 ## Esc / Esc Esc (헷갈리는 것만)
 
 기본 단축키(`Enter` 전송, `Tab` 자동완성 등)는 `/help`. 비자명한 것:
@@ -141,7 +137,7 @@ subagent에도 `isolation: "worktree"` 옵션으로 격리 실행 가능.
 
 > 로컬(비클라우드) 반복 실행은 `/loop`.
 
-## 권한 모드 (Shift+Tab 순환)
+## 권한·실행 모드 (Shift+Tab)
 
 `Shift+Tab`은 단일 토글이 아니라 **권한 모드를 순환**한다:
 
@@ -149,7 +145,7 @@ subagent에도 `isolation: "worktree"` 옵션으로 격리 실행 가능.
 default → acceptEdits → plan [→ bypassPermissions → auto]
 ```
 
-(기본 3개는 항상 노출. `bypassPermissions`는 `--dangerously-skip-permissions` 등으로 시작한 경우, `auto`는 계정이 auto 모드 요건을 충족한 경우만 순환에 추가되며 이 순서로 붙는다.)
+(사용 가능한 모드와 순서는 버전·계정·설정에 따라 달라질 수 있다. 실행 중 `/permissions` 및 공식 문서에서 확인한다.)
 
 - `default` — 매번 권한 확인
 - `acceptEdits` — 파일 편집 자동 수락
@@ -184,7 +180,7 @@ default → acceptEdits → plan [→ bypassPermissions → auto]
 - `"$defaults"` = 내장 기본 규칙 포함
 - `hard_deny` = 항상 차단. 도구 단위 정밀 허용/거부는 별도 `permissions.allow`/`deny` 키
 
-## 유용한 팁
+## 입력·세션 조작
 
 | 팁 | 설명 |
 |----|------|
