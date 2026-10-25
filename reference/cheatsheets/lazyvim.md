@@ -141,106 +141,30 @@ LazyVim이 기본 탑재하는 모션 플러그인.
 
 ---
 
-## 부록: 스톡 개념 레퍼런스
+## 동작을 추론할 때 필요한 경계
 
-키맵 표에 안 들어가지만 알아두면 원리가 잡히는 Neovim·lazy.nvim 기본 개념 모음.
+### Root와 cwd
 
-### Root Dir vs cwd
-
-LazyVim은 열린 파일에서 가장 가까운 루트 마커(`.git > .editorconfig > package.json > Makefile > ...`)를 **Root Dir**로 잡고, 검색·grep·탐색기의 기본 범위로 쓴다. 대문자 변형(`<leader>fF`, `<leader>sG` 등)은 **cwd** 기준. monorepo 하위 `package.json`이 Root로 잡혀 검색 범위가 좁다 싶으면 cwd 버전을 쓰거나 `:pwd`/`:cd`로 확인. Root = cwd인 단순 프로젝트에선 차이 없음.
-
-### 블랙홀 레지스터 `"_` (삭제 ≠ 잘라내기)
-
-Vim은 삭제(`d`/`x`/`c`)도 무명 레지스터(`"`)에 넣어 yank한 내용을 덮어쓴다. `"_` 프리픽스로 지우면 아무 레지스터에도 안 들어감.
-
-```vim
-"_d    " 지운 내용이 어디에도 안 들어감 (yank 보존)
-"_diw  " 단어 삭제하되 클립보드 유지
+```text
+Root : 프로젝트 경계 (검색·탐색 범위에 사용될 수 있음)
+cwd  : Neovim의 현재 작업 디렉터리 (:pwd)
 ```
 
-### lazy.nvim 플러그인 스펙 — 초기화 훅
+프로젝트 검색 범위가 예상보다 좁다면 `:pwd`와 Root 판정 설정을 확인한다. LazyVim의 키맵은 Root 기준과 cwd 기준을 구분할 수 있으며, 실제 매핑은 `<leader>sk`에서 확인한다.
 
-플러그인 spec의 세 가지 setup 훅. `opts`는 `config`의 가장 흔한 패턴(`require(main).setup(opts)`)을 자동화한 sugar.
+### Vim 명령과 Plugin 명령
 
-| 훅 | 시점/역할 | 형태 |
-|---|---|---|
-| `init` | 플러그인 로드 **전** 실행 (주로 vimscript 전역변수 세팅) | `init = function() vim.g.xxx = 1 end` |
-| `opts` | 데이터만 선언 → lazy가 `require(main).setup(opts)` 대행 | `opts = { ... }` |
-| `config` | setup 호출을 직접 작성 (키맵·autocmd 등 추가 로직 가능) | `config = function() require("mod").setup({...}) end` |
-
-```lua
-{ "author/plugin", opts = { foo = true } }                                         -- 선언형
-{ "author/plugin", config = function() require("mod").setup({ foo = true }) end }   -- 명령형
-{ "rose-pine/neovim", name = "rose-pine", opts = {} }                              -- name 명시
+```text
+Vim Register       → "_diw : 단어 삭제, 블랙홀 레지스터 사용
+lazy.nvim spec     → init / opts / config
+Neovim Help        → :help / :helpgrep / :helptags
+프로젝트 로컬 설정 → 'exrc' 옵션 + 파일 신뢰 확인
+Snippet            → completion engine + snippet source + 파일 형식
 ```
 
-> `main`은 setup할 모듈명, `name`은 플러그인 식별자·설치 디렉토리명. 둘 다 repo 마지막 세그먼트에서 추론되므로 repo명이 모듈명·식별자와 어긋나면 명시 필요 (예: `rose-pine/neovim` → 식별자가 `neovim`으로 잡히므로 `name = "rose-pine"`).
+- `"_`는 **블랙홀 레지스터**다. 삭제가 기본 레지스터를 덮는 것이 싫을 때 `"_diw`처럼 명시한다. 편집 문법은 [Vim 치트시트](vim.md)에서 다룬다.
+- `init`은 Plugin 로드 전 실행할 코드, `opts`는 설정값, `config`는 로드 시 설정 동작을 지정한다. 자세한 병합·로딩 규칙은 [lazy.nvim 공식 문서](https://lazy.folke.io/spec).
+- 프로젝트의 `.nvim.lua` 같은 로컬 설정은 `exrc` 활성화와 신뢰 정책을 확인해야 한다. [Neovim 공식 도움말](https://neovim.io/doc/user/options.html#'exrc')
+- 도움말 태그는 `:help {tag}`, 본문 검색은 `:helpgrep {pattern}`을 사용한다. 스니펫 디렉터리·자동 로드 여부는 설치한 completion/snippet 플러그인 설정에 따라 확인한다.
 
-### 프로젝트 로컬 설정 (`.nvim.lua` / `.exrc`)
-
-Neovim은 옵션 활성화 + 파일 trust **두 가지가 모두** 충족돼야 로컬 설정을 로드한다.
-
-```lua
--- ~/.config/nvim/lua/config/options.lua
-vim.o.exrc = true
-```
-
-빈 버퍼에서 `:trust`만 치면 `cannot update trust file: buffer is not associated with file` 에러. 파일을 열고 실행:
-
-```vim
-:e .nvim.lua
-:trust
-" 또는
-:trust ++file=.nvim.lua
-```
-
-성공 시 `~/.local/state/nvim/trust`에 해시 등록. 로드 확인:
-
-```vim
-:lua print(vim.secure.read('.nvim.lua'))   " nil → trust 안 됨
-:echo &exrc                                 " 1이어야 함
-```
-
-소유자/권한이 본인이어야 함 (`vim.secure`는 타 사용자 소유 거부). 심볼릭 링크면 실제 파일도 동일 조건.
-
-### 플러그인 문서 보기 (vimdoc)
-
-플러그인 문서는 `:help`(vimdoc)로 본다. 태그를 모를 땐 **Tab 자동완성**이 핵심.
-
-```vim
-:help obsidian.nvim
-:help obsidian<Tab>      " 태그 모를 때: 실제 help 태그 후보가 뜸 (안 뜨면 vimdoc 없음, README만)
-:helpgrep workspaces     " 헬프 본문 전체 검색 → :cnext / :cprev 로 이동
-:helptags ALL            " 방금 설치해 :help에 안 뜰 때 (또는 :Lazy sync 후 재시작)
-```
-
-- 헬프 창 내부: `<C-]>` 태그 점프 / `<C-o>`·`<C-t>` 뒤로 / `:q` 닫기.
-- picker 지름길: `<leader>sh`(Help Pages), `<leader>sk`(Key Maps), `<leader>sm`(Man Pages).
-- `:Lazy`에서 플러그인 위 `<CR>` → 렌더된 README + help 태그 링크 (vimdoc 없는 플러그인 폴백).
-
-### VSCode 스니펫 추가 (blink.cmp 자동 로드)
-
-LazyVim 기본 보완 엔진은 [blink.cmp](https://github.com/Saghen/blink.cmp). 그 스니펫 소스가 시작 시 `~/.config/nvim/snippets/`를 **규약으로 자동 스캔**한다 — Lua 배선 0. VSCode 스니펫 포맷(`package.json` + 언어별 `.json`) 그대로 놓으면 끝.
-
-```
-~/.config/nvim/snippets/
-├── package.json    # 어떤 .json을 어떤 언어에 물릴지 등록
-└── cpp.json        # 언어별 스니펫 정의
-```
-
-```jsonc
-// package.json — contributes.snippets 배열에 언어별 파일 등록
-{ "contributes": { "snippets": [ { "language": "cpp", "path": "./cpp.json" } ] } }
-
-// cpp.json — "이름": { prefix, body, description }
-{ "for loop": {
-  "prefix": "fori",
-  "description": "인덱스 for",
-  "body": [ "for (int ${1:i} = 0; $1 < ${2:n}; $1++) {", "\t$0", "}" ]
-} }
-```
-
-- **body 문법**: `$1`,`$2` = Tab 정지점(같은 번호는 동시 편집) / `${1:default}` = 기본값 있는 placeholder / `$0` = 최종 커서 / `\t` = 리터럴 들여쓰기 탭.
-- **쓰는 법**: 해당 언어 파일에서 insert 모드로 `prefix` 입력 → blink 완성 메뉴에서 확정 → body 펼침, `Tab`으로 정지점 이동.
-- **반영**: 스니펫 캐시하므로 편집 후 **nvim 재시작**. 새 언어는 `<lang>.json` 추가 + `package.json`에 한 줄 등록.
-- blink의 스캔 경로는 `search_paths` 기본값이 `stdpath("config")/snippets` — 즉 위 규약은 blink stock 동작이지 LazyVim이 따로 얹은 게 아니다.
+**원칙:** 이 문서는 LazyVim 키맵의 구조를 설명한다. Neovim 내부 API·설정 플러그인의 전체 사용법은 공식 문서와 개별 주제 문서에 맡긴다.
