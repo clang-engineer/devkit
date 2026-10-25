@@ -3142,6 +3142,79 @@
             "file": "opencode.md"
           }
         ]
+      },
+      {
+        "title": "검색·HTTP·작업 실행·측정",
+        "items": [
+          {
+            "slug": "rg",
+            "name": "ripgrep",
+            "desc": "검색할 파일·정규식 패턴·출력 형식을 분리해 이해한다.",
+            "tldr": "common/rg",
+            "official": [
+              {
+                "label": "Official documentation",
+                "url": "https://github.com/BurntSushi/ripgrep"
+              }
+            ],
+            "custom": {
+              "label": "devkit ripgrep Cheatsheet",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/rg.md"
+            },
+            "file": "rg.md"
+          },
+          {
+            "slug": "httpie",
+            "name": "HTTPie",
+            "desc": "HTTP 요청의 헤더·쿼리·JSON 필드 구분자와 실행 문법.",
+            "tldr": "common/http",
+            "official": [
+              {
+                "label": "Official documentation",
+                "url": "https://httpie.io/docs/cli"
+              }
+            ],
+            "custom": {
+              "label": "devkit HTTPie Cheatsheet",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/httpie.md"
+            },
+            "file": "httpie.md"
+          },
+          {
+            "slug": "just",
+            "name": "just",
+            "desc": "Recipe·인자·의존성을 조합하는 작업 실행 문법.",
+            "tldr": "common/just",
+            "official": [
+              {
+                "label": "Official documentation",
+                "url": "https://just.systems/man/en/"
+              }
+            ],
+            "custom": {
+              "label": "devkit just Cheatsheet",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/just.md"
+            },
+            "file": "just.md"
+          },
+          {
+            "slug": "hyperfine",
+            "name": "hyperfine",
+            "desc": "반복 실행·워밍업·준비 단계와 성능 비교의 구조.",
+            "tldr": "common/hyperfine",
+            "official": [
+              {
+                "label": "Official documentation",
+                "url": "https://github.com/sharkdp/hyperfine"
+              }
+            ],
+            "custom": {
+              "label": "devkit hyperfine Cheatsheet",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/hyperfine.md"
+            },
+            "file": "hyperfine.md"
+          }
+        ]
       }
     ],
     "guides": [
