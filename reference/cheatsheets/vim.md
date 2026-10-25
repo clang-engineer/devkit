@@ -1,477 +1,130 @@
-# Vim Cheatsheet
+# Vim — 편집 문법 치트시트
 
-> **모드**: Normal(기본), Insert(입력), Visual(선택), Command(명령)
-> 대부분의 명령 앞에 숫자를 붙이면 반복된다. 예: `5dd` = 5줄 삭제, `3w` = 단어 3개 이동.
+> **동작(Operator)과 범위(Motion / Text Object)를 조합**하면 명령을 유추할 수 있다. 예외적인 명령과 Ex 명령은 별도의 계열로 이해한다.
 
-## 문서 범위
-
-Vim의 **Operator·Motion·Text Object·Register**와 편집기 내부 명령을 다룬다. 터미널의 Alt 키 설정·Neovim의 swap 파일 위치 같은 환경별 운영 내용은 여기서 관리하지 않는다.
-
-## 편집 명령의 문법
+## 1. 모드 — 키의 의미를 결정한다
 
 ```text
-[count] operator [count] motion
-   │       │               └─ 범위: w(다음 단어), $(줄 끝), ...(이동)
-   │       └─ 동작: d(delete), c(change), y(yank)
-   └─ 반복 횟수
-
-d w   → 다음 단어 경계까지 삭제
-c i w → 현재 단어 내부를 변경 (i = inner, w = word)
-y a p → 단락과 주변 공백까지 복사 (a = around, p = paragraph)
-3 d d → 세 줄 삭제 (같은 operator 두 번은 줄 단위)
-```
-
-Vim은 키를 하나씩 암기하기보다 **동작(operator) × 범위(motion/text object)**로 조합한다. `.`은 마지막 변경 반복, `u`는 undo, `Ctrl+r`은 redo다. 모든 키가 이 문법을 따르지는 않는다.
-
-```text
-Normal ── i/a/o ──> Insert
+Normal ── i/a/o ──> Insert  : 텍스트 입력
    │
-   ├── v/V/Ctrl+v ──> Visual
-   └── : ───────────> Command-line
+   ├── v / V / Ctrl-v → Visual : 범위 선택
+   └── : ────────────> Command-line : Ex 명령
 
-Insert / Visual / Command-line ── Esc → Normal
+Insert / Visual ── Esc → Normal
+Command-line ── Esc → 명령 입력 취소 후 Normal
 ```
 
-- `i`는 insert, `a`는 append, `o`는 아래 줄을 열고 입력한다.
-- `v`는 문자, `V`는 줄, `Ctrl+v`는 블록 선택이다.
-- `:wq`는 저장 후 종료, `:q!`는 변경을 버리고 종료한다.
+- `i`(insert)는 커서 앞, `a`(append)는 커서 뒤, `o`(open)는 아래 새 줄에서 입력한다.
+- 대문자 `I`는 줄의 첫 비공백 문자 앞, `A`는 줄 끝, `O`는 위 새 줄에서 입력한다.
+- `v`는 문자, `V`는 줄, `Ctrl-v`는 블록 선택이다.
 
-## 모드 전환
+## 2. Normal 모드 — 동작과 범위의 조합
 
-| 명령어 | 설명 |
-|--------|------|
-| `i` | 커서 위치에 입력 모드 |
-| `I` | 줄 첫 문자 앞에 입력 모드 |
-| `a` | 커서 다음에 입력 모드 |
-| `A` | 줄 맨 뒤에 입력 모드 |
-| `o` | 아래 줄에 입력 모드 |
-| `O` | 위 줄에 입력 모드 |
-| `s` | 문자 삭제 후 입력 모드 |
-| `S` | 줄 삭제 후 입력 모드 |
-| `Esc` / `Ctrl+c` | Normal 모드로 돌아가기 |
-| `v` | Visual 모드 (문자 단위) |
-| `V` | Visual Line 모드 (줄 단위) |
-| `Ctrl+v` | Visual Block 모드 (블록) |
-| `gv` | 직전 Visual 선택 영역 복원 |
+```text
+["register] [count] operator [count] motion/text-object
+     │          │       │               │
+     │          │       │               ├─ w / e / b : 단어 경계 이동
+     │          │       │               ├─ 0 / ^ / $ : 줄의 시작·첫 글자·끝
+     │          │       │               └─ iw / aw / i" / a" : Text Object
+     │          │       ├─ d : delete
+     │          │       ├─ c : change (삭제 후 Insert)
+     │          │       └─ y : yank (복사)
+     │          └─ 횟수 (앞뒤 count는 곱해질 수 있음)
+     └─ 선택한 레지스터 (없으면 기본 동작)
+```
 
-## 커서 이동
+**Motion은 커서를 움직이는 규칙**, **Text Object는 Operator 또는 Visual 모드에서 영역을 선택하는 규칙**이다. `iw`를 Normal 모드에서 단독 이동 명령처럼 사용하지 않는다.
 
-| 명령어 | 설명 |
-|--------|------|
-| `h` `j` `k` `l` | 좌 하 상 우 |
-| `w` / `W` | 다음 단어 시작 (W는 공백 기준) |
-| `e` / `E` | 다음 단어 끝 |
-| `b` / `B` | 이전 단어 시작 |
-| `ge` / `gE` | 이전 단어 끝 |
-| `0` | 줄 맨 앞 (0번째 칸) |
-| `^` | 줄 첫 비공백 문자 |
-| `$` | 줄 맨 뒤 |
-| `g_` | 줄 마지막 비공백 문자 |
-| `gg` | 파일 맨 앞 |
-| `G` | 파일 맨 뒤 |
-| `5G` / `:5` | 5번째 줄로 이동 |
-| `H` `M` `L` | 화면 위 / 중간 / 아래로 이동 |
-| `{` / `}` | 이전 / 다음 단락 |
-| `(` / `)` | 이전 / 다음 문장 |
-| `%` | 짝 괄호로 이동 `()` `[]` `{}` |
-| `fx` / `Fx` | 현재 줄에서 다음 / 이전 `x` 문자로 이동 |
-| `tx` / `Tx` | `x` 직전 / 직후로 이동 |
-| `;` / `,` | 직전 `f`/`t` 검색 반복 (정/역방향) |
-| `*` / `#` | 커서 단어로 아래 / 위 검색 |
+| 조합 | 해석 |
+|---|---|
+| `dw` | 다음 단어 경계까지 삭제 |
+| `ciw` | 현재 단어 내부를 바꾸고 입력 모드 진입 |
+| `ya"` | 따옴표와 그 안의 내용을 복사 |
+| `d$` / `D` | 줄 끝까지 삭제 |
+| `3dd` | 현재 줄부터 3줄 삭제 |
+| `"ayiw` | `a` 레지스터에 현재 단어 내부 복사 |
 
-## Prefix 키 개념
+`dd`, `cc`, `yy`처럼 Operator를 두 번 쓰면 줄 단위 동작이다. `.`은 마지막 변경 반복, `u`는 Undo, `Ctrl-r`은 Redo다.
 
-> Vim의 키맵은 prefix로 카테고리가 갈린다. 새 키맵을 외울 때 어디 prefix인지부터 보면 빨라진다.
+## 3. 범위를 만드는 두 가지 방식
 
-| Prefix | 카테고리 | 예 |
+```text
+Motion: 어디까지 이동할까?
+  w  다음 단어 시작     e  단어 끝        b  이전 단어 시작
+  0  줄 시작            ^  첫 비공백      $  줄 끝
+  gg 파일 시작          G  파일 끝
+
+Text Object: 어떤 덩어리인가?
+  i = inner (안쪽)      a = around (구분자·주변 포함)
+  w = word              " / ' / ( / [ / { = 둘러싼 영역
+  p = paragraph
+```
+
+`diw`와 `daw`는 공백 처리 범위가 다르다. 괄호 안쪽만 수정할 때 `ci(`, 괄호까지 지울 때 `da(`처럼 **동작만 교체해도 같은 영역 규칙을 재사용**한다.
+
+Visual에서는 `viw`, `va(`처럼 Text Object로 범위를 선택한 뒤 `d`, `y`, `>` 등을 적용할 수 있다.
+
+## 4. 레지스터 — 변경 내용의 저장 위치
+
+```text
+y / d / c → Register → p / P
+                │
+                ├─ "  : unnamed (기본)
+                ├─ a-z: 이름 붙인 저장소
+                ├─ 0  : 최근 yank
+                ├─ +  : 시스템 클립보드 (지원 환경)
+                └─ _  : black hole (버리기)
+```
+
+`"ap`는 `a` 레지스터 붙여넣기, `"_diw`는 삭제 내용을 버리기, `"+y`는 지원 환경에서 시스템 클립보드에 복사한다. 레지스터 동작에는 번호 레지스터와 삭제 크기에 따른 추가 규칙이 있다.
+
+## 5. 탐색·반복·범위 편집
+
+```text
+/pattern  → 앞으로 검색       ?pattern → 뒤로 검색
+n / N     → 검색 방향대로 다음 / 반대 방향
+* / #     → 커서 아래 단어를 앞으로 / 뒤로 검색
+
+qa ... q  → 레지스터 a에 매크로 기록
+@a        → 기록 재생          @@ → 직전 매크로 재생
+ma        → 위치를 mark a에 저장
+'a / `a  → mark a의 줄 / 정확한 위치로 이동
+```
+
+`:%s/old/new/g`는 전체 버퍼의 모든 줄에서 치환하고, `:s/old/new/g`는 현재 줄에서 치환한다. `:%s/old/new/gc`의 `c`는 **confirm**이다.
+
+`Ctrl-o` / `Ctrl-i`는 점프 목록 뒤/앞, `:cnext` / `:cprev`는 Quickfix 항목 이동이다.
+
+## 6. 편집 대상의 계층 — Buffer / Window / Tab
+
+```text
+Buffer (파일·텍스트 상태)
+   ▲
+Window (Buffer를 표시하는 뷰)
+   ▲
+Tabpage (Window 배치 묶음)
+```
+
+| 대상 | 대표 명령 | 의미 |
 |---|---|---|
-| `g` | 확장 명령 | `gg`(맨 위), `gd`(local 정의), `gx`(URL 열기), `gu`/`gU`(대소문자), `g;`/`g,`(change list) |
-| `z` | 화면·fold | `zz`(중앙), `zo`/`zc`(fold), `zR`/`zM`(전부), `zt`/`zb`(맨 위/아래) |
-| `[` / `]` | 이전/다음 이동 | `[d`/`]d`(진단), `[m`/`]m`(함수), `[p`/`]p`(인덴트 붙여넣기) |
-| `d` `y` `c` | operator (+motion) | `dw`, `y$`, `cw`, `ciw`, `daB` |
-| `<leader>` | 사용자/플러그인 | `<leader>w` 등 (기본 `\`, LazyVim은 `Space`) |
-| `<localleader>` | 파일타입 전용 | (기본 `\`) |
-| `m` / `"` | 마크 / 레지스터 | `ma`, `"ay`, `"+y` |
+| Buffer | `:ls`, `:bnext`, `:bprev`, `:bd` | 열린 버퍼 목록·전환·닫기 |
+| Window | `:split`, `:vsplit`, `Ctrl-w h/j/k/l` | 분할·창 이동 |
+| Tab | `:tabnew`, `gt`, `gT` | 배치 생성·다음·이전 |
+| File | `:w`, `:q`, `:wq`, `:q!` | 저장·종료 |
 
-## 스크롤
+**Tab은 파일 하나가 아니라 Window 레이아웃**이다. Window를 닫는 것과 Buffer를 지우는 것도 다르다.
 
-| 명령어 | 설명 |
-|--------|------|
-| `Ctrl+f` / `Ctrl+b` | 한 페이지 아래 / 위 |
-| `Ctrl+d` / `Ctrl+u` | 반 페이지 아래 / 위 |
-| `Ctrl+e` / `Ctrl+y` | 한 줄 아래 / 위 |
-| `zz` | 커서를 화면 중앙으로 |
-| `zt` | 커서를 화면 위로 |
-| `zb` | 커서를 화면 아래로 |
+## 7. 설정과 도움말은 별도 명령 계열
 
-## Insert 모드 단축키
-
-| 명령어 | 설명 |
-|--------|------|
-| `Ctrl+h` | 한 문자 지우기 (백스페이스) |
-| `Ctrl+w` | 한 단어 지우기 |
-| `Ctrl+u` | 줄 시작까지 지우기 |
-| `Ctrl+j` | 줄바꿈 삽입 |
-| `Ctrl+t` / `Ctrl+d` | 들여쓰기 / 내어쓰기 |
-| `Ctrl+n` / `Ctrl+p` | 자동완성 다음 / 이전 후보 (단어) |
-| `Ctrl+r{reg}` | 레지스터 내용 삽입 (예: `Ctrl+r"`) |
-| `Ctrl+o {cmd}` | Normal 명령 한 번 실행 후 다시 Insert |
-
-### Ctrl-X 자동완성 (플러그인 없이)
-
-| 키 | 대상 |
-|---|---|
-| `Ctrl+x Ctrl+l` | 라인 단위 |
-| `Ctrl+x Ctrl+f` | 파일명·경로 (현재 디렉토리 기준) |
-| `Ctrl+x Ctrl+o` | omnifunc (filetype별) |
-| `Ctrl+x Ctrl+k` | 사전 (`dictionary` 옵션) |
-| `Ctrl+x Ctrl+n` / `Ctrl+x Ctrl+p` | 현재 버퍼 단어 |
-
-## Abbreviate — 타이핑 시 자동 치환
-
-스페이스/Enter 직후 치환.
-
-```vim
-abbr  consolee console     " insert + command 모두
-iabbr coment   comment     " insert 전용
-cabbr Q        q           " command 전용
+```text
+:set number       → 옵션 설정
+:map / :nmap      → 키 매핑 조회·정의
+:help motion.txt  → Motion 공식 도움말
+:help text-objects
+:help registers
+:help usr_04.txt
 ```
 
-### 동적 abbreviate
+Vim의 모든 명령이 Operator 문법을 따르는 것은 아니다. `:...`는 Ex 명령, `z...`는 폴드·스크롤 등의 명령 계열, `Ctrl-w ...`는 Window 조작 접두어다. **공통 규칙으로 유추할 수 있는 명령과 개별적으로 알아야 하는 명령을 구분**한다.
 
-```vim
-iabbr <expr> __time   strftime("%Y-%m-%d %H:%M:%S")
-iabbr <expr> __file   expand('%:p')
-iabbr <expr> __branch trim(system("git rev-parse --abbrev-ref HEAD"))
-```
-
-타임스탬프·파일명 자주 넣으면 스니펫 플러그인 대체.
-
-## 편집
-
-| 명령어 | 설명 |
-|--------|------|
-| `x` / `X` | 커서 / 이전 문자 삭제 |
-| `r<char>` | 문자 하나 교체 |
-| `R` | Replace 모드 (덮어쓰기) |
-| `u` | Undo |
-| `U` | 현재 줄의 모든 변경 되돌리기 |
-| `Ctrl+r` | Redo |
-| `.` | 마지막 변경 반복 |
-| `Ctrl+a` / `Ctrl+x` | 커서 아래(뒤) 숫자 증가 / 감소 (`10Ctrl+a` = +10) |
-| `J` | 다음 줄을 현재 줄 뒤에 붙임 (보통 공백 1개, 문장 끝 뒤 2개·`)` 앞 0개) |
-| `gJ` | 공백 없이 줄 붙이기 |
-| `~` | 대소문자 토글 |
-| `g~{motion}` | 영역 대소문자 토글 |
-| `gu{motion}` / `gU{motion}` | 영역 소문자 / 대문자화 |
-| `cc` / `S` | 줄 변경 |
-| `C` | 커서부터 줄 끝까지 변경 |
-| `cw` / `ciw` | 단어 변경 / 안쪽 단어 변경 |
-| `c$` | 커서부터 줄 끝까지 변경 (= `C`) |
-
-## 텍스트 오브젝트
-
-> `d`, `c`, `y`, `v` 같은 연산자 뒤에 붙여 쓴다. `a` = around(주변 포함), `i` = inner(안쪽만).
-
-| 오브젝트 | 의미 |
-|--------|------|
-| `aw` / `iw` | 단어 (whitespace 포함 / 단어만) |
-| `as` / `is` | 문장 |
-| `ap` / `ip` | 단락 |
-| `a"` `a'` `` a` `` | 따옴표 영역 (포함) |
-| `i"` `i'` `` i` `` | 따옴표 영역 (안쪽) |
-| `a(` `a)` `ab` | `()` 블록 (포함) |
-| `i(` `i)` `ib` | `()` 블록 (안쪽) |
-| `a{` `a}` `aB` | `{}` 블록 (포함) |
-| `i{` `i}` `iB` | `{}` 블록 (안쪽) |
-| `a[` `a]` / `i[` `i]` | `[]` 블록 |
-| `a<` `a>` / `i<` `i>` | `<>` 블록 |
-| `at` / `it` | XML/HTML 태그 |
-
-**예**: `ci"` = 따옴표 안 내용 변경, `da{` = `{}` 블록 통째 삭제, `yip` = 단락 복사.
-
-## 잘라내기 / 복사 / 붙여넣기
-
-| 명령어 | 설명 |
-|--------|------|
-| `yy` / `Y` | 줄 복사 |
-| `2yy` | 2줄 복사 |
-| `yw` / `yiw` / `yaw` | 단어 복사 (커서부터 / 단어 / 주변포함) |
-| `y$` / `y0` | 줄 끝까지 / 줄 시작까지 복사 |
-| `dd` | 줄 삭제 |
-| `2dd` | 2줄 삭제 |
-| `dw` / `diw` / `daw` | 단어 삭제 |
-| `D` / `d$` | 커서부터 줄 끝까지 삭제 |
-| `d0` | 줄 시작까지 삭제 |
-| `p` / `P` | 붙여넣기 (커서 뒤 / 앞) |
-| `gp` / `gP` | 붙여넣기 후 커서를 끝으로 이동 |
-| `:3,5d` | 3~5번째 줄 삭제 |
-| `"+y` / `"+p` | 시스템 클립보드 복사 / 붙여넣기 |
-| `"*y` / `"*p` | 선택 클립보드 (X11) |
-
-## 들여쓰기
-
-| 명령어 | 설명 |
-|--------|------|
-| `>>` / `<<` | 현재 줄 들여쓰기 / 내어쓰기 |
-| `>{motion}` | 영역 들여쓰기 (예: `>ap`) |
-| `=={motion}` | 자동 들여쓰기 |
-| `==` | 현재 줄 자동 들여쓰기 |
-| `gg=G` | 파일 전체 자동 들여쓰기 |
-| Visual 모드 + `>` `<` | 영역 들여쓰기 / 내어쓰기 |
-
-## Visual 모드
-
-| 명령어 | 설명 |
-|--------|------|
-| `v` + 이동 + `y` | 영역 복사 |
-| `v` + 이동 + `d` | 영역 삭제 |
-| `v` + 이동 + `c` | 영역 변경 |
-| `v` + 이동 + `>` / `<` | 들여쓰기 / 내어쓰기 |
-| `V` + 이동 + `d` | 여러 줄 삭제 |
-| `Ctrl+v` + 이동 + `I` + 입력 + `Esc Esc` | 블록 단위 동시 삽입 |
-| `Ctrl+v` + 이동 + `c` + 입력 + `Esc` | 블록 단위 변경 |
-| `o` | 선택 시작점/끝점 토글 |
-| `O` | (블록 모드) 반대편 모서리로 이동 |
-| `u` / `U` | 선택 영역 소문자 / 대문자화 |
-| `~` | 대소문자 토글 |
-
-## 검색 & 치환
-
-| 명령어 | 설명 |
-|--------|------|
-| `/pattern` | 아래로 검색 |
-| `?pattern` | 위로 검색 |
-| `n` / `N` | 다음 / 이전 결과 |
-| `*` / `#` | 커서 단어 아래로 / 위로 검색 |
-| `:noh` | 검색 하이라이트 끄기 |
-| `/\vpattern` | very magic 모드 (정규식 이스케이프 최소) |
-| `:s/old/new/` | 현재 줄 첫 번째 치환 |
-| `:s/old/new/g` | 현재 줄 전체 치환 |
-| `:%s/old/new/g` | 파일 전체 치환 |
-| `:%s/old/new/gc` | 파일 전체 치환 (확인) |
-| `:5,10s/old/new/g` | 5~10번째 줄 치환 |
-| `:%s/old/new/gci` | 대소문자 무시 치환 |
-
-## 여러 파일에서 검색 (Quickfix)
-
-| 명령어 | 설명 |
-|--------|------|
-| `:vimgrep /pattern/ {file}` | 파일 검색 (예: `:vimgrep /TODO/ **/*.js`) |
-| `:cnext` / `:cn` | 다음 결과로 이동 |
-| `:cprevious` / `:cp` | 이전 결과로 이동 |
-| `:copen` / `:cope` | quickfix 창 열기 |
-| `:cclose` / `:ccl` | quickfix 창 닫기 |
-| `:cdo {cmd}` | quickfix 모든 항목에 명령 실행 (예: `:cdo s/old/new/g \| update`) |
-
-## 마크
-
-> 마크는 파일 내 위치에 이름표를 붙인다. 소문자(`a-z`)는 파일 단위, 대문자(`A-Z`)는 전역.
-
-| 명령어 | 설명 |
-|--------|------|
-| `:marks` | 마크 목록 |
-| `ma` | 현재 위치를 `a` 마크로 저장 |
-| `` `a `` | 마크 `a` 위치로 (행+열) |
-| `'a` | 마크 `a`가 있는 줄로 |
-| `` `0 `` | 직전에 종료한 위치 |
-| `` `" `` | 직전 파일 편집 위치 |
-| `` `. `` | 마지막 변경 위치 |
-| ` `` ` | 마지막 점프 이전 위치 |
-| `Ctrl+o` / `Ctrl+i` | 점프 목록 뒤로 / 앞으로 |
-| `g;` / `g,` | 변경 목록 이전 / 다음 |
-
-## 레지스터
-
-> `:registers`로 전체 보기. `"x` 접두사로 특정 레지스터를 지정한다.
-
-| 레지스터 | 의미 |
-|--------|------|
-| `"ay` / `"ap` | 레지스터 `a`에 복사 / 붙여넣기 |
-| `"0` | 직전 yank (덮어쓰이지 않음) |
-| `""` | unnamed (기본) |
-| `"+` | 시스템 클립보드 |
-| `"*` | 선택 클립보드 (X11) |
-| `"%` | 현재 파일명 |
-| `"#` | 직전 버퍼 파일명 |
-| `"/` | 직전 검색 패턴 |
-| `":` | 직전 명령 |
-| `".` | 직전 입력 텍스트 |
-| `"-` | 작은 삭제 (한 줄 미만) |
-| `"_` | 블랙홀 (버림) |
-| `"=` | 표현식 (계산 결과 삽입) |
-
-## 매크로
-
-| 명령어 | 설명 |
-|--------|------|
-| `qa` | 레지스터 `a`에 녹화 시작 |
-| `q` | 녹화 종료 |
-| `@a` | 매크로 `a` 실행 |
-| `@@` | 직전 매크로 재실행 |
-| `5@a` | 매크로 `a` 5회 실행 |
-| `:reg a` | 레지스터 `a` 내용 확인 |
-
-## 폴딩
-
-| 명령어 | 설명 |
-|--------|------|
-| `zo` / `zc` | 폴드 열기 / 닫기 |
-| `za` | 폴드 토글 |
-| `zR` / `zM` | 모든 폴드 열기 / 닫기 |
-| `zr` / `zm` | 폴드 한 단계 열기 / 닫기 |
-| `zf{motion}` | 영역으로 폴드 생성 |
-| `zd` | 폴드 삭제 |
-| `zE` | 모든 폴드 삭제 |
-| `zj` / `zk` | 다음 / 이전 폴드 시작으로 이동 |
-
-### foldmethod — 접는 기준
-
-```vim
-:set foldmethod=indent     " 들여쓰기 기준
-:set foldmethod=syntax     " 구문 트리 기준 (filetype별)
-:set foldmethod=marker     " {{{ }}} 마커
-:set foldmethod=manual     " 수동 (zf로 영역 지정)
-:set foldmethod=expr       " 표현식 (treesitter 등)
-:set foldlevelstart=99     " 파일 열자마자 펼친 상태
-```
-
-Neovim + treesitter: `foldmethod=expr` + `foldexpr=v:lua.vim.treesitter.foldexpr()` (구 `nvim_treesitter#foldexpr()`는 deprecated).
-
-## 저장 & 종료
-
-| 명령어 | 설명 |
-|--------|------|
-| `:w` | 저장 |
-| `:w <file>` | 다른 이름으로 저장 |
-| `:saveas <file>` | 다른 이름으로 저장 (편집 대상도 전환) |
-| `:q` | 종료 |
-| `:q!` | 강제 종료 (저장 안 함) |
-| `:wq` / `:x` | 저장 후 종료 |
-| `ZZ` | `:wq`와 동일 |
-| `ZQ` | `:q!`와 동일 |
-| `:wa` | 모든 버퍼 저장 |
-| `:wqa` | 모든 버퍼 저장 후 종료 |
-| `:qa!` | 모든 버퍼 강제 종료 |
-
-## 버퍼
-
-| 명령어 | 설명 |
-|--------|------|
-| `:e <file>` | 파일 열기 |
-| `:ls` / `:buffers` | 버퍼 목록 |
-| `:bn` / `:bnext` | 다음 버퍼 |
-| `:bp` / `:bprevious` | 이전 버퍼 |
-| `:b <name>` / `:b <num>` | 특정 버퍼로 이동 |
-| `:bd` | 버퍼 닫기 |
-| `:bufdo {cmd}` | 모든 버퍼에 명령 실행 |
-
-## 창 (Window/Split)
-
-| 명령어 | 설명 |
-|--------|------|
-| `:split` / `Ctrl+w s` | 가로 분할 |
-| `:vsplit` / `Ctrl+w v` | 세로 분할 |
-| `Ctrl+w w` | 다음 창 |
-| `Ctrl+w h/j/k/l` | 방향 창으로 이동 |
-| `Ctrl+w q` / `:q` | 창 닫기 |
-| `Ctrl+w o` | 다른 창 모두 닫기 |
-| `Ctrl+w =` | 창 크기 균등 |
-| `Ctrl+w _` / `Ctrl+w \|` | 가로 / 세로 최대화 |
-| `Ctrl+w H/J/K/L` | 창을 좌/하/상/우로 이동 |
-| `Ctrl+w r` | 창 순서 회전 |
-
-## 탭
-
-| 명령어 | 설명 |
-|--------|------|
-| `:tabnew <file>` | 새 탭 열기 |
-| `:tabclose` | 탭 닫기 |
-| `:tabonly` | 다른 탭 모두 닫기 |
-| `gt` / `gT` | 다음 / 이전 탭 |
-| `2gt` | 2번째 탭으로 |
-| `:tabs` | 탭 목록 |
-| `:tabmove N` | N번 위치로 탭 이동 |
-| `:tabdo {cmd}` | 모든 탭에 명령 실행 |
-
-## Diff 모드
-
-| 명령어 | 설명 |
-|--------|------|
-| `vimdiff a b` | 쉘에서 두 파일 비교 실행 |
-| `:diffthis` | 현재 창을 diff에 포함 |
-| `:diffoff` | diff 모드 해제 |
-| `:diffupdate` | diff 갱신 |
-| `]c` / `[c` | 다음 / 이전 변경 위치 |
-| `do` (diff obtain) | 다른 쪽 내용 가져오기 |
-| `dp` (diff put) | 다른 쪽으로 내용 보내기 |
-
-## 도움말 & 심볼
-
-| 명령어 | 설명 |
-|--------|------|
-| `:help {topic}` | 도움말 (예: `:help dd`) |
-| `K` | 커서 아래 단어 도움말 (LSP 있으면 hover, 없으면 `keywordprg`) |
-| `:set keywordprg?` | 현재 `keywordprg` 값 확인 (기본: `man`) |
-| `:setlocal keywordprg=pydoc` | 버퍼 단위로 변경 (예: Python용) |
-
-## 설정
-
-| 명령어 | 설명 |
-|--------|------|
-| `:set number` / `:set nonumber` | 줄 번호 표시 / 숨기기 |
-| `:set relativenumber` | 상대 줄 번호 |
-| `:set paste` / `:set nopaste` | 붙여넣기 모드 (들여쓰기 방지) |
-| `:syntax on` | 문법 강조 |
-| `:set hlsearch` / `:noh` | 검색 하이라이트 / 끄기 |
-| `:set ignorecase` / `:set smartcase` | 대소문자 무시 / 대문자 입력 시 구분 |
-| `:set wrap` / `:set nowrap` | 줄 바꿈 표시 |
-| `:set spell` / `:set nospell` | 맞춤법 검사 |
-
-### 들여쓰기 옵션
-
-| 옵션 | 의미 |
-|---|---|
-| `autoindent` | 직전 행 들여쓰기 따라가기 |
-| `smartindent` | `{`, 키워드 보고 추가 들여쓰기 |
-| `cindent` | C/C++ 스타일 |
-| `tabstop=4` | Tab 표시 너비 |
-| `shiftwidth=4` | `>`/`<` 단위 |
-| `expandtab` | Tab을 space로 |
-| `filetype indent on` | 파일유형별 들여쓰기 |
-
-### 그 외 동작 옵션
-
-| 옵션 | 의미 |
-|---|---|
-| `nocompatible` | vi 호환 모드 끔 |
-| `history=1000` | 명령·검색 히스토리 크기 |
-| `backspace=eol,start,indent` | backspace 허용 영역 |
-| `nowrapscan` | 검색이 끝/처음에서 wrap 안 함 |
-| `ruler` | 커서 위치 표시 |
-| `incsearch` | 점진 검색 |
-| `autoread` | 외부 변경 자동 재로드 (`checktime` 필요) |
-
-## 파일 인코딩
-
-```vim
-:e ++enc=utf-8       " 다른 인코딩으로 다시 읽기
-:e ++enc=euc-kr
-:set fileencoding=utf-8 | w   " 인코딩 변환 후 저장
-```
-
-### 자동 추정 순서
-
-```vim
-set fileencodings=ucs-bom,utf-8,euc-kr,latin1
-```
-
-한국어 환경에서 `euc-kr`을 포함시켜 둘 것 — 안 들어 있으면 latin1로 해석되어 깨짐.
-
-| 옵션 | 의미 |
-|---|---|
-| `encoding` | vim 내부 작업용 (보통 `utf-8`) |
-| `fileencoding` | 현재 버퍼의 디스크 인코딩 |
-| `fileencodings` | 읽을 때 시도 순서 |
-| `termencoding` | 터미널 입출력 인코딩 |
-
+공식 문서: [Vim User Manual](https://vimhelp.org/usr_toc.txt.html) · [Vim Reference](https://vimhelp.org/)
