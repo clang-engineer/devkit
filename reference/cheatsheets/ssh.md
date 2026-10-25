@@ -2,37 +2,27 @@
 
 > SSH 키·`~/.ssh/config`·SCP/rsync·포트 포워딩·점프 호스트. macOS Keychain 통합 포함.
 
-## 개념 흐름
+## 접속 구조와 명령 계열
 
 ```text
-키 생성 (ssh-keygen) → 서버 등록 (ssh-copy-id) → 접속 (ssh)
-                                    ↓
-                    ssh-agent에 키 등록 (ssh-add)
-                                    ↓
-              ~/.ssh/config로 alias 관리 → ssh host
+Client ── ssh [options] user@host ──> Server
+   │          │
+   │          ├─ -i KEY : identity file
+   │          ├─ -p PORT: 서버 포트
+   │          ├─ -J HOST: jump host 경유
+   │          └─ -L / -R / -D : 터널 방향·방식
+   ├─ ~/.ssh/config : Host 별칭·접속 기본값
+   └─ ssh-agent     : 개인키 사용 지원 (ssh-add로 등록)
 ```
 
-핵심 명령어:
+`ssh-keygen`은 키 생성, `ssh-copy-id`는 공개키 등록, `ssh`는 접속, `scp`는 복사, `rsync -e ssh`는 SSH를 통한 파일 동기화다. **키를 생성하는 것과 agent에 올리는 것은 별개**다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 키 만들기 | `ssh-keygen -t ed25519 -C "email"` | ed25519 권장 |
-| 서버에 키 등록 | `ssh-copy-id user@host` | 공개키 자동 복사 |
-| config 설정 | `~/.ssh/config`에 `Host` 정의 | `ssh alias`로 접속 |
-| 포트 포워딩 | `ssh -L 8080:localhost:80 host` | 로컬 포트 → 원격 |
-| 점프 호스트 | `ssh -J bastion target` | 중간 서버 경유 |
-| 키 등록 확인 | `ssh-add -l` | 어떤 키가 있는지 |
-| 디버그 | `ssh -vvv host` | 상세 로그 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| rsync | SSH 위 디렉토리 동기화 (변경분만 전송) |
-| scp | SSH 채널 위 파일 복사 |
-| autossh | 연결 끊기면 자동 재연결 |
-| git | SSH로 GitHub/GitLab 접속 |
-| tmux | SSH 세션 유지 (연결 끊겨도 프로세스 보존) |
+```sh
+ssh-keygen -t ed25519
+ssh-add ~/.ssh/id_ed25519
+ssh -J bastion user@target
+ssh -L 8080:localhost:80 user@host
+```
 
 ## ssh-agent + ssh-add
 
