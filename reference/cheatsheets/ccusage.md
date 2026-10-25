@@ -1,78 +1,49 @@
-# ccusage Cheatsheet
+# ccusage — 사용 기록과 예산 경계
 
-`ccusage`는 AI 코딩 도구의 사용 로그를 집계해 보여주는 CLI 모듈이다. 잔여량이 아닌 사용량 기반 리포팅에 유리하다.
+> **기록된 사용량**과 **서비스가 제공하는 실제 잔여 한도**는 다르다. ccusage는 사용 기록을 집계하고, 예산 판단은 별도 정책으로 처리한다.
 
-## 명령 구조
+## 명령의 대상
 
 ```text
-ccusage <service> <period> [output options]
-         │         │          ├─ --compact : 간략 출력
-         │         │          └─ --json    : 구조화 출력
-         │         └─ daily / weekly / session
-         └─ opencode / copilot / codex 등 지원 서비스
+AI 코딩 도구의 로컬 사용 기록
+              │
+         ccusage 집계
+         ├─ Service : opencode / copilot / ... (지원 범위 확인)
+         ├─ Period  : daily / weekly / session
+         └─ Output  : --compact / --json
+              │
+         사용량·비용 리포트
+              │
+     별도 정책·개인 Wrapper
+         └─ 예산 / 경고 임계치
 ```
-
-`ccusage`는 사용 기록을 집계한다. **실제 잔여 한도**를 직접 알려주는 명령은 아니다.
 
 ```sh
 ccusage opencode daily --compact
-ccusage opencode weekly --compact
+ccusage opencode weekly --json
 ccusage copilot session --compact
 ```
 
-`ccusage-budget`은 별도의 개인 래퍼로, 집계 결과에 경고 임계치를 적용한다.
+`--json`은 기계가 읽는 출력, `--compact`는 간결한 표시를 위한 옵션이다. 실제로 지원하는 서비스·기간·플래그는 설치된 ccusage 버전의 `--help`에서 확인한다.
 
-## 자주 쓰는 조합
+## 임계치와 잔여 한도를 혼동하지 않는다
 
-```bash
-ccusage opencode daily --json --since 2026-07-20 --compact
-ccusage opencode weekly --compact
-ccusage copilot session --compact
+```text
+사용량 집계 ──> 사용 비용·토큰
+                    │
+          사용자 지정 예산과 비교
+                    │
+               OK / WARN / CRITICAL
+
+공급자의 실제 사용 제한·리셋 시점 → 별도 정보
 ```
 
-## `ccusage-budget` 래퍼(운영용)
+개인 환경의 `ccusage-budget`은 **ccusage의 공식 하위 명령이 아닌 별도 Wrapper**다. 예산·토큰 가격을 바탕으로 계산한 추정치를 공급자의 실제 잔여 할당량으로 표시하지 않는다. Wrapper의 구현·기본 임계치·환경변수는 해당 스크립트에서 확인한다.
 
-개인 환경에서 사용량 임계치 경보를 위해 만든 얇은 래퍼다.
+## 확인 순서
 
-```bash
-ccusage-budget                               # 기본(7일, warn 100, critical 200, service opencode)
-ccusage-budget --days 14 --warn 80 --critical 150
-ccusage-budget --service opencode --days 1 --warn 20 --critical 40
-ccusage-budget --budget 200 --token-price 0.000002  # 비용 잔액 기준으로 대략적 남은 토큰 추정
-ccusage-budget --period day --budget 200                    # 금일 usage 대비 잔여 비율
-ccusage-budget --period week --budget 500                   # 금주 usage 대비 잔여 비율
-ccusage-budget --period month --budget 2000                 # 금월 usage 대비 잔여 비율
-ccusage-budget --period week --remaining 95                   # 웹에서 보인 remaining(%)로 한도 추정
-```
+1. 기록이 존재하는지와 집계 대상 기간을 확인한다.
+2. `--json` 출력의 금액·토큰 단위를 확인한다.
+3. 예산과 비교하는 경우 사용자 정의 임계치인지 공급자 한도인지 구분한다.
 
-기간별 기본 예산을 고정하려면 환경변수로 지정하면 편합니다.
-
-```bash
-export CCUSAGE_BUDGET_DAY=200
-export CCUSAGE_BUDGET_WEEK=500
-export CCUSAGE_BUDGET_MONTH=2000
-
-ccusage-budget --period day
-ccusage-budget --period week
-ccusage-budget --period month
-
-# UI에서 남은 비율만 확인됐을 때: remaining=95이면 다음으로 역산
-ccusage-budget --period week --remaining 95
-```
-
-`ccusage-budget` 동작 포인트:
-
-- `ccusage ... daily --json`을 받아서 비용/토큰 총합 계산
-- 모델별 비용을 집계해 상위비중 확인
-- 총비용이 임계치를 넘으면 경보 레벨 표시(`OK/WARN/CRITICAL`)
-
-## 용어 정리(짧게)
-
-- `remaining`(남은량): 현재 계약에서 남은 사용 가능량. `ccusage`는 보통 기본적으로 직접 제공하지 않음.
-- `임계치`: 허용 범위를 넘었는지 판단하는 경계값. 보통 `warn/critical` 두 단계로 둔다.
-- `모듈`: 단일 목적의 독립 실행 단위. 여기선 `ccusage`가 집계 모듈.
-- `wrapper`: 모듈 위에 정책만 추가한 얇은 스크립트. 여기선 `ccusage-budget`.
-
-## 참고
-
-- `alias ccb='ccusage-budget'` (원하면 편의용으로 별도 alias 가능)
+공식 도구·개인 Wrapper의 옵션을 혼합해 암기하지 않는다.
