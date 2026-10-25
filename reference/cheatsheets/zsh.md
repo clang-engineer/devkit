@@ -2,23 +2,22 @@
 
 > Zsh **고유** 기능 중심. 스크립트·job 제어의 Bash 기준 예제는 [shell.md](shell.md), 프로세스 조회 명령은 [tools-dictionary.md](tools-dictionary.md#linux시스템) 참고. Bash 예제를 옮길 때는 배열·파라미터 확장 차이를 확인한다.
 
-## Zsh가 해석하는 입력의 층
+## 세 가지 역할부터 구분
 
 ```text
-프롬프트 입력 (ZLE 키 바인딩)
-       │
-History Expansion   !! / !$ / !n
-       │
-Globbing            **/*.py / *(.) / ^pattern
-       │
-Parameter Expansion ${var} / ${(flags)var}
-       │
-명령 실행
+Zsh
+├─ ZLE (Line Editor)     → 실행 전 입력줄 편집
+│   └─ Ctrl+A / Ctrl+E / Ctrl+R
+├─ Expansion             → 입력을 실제 인자로 변환
+│   ├─ History            !! / !$
+│   ├─ Parameter          ${var} / ${(flags)var}
+│   └─ Filename Generation (Glob) **/*.py / *(.)
+└─ Shell 환경            → Directory Stack / Alias / Completion / Option
 ```
 
-`!!`은 직전 명령, `!$`는 직전 명령의 마지막 인자를 가리킨다. `**/`는 하위 디렉터리까지 재귀 매칭한다. ZLE 단축키는 **셸의 명령 입력줄**에 적용되며 tmux·Neovim의 키맵과 다르다.
+**ZLE는 입력 편집기이지 명령 해석의 첫 확장 단계가 아니다.** 입력을 확정하면 History Expansion 등이 처리되고, Filename Generation(Glob)은 뒤쪽에서 수행된다. 확장에는 별칭·명령 치환·Brace Expansion 등도 포함되므로 위 그림은 전체 파서 순서가 아니라 **역할 구분도**다.
 
-Bash와 Zsh는 배열 인덱스·단어 분리·확장 규칙이 다르므로 동일한 문법이라고 가정하지 않는다. 공통 스크립트 문법은 [Shell](shell.md)에서 다룬다.
+Bash와 Zsh는 배열 인덱스·단어 분리·확장 규칙이 다르다. 공통 스크립트 문법은 [Shell](shell.md)에서 다룬다.
 
 ## 프롬프트 입력 편집 (Emacs 키바인딩)
 
@@ -62,27 +61,37 @@ ls /var/log/messages
 less !$                    # → less /var/log/messages
 ```
 
-## Glob (Zsh 확장)
+## Glob — 패턴과 필터를 조합한다
 
-**기본 활성화**. bash와 다르게 추가 옵션 없이 즉시 사용.
+```text
+<파일명 패턴>[(qualifier)]
+      │             └─ 어떤 종류·속성의 파일을 남길까?
+      └─ 어떤 이름·경로와 일치할까?
 
-| 패턴 | 의미 | 예 |
-|------|------|----|
-| `**/*.js` | 재귀 (모든 하위 디렉터리) | `ls **/*.js` |
-| `*.{js,ts}` | brace 확장 | `rm *.{log,tmp}` |
-| `file<1-10>.txt` | 숫자 범위 | `ls file<1-5>.txt` |
-| `*.txt~backup.txt` | 제외 (negation) | `ls *.txt~backup.txt` |
-| `(#i)pattern` | 대소문자 무시 | `ls (#i)*.JPG` |
-| `*(.)` | 일반 파일만 | `ls *(.)` |
-| `*(/)` | 디렉터리만 | `ls *(/)` |
-| `*(@)` | 심볼릭 링크만 | `ls *(@)` |
-| `*(.x)` | 실행 가능한 파일만 | `ls *(.x)` |
-| `*(.m-7)` | 7일 이내 수정 | `ls *(.m-7)` |
-| `*(.Lm+1)` | 1MB 초과 | `ls *(.Lm+1)` |
+**/*.js       하위 디렉터리까지 .js 파일명 매칭
+*(.)          일반 파일만
+*(/)          디렉터리만
+*(.m-7)       7일 이내 수정된 일반 파일
+**/*(.m-7)    재귀 검색 + 파일 종류 + 수정 시각 조건
+```
 
-> 끝의 `(...)`는 **glob qualifier** — Zsh만의 강력한 필터. `find` 없이 한 줄.
+| 구성 요소 | 의미 | 조합 예 |
+|---|---|---|
+| `*` / `**/` | 현재 경로의 이름 / 하위 경로까지 | `**/*.js` |
+| `(.)` / `(/)` / `(@)` | 일반 파일 / 디렉터리 / 심볼릭 링크 | `*(.)` |
+| `(.x)` | 실행 가능한 일반 파일 | `*(.x)` |
+| `(.m-7)` / `(.Lm+1)` | 최근 7일 수정 / 1MiB 초과 | `*(.m-7)` |
+| `*.{js,ts}` | Brace Expansion으로 두 패턴 생성 | `*.js`, `*.ts` |
 
-`setopt extended_glob`가 필요한 패턴도 있으니 zshrc에 미리 켜두면 편함.
+**옵션 구분:** 위의 기본 Glob Qualifier는 `BARE_GLOB_QUAL` 설정에 의존한다. `^pattern`, `pattern~exclude`, `(#i)pattern` 등은 `EXTENDED_GLOB`가 필요한 별도 패턴 문법이다.
+
+```zsh
+setopt extended_glob
+print -rl -- **/*(.m-7)       # 최근 수정된 일반 파일
+print -rl -- *.txt~backup.txt # 제외 패턴
+```
+
+매칭이 없을 때 Zsh는 기본적으로 오류를 낼 수 있다(`NOMATCH`). 삭제 명령과 Glob을 조합할 때는 먼저 `print -rl -- PATTERN`으로 실제 대상을 확인한다.
 
 ## 디렉터리 스택
 
@@ -163,35 +172,9 @@ export LESS='-R'
 
 > 실전에서는 `starship` 같은 외부 프롬프트를 쓰는 게 표준. `eval "$(starship init zsh)"`.
 
-## Oh My Zsh — 프레임워크 옵션
+## Oh My Zsh와 역할 구분
 
-```sh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-```
-
-자주 켜는 플러그인:
-
-```sh
-# ~/.zshrc
-plugins=(
-  git
-  zsh-autosuggestions       # 회색 자동 제안
-  zsh-syntax-highlighting   # 문법 강조
-  z                         # 디렉터리 점프 (또는 zoxide)
-  extract                   # x 명령으로 압축 자동 해제
-)
-```
-
-`zsh-autosuggestions`, `zsh-syntax-highlighting`은 별도 clone 필요:
-
-```sh
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-git clone https://github.com/zsh-users/zsh-syntax-highlighting \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-```
-
-> Oh My Zsh가 무거우면 `zinit`이나 [zsh4humans](https://github.com/romkatv/zsh4humans) 같은 가벼운 대안 검토.
+`Oh My Zsh`는 Zsh 자체가 아니라 설정·플러그인 프레임워크다. ZLE·Glob·History 같은 **셸 내장 기능을 이해하는 데 설치가 필요하지 않다.** 플러그인 설정은 실제 사용 환경의 dotfiles에서 관리한다.
 
 ## 참고
 
