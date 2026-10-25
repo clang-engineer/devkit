@@ -62,7 +62,7 @@ Working Tree ── add ──> Index ── commit ──> Local Repository
 
 | 명령어 | 설명 |
 |--------|------|
-| `git pull` | 원격 변경사항 가져오기 + 병합 |
+| `git pull` | fetch 후 설정·옵션에 따라 merge 또는 rebase |
 | `git pull --ff-only` | Fast-forward만 허용 |
 | `git push` | 푸시 |
 | `git push -u origin <branch>` | 브랜치 최초 푸시 |
@@ -260,5 +260,5 @@ git rm -r --cached path/  # 디렉토리 전체
 |--------|------|---------|
 | `git reset --hard` | HEAD·인덱스·작업 트리 초기화 | 커밋된 내용은 reflog로 복구 가능할 수 있지만, 미커밋 작업 트리 변경은 Git으로 복구가 보장되지 않음 |
 | `git push --force` | 강제 푸시 | 팀 히스토리 파괴 |
-| `git push --force-with-lease` | 안전한 강제 푸시 | 원격 변경 확인 후 푸시 |
+| `git push --force-with-lease` | 예상한 원격 참조 상태와 일치할 때 강제 갱신 | 다른 사람의 변경을 덮어쓸 위험이 완전히 사라지는 것은 아님 |
 | `git filter-branch` | 히스토리 재작성 | 전체 히스토리 변경 |
