@@ -36,7 +36,7 @@ ssh-add -D                     # 모든 키 삭제
 ssh-add -d ~/.ssh/id_ed25519   # 특정 키 삭제
 ```
 
-**키 순서가 중요**. SSH는 `ssh-add -l` 순으로 시도한다. 서버 `MaxAuthTries`(기본 6)를 넘기면 인증 실패.
+**인증 키 선택이 중요하다.** 실제 키 제시 순서는 `IdentityFile`, `IdentitiesOnly`, agent 및 클라이언트 설정에 좌우되므로 `ssh-add -l` 출력 순서와 같다고 단정하지 않는다. 서버 `MaxAuthTries`(기본 6)를 넘기면 인증 실패.
 
 ### macOS Keychain (재부팅 후에도 유지)
 
