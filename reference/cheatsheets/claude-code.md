@@ -2,46 +2,19 @@
 
 > [Claude Code](https://docs.claude.com/en/docs/claude-code) — Anthropic이 만든 터미널용 코딩 에이전트. `npm i -g @anthropic-ai/claude-code` 후 `claude` 실행.
 
-## 개념 흐름
+## 실행 인터페이스와 지속 설정
 
 ```text
-claude 실행 → 대화 → 파일 수정
-     ↓           ↓        ↓
-  -c (이어서)   /compact  @파일첨부
-     ↓           ↓        ↓
-  세션 유지     토큰 절약  컨텍스트 제공
+claude [CLI 옵션] [요청]  → 세션 시작·재개·단일 실행
+        │
+대화 중 /command          → 세션 조작·설정·도구 관리
+        │
+프로젝트 CLAUDE.md        → 지속 지침·맥락
+        │
+Tool / MCP / Hook         → 외부 작업·이벤트 자동화
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 시작 | `claude` | 대화 시작 |
-| 이어서 | `claude -c` | 이전 세션 이어서 |
-| compact | `/compact` | 토큰 절약 |
-| 모드 전환 | `Shift+Tab` | plan/accept 순환 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| git | claude가 파일 수정 후 git으로 추적 |
-| opencode | 대안 AI 코딩 에이전트 |
-| ccusage | claude code 사용량 집계 |
-
-## 30초만 본다면
-
-| 상황 | 명령 |
-|------|------|
-| 시작 | `claude` |
-| 한 줄 요청만 처리 | `claude "git status 정리해줘"` |
-| 어제 작업 이어서 | `claude -c` |
-| 토큰이 너무 늘었을 때 | 대화 중 `/compact` |
-| 권한 모드 전환 (plan/accept 등) | `Shift+Tab` (모드 순환) |
-| 작업 중단 | `Esc` (또는 `Ctrl+C`) |
-| 파일 첨부 | 프롬프트에 `@경로` 입력 (Tab 자동완성) |
-| 셸 명령 직접 실행 | 프롬프트에 `!ls` |
-| 작업 비용 확인 | `/cost` |
+`claude -c`는 기존 세션을 이어가고, `/compact`는 대화 컨텍스트를 압축한다. `@path`는 파일 참조, `!command`는 대화 중 셸 명령 입력이다. **CLI 옵션·대화 명령·설정 파일·Hook은 서로 다른 제어 계층**이다.
 
 ## 처음 설정할 때
 
