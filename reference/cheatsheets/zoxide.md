@@ -2,24 +2,16 @@
 
 방문 빈도와 최근성을 학습해 디렉터리 이동을 줄여주는 `cd` 보완 도구. 목적지를 대략 알고 있을 때 빠르다.
 
-## 30초 요약
+## 명령 구조와 선택 기준
 
-```sh
-brew install zoxide
-eval "$(zoxide init zsh)"
-z project
-zi
-z -
+```text
+cd <정확한 경로>      → 지정 경로로 이동
+z <기억나는 단어>     → 방문 기록에서 경로 추정 후 이동
+zi                    → 후보를 대화형으로 선택
+yazi                  → 파일 트리를 직접 탐색
 ```
 
-## Mental model
-
-| 상황 | 도구 |
-|---|---|
-| 경로를 알고 있음 | `cd` |
-| 이름 일부만 기억함 | `zoxide`의 `z` |
-| 후보를 보며 고름 | `zi` 또는 `fzf` |
-| 파일 구조를 둘러봄 | `yazi` |
+`z`는 방문 이력에 기반한 점프, `zi`는 interactive 선택이다. `fzf`의 `Alt-C`는 파일 시스템에서 후보를 찾는 반면 `zi`는 zoxide가 학습한 경로를 사용한다.
 
 ## 자주 쓰는 명령
 
@@ -41,10 +33,6 @@ eval "$(zoxide init zsh)"
 ```
 
 기본 alias/function으로 `z`와 `zi`가 제공된다.
-
-## fzf와 함께 쓰기
-
-`zi`는 후보가 여러 개일 때 대화형으로 고르는 흐름에 적합하다. fzf shell integration의 `Alt-C`는 파일 시스템을 직접 훑고, zoxide는 방문 이력을 기준으로 후보를 만든다.
 
 ## 문제 해결
 
