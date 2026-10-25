@@ -1,6 +1,6 @@
 # Zsh Cheatsheet
 
-> Zsh **고유** 기능 중심. 스크립트·job 제어의 Bash 기준 예제는 [shell.md](shell.md), 프로세스 조회 명령은 [tools-dictionary.md](tools-dictionary.md#linux시스템) 참고. Bash 예제를 옮길 때는 배열·파라미터 확장 차이를 확인한다.
+> Zsh **고유** 기능 중심. 스크립트·job 제어의 Bash 기준 예제는 [shell.md](shell.md), 프로세스 조회 명령은 [CLI 도구 발견 지도](tools-dictionary.md) 참고. Bash 예제를 옮길 때는 배열·파라미터 확장 차이를 확인한다.
 
 ## 세 가지 역할부터 구분
 
