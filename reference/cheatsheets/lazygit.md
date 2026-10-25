@@ -4,51 +4,19 @@
 > CLI git 명령을 외우지 않아도 거의 모든 워크플로가 가능.
 > 공식: https://github.com/jesseduffield/lazygit
 
-## 개념 흐름
+## 패널에 따라 키의 의미가 달라진다
 
 ```text
-Status → Files → Branches → Commits → Stash
-  ↓        ↓         ↓          ↓        ↓
-  a        Space     n          e        Space
-  변경확인  스테이지   브랜치생성   리베이스   적용
+Git Repository
+  ├─ Files    → 변경 선택·Stage (Space)
+  ├─ Branches → 브랜치 선택·생성
+  ├─ Commits  → 이력 탐색·재작성
+  └─ Stash    → 임시 보관 변경 관리
 ```
 
-핵심 명령어:
+**같은 키라도 현재 패널이 대상(context)**이다. 먼저 패널을 고르고, `?`로 해당 패널의 현재 키맵을 확인한다. `Space`는 Files에서 Stage 토글, Stash에서 보관 항목 적용처럼 대상에 따라 의미가 달라진다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 스테이지 | `Space` (Files) | 파일/히크 단위 토글 |
-| 커밋 | `c` (한 줄) / `C` (에디터) | 메시지 입력 |
-| 브랜치 | `n` (Branches) | 새 브랜치 생성 |
-| 리베이스 | `e` (Commits) | 인터랙티브 리베이스 |
-| stash | `Space` (Stash) | stash 적용 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| git | lazygit이 감싸는 CLI 도구 |
-| gh | GitHub CLI와 함께 사용 |
-| delta | diff 페이저 (lazygit 내부에서 사용) |
-| LazyVim | `<leader>gg`로 lazygit 실행 |
-
-## 30초만 본다면
-
-| 상황 | 키 |
-|---|---|
-| 패널 직접 점프 | `1`~`5` (Status·Files·Branches·Commits·Stash) |
-| 현재 패널 도움말 | `?` (가장 좋은 학습 자료) |
-| 파일 스테이지 토글 | `Files`에서 `Space` |
-| Hunk 단위 스테이지 | 파일에 `Enter` → hunk마다 `Space` |
-| 한 줄 커밋 메시지 | `c` |
-| 멀티라인 (에디터) | `C` (대문자) |
-| amend | `A` |
-| 브랜치 만들기 | `Branches`에서 `n` |
-| 전체 브랜치 관계 보기 | `Status`에서 `a` (`A`는 역순) |
-| 인터랙티브 리베이스 | `Commits`에서 베이스 위에 `e` |
-| squash / fixup / drop / reword | `s` / `f` / `d` / `r` |
-| stash 적용 | `Stash`에서 `Space` |
-| 종료 | `q` |
+`c`는 커밋 입력, `C`는 에디터를 사용하는 커밋 입력 등 대소문자도 동작을 구분한다. 아래 키는 기본 설정을 기준으로 하며 실제 키맵이 우선한다.
 
 ## 설치
 
