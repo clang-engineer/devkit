@@ -3126,22 +3126,6 @@
             "file": "claude-code.md"
           },
           {
-            "slug": "ccusage",
-            "name": "ccusage",
-            "desc": "코딩 에이전트 사용 기록 집계와 개인 예산 Wrapper의 경계",
-            "official": [
-              {
-                "label": "ccusage repository",
-                "url": "https://github.com/ryoppippi/ccusage"
-              }
-            ],
-            "custom": {
-              "label": "devkit ccusage Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/ccusage.md"
-            },
-            "file": "ccusage.md"
-          },
-          {
             "slug": "opencode",
             "name": "opencode",
             "desc": "Provider-agnostic 터미널 AI 코딩 에이전트.",
@@ -3176,27 +3160,6 @@
           "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/shell.md"
         },
         "file": "shell.md",
-        "kind": "guide"
-      },
-      {
-        "slug": "python-pypi-publishing",
-        "name": "Python PyPI Publishing",
-        "desc": "uv 빌드, GitHub OIDC, Trusted Publishing 배포 흐름.",
-        "official": [
-          {
-            "label": "PyPI Trusted Publishers",
-            "url": "https://docs.pypi.org/trusted-publishers/"
-          },
-          {
-            "label": "Python packaging guide",
-            "url": "https://packaging.python.org/"
-          }
-        ],
-        "custom": {
-          "label": "devkit PyPI Publishing Cheatsheet",
-          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/python-pypi-publishing.md"
-        },
-        "file": "python-pypi-publishing.md",
         "kind": "guide"
       },
       {
