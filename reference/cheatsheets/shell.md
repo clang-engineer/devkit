@@ -382,46 +382,15 @@ done
 wait
 ```
 
-### 백그라운드로 띄우고 바로 로그 보기
+### 백그라운드 작업과 서비스의 경계
+
+`nohup`은 SIGHUP을 무시하도록 실행하지만 **프로세스 유지·입출력 분리·자동 재시작을 보장하지 않는다.** `disown`은 셸의 작업 목록에서 제거하며, `tmux`는 터미널 세션을 유지하고, `systemd` 등 서비스 관리자는 재시작 정책을 관리한다.
 
 ```sh
-# nohup + 백그라운드 + 로그 따라가기 한 줄. `&`가 명령 구분자라 `;` 불필요
-nohup ./run.sh > /tmp/job.log 2>&1 & tail -F /tmp/job.log
+nohup ./run.sh </dev/null >app.log 2>&1 &
 ```
 
-- `tail -F`(대문자): 파일이 아직 없어도 기다리고, 로테이션돼도 다시 붙음(`--follow=name --retry`). 백그라운드 직후엔 리다이렉트 파일이 아직 안 생겼을 수 있어 `-F`가 유용하다.
-- `tail -f`(소문자): 파일이 있어야만 따라감. 없으면 에러, inode 바뀌면 끊김.
-- **Ctrl+C는 포그라운드 `tail`만 죽인다.** 백그라운드 job은 다른 프로세스 그룹이라 SIGINT를 안 받아 계속 떠 있음.
-
-### 셸 종료 시 백그라운드 작업
-
-프로세스가 살아남는지는 셸의 HUP 정책, 로그인 셸 여부, 터미널 입출력, 상위 프로세스·서비스 관리 정책에 따라 달라진다. Bash의 `huponexit`, Zsh의 `HUP` 옵션만으로 생존 여부를 단정하지 않는다.
-
-터미널 연결 없이 계속 실행할 작업은 `nohup`과 입출력 분리, `tmux`, 또는 서비스 관리자를 목적에 맞게 선택한다.
-
-### 함정: `sudo cmd &`
-
-`sudo`를 백그라운드로 보내면 인증 입력이 필요할 때 실패하거나 작업 제어로 정지될 수 있다. 정지 원인과 신호는 터미널·sudo 설정에 따라 다르다. 대부분의 dev 서버는 1024 미만 포트를 안 써 sudo 자체가 불필요.
-
-### `nohup` + 백그라운드 정지(Suspended) 회피
-
-`nohup`이 `SIGHUP`은 막아도, `stdin`이 터미널에 남아 있으면 백그라운드에서 터미널 읽기/출력 시도 시 `SIGTTIN`/`SIGTTOU`로 멈출 수 있다.
-
-```sh
-nohup npm run dev -- --host 0.0.0.0 --port 9000 \
-  </dev/null \
-  >/tmp/app-dev.log 2>&1 &
-tail -f /tmp/app-dev.log
-```
-
-실행 점검:
-
-```sh
-ps -o pid,state,command | rg "npm run dev|node .*vite"
-lsof -nP -iTCP:9000 -sTCP:LISTEN
-```
-
-상태가 `T`면 정지된 상태이므로 `SIGCONT`/재시작 또는 재기동이 필요하다.
+프로세스가 살아 있지만 응답하지 않는 경우는 [nohup 백그라운드 작업 정지 진단](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-07-28-nohup-dev-server-suspended.md)을 참고한다. `sudo` 인증과 백그라운드 작업 제어는 별도로 확인한다.
 
 ## trap — 종료 시 정리
 
@@ -432,19 +401,6 @@ trap 'echo interrupted; exit 130' INT TERM
 ```
 
 자주 쓰는 시그널: `EXIT`(스크립트 종료), `INT`(Ctrl+C), `TERM`(kill), `HUP`(터미널 끊김), `ERR`(`set -e`와 함께 명령 실패 시).
-
-## 자주 쓰는 한 줄
-
-```sh
-# 인자가 없으면 사용법
-[[ $# -eq 0 ]] && { echo "usage: $0 <arg>"; exit 1; }
-
-# 명령 존재 확인
-command -v jq >/dev/null || { echo "jq required" >&2; exit 1; }
-
-# 스크립트 자신의 경로 (Bash 전용: BASH_SOURCE)
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-```
 
 ## 참고
 
