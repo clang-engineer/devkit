@@ -1,173 +1,103 @@
-# chezmoi Cheatsheet
+# chezmoi — Dotfiles 상태·변환·배포 지도
 
-여러 머신에 dotfiles를 관리·배포하는 Go 단일 바이너리 (`chezmoi` = 프랑스어 "chez moi", 내 집에 → dotfiles를 홈 `~`에 깐다). 핵심 모델은 **3-상태**:
+> chezmoi는 여러 환경의 설정 파일을 **Source에서 원하는 상태(Target)로 해석한 뒤 실제 홈(Destination)에 적용**한다. 명령보다 세 상태와 변환 규칙을 먼저 이해한다.
 
-- **source state** — git으로 추적하는 dotfiles 원본. 기본 `~/.local/share/chezmoi`.
-- **target state** — source에 템플릿/스크립트를 적용해 계산한 "이래야 한다"는 상태.
-- **destination** — 실제 홈(`~`). `apply`가 destination을 target으로 맞춘다.
+## 전체 기능 지도
 
-편집은 **source를 고치고 `apply`** 하는 게 정석. destination(`~/.zshrc` 등)을 직접 고치면 다음 `apply`에서 덮인다.
+```text
+chezmoi
+├─ 상태 관리     Source / Target / Destination
+├─ 파일 속성     dot_ / private_ / executable_ / symlink_ / exact_
+├─ 환경별 변환   Template / Data / Secret
+├─ 자동 실행     run_ / run_once_ / run_onchange_
+├─ 제외·보호     .chezmoiignore / age / GPG
+├─ 동기화        Git / init / update / re-add
+└─ 검증          diff / status / verify / doctor
+```
 
 ## 세 상태와 명령의 방향
 
 ```text
-Source State (Git 추적 원본)
-   │  chezmoi edit / add
-   ▼
-Target State (템플릿·속성 해석 결과)
-   │  chezmoi diff → 적용 전 비교
-   │  chezmoi apply
-   ▼
-Destination (실제 홈 디렉터리)
+실제 홈 파일 ── add / re-add ──> Source State (관리 원본)
+                                    │
+                               속성·템플릿 해석
+                                    ▼
+                               Target State
+                                    │
+                         diff / status → apply
+                                    ▼
+                              Destination (~)
 ```
 
-`edit`는 관리 원본을 수정하고 `apply`는 실제 홈에 반영한다. `add`는 기존 홈 파일을 관리 대상으로 가져온다. **Source와 Destination을 혼동하면 다음 apply에서 수동 수정이 덮일 수 있다.**
+- `add`는 기존 파일을 관리 대상으로 편입, `edit`는 Source 수정, `re-add`는 Destination 변경을 Source에 다시 반영한다.
+- `diff`는 적용 전 차이를 확인하고 `apply`는 실제 파일을 변경한다.
+- `update`는 Source 저장소의 갱신과 적용을 연결한다. Source와 Destination은 자동 양방향 동기화되는 것이 아니다.
 
-```sh
-chezmoi add ~/.zshrc
-chezmoi edit ~/.zshrc
-chezmoi diff
-chezmoi apply
+## 파일 이름이 속성을 표현한다
+
+```text
+Source name                    Destination
+dot_zshrc                   → ~/.zshrc
+private_dot_ssh/config      → ~/.ssh/config (권한 제한)
+executable_script           → ~/script (실행 가능)
+symlink_dot_vimrc           → ~/.vimrc (심볼릭 링크)
+dot_zshrc.tmpl              → ~/.zshrc (템플릿 렌더)
+exact_dot_config/           → ~/.config/ (관리 대상과 일치하도록 조정)
 ```
 
-## 일상 명령어
+접두어는 **파일의 의미와 배포 방식**을 지정한다. `exact_`는 관리하지 않는 대상 파일을 삭제할 수 있으므로 특히 주의한다. 파일명 속성을 변경할 때는 `chattr`를 사용한다.
 
-| 명령 | 동작 |
-|------|------|
-| `chezmoi init` | source 디렉토리 생성/초기화 |
-| `chezmoi init <user>/<repo>` | GitHub 리포에서 source clone (`--apply`로 clone+적용 한 번에) |
-| `chezmoi add ~/.zshrc` | 기존 파일을 source로 편입 (`dot_zshrc`로 저장됨) |
-| `chezmoi edit ~/.zshrc` | 그 파일의 **source**를 연다 (destination 아님) |
-| `chezmoi apply` | destination을 target에 맞춤 (실제 적용) |
-| `chezmoi diff` | target vs destination 차이 (적용 전 미리보기) |
-| `chezmoi status` | 변경될 항목 요약 (`git status`처럼 코드 표시) |
-| `chezmoi re-add` | destination에서 수정된 관리 파일을 source로 되반영 |
-| `chezmoi update` | `git pull` + `apply` 한 번에 |
-| `chezmoi cd` | source 디렉토리에서 서브셸 실행 (`exit`로 복귀) |
-| `chezmoi git -- <args>` | source에서 git 실행 (`chezmoi git -- push`) |
-| `chezmoi managed` / `unmanaged` | 관리 중 / 관리 안 되는 파일 목록 |
-| `chezmoi forget ~/.zshrc` | source에서만 제거 (destination 파일은 유지) |
-| `chezmoi destroy ~/.zshrc` | source + destination + state 전부 삭제 |
-| `chezmoi doctor` | 환경 진단 (누락 도구, 설정 문제) |
+## Template과 Data의 역할
 
-- **적용 전 항상 `diff` 또는 `-n`(`--dry-run`).** `apply -v`는 뭘 바꾸는지 보여주며 적용.
-- `chezmoi apply ~/.zshrc`처럼 **경로 인자로 대상 한정** 가능 (전체 대신 일부만).
-- `status` 코드: 왼쪽=마지막 적용 후 destination 변화, 오른쪽=적용 시 일어날 변화. `M`=수정 `A`=추가 `D`=삭제.
+```text
+Source Template (.tmpl)
+       + Data (.chezmoi.os / 사용자 설정 / Secret)
+                         │
+                         ▼
+                  Rendered Target
+```
 
-## source 네이밍 규칙 (attributes)
-
-source 파일명의 **접두사/접미사가 곧 파일 속성**. destination 이름으로 역변환된다.
-
-| source 이름 | destination | 의미 |
-|-------------|-------------|------|
-| `dot_zshrc` | `.zshrc` | `dot_` → 선행 `.` |
-| `private_dot_ssh/` | `.ssh/` (0600/0700) | 그룹·기타 권한 제거 |
-| `readonly_foo` | `foo` (0444) | 쓰기 권한 제거 |
-| `executable_script` | `script` (+x) | 실행 권한 부여 |
-| `dot_zshrc.tmpl` | `.zshrc` | 템플릿으로 렌더 |
-| `encrypted_private_key.age` | `key` | 저장은 암호화, 적용 시 복호화 |
-| `symlink_dot_vimrc` | `.vimrc` → 심볼릭 링크 | 내용이 링크 타겟 경로 |
-| `exact_dot_config/` | `.config/` | 디렉토리에서 관리 외 파일 **삭제** (정확히 일치) |
-| `empty_foo` | `foo` (빈 파일 허용) | 기본은 빈 파일이면 제거되는데 이걸로 유지 |
-| `literal_...` | 접두사 파싱 중단 | 실제로 `dot_`로 시작하는 파일명 등 |
-
-- **속성 변경은 손으로 rename 말고 `chezmoi chattr`.** 예: `chezmoi chattr +executable,private ~/.ssh/config` / `+template ~/.zshrc`.
-- 접두사 순서 고정: `encrypted_` `private_` `readonly_` `empty_` `executable_` `symlink_` 등 → `dot_` → 이름. 헷갈리면 `add` 후 `chezmoi source-path ~/.foo`로 실제 저장 이름 확인.
-- `exact_`는 **디렉토리 접두사** — 붙이면 그 디렉토리의 미관리 파일을 apply 시 지운다. 안 붙이면 추가 파일은 그대로 둔다.
-- `symlink_`는 **말단 파일에만** 붙지 디렉토리엔 안 붙는다. 엔트리 파일 내용이 곧 링크 타겟 경로 (보통 `.tmpl`). 중첩 타겟(`~/.config/nvim`만 링크)은 **소스 디렉토리 중첩으로 미러**: `dot_config/symlink_nvim.tmpl` → `~/.config/nvim`. 평평한 `symlink_dot_config_nvim` 식 네이밍은 없다.
-
-## 템플릿 (.tmpl)
-
-Go `text/template` + [sprig](https://masterminds.github.io/sprig/) 함수. 머신별 분기·시크릿 주입에 사용.
+`Template`는 머신별 분기·값 주입, `Data`는 그 분기에 사용하는 입력이다. `.chezmoitemplates`는 여러 파일이 재사용하는 템플릿 조각을 관리한다.
 
 ```gotmpl
-# ~/.gitconfig.tmpl
-[user]
-    email = {{ .email }}
 {{ if eq .chezmoi.os "darwin" }}
-    # macOS 전용 설정
+# macOS 전용 설정
 {{ end }}
 ```
 
-| 명령 | 동작 |
-|------|------|
-| `chezmoi data` | 템플릿에서 쓸 수 있는 전체 데이터 (`.chezmoi.*` + 사용자 정의) |
-| `chezmoi execute-template '{{ .chezmoi.os }}'` | 템플릿 조각을 즉석 렌더 (디버깅) |
-| `chezmoi cat ~/.gitconfig` | 템플릿 렌더 **결과**(target 내용)를 출력 |
-| `chezmoi edit --apply ~/.zshrc` | 편집 직후 바로 적용 |
+`chezmoi data`는 사용 가능한 데이터를 확인하고, `chezmoi cat <target>`은 렌더링 결과를 확인한다.
 
-- 내장 변수: `.chezmoi.os` (`darwin`/`linux`), `.chezmoi.arch`, `.chezmoi.hostname`, `.chezmoi.homeDir`.
-- 사용자 데이터는 `.chezmoi.toml.tmpl`(config 템플릿) 또는 source 루트의 `.chezmoidata.<fmt>`에 정의.
-- 시크릿은 파일에 넣지 말고 템플릿 함수로: `{{ (onepassword "item").fields... }}`, `{{ pass "..." }}`, `{{ keyring "svc" "user" }}`.
-- 실행 스크립트 템플릿은 렌더 결과의 shebang이 첫 바이트여야 한다. 조건문 뒤 개행까지 지우려면 양쪽 공백 제어를 쓴다:
+## 파일 배포와 스크립트 실행은 다르다
 
-```gotmpl
-{{- if ne .chezmoi.os "windows" -}}
-#!/usr/bin/env bash
-{{- end }}
-```
+| 구분 | 역할 | 대표 형식 |
+|---|---|---|
+| Managed file | Target 상태로 배포 | `dot_zshrc`, `.tmpl` |
+| Run script | 적용 과정에서 명령 실행 | `run_...` |
+| Once | 스크립트 내용 기반 실행 이력 | `run_once_...` |
+| On change | 내용 변경을 기준으로 재실행 | `run_onchange_...` |
+| Ignore | Target 대상에서 제외 | `.chezmoiignore` |
+| Encrypt | Source에 비밀값을 암호화해 보관 | `encrypted_...` |
 
-### 재사용 템플릿 (`.chezmoitemplates`)
+`run_once_`·`run_onchange_`는 단순한 시간 기반 스케줄러가 아니다. 스크립트 내용의 변화와 실행 상태를 기반으로 적용 여부를 판단한다.
 
-여러 target에 같은 내용을 렌더할 때 source root의 `.chezmoitemplates/`에 authored 원본을 하나만
-둔다. 이 디렉토리 자체는 홈에 배포되지 않는다.
+## Git·Secret·검증의 경계
 
 ```text
-.chezmoitemplates/agent-commands/commit-push.md   # 단일 원본
-dot_claude/commands/commit-push.md.tmpl           # ~/.claude/commands/...
-dot_codex/prompts/commit-push.md.tmpl             # ~/.codex/prompts/...
-dot_config/opencode/commands/commit-push.md.tmpl  # ~/.config/opencode/commands/...
+Git          → Source 버전·동기화
+chezmoi      → Target 생성·Destination 적용
+age / GPG    → 비밀값 암호화·복호화
+Secret store → 템플릿에 필요한 민감 정보 공급
 ```
 
-각 target 템플릿은 같은 원본을 포함한다.
-
-```gotmpl
-{{ include ".chezmoitemplates/agent-commands/commit-push.md" -}}
-```
-
-- `include`는 source 파일 내용을 가져오므로 한 곳만 수정하면 모든 target이 함께 바뀐다.
-- 닫는 `-}}`는 wrapper 템플릿의 후행 개행을 제거한다. 빼면 원본 끝에 빈 줄이 하나 더 생길 수 있다.
-- `chezmoi cat <target>`으로 렌더 결과를 보고, `cmp`로 여러 target의 바이트 동일성까지 검증할 수 있다.
-
-## 스크립트 (run_)
-
-source 루트의 `run_*` 파일은 **apply 시 실행**되는 스크립트(관리 파일 아님).
-
-| 접두사 | 실행 시점 |
-|--------|-----------|
-| `run_foo.sh` | 매 apply마다 |
-| `run_once_foo.sh` | 내용 해시가 처음일 때 딱 한 번 (setup용) |
-| `run_onchange_foo.sh` | 스크립트 내용이 바뀔 때마다 (예: brew 목록 변경 시 `brew bundle`) |
-| `run_before_` / `run_after_` | 파일 적용 **전 / 후** 순서 지정 |
-
-- `run_once_`/`run_onchange_`는 **내용 해시로 판정**한다. `.tmpl`로 만들어 관련 데이터를 주석에 박아두면, 그 데이터가 바뀔 때 재실행을 유도할 수 있다.
-- 실행 순서는 파일명 알파벳순. `run_once_before_00-...` 식으로 숫자 프리픽스를 흔히 쓴다.
-
-## 무시 & 암호화
-
-- **`.chezmoiignore`** — source 루트에 두면 그 패턴은 target에서 제외 (템플릿 지원 → OS별 무시 가능). `README.md` 등 리포에는 두되 배포 안 할 파일에. **적는 이름은 source명이 아니라 target명**: `dot_zshrc`(X) → `.zshrc`(O), run 스크립트는 프리픽스 뗀 이름(`run_once_after_10-x.sh` → `10-x.sh`). `.tmpl`이면 `{{ if ne .chezmoi.os "windows" }}` 블록 안에 **반대편(그 OS에서 안 쓸) 파일**을 넣어 무시.
-- **암호화**: `chezmoi.toml`에 `encryption = "age"`(권장) 또는 `"gpg"` 설정 후 `chezmoi add --encrypt ~/.ssh/id_ed25519`. source엔 `encrypted_...age`로 저장, apply 때 복호화.
-- age 키 생성: `chezmoi age-keygen`(또는 `age-keygen`). edit는 `chezmoi edit`(자동 복호화) 또는 `chezmoi edit-encrypted`.
-
-## 함정
-
-- **destination 직접 편집분은 apply가 덮는다.** 손으로 고쳤으면 `chezmoi re-add`로 source에 회수하거나, 애초에 `chezmoi edit`으로 편집.
-- **`add`는 스냅샷**이다 — 이후 파일이 바뀌어도 source는 자동 갱신 안 됨. `re-add`가 필요.
-- **`.tmpl` 파일을 `add`로 다시 넣으면 템플릿이 리터럴 값으로 덮인다.** 템플릿은 `chezmoi edit`으로만 손대고 `add` 재실행 주의.
-- **`exact_` 없는 디렉토리는 추가 파일을 안 지운다** — 정리를 원하면 `exact_`를 명시.
-- source 위치는 `~/.local/share/chezmoi`가 기본이나 config로 바뀔 수 있다. 실제 위치는 `chezmoi source-path`로 확인.
-
-## 검증
+암호화된 파일이라도 복호화된 Destination과 실행 로그의 접근 권한은 별도로 관리한다.
 
 ```sh
-chezmoi doctor                 # 환경 진단
-chezmoi diff                   # 적용 전 전체 차이
-chezmoi apply -nv ~/.zshrc     # dry-run + verbose로 특정 파일만 미리보기
-chezmoi verify && echo OK      # destination이 target과 일치하면 성공 종료코드
+chezmoi diff
+chezmoi apply --dry-run
+chezmoi apply
+chezmoi verify
 ```
 
-## 참고
+**주의:** `apply`는 실제 파일을 덮어쓸 수 있다. `destroy`·`exact_` 등 파괴적 기능은 대상과 미리보기를 확인한다.
 
-- [chezmoi 공식 문서](https://www.chezmoi.io/)
-- [User guide](https://www.chezmoi.io/user-guide/setup/) / [Reference](https://www.chezmoi.io/reference/)
-- 관련 치트시트: `git.md` (source 리포 관리), `ssh.md` (암호화 대상 키)
+공식 명세: [chezmoi User Guide](https://www.chezmoi.io/user-guide/) · [Reference](https://www.chezmoi.io/reference/)
