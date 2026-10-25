@@ -81,11 +81,13 @@ WantedBy=multi-user.target
 
 ## 서비스 삭제
 
+서비스가 실제로 이 경로의 **관리자 정의 Unit**인지 먼저 확인한다. 패키지 소유 Unit을 임의로 삭제하지 않는다. 시스템 Unit 수정에는 관리자 권한이 필요하다.
+
 ```bash
 # 시스템 서비스
 systemctl stop <service>
 systemctl disable <service>
-rm /etc/systemd/system/<service>.service
+sudo rm /etc/systemd/system/<service>.service
 systemctl daemon-reload
 systemctl reset-failed
 
@@ -127,10 +129,14 @@ ExecStart=/usr/local/bin/backup.sh
 Description=Run backup daily
 
 [Timer]
-OnCalendar=*-*-* 03:00:00         # 매일 03:00 (cron의 `0 3 * * *`)
-RandomizedDelaySec=10m             # 0~10분 사이 랜덤 지연 (서버 부하 분산)
-Persistent=true                    # 머신 꺼져 있던 시간의 누락분 다음 부팅 시 실행
-Unit=backup.service                # 생략하면 동일 이름의 .service
+# 매일 03:00 (cron: 0 3 * * *)
+OnCalendar=*-*-* 03:00:00
+# 0~10분 사이 지연
+RandomizedDelaySec=10m
+# 비활성 기간에 놓친 일정이 있으면 재활성화 시 한 번 보정
+Persistent=true
+# 생략하면 같은 이름의 .service 사용
+Unit=backup.service
 
 [Install]
 WantedBy=timers.target
@@ -161,8 +167,8 @@ journalctl -u backup.service                   # 실행 로그
 ### cron 대비 장점
 
 - 로그가 `journalctl -u <name>`로 다른 systemd 유닛과 동일 위치
-- `Persistent=true`로 머신 꺼져있던 시간 보정
-- `Requires=`로 의존성 표현
+- `Persistent=true`는 timer 비활성 기간의 누락 실행을 재활성화 시 한 번 보정
+- Unit 의존성은 `Requires=` 등으로 표현하며, 실행 순서는 `After=` 등으로 별도 지정
 - `OnBootSec=`, `OnUnitActiveSec=` 같은 상대 시간 표현
 
 ---
