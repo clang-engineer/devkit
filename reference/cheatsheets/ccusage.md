@@ -2,40 +2,25 @@
 
 `ccusage`는 AI 코딩 도구의 사용 로그를 집계해 보여주는 CLI 모듈이다. 잔여량이 아닌 사용량 기반 리포팅에 유리하다.
 
-## 개념 흐름
+## 명령 구조
 
 ```text
-사용 로그 → 집계 → 리포트
-     ↓         ↓        ↓
-  일별/주별   임계치    JSON/compact
+ccusage <service> <period> [output options]
+         │         │          ├─ --compact : 간략 출력
+         │         │          └─ --json    : 구조화 출력
+         │         └─ daily / weekly / session
+         └─ opencode / copilot / codex 등 지원 서비스
 ```
 
-핵심 명령어:
+`ccusage`는 사용 기록을 집계한다. **실제 잔여 한도**를 직접 알려주는 명령은 아니다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 일별 보기 | `ccusage opencode daily --compact` | 일별 사용량 |
-| 주간 보기 | `ccusage opencode weekly --compact` | 주간 사용량 |
-| 임계치 | `ccusage-budget --days 7 --warn 100` | 사용량 모니터링 |
+```sh
+ccusage opencode daily --compact
+ccusage opencode weekly --compact
+ccusage copilot session --compact
+```
 
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| opencode | OpenCode 사용량 집계 |
-| Claude Code | Claude Code 사용량 집계 |
-| GitHub Copilot | Copilot 사용량 집계 |
-
-## 30초 가이드
-
-| 상황 | 명령 |
-|---|---|
-| OpenCode 사용량 일별 보기 | `ccusage opencode daily --compact` |
-| OpenCode 사용량 JSON 보기 | `ccusage opencode daily --json` |
-| OpenCode 7일 임계치 점검 | `ccusage-budget --days 7 --warn 100 --critical 200 --service opencode` |
-| OpenCode 최근 주간 보기 | `ccusage opencode weekly --compact` |
-| Copilot 사용량 보기 | `ccusage copilot daily --compact` |
-| Codex 사용량 보기 | `ccusage codex daily --compact` |
+`ccusage-budget`은 별도의 개인 래퍼로, 집계 결과에 경고 임계치를 적용한다.
 
 ## 자주 쓰는 조합
 
