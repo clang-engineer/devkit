@@ -78,22 +78,34 @@ y / d / c → Register → p / P
 
 `"ap`는 `a` 레지스터 붙여넣기, `"_diw`는 삭제 내용을 버리기, `"+y`는 지원 환경에서 시스템 클립보드에 복사한다. 레지스터 동작에는 번호 레지스터와 삭제 크기에 따른 추가 규칙이 있다.
 
-## 5. 탐색·반복·범위 편집
+## 5. 탐색·위치·반복·접기
 
 ```text
-/pattern  → 앞으로 검색       ?pattern → 뒤로 검색
-n / N     → 검색 방향대로 다음 / 반대 방향
-* / #     → 커서 아래 단어를 앞으로 / 뒤로 검색
-
-qa ... q  → 레지스터 a에 매크로 기록
-@a        → 기록 재생          @@ → 직전 매크로 재생
-ma        → 위치를 mark a에 저장
-'a / `a  → mark a의 줄 / 정확한 위치로 이동
+Vim의 탐색과 반복
+├─ Search      : 내용으로 위치 찾기 (/ ? n N)
+├─ Mark        : 특정 위치를 이름으로 기억 (m, ', `)
+├─ Jump List   : 이동 이력을 따라 앞뒤로 탐색 (Ctrl-o / Ctrl-i)
+├─ Quickfix    : 여러 위치의 결과 목록 (:cnext / :cprev)
+├─ Macro       : 키 입력 시퀀스를 Register에 기록·재생 (q / @)
+├─ Dot Repeat  : 마지막 변경을 반복 (.)
+├─ Undo Tree   : 변경 이력을 되돌리거나 다시 적용 (u / Ctrl-r)
+└─ Fold        : 텍스트를 지우지 않고 화면에서 접기 (z 계열)
 ```
 
-`:%s/old/new/g`는 전체 버퍼의 모든 줄에서 치환하고, `:s/old/new/g`는 현재 줄에서 치환한다. `:%s/old/new/gc`의 `c`는 **confirm**이다.
+| 기능 | 언제 필요한가 | 대표 진입점 |
+|---|---|---|
+| Search | 같은 문자열을 찾을 때 | `/pattern`, `n` / `N` |
+| Mark | 지정한 위치로 나중에 돌아올 때 | `ma`, `'a`, `\`a` |
+| Jump List | 정의 이동·검색 등 이전 위치로 돌아갈 때 | `Ctrl-o` / `Ctrl-i` |
+| Quickfix | 검색·컴파일 결과를 차례로 탐색할 때 | `:copen`, `:cnext` |
+| Macro | 여러 키 입력을 순서대로 반복할 때 | `qa … q`, `@a` |
+| Dot Repeat | 직전 변경 동작을 반복할 때 | `.` |
+| Undo | 변경 이력을 되돌릴 때 | `u`, `Ctrl-r` |
+| Fold | 긴 코드의 일부를 접어 구조를 볼 때 | `za` 토글, `zc` 접기, `zo` 열기 |
 
-`Ctrl-o` / `Ctrl-i`는 점프 목록 뒤/앞, `:cnext` / `:cprev`는 Quickfix 항목 이동이다.
+**Macro는 Register에 명령 시퀀스를 저장**하고, Mark는 **위치**를 기억한다. Jump List는 이동 이력, Fold는 표시 상태이므로 서로 역할이 다르다. Fold의 생성·유지 방식은 `foldmethod`에 따라 달라진다.
+
+범위 치환은 `:%s/old/new/g`(전체 버퍼), `:s/old/new/g`(현재 줄)처럼 Ex 명령으로 수행한다. `gc`의 `c`는 치환 시 확인(confirm) 옵션이다.
 
 ## 6. 편집 대상의 계층 — Buffer / Window / Tab
 
