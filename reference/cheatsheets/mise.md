@@ -2,33 +2,27 @@
 
 여러 언어 런타임(node·ruby·java·python…)의 버전을 **하나의 도구**로 관리하는 Rust 단일 바이너리 (`mise` = 프랑스어 요리 용어 *mise en place*, "제자리에 놓기" → 작업 전 도구를 제자리에 세팅). `asdf`의 후속격이며 rbenv/jenv/pyenv/nvm을 한꺼번에 대체한다. shim 대신 **PATH를 직접 갈아끼워** 호출 오버헤드가 없다(asdf shim ~120ms → mise ~5ms).
 
-## 개념 흐름
+## 버전 선택과 실행의 관계
 
 ```text
-config.toml (버전 선언) → mise activate (PATH 반영)
-     ↓                        ↓
-  .tool-versions            셸 훅(precmd/chpwd)
-     ↓                        ↓
-  python=3.12               PATH 재계산
-  node=20
+mise.toml / .tool-versions
+      │ 버전 선언 (mise use)
+      ▼
+mise install ──> 런타임 설치
+      │
+mise activate <shell> ──> 셸 통합·PATH 선택
+      │
+      └─ 디렉터리·설정 변경에 맞춰 활성 버전 결정
 ```
 
-핵심 명령어:
+`use`는 사용할 버전을 **선언**, `install`은 설치, `activate`는 셸에서 선택한 버전을 사용하도록 통합한다. 설치와 활성화는 같은 동작이 아니다.
 
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 설치 | `brew install mise` | macOS |
-| 활성화 | `eval "$(mise activate zsh)"` | ~/.zshrc에 추가 |
-| 버전 설치 | `mise install` | config 기준 설치 |
-| 사용 | `mise use python@3.12` | 프로젝트별 버전 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| asdf | mise가 대체하는 기존 도구 |
-| pyenv/nvm/rbenv | 개별 언어 런타임 매니저 대체 |
-| direnv | 디렉토리별 환경변수와 함께 사용 |
+```sh
+mise use node@22
+mise install
+eval "$(mise activate zsh)"
+mise current
+```
 
 ## 설치 & 활성화
 
