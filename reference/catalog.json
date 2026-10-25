@@ -2948,7 +2948,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Chrome Cheatsheet",
+              "label": "devkit Chrome 문제 해결 기록",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/chrome.md"
             },
             "file": "chrome.md"
@@ -3144,7 +3144,7 @@
           {
             "slug": "ccusage",
             "name": "ccusage",
-            "desc": "Claude Code 사용량 집계와 임계치 경보.",
+            "desc": "코딩 에이전트 사용 기록 집계와 개인 예산 Wrapper의 경계",
             "official": [
               {
                 "label": "ccusage repository",
@@ -3229,12 +3229,12 @@
       },
       {
         "slug": "tools-dictionary",
-        "name": "tools-dictionary",
-        "desc": "CLI 도구/개념 사전 + 핵심 명령어 (curl, docker, nginx, systemctl 등)",
+        "name": "CLI 도구 발견 지도",
+        "desc": "작업 목적에 따라 CLI 도구를 찾고, 역할·대체/보완 관계와 파이프라인을 이해하는 지도",
         "file": "tools-dictionary.md",
         "official": [],
         "custom": {
-          "label": "devkit tools-dictionary",
+          "label": "devkit CLI 도구 발견 지도",
           "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tools-dictionary.md"
         },
         "kind": "guide"
