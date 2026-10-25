@@ -3180,7 +3180,7 @@
       {
         "slug": "terminal-tui",
         "name": "terminal-tui",
-        "desc": "현대적 TUI 도구 지도와 선택 기준 (lazy 계열, 영역별 대안, 도입 우선순위)",
+        "desc": "현대적 TUI·DB 도구 지도와 선택 기준 (역할, 대안, 사용 환경)",
         "file": "terminal-tui.md",
         "official": [],
         "custom": {
@@ -3204,31 +3204,6 @@
           "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/shell.md"
         },
         "file": "shell.md",
-        "kind": "guide"
-      },
-      {
-        "slug": "database-tui",
-        "name": "Database TUI",
-        "desc": "Harlequin, Rainfrog, vim-dadbod-ui 등 터미널·편집기 기반 DB 클라이언트 선택 기준.",
-        "official": [
-          {
-            "label": "Harlequin repository",
-            "url": "https://github.com/tconbeer/harlequin"
-          },
-          {
-            "label": "Rainfrog repository",
-            "url": "https://github.com/achristmascarl/rainfrog"
-          },
-          {
-            "label": "vim-dadbod-ui repository",
-            "url": "https://github.com/kristijanhusak/vim-dadbod-ui"
-          }
-        ],
-        "custom": {
-          "label": "devkit Database TUI Cheatsheet",
-          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/database-tui.md"
-        },
-        "file": "database-tui.md",
         "kind": "guide"
       },
       {
