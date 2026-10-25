@@ -5,33 +5,22 @@
 > `<leader>` 기본값: `Space`
 > 모드: `n`(Normal) `i`(Insert) `v`(Visual) `x`(Visual+Select) `o`(Operator) `t`(Terminal) `s`(Select) `c`(Cmdline)
 
-## 개념 흐름
+## 키맵을 읽는 구조
 
 ```text
-LazyVim = Neovim + 사전 설정 배포
-     ↓
-리더 키(Space) → 그룹별 명령
-     ↓
-f(파일) / b(버퍼) / g(Git) / s(검색) / w(윈도우)
+Neovim 기본 편집 문법
+      │
+LazyVim (Plugin + 기본 설정)
+      │
+<leader> (기본 Space)
+  ├─ f : file 관련
+  ├─ b : buffer 관련
+  ├─ g : Git 관련
+  ├─ s : search 관련
+  └─ w : window 관련
 ```
 
-핵심 명령어:
-
-| 단계 | 명령 | 설명 |
-|------|------|------|
-| 파일 탐색 | `<leader>ff` | Telescope 파일 찾기 |
-| 파일 검색 | `<leader>sg` | ripgrep로 내용 검색 |
-| Git 변경 | `<leader>gg` | lazygit 실행 |
-| 설정 | `:LazyExtras` | Extras 관리 |
-
-## 연결 도구
-
-| 도구 | 관계 |
-|------|------|
-| Neovim | LazyVim이 설치되는 기반 |
-| ripgrep | `<leader>sg` 검색에 사용 |
-| telescope | 파일/버퍼 탐색 UI |
-| lazy.nvim | 플러그인 매니저 |
+`<leader>ff`처럼 **접두 키 → 기능 그룹 → 동작** 순으로 읽는다. 하지만 실제 키는 설치된 Plugin·Extras·사용자 설정에 따라 달라진다. `<leader>sk`로 현재 Keymap을 검색하고 `:LazyExtras`로 활성 Extras를 확인한다. 전체 키 목록을 외우기보다 그룹을 먼저 익힌다.
 
 ## 목차
 
