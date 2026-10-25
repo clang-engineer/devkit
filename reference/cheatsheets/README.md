@@ -32,11 +32,11 @@
 
 | 파일 | 설명 |
 |------|------|
-| [vim.md](vim.md) | Vim 모드별 명령어 |
-| [lazyvim.md](lazyvim.md) | LazyVim 키맵 |
-| [lazygit.md](lazygit.md) | LazyGit TUI 단축키 |
-| [tmux.md](tmux.md) | Tmux 세션/윈도우/패널 |
-| [ghostty.md](ghostty.md) | Ghostty 터미널 탭/분할/키맵 |
+| [vim.md](vim.md) | Vim Operator·Motion·Text Object 조합 문법 |
+| [lazyvim.md](lazyvim.md) | LazyVim Leader 그룹·키맵 문법 |
+| [lazygit.md](lazygit.md) | LazyGit 패널별 키의 의미 |
+| [tmux.md](tmux.md) | tmux 대상 계층·명령 문법·세션 유지 |
+| [ghostty.md](ghostty.md) | Ghostty 창·탭·분할의 관계 |
 | [yazi.md](yazi.md) | Yazi — Rust TUI 파일 매니저 |
 | [terminal-tui.md](terminal-tui.md) | 현대적 TUI·DB 도구 지도와 선택 기준 |
 
@@ -44,12 +44,12 @@
 
 | 파일 | 설명 |
 |------|------|
-| [shell.md](shell.md) | Bash `set` 옵션, `&`/`&&`/`;`/`\|\|`, job 관리 |
-| [zsh.md](zsh.md) | Zsh 단축키, glob, alias |
+| [shell.md](shell.md) | Bash 명령 해석·확장·실행·작업 제어 |
+| [zsh.md](zsh.md) | Zsh ZLE·History·Glob·환경의 관계 |
 | [atuin.md](atuin.md) | Atuin 구조화 shell history 검색 |
 | [fzf.md](fzf.md) | fzf 범용 fuzzy finder |
 | [zoxide.md](zoxide.md) | zoxide 방문 기반 디렉터리 점프 |
-| [powershell.md](powershell.md) | PowerShell — Bash와 다른 점 위주 |
+| [powershell.md](powershell.md) | PowerShell 객체 파이프라인·Verb-Noun 문법 |
 
 ## 시스템 & 서버
 
@@ -76,7 +76,7 @@
 
 | 파일 | 설명 |
 |------|------|
-| [git.md](git.md) | Git 명령어 (브랜치, stash, rebase, tag 등) |
+| [git.md](git.md) | Git Working Tree·Index·Repository 상태 변화 |
 | [jj.md](jj.md) | Jujutsu(jj) — change, revision, operation log 및 Git 원격 연동 |
 | [git-delta.md](git-delta.md) | git-delta — Git diff pager |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 |
@@ -96,9 +96,13 @@
 | [taskwarrior.md](taskwarrior.md) | Taskwarrior 3.5 — 태스크 관리 |
 | [python-pypi-publishing.md](python-pypi-publishing.md) | Python PyPI Trusted Publishing |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
-| [ccusage.md](ccusage.md) | ccusage 사용 기록 집계와 별도 예산 Wrapper의 경계 |
+| [ccusage.md](ccusage.md) | ccusage 사용 기록과 별도 예산 정책의 구분 |
 | [opencode.md](opencode.md) | opencode — 터미널 AI 코딩 에이전트 |
 
+
+## 문서 경계
+
+명령어 목록을 다시 만들지 않는다. **고유한 문법·상태 모델·조합 규칙**이 없는 내용은 공식 문서나 해당 도구의 개별 문서로 연결한다. Chrome은 범용 치트시트가 아니라 실제 문제 해결 기록으로 유지한다.
 
 ## 목록 원본
 
