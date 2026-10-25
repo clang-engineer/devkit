@@ -1,6 +1,6 @@
 # mise Cheatsheet
 
-여러 언어 런타임(node·ruby·java·python…)의 버전을 **하나의 도구**로 관리하는 Rust 단일 바이너리 (`mise` = 프랑스어 요리 용어 *mise en place*, "제자리에 놓기" → 작업 전 도구를 제자리에 세팅). `asdf`의 후속격이며 rbenv/jenv/pyenv/nvm을 한꺼번에 대체한다. shim 대신 **PATH를 직접 갈아끼워** 호출 오버헤드가 없다(asdf shim ~120ms → mise ~5ms).
+여러 언어 런타임(node·ruby·java·python…)의 버전을 **하나의 도구**로 관리하는 Rust 단일 바이너리 (`mise` = 프랑스어 요리 용어 *mise en place*, "제자리에 놓기" → 작업 전 도구를 제자리에 세팅). `asdf`의 후속격이며 rbenv/jenv/pyenv/nvm을 한꺼번에 대체한다. 셸 활성화 방식에서는 PATH를 조정하고, 필요에 따라 shims 방식도 사용할 수 있다.
 
 ## 버전 선택과 실행의 관계
 
@@ -15,7 +15,7 @@ mise activate <shell> ──> 셸 통합·PATH 선택
       └─ 디렉터리·설정 변경에 맞춰 활성 버전 결정
 ```
 
-`use`는 사용할 버전을 **선언**, `install`은 설치, `activate`는 셸에서 선택한 버전을 사용하도록 통합한다. 설치와 활성화는 같은 동작이 아니다.
+`use`는 버전을 **선언하며 필요 시 설치도 수행**한다. `install`은 도구 설치, `activate`는 셸 통합을 담당한다. 버전 선언·설치·활성화는 서로 구분되는 역할이다.
 
 ```sh
 mise use node@22
