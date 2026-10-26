@@ -5,7 +5,11 @@ const root = path.resolve(__dirname, '../..');
 const map = JSON.parse(fs.readFileSync(path.join(root, 'reference/catalog.json'), 'utf8')).tool_map;
 const definitions = new Map();
 for (const category of map.categories) for (const command of category.commands) {
-  if (command.description && !definitions.has(command.name.toLowerCase())) definitions.set(command.name.toLowerCase(), command);
+  if (command.description && !definitions.has(command.name.toLowerCase())) {
+    // Membership metadata belongs to this category, not to the tool definition.
+    const { hosts, tags, section, ...definition } = command;
+    definitions.set(command.name.toLowerCase(), definition);
+  }
 }
 for (const category of map.categories) {
   category.commands = category.commands.map(command => ({ ...definitions.get(command.name.toLowerCase()), ...command }));

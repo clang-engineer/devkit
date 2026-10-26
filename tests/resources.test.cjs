@@ -69,8 +69,12 @@ test('current plugin and history scopes do not create editor replacement edges',
   assert.ok(!cli.categories.find(category => category.name === 'Shell').commands.some(command => command.name === 'history'));
   const relations = cli.categories.flatMap(category => category.relations);
   assert.ok(!relations.some(edge => edge.from === 'vim' && edge.to === 'vim-dadbod-ui'));
-  const plugin = cli.categories.find(category => category.name === 'Neovim Plugins · DB').commands.find(command => command.name === 'vim-dadbod-ui');
+  const plugin = cli.categories.find(category => category.id === 'role:database').commands.find(command => command.name === 'vim-dadbod-ui');
+  assert.deepEqual(plugin.hosts, ['neovim']);
   assert.ok(plugin.description.includes('플러그인'));
   assert.ok(plugin.links.some(link => link.label === '내 설정'));
-  assert.ok((sheets.guides || []).some(item => item.slug === 'python-pypi-publishing'));
+  for (const guide of sheets.guides || []) {
+    assert.equal(guide.kind, 'guide');
+    assert.ok(fs.existsSync(path.join(base, 'reference/cheatsheets', guide.file)), guide.slug);
+  }
 });

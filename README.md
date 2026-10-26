@@ -2,7 +2,7 @@
 
 Curated dev cheatsheets and templates I keep handy while working.
 
-**32 cheatsheets** across 9 categories · **6 templates** — generic,
+**30 tool cheatsheets + 2 guides** · **6 templates** — generic,
 reusable references and starting points, not machine- or project-specific config.
 
 ## Reference catalog
@@ -24,8 +24,8 @@ tests/                              reference 데이터 보존 테스트
 TUI만 확인할 때는 `make test-cli`를 사용한다. 새 필드를 추가하기 전에는
 `reference/catalog.json`의 구조와 `cmdtreemap` 호환성을 먼저 확인한다.
 
-현재 JSON 원본은 `reference/catalog.json` 하나다. `tool_map`은 도구 관계 지도,
-`cheatsheets`는 치트시트 목록과 문서 링크를 소유한다. 긴 사용법 본문은
+현재 JSON 원본은 `reference/catalog.json` 하나다. `tool_map`은 작업 목적별 분류·상위 그룹·호스트 메타데이터와 도구 관계를,
+`cheatsheets`는 치트시트 목록과 문서 링크를 소유한다. 웹 UI는 분류를 별도로 추측하거나 보정하지 않는다. 긴 사용법 본문은
 `reference/cheatsheets/*.md`에 둔다. Go의 내장용 `cmdtreemap/catalog.json`은
 `make prepare`로 갱신한다.
 

@@ -117,11 +117,15 @@ cat alias는 [bat 공식 문서의 예](https://github.com/sharkdp/bat#automatic
 
 도구를 선택하면 그 도구 자체의 역할을 먼저 읽는다. 다른 도구와의 비교는 relation의 problem·solution·boundary에서 설명한다. 같은 도구가 여러 분야에 등장할 때 commands에는 이름만 참조할 수 있으며 소개·공식 문서·사용 예시의 정의는 한 곳에 둔다.
 
-- Shell: 셸 구현체·설정 프레임워크·프롬프트
-- CLI의 Command History: history·atuin·fzf를 이용한 기록·검색
-- Editors와 Editor Configurations: 편집기와 그 위의 설정 배포판
-- Plugins: Neovim·tmux·Zsh 확장. 기반 도구의 대안처럼 연결하지 않는다.
-- Database: DB별 CLI와 독립 클라이언트. 에디터 DB 플러그인은 Plugins에서도 같은 항목으로 찾는다.
-- 주제별 자료: 개별 도구가 아닌 비교·작업 절차 문서. cheatsheets.guides에서 관리한다.
+- Shell: 셸 구현체·설정 프레임워크·프롬프트·플러그인. 호스트가 있는 확장은 `hosts`로 묶는다.
+- Command History: history·atuin·fzf를 이용한 기록·검색.
+- Editors: 편집기·설정 배포판·편집 확장. 플러그인을 기반 도구의 대안처럼 연결하지 않는다.
+- Terminal Emulators: Ghostty·kitty·iTerm2 등 터미널 에뮬레이터. 터미널에서 실행하는 모든 프로그램을 뜻하지 않는다.
+- Database: DB별 CLI·독립 클라이언트·에디터 DB 플러그인. 플러그인의 실행 환경은 `hosts`로 구분한다.
+- 개발 도구: Task Runners, Build & Compile, Debugging, Code Quality, Runtime & Package Management 등 작업 목적별로 나눈다. Python은 Programming Languages에도 속한다.
+- AI Coding Assistants: 독립 코딩 에이전트와 에디터의 AI 코딩 확장. 실행 환경과 호스트는 별도 메타데이터다.
+- 주제별 자료: 개별 도구가 아닌 비교·작업 절차 문서. `cheatsheets.guides`에서 관리하며 `related_tools`로 관련 도구에 연결한다.
+
+상위 그룹·분류 ID·호스트·태그의 원본 필드는 [Reference 분류 원본](README.md#분류-원본)에 정리한다. 웹과 Go TUI는 같은 목적별 분류를 사용하며, 치트시트 문서 묶음을 도구 분류로 사용하지 않는다.
 
 플러그인 목록은 2026-10-14 dotfiles main의 명시적 설정, LazyVim Extras와 lazy-lock.json을 확인한 목록이다. 실행 중인 개인 머신을 조사한 설치 현황은 아니다. vim/의 이전 설정과 주석 처리된 tmux 후보는 현재 사용 목록에 포함하지 않았다. 각 플러그인의 내 설정 링크가 근거이며 설정이 바뀌면 재검토한다.
