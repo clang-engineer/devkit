@@ -1,6 +1,6 @@
 # Neovim — 내장 API·언어 기능·확장 구조 치트시트
 
-> **Neovim은 Vim의 편집 모델을 계승하고, Lua API·내장 LSP·진단·외부 프로세스 연동을 제공하는 확장 가능한 편집기**다. 편집 명령은 [Vim](vim.md), 플러그인 구성·키맵은 [LazyVim](lazyvim.md)에서 다룬다.
+> **Neovim은 Vim의 편집 모델을 계승하면서 공개 API·Lua Runtime·RPC를 중심으로 외부 확장과 통합을 강조한 편집 플랫폼**이다. 내장 LSP·Diagnostics·Extmark 등은 이 확장 기반 위에서 제공되는 주요 기능이다. 편집 명령은 [Vim](vim.md), 플러그인 구성·키맵은 [LazyVim](lazyvim.md)에서 다룬다.
 
 ## 전체 개념지도 — 계승과 확장
 
