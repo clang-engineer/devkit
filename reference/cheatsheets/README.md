@@ -77,7 +77,9 @@
 
 | 파일 | 설명 |
 |------|------|
-| [elasticsearch.md](elasticsearch.md) | Elasticsearch 쿼리/관리 |
+| [logstash.md](logstash.md) | Logstash 이벤트 수집·변환·출력 파이프라인 |
+| [elasticsearch.md](elasticsearch.md) | Elasticsearch 분산 저장·검색·운영 |
+| [kibana.md](kibana.md) | Kibana 데이터 탐색·KQL·시각화·대시보드 |
 
 ## Git & 버전 관리
 
