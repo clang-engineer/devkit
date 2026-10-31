@@ -39,6 +39,12 @@ Shell
 
 `"$@"`는 전달받은 각 인자를 그대로 보존한다. 반대로 인용하지 않은 `$var`는 Bash에서 단어 분리와 파일명 확장의 영향을 받을 수 있다.
 
+```bash
+value="hello world"
+printf '<%s>\\n' "$value"  # <hello world> : 한 인자
+printf '<%s>\\n' $value    # <hello> / <world> : 두 인자 (Bash 기본 설정)
+```
+
 ### Parameter Expansion — 변수 값을 가공하기
 
 ```text
@@ -92,6 +98,11 @@ ${parameter...}
 | 서브셸에서 그룹 실행 | `( a; b )` | 환경 분리 |
 
 `cmd > log 2>&1`과 `cmd 2>&1 > log`는 다르다. **리다이렉션은 왼쪽에서 오른쪽 순서대로 적용**한다.
+
+```bash
+printf 'error\\nwarning\\nerror\\n' | sort | uniq -c > counts.txt
+# 파이프: 출력 전달 → 정렬 → 중복 집계 / 리다이렉션: 결과를 파일에 저장
+```
 
 ### 여러 줄 입력 · 프로세스 치환
 
