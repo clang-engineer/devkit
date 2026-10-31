@@ -3,7 +3,7 @@
 > Bash 쓰던 사람이 Windows에서 PowerShell 만났을 때 손 안 닿는 부분 위주.
 > 대상: Windows PowerShell 5.1 + PowerShell 7 (PSCore). 차이가 있으면 표기.
 
-## 객체 파이프라인과 명령 문법
+### 객체 파이프라인과 명령 문법
 
 ```text
 Verb-Noun [-Parameter Value] | Verb-Noun ...
@@ -23,7 +23,11 @@ $items = @(1, 2, 3) # 배열
 
 `ls`·`cat` 같은 별칭이 있어도 Bash 명령과 옵션·출력 타입이 같지는 않다. PowerShell 5.1과 7의 차이는 아래 버전별 주의사항을 참고한다.
 
-## Bash와 핵심 차이
+## 1. 객체와 명령 구성
+
+PowerShell의 파이프라인은 텍스트가 아닌 **객체와 속성**을 중심으로 읽는다. 다만 외부 실행 파일은 텍스트 스트림을 주고받을 수 있으므로 구분한다.
+
+### Bash와 핵심 차이
 
 | 영역 | Bash | PowerShell |
 |------|------|------------|
@@ -37,7 +41,7 @@ $items = @(1, 2, 3) # 배열
 | 명령 결과 | 종료 코드 (`$?`) | 객체 + `$?` (true/false) |
 | 호출 연산자 | (없음) | `&` (`& "C:\path with space\app.exe" arg`) |
 
-## 변수와 환경변수
+### 변수와 환경변수
 
 ```powershell
 $var = "hello"                         # 변수
@@ -69,7 +73,11 @@ ps | ? CPU -gt 100 | select Name,CPU
 
 `$_` 는 파이프 현재 항목 (Bash의 자리표시자 없음 → `$_` 가 그 역할).
 
-## 자주 쓰는 cmdlet
+## 2. 대상별 명령 — Cmdlet·파일·문자열
+
+Cmdlet은 **Verb-Noun** 조합으로 동작을 발견한다. 대상과 목적을 먼저 고르고 세부 옵션은 `Get-Help`에서 확인한다.
+
+### 자주 쓰는 cmdlet
 
 ```powershell
 Get-Command rg                         # 명령 위치/타입 (which 대체)
@@ -80,7 +88,7 @@ Resolve-Path .\rel                     # 절대 경로
 Measure-Command { ... }                # time { ... }
 ```
 
-## 파일 / 디렉터리
+### 파일 / 디렉터리
 
 ```powershell
 Get-ChildItem               # ls
@@ -112,7 +120,7 @@ Add-Content file.txt "x"               # append
 gc "C:\path\to\file.log" -Wait -Tail 10   # 마지막 10줄부터 실시간 follow
 ```
 
-## 문자열 / 출력
+### 문자열 / 출력
 
 ```powershell
 "Hello $name"                          # 보간 (큰따옴표만)
@@ -133,7 +141,11 @@ Write-Host "color" -ForegroundColor Cyan
 Write-Output $obj                      # 파이프로 흘려보냄 (echo 아님)
 ```
 
-## 제어 흐름
+## 3. 실행·오류 제어
+
+조건·반복은 실행 흐름을, 오류 처리와 종료 코드는 성공 여부를 제어한다.
+
+### 제어 흐름
 
 ```powershell
 # &&/|| 대체 (PS 5.1)
@@ -152,7 +164,7 @@ do { ... } while ($cond)
 
 비교 연산자(중요): `-eq`, `-ne`, `-lt`, `-gt`, `-le`, `-ge`, `-like` (와일드카드), `-match` (정규식), `-in`, `-contains`. **`==` 같은 거 안 됨**.
 
-## 함수 / splatting
+### 함수 / splatting
 
 ```powershell
 function Get-Sum {
@@ -172,7 +184,7 @@ Get-ChildItem @params                  # @hash → 파라미터 풀기
 function Wrap { Get-Process @args }    # @args → 호출자 인자 그대로 패스
 ```
 
-## 에러 처리
+### 에러 처리
 
 ```powershell
 try {
@@ -190,7 +202,7 @@ risky -ErrorAction Stop                # 호출 단위로 적용
 risky -ErrorAction SilentlyContinue    # 조용히 무시 (Get-Command 가드 시 자주)
 ```
 
-## 외부 명령 / 종료 코드
+### 외부 명령 / 종료 코드
 
 ```powershell
 git status                             # 그냥 호출
@@ -205,7 +217,11 @@ $LASTEXITCODE                          # 외부 명령 종료 코드 ($?와 다�
 git log --% --format=%H                # --% 이후 그대로 전달
 ```
 
-## $PROFILE / 모듈
+## 4. 실행 환경·호환성
+
+Profile·Module·Alias는 셸 환경을 확장한다. PowerShell 5.1과 7의 차이는 실제 사용 버전에 맞춰 확인한다.
+
+### $PROFILE / 모듈
 
 ```powershell
 $PROFILE                               # 현재 사용자 프로파일 경로
@@ -221,7 +237,7 @@ Get-Module                             # 로드된 모듈
 Get-Module -ListAvailable              # 설치된 모듈
 ```
 
-## 헷갈리는 alias (Windows 한정 함정)
+### 헷갈리는 alias (Windows 한정 함정)
 
 | alias | 실제 cmdlet | 함정 |
 |-------|-------------|------|
@@ -239,7 +255,7 @@ Get-Alias curl                         # 특정 alias 확인
 Remove-Item Alias:curl                 # alias 제거 (현재 세션)
 ```
 
-## PS 5.1 vs PS 7 한눈 비교
+### PS 5.1 vs PS 7 한눈 비교
 
 | 기능 | PS 5.1 (powershell.exe) | PS 7 (pwsh.exe) |
 |------|------------------------|------------------|
@@ -252,7 +268,7 @@ Remove-Item Alias:curl                 # alias 제거 (현재 세션)
 | 크로스플랫폼 | Windows만 | Windows/Mac/Linux |
 | `$PROFILE` | `Documents\WindowsPowerShell\` | `Documents\PowerShell\` (Win) / `~/.config/powershell/` (Linux) |
 
-## 자주 까먹는 미니 팁
+### 자주 까먹는 미니 팁
 
 ```powershell
 # 명령 결과를 변수와 화면 둘 다
@@ -276,7 +292,7 @@ Invoke-History 5                       # 5번 명령 재실행
 (Get-PSReadLineOption).HistorySavePath # 히스토리 파일 경로
 ```
 
-## Windows 운영 작업과의 경계
+### Windows 운영 작업과의 경계
 
 ```text
 PowerShell 객체 파이프라인
