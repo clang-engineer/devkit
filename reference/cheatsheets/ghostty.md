@@ -21,7 +21,11 @@ Ghostty의 분할은 **화면 배치**이며 tmux의 Server·Session 보존 기�
 
 키 표기: `⌘` Command, `⌥` Option, `⌃` Control, `⇧` Shift. 아래 키는 기본 macOS 설정 기준이며 `ghostty +list-keybinds`로 현재 바인딩을 확인한다.
 
-## 분할 (split)
+## 1. 화면 구성 — Split · Tab · Window
+
+**Split은 현재 Tab의 화면을 나누고, Tab·Window는 그보다 상위의 화면 전환 단위**다. 아래 키는 macOS 기본 바인딩이며 현재 설정은 `ghostty +list-keybinds`로 확인한다.
+
+### 분할 (Split)
 
 | 키 | 동작 |
 |---|---|
@@ -36,7 +40,7 @@ Ghostty의 분할은 **화면 배치**이며 tmux의 Server·Session 보존 기�
 
 > 실수로 분할됐을 때 원복: 없앨 분할에 포커스 → `⌘ W`. **surface에서 프로세스(예: `tmux attach`)가 돌면 확인 프롬프트가 뜬다** — 확인하면 닫힘. tmux 세션은 안 죽고 클라이언트만 detach.
 
-## 탭 & 창
+### Tab · Window — 상위 화면 전환
 
 | 키 | 동작 |
 |---|---|
@@ -50,7 +54,7 @@ Ghostty의 분할은 **화면 배치**이며 tmux의 Server·Session 보존 기�
 | `⌘ ⌥ ⇧ W` | 모든 창 닫기 |
 | `⌘ Enter` | 전체화면 토글 |
 
-## 클립보드 & 스크롤
+## 2. 출력 탐색 — 클립보드와 스크롤
 
 | 키 | 동작 |
 |---|---|
@@ -63,7 +67,9 @@ Ghostty의 분할은 **화면 배치**이며 tmux의 Server·Session 보존 기�
 | `⌘ ↑` / `⌘ ↓` | 이전/다음 프롬프트로 점프 (jump_to_prompt, shell integration 필요) |
 | `⌘ J` | 선택 위치로 스크롤 |
 
-## 글꼴 & 설정 & 진단
+## 3. 설정과 진단
+
+### 글꼴·설정·진단
 
 | 키 | 동작 |
 |---|---|
@@ -72,7 +78,7 @@ Ghostty의 분할은 **화면 배치**이며 tmux의 Server·Session 보존 기�
 | `⌘ ,` / `⌘ ⇧ ,` | 설정 열기 / 리로드 |
 | `⌘ ⌥ I` | 인스펙터 토글 (렌더링/키 디버깅) |
 
-## CLI
+### CLI — 실효 설정과 키맵 조회
 
 ```sh
 ghostty +list-keybinds     # 현재 유효 키맵 전부 (커스텀 반영)
@@ -84,7 +90,7 @@ ghostty +list-keybinds --plain | rg -n "alt\\+arrow_left|alt\\+arrow_right"
 
 > 설정 파일: `~/.config/ghostty/config`. `keybind = super+d=new_split:right` 형식으로 재정의, `keybind = super+d=unbind`로 해제.
 
-## 설정 파일 위치 & Option 키
+### 설정 파일 위치 · Option 키
 
 macOS에서 Ghostty는 **두 경로의 config를 모두 읽어 병합**한다 — 충돌 키는 뒤에 로드되는 **App Support 쪽이 이긴다**:
 
