@@ -54,7 +54,7 @@ output {
 }
 ```
 
-**동작 예시:** `INFO api started`를 입력하면 Dissect가 `level=INFO`, `service=api`, `detail=started`로 분리하고 Mutate가 `level`을 `info`로 바꾼다. Stdout에서 변환된 이벤트를 확인한다. 원래 `message` 필드도 별도로 제거하지 않았다면 유지된다.
+**동작 예시:** 설정을 `pipeline.conf`로 저장한 뒤 `bin/logstash -f pipeline.conf`로 실행한다. 표준 입력에 `INFO api started`를 입력하면 Dissect가 `level=INFO`, `service=api`, `detail=started`로 분리하고 Mutate가 `level`을 `info`로 바꾼다. Stdout에서 변환된 이벤트를 확인한다. 원래 `message` 필드도 별도로 제거하지 않았다면 유지된다.
 
 | 구성 | 무엇을 결정하나? | 대표 플러그인 |
 |---|---|---|
@@ -82,6 +82,8 @@ filter {
 
 ## 3. 실행·검증 — 설정에서 이벤트까지
 
+**검증은 두 단계**다. 먼저 설정 파일을 파싱할 수 있는지 검사하고, 다음으로 샘플 이벤트를 흘려 보내 필드가 기대대로 변환되는지 확인한다. 이 둘은 서로 다른 검증이다.
+
 ```sh
 bin/logstash -f pipeline.conf --config.test_and_exit  # 문법·설정 검증
 bin/logstash -f pipeline.conf                          # 파이프라인 실행
@@ -90,7 +92,7 @@ bin/logstash --config.reload.automatic -f pipeline.conf # 설정 변경 감지
 
 `bin/logstash`는 압축 배포판 기준 경로다. 패키지·컨테이너 설치에서는 실행 경로와 설정 디렉터리가 다를 수 있다. **설정 검증 통과는 입력 데이터의 패턴 매칭 성공을 보장하지 않는다.** 위 Stdout 예제로 샘플 이벤트를 먼저 통과시켜 확인한다.
 
-여러 파이프라인은 `pipelines.yml`에서 각 파이프라인의 설정 파일과 Worker·Queue 설정을 분리할 수 있다. `-f` 실행과 `pipelines.yml` 적용 방식은 실행 옵션에 따라 달라진다.
+여러 파이프라인은 `pipelines.yml`에서 각 파이프라인의 설정 파일과 Worker·Queue 설정을 분리할 수 있다. **Input·Filter·Output의 선언 순서와 이벤트 처리 순서는 구분**해야 하며, 병렬 Worker 설정에 따라 이벤트의 전체 순서가 보장되지 않을 수 있다. `-f` 실행과 `pipelines.yml` 적용 방식은 실행 옵션에 따라 달라진다.
 
 ## 4. Queue·오류·운영 관찰
 
@@ -115,6 +117,8 @@ Logstash의 모니터링 API는 일반적으로 HTTP `9600` 포트를 사용한�
 ```sh
 curl http://localhost:9600/_node/stats/pipelines?pretty
 ```
+
+**운영 예시:** 이벤트가 입력되지만 Elasticsearch에 나타나지 않으면 Stdout Output으로 Filter 결과를 먼저 확인한다. 변환이 정상이면 Elasticsearch Output의 인증·연결·오류 로그와 Pipeline 통계를 확인한다. 수집 실패와 검색 시간 범위 문제를 구분한다.
 
 Persistent Queue는 장애 시 이벤트 보존 가능성을 높이지만 모든 상황에서 정확히 한 번 처리(exactly once)를 보장하지 않는다. DLQ도 모든 실패를 자동 수집하지 않는다.
 
