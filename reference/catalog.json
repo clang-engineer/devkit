@@ -3442,7 +3442,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Vim Cheatsheet",
+              "label": "Vim — 모드와 편집 문법",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/vim.md"
             },
             "file": "vim.md"
@@ -3458,7 +3458,7 @@
               }
             ],
             "custom": {
-              "label": "devkit LazyVim Cheatsheet",
+              "label": "LazyVim — 기능 구성과 확장",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/lazyvim.md"
             },
             "file": "lazyvim.md"
@@ -3475,7 +3475,7 @@
               }
             ],
             "custom": {
-              "label": "devkit LazyGit Cheatsheet",
+              "label": "LazyGit — Git 상태와 패널 조작",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/lazygit.md"
             },
             "file": "lazygit.md"
@@ -3496,7 +3496,7 @@
               }
             ],
             "custom": {
-              "label": "devkit tmux Cheatsheet",
+              "label": "tmux — 세션 유지와 화면 분할",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tmux.md"
             },
             "file": "tmux.md"
@@ -3512,7 +3512,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Ghostty Cheatsheet",
+              "label": "Ghostty — 창·탭·분할 구조",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/ghostty.md"
             },
             "file": "ghostty.md"
@@ -3529,7 +3529,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Yazi Cheatsheet",
+              "label": "Yazi — 파일 탐색과 작업",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/yazi.md"
             },
             "file": "yazi.md"
@@ -3551,7 +3551,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Zsh Cheatsheet",
+              "label": "Zsh — 입력 편집과 셸 확장",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/zsh.md"
             },
             "file": "zsh.md"
@@ -3568,7 +3568,7 @@
               }
             ],
             "custom": {
-              "label": "devkit PowerShell Cheatsheet",
+              "label": "PowerShell — 객체 파이프라인",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/powershell.md"
             },
             "file": "powershell.md"
@@ -3590,7 +3590,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Atuin Cheatsheet",
+              "label": "Atuin — 명령 기록과 재사용",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/atuin.md"
             },
             "file": "atuin.md"
@@ -3607,7 +3607,7 @@
               }
             ],
             "custom": {
-              "label": "devkit fzf Cheatsheet",
+              "label": "fzf — 후보 선택 파이프라인",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/fzf.md"
             },
             "file": "fzf.md"
@@ -3624,7 +3624,7 @@
               }
             ],
             "custom": {
-              "label": "devkit zoxide Cheatsheet",
+              "label": "zoxide — 방문 기록 기반 이동",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/zoxide.md"
             },
             "file": "zoxide.md"
@@ -3646,7 +3646,7 @@
               }
             ],
             "custom": {
-              "label": "devkit SSH Cheatsheet",
+              "label": "SSH — 인증과 원격 연결",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/ssh.md"
             },
             "file": "ssh.md"
@@ -3663,7 +3663,7 @@
               }
             ],
             "custom": {
-              "label": "devkit systemd Cheatsheet",
+              "label": "systemd — 서비스와 타이머",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/systemd.md"
             },
             "file": "systemd.md"
@@ -3671,7 +3671,7 @@
         ]
       },
       {
-        "title": "macOS",
+        "title": "macOS 창 관리",
         "items": [
           {
             "slug": "aerospace",
@@ -3684,26 +3684,10 @@
               }
             ],
             "custom": {
-              "label": "devkit AeroSpace Cheatsheet",
+              "label": "AeroSpace — 창 배치와 작업 공간",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/aerospace.md"
             },
             "file": "aerospace.md"
-          },
-          {
-            "slug": "hammerspoon",
-            "name": "Hammerspoon",
-            "desc": "Lua 기반 macOS 자동화와 윈도우 관리.",
-            "official": [
-              {
-                "label": "Hammerspoon documentation",
-                "url": "https://www.hammerspoon.org/docs/"
-              }
-            ],
-            "custom": {
-              "label": "Hammerspoon 이벤트 자동화",
-              "url": "https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/2026-10-31-hammerspoon-event-automation.md"
-            },
-            "file": "hammerspoon.md"
           }
         ]
       },
@@ -3721,10 +3705,32 @@
               }
             ],
             "custom": {
-              "label": "devkit Elasticsearch Cheatsheet",
+              "label": "Elasticsearch — 분산 저장과 검색",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/elasticsearch.md"
             },
             "file": "elasticsearch.md"
+          },
+          {
+            "slug": "logstash",
+            "name": "Logstash",
+            "desc": "이벤트 입력·필터·출력과 파이프라인 운영",
+            "file": "logstash.md",
+            "official": [],
+            "custom": {
+              "label": "Logstash — 이벤트 수집과 변환",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/logstash.md"
+            }
+          },
+          {
+            "slug": "kibana",
+            "name": "Kibana",
+            "desc": "Data View·Discover·Lens·Dashboard와 KQL",
+            "file": "kibana.md",
+            "official": [],
+            "custom": {
+              "label": "Kibana — 데이터 탐색과 시각화",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/kibana.md"
+            }
           }
         ]
       },
@@ -3743,7 +3749,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Git Cheatsheet",
+              "label": "Git — 변경 기록과 이력",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/git.md"
             },
             "file": "git.md"
@@ -3760,28 +3766,10 @@
               }
             ],
             "custom": {
-              "label": "devkit jj Cheatsheet",
+              "label": "Jujutsu — 변경과 리비전",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/jj.md"
             },
             "file": "jj.md"
-          },
-          {
-            "slug": "git-delta",
-            "name": "git-delta",
-            "desc": "Git diff와 show 출력을 읽기 쉽게 만드는 syntax-highlighting pager.",
-            "tldr": "common/delta",
-            "official": [
-              {
-                "label": "delta repository",
-                "url": "https://github.com/dandavison/delta"
-              }
-            ],
-            "custom": {
-              "label": "delta 공식 문서",
-              "url": "https://github.com/dandavison/delta"
-            },
-            "external_reference": "https://github.com/dandavison/delta",
-            "tool_id": "delta"
           },
           {
             "slug": "chezmoi",
@@ -3795,7 +3783,7 @@
               }
             ],
             "custom": {
-              "label": "devkit chezmoi Cheatsheet",
+              "label": "chezmoi — 설정 파일 상태 관리",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/chezmoi.md"
             },
             "file": "chezmoi.md"
@@ -3817,7 +3805,7 @@
               }
             ],
             "custom": {
-              "label": "devkit SOPS Cheatsheet",
+              "label": "SOPS — 암호화와 키 관리",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/sops.md"
             },
             "file": "sops.md"
@@ -3839,7 +3827,7 @@
               }
             ],
             "custom": {
-              "label": "devkit mise Cheatsheet",
+              "label": "mise — 런타임 버전과 실행 환경",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/mise.md"
             },
             "file": "mise.md"
@@ -3856,7 +3844,7 @@
               }
             ],
             "custom": {
-              "label": "devkit uv Cheatsheet",
+              "label": "uv — Python 의존성과 실행 환경",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/uv.md"
             },
             "file": "uv.md"
@@ -3873,7 +3861,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Taskwarrior Cheatsheet",
+              "label": "Taskwarrior — 작업 상태와 필터",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/taskwarrior.md"
             },
             "file": "taskwarrior.md"
@@ -3889,7 +3877,7 @@
               }
             ],
             "custom": {
-              "label": "devkit Claude Code Cheatsheet",
+              "label": "Claude Code — 에이전트 작업과 도구",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/claude-code.md"
             },
             "file": "claude-code.md"
@@ -3905,7 +3893,7 @@
               }
             ],
             "custom": {
-              "label": "devkit opencode Cheatsheet",
+              "label": "OpenCode — 에이전트 구성과 실행",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/opencode.md"
             },
             "file": "opencode.md"
@@ -3913,7 +3901,7 @@
         ]
       },
       {
-        "title": "검색·HTTP·작업 실행·측정",
+        "title": "검색·HTTP·작업 실행",
         "items": [
           {
             "slug": "rg",
@@ -3927,7 +3915,7 @@
               }
             ],
             "custom": {
-              "label": "devkit ripgrep Cheatsheet",
+              "label": "ripgrep — 검색 범위와 패턴",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/rg.md"
             },
             "file": "rg.md",
@@ -3945,7 +3933,7 @@
               }
             ],
             "custom": {
-              "label": "devkit HTTPie Cheatsheet",
+              "label": "HTTPie — HTTP 요청 구성",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/httpie.md"
             },
             "file": "httpie.md"
@@ -3962,27 +3950,10 @@
               }
             ],
             "custom": {
-              "label": "devkit just Cheatsheet",
+              "label": "just — 레시피와 실행 흐름",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/just.md"
             },
             "file": "just.md"
-          },
-          {
-            "slug": "hyperfine",
-            "name": "hyperfine",
-            "desc": "반복 실행·워밍업·준비 단계와 성능 비교의 구조.",
-            "tldr": "common/hyperfine",
-            "official": [
-              {
-                "label": "Official documentation",
-                "url": "https://github.com/sharkdp/hyperfine"
-              }
-            ],
-            "custom": {
-              "label": "hyperfine 벤치마크 방법론",
-              "url": "https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/2026-10-31-hyperfine-benchmark-methodology.md"
-            },
-            "file": "hyperfine.md"
           }
         ]
       }
@@ -4020,7 +3991,7 @@
         "official": [],
         "custom": {
           "label": "CLI 도구 발견 지도",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/tools-dictionary.md"
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/tools-dictionary.md"
         },
         "kind": "guide",
         "related_tools": [
