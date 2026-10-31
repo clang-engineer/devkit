@@ -5,17 +5,21 @@ macOS 자동화 런타임. Lua로 창 관리·키바인딩·알림·이벤트 �
 ## 자동화의 입력과 동작
 
 ```text
-~/.hammerspoon/init.lua
-         │
-         ├─ hs.hotkey → 키 입력 이벤트
-         ├─ hs.timer  → 시간 이벤트
-         ├─ hs.window → 창 조회·조작
-         └─ hs.alert  → 알림 출력
-                 │
-              Lua Callback
-```
+~/.hammerspoon/init.lua (Lua 설정·바인딩)
+               │ 로드 / reload
+               ▼
+Hammerspoon Runtime
+       │
+       ├─ hs.hotkey / hs.timer / hs.eventtap → 이벤트 감지
+       │                          │
+       │                          ▼
+       │                      Lua Callback
+       │                          │
+       └─ hs.window / hs.alert / hs.application → macOS 동작
 
-Hammerspoon은 고정된 키맵을 외우는 도구가 아니라 **이벤트 → Lua 함수 → macOS 동작**을 조합하는 런타임이다. `hs.reload()`는 설정 재로드, `hs.ipc.cliInstall()`은 CLI 접근을 설치한다.
+Console / hs CLI → 실행 상태 관찰·재로드
+```
+Hammerspoon은 고정된 키맵을 외우는 도구가 아니라 **이벤트 → Lua Callback → macOS 동작**을 조합하는 런타임이다. `hs.window`는 이벤트 소스가 아니라 창을 조회·조작하는 API이고, `hs.alert`는 표시 동작이다. `hs.reload()`는 설정 재로드, `hs.ipc.cliInstall()`은 CLI 접근을 설치한다.
 
 ## 1. 런타임·설정 — 이벤트와 Lua
 
@@ -36,7 +40,7 @@ Hammerspoon은 **이벤트를 받아 Lua Callback을 실행하는 자동화 환�
 
 Window Hint는 화면의 창을 빠르게 선택하는 기능으로, 창 배치·타일링과는 별개다.
 
-화면의 모든 창에 라벨을 띄우고 키 입력으로 즉시 포커스 전환.
+화면의 창에 라벨을 띄우고 키 입력으로 포커스를 전환한다. 아래 예시는 **키 입력 이벤트 → Callback → Window Hint 표시**의 흐름이다.
 
 ```lua
 hs.hotkey.bind({'shift'}, 'F1', hs.hints.windowHints)
