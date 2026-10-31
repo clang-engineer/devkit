@@ -5,31 +5,34 @@
 ## 전체 작동 모델 — 입력·편집·표시
 
 ```text
-                  사용자 키 입력
-                        │
-                 Mode가 의미 결정
-         ┌──────────────┼───────────────┐
-         ▼              ▼               ▼
-       Normal         Insert         Visual / Ex
-         │              │               │
-  Operator + 범위    텍스트 입력      선택 / 명령 실행
-         └──────────────┴───────────────┘
-                        │
-                        ▼
-                 Buffer (텍스트 상태)
-                   ▲           │
-          Register │           ├─ Undo : 변경 이력
-          복사·삭제 내용        └─ Dot / Macro : 동작 반복
-                        │
-                 Window (표시 뷰)
-                   ├─ Fold : 줄 접기
-                   └─ Tabpage : Window 배치 묶음
+사용자 키 입력
+    │
+    ▼
+Mode에 따라 해석
+├─ Normal       : Operator + Motion / Text Object
+├─ Insert       : 텍스트 입력
+├─ Visual       : 범위 선택 후 동작
+└─ Command-line : Ex 명령
+    │
+    ▼
+Buffer (텍스트 상태)
+├─ Register ↔ 복사·삭제·붙여넣기
+├─ Undo Tree : 변경 이력·복구
+└─ Dot / Macro : 편집 동작 반복
 
-탐색·위치 기억: Search / Mark / Jump / Quickfix
-설정·키맵·도움말: 동작 방식 제어·발견
+위치 탐색 → Search / Mark / Jump / Quickfix
+              │ 커서·이동 대상 선택
+              ▼
+         Buffer 안의 위치
+
+Tabpage (Window 배치 묶음)
+└─ Window (Buffer를 표시하는 뷰)
+   └─ Fold (줄을 접어 표시)
+
+설정·Keymap·Help : 입력과 동작을 제어·발견
 ```
 
-위 그림은 **입력에서 텍스트 변경·표시까지의 중심 흐름**을 보여준다. Register·Undo·Macro·탐색은 그 과정에서 쓰이는 서로 다른 보조 메커니즘이며, 모두 순서대로 실행되는 단계는 아니다. Window는 Buffer를 표시하고 Tabpage는 Window 배치를 관리한다.
+**중심 흐름은 입력 → Mode 해석 → Buffer 조작**이다. Register는 텍스트의 보관·재사용, Undo·Macro는 변경 이력과 반복, 탐색은 커서 위치 선택에 관여한다. Tabpage·Window·Fold는 **표시 구조**이므로 Buffer 변경의 다음 실행 단계가 아니다. 각 가지는 관계를 나타내며 반드시 순서대로 실행되는 것은 아니다.
 
 ## 1. 모드 — 키의 의미를 결정한다
 
