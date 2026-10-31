@@ -5,16 +5,17 @@
 ## 관리 대상과 상태
 
 ```text
-Unit 파일 (.service / .timer)
-      │
-      ├─ systemctl daemon-reload  → Unit 정의 다시 읽기
-      ├─ systemctl start/stop     → 현재 실행 상태
-      ├─ systemctl enable/disable → 부팅 시 활성화 설정
-      └─ systemctl status         → 상태 관찰
-                │
-                └─ journalctl -u NAME → 로그 관찰
-```
+Unit 정의 (.service / .timer) [1]
+        │ daemon-reload : Manager가 정의 다시 읽음
+        ▼
+systemd Manager
+   ├─ Service Unit ── start/stop ──> 프로세스 상태 [2]
+   │       ▲
+   │       └── Timer Unit ── 일정 도달 ── 활성화 [3]
+   └─ enable/disable : 부팅·타깃과의 연결 설정 [2]
 
+실행 결과·로그 ──> Journal ── journalctl 조회 [4]
+```
 **start와 enable은 다르다.** `start`는 지금 실행하고, `enable`은 자동 시작 연결을 설정한다. `daemon-reload`는 Unit 정의를 다시 읽지만 서비스를 재시작하지 않는다.
 
 ```sh
@@ -24,7 +25,7 @@ systemctl status app.service
 journalctl -u app.service -f  # -u: unit, -f: follow
 ```
 
-Timer는 서비스 실행을 예약하는 별도 Unit이다. `systemctl`은 Unit 상태를 제어하고 `journalctl`은 기록을 읽는다.
+Timer는 일정에 따라 연결된 Service를 활성화하는 별도 Unit이다. **enable은 지금 실행한다는 뜻이 아니고, daemon-reload는 재시작이 아니다.** `systemctl`은 Unit을 제어하고 `journalctl`은 기록을 읽는다.
 
 ## 1. Unit 정의 — 파일과 우선순위
 
@@ -117,7 +118,7 @@ loginctl enable-linger {username}
 
 ## 3. 예약 실행 — Timer
 
-Timer는 스케줄을 선언하고 연결된 Service를 활성화한다. Timer 자체가 작업 명령을 실행하는 Service를 대체하지는 않는다.
+**Timer → Service → Process**의 관계를 기억한다. Timer는 스케줄을 선언하고 연결된 Service를 활성화한다. Timer 자체가 작업 명령을 실행하는 Service를 대체하지는 않는다.
 
 `.service` + `.timer` 파일 한 쌍. `.timer`가 일정에 맞춰 `.service`를 실행.
 
