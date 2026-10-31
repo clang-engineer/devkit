@@ -16,13 +16,15 @@ macOS용 i3 스타일 타일링 윈도우 매니저. SIP 비활성화 없이 기
      │        │          │
      └────────┴──────────┘
               ▼
-Workspace ── 관리 ──> Window 배치·전환
+Workspace (작업 공간)
+    └─ Window (배치 대상)
+        └─ Layout Tree (분할·정렬 구조)
 
 Mode   : 입력 키의 명령 매핑을 전환 [3]
 Config : 키·규칙·기본 동작을 정의 [4]
 ```
 
-AeroSpace는 **GUI 창의 공간 배치**를 관리한다. tmux의 Session·Pane 유지와는 별개다. 이 그림은 실행 순서가 아니라 기능 관계도다.
+AeroSpace는 **GUI 창의 공간 배치**를 관리한다. Focus는 조작할 창을 고르고, Move는 창의 위치·Workspace를 바꾸며, Layout은 배치 구조를 바꾼다. tmux의 Session·Pane 유지와는 별개다. 위 그림은 **명령 흐름과 관리 대상의 관계**를 구분해 보여준다.
 
 ## 1. 탐색과 이동 — Focus · Window · Workspace
 
@@ -36,6 +38,8 @@ Alt + Shift + 1..9     → Window를 Workspace로 이동
 ```
 
 ## 2. 배치 — Layout · Resize
+
+**Layout은 창의 포함 계층이 아니라 Workspace 내부의 창 배치 방식**이다. Tiling은 창을 분할 구조로 배치하고 Accordion은 겹쳐 넘겨보는 방식이며, Floating은 타일 배치에서 제외한다.
 
 | 단축키 | 설명 |
 |---|---|
@@ -66,6 +70,9 @@ Alt + Shift + 1..9     → Window를 Workspace로 이동
 > **바인딩은 병합이 아니라 대체다.** `[mode.main.binding]`을 하나라도 정의하면 나머지 기본 바인딩은 폴백되지 않고 **빈 테이블로 사라진다**(다른 설정 키는 기본값 폴백되는 것과 반대). 서비스 모드도 `[mode.service.binding]`을 직접 안 적으면 통째로 못 쓴다 → 원하는 stock 키는 config에 명시적으로 나열해야 한다.
 
 ## 4. 관찰과 자동화 — CLI · Config · Rules
+
+**작동 예시:** `aerospace list-windows --all`로 대상을 조회하고, `aerospace workspace 3`으로 작업 공간을 전환한다. 창을 선택한 상태에서 `aerospace move-node-to-workspace 2`를 실행하면 그 창을 다른 Workspace로 옮긴다. 조회·전환·이동은 서로 다른 동작이다.
+
 
 ```bash
 open -a AeroSpace              # 앱 실행
