@@ -1,9 +1,9 @@
 # Tmux Cheatsheet
 
-> **terminal multiplexer** — 하나의 터미널에서 여러 세션/윈도우/패널을 관리. SSH 끊겨도 세션 살아있음 — 서버 작업 표준.
+> **terminal multiplexer** — 하나의 터미널에서 여러 세션/윈도우/패널을 관리. 클라이언트를 분리해도 서버가 유지되는 동안 작업을 계속 실행할 수 있다.
 >
 > **Prefix Key**: `Ctrl+b` (기본 설정 기준)  
-> 아래 명령어에서 `Prefix`는 `Ctrl+b`를 의미합니다.
+> 아래 `Prefix`는 기본 키인 `Ctrl+b`를 뜻한다. 실제 바인딩은 설정에 따라 달라진다.
 
 ## 전체 구조 — 무엇을 관리하는가?
 
@@ -15,7 +15,7 @@ tmux Server
 │     └─ Pane      : 명령·프로세스를 실행하는 분할 영역
 ├─ Layout          : Pane 배치·크기·확대
 ├─ Copy Mode       : 출력 이력 탐색·선택
-│  └─ Buffer       : 복사한 텍스트 저장·붙여넣기
+├─ Buffer          : 복사한 텍스트 저장·붙여넣기
 └─ 동작 확장
    ├─ Status Line  : 상태 표시
    ├─ Format       : #{...} 상태값 표현
@@ -23,7 +23,7 @@ tmux Server
    └─ Config       : Option·Key Binding
 ```
 
-**핵심 구분:** Client를 detach해도 Server의 Session·Window·Pane은 유지될 수 있다. Pane 분할은 화면 배치이고, Session 유지와는 다른 기능이다. 위 그림은 실행 순서가 아닌 **관리 대상과 기능 관계**다.
+**핵심 구분:** Client를 detach해도 Server가 살아 있는 동안 Session·Window·Pane은 유지된다. Pane 분할은 화면 배치이고, Session 유지와는 다른 기능이다. 위 그림은 실행 순서가 아닌 **관리 대상과 기능 관계**다.
 
 ## 명령을 읽는 법
 
@@ -83,40 +83,41 @@ Window는 화면 전환 단위, Pane은 화면 내부의 실행 영역, Layout�
 | `Prefix l` | 마지막 윈도우로 이동 |
 | `Prefix i` | 윈도우 정보 표시 |
 
-### Pane·Layout — 분할·이동·배치
+### Pane — 생성·선택·이동
 
-| 명령어 | 설명 |
-|--------|------|
-| `Prefix %` | 세로로 패널 분할 |
-| `Prefix "` | 가로로 패널 분할 |
-| `Prefix o` | 다음 패널로 이동 |
-| `Prefix ;` | 직전에 활성화했던 패널로 토글 (last-pane) |
-| `Prefix ←↑→↓` | 방향키로 패널 이동 |
-| `Prefix Ctrl+←↑→↓` | 패널 크기 조정 |
-| `Prefix z` | 패널 확대/축소 토글 |
-| `Prefix x` | 패널 종료 (확인 필요) |
-| `Prefix !` | 패널을 새 윈도우로 분리 |
-| `Prefix q` | 패널 번호 표시 (번호 입력으로 이동) |
-| `Prefix {` | 현재 패널을 이전 패널과 위치 교환 (swap-pane) |
-| `Prefix }` | 현재 패널을 다음 패널과 위치 교환 (swap-pane) |
-| `Prefix Space` | 패널 레이아웃 순환 |
-| `Prefix m` | 현재 패널 마크 토글 (한 번에 하나만 가능) |
-| `Prefix M` | 설정된 마크 전체 해제 |
-| `swap-pane` | 현재 패널과 마크된 패널 교환 |
-| `join-pane` | 마크된 패널을 현재 윈도우로 가져오기 |
-| `Prefix E` | 모든 패널을 균등하게 정렬 |
-| `Prefix Alt+1` | even-horizontal 레이아웃 (좌우 균등) |
-| `Prefix Alt+2` | even-vertical 레이아웃 (상하 균등) |
-| `Prefix Alt+3` | main-horizontal (위 큰 패널 + 아래 작은 패널들) |
-| `Prefix Alt+4` | main-vertical (왼쪽 큰 패널 + 오른쪽 작은 패널들) |
-| `Prefix Alt+5` | tiled 레이아웃 (격자) |
-| `Prefix Ctrl+o` | 패널을 순방향으로 회전 |
-| `Prefix Alt+o` | 패널을 역방향으로 회전 |
-| `Prefix Alt+←↑→↓` | 패널을 5칸씩 크기 조정 |
+Pane은 각자 실행 프로그램을 가지며, Window 안에서 나눠 보거나 다른 Window로 옮길 수 있다.
+
+| 목적 | 대표 키·명령 | 동작 |
+|---|---|---|
+| 생성 | `Prefix %` / `Prefix "` | 좌우 / 상하 분할 |
+| 선택 | `Prefix o` / `Prefix ;` | 다음 / 직전 Pane |
+| 방향 이동 | `Prefix ←↑→↓` | 방향별 Pane 선택 |
+| 번호 선택 | `Prefix q` | Pane 번호 표시 후 선택 |
+| 확대 | `Prefix z` | 현재 Pane Zoom 토글 |
+| 종료 | `Prefix x` | Pane 종료 (확인) |
+| 분리 | `Prefix !` | Pane을 새 Window로 분리 |
+| 위치 교환 | `Prefix {` / `Prefix }` | 앞 / 뒤 Pane과 교환 |
+| 표시·마크 | `Prefix m` / `Prefix M` | Pane 마크 / 마크 해제 |
+| 다른 Pane과 교환·합치기 | `swap-pane` / `join-pane` | Source·Target을 지정해 조작 |
+
+`swap-pane`·`join-pane`은 키 하나로 외우기보다 **Source(`-s`) → Target(`-t`)** 관계로 이해한다. Session 간 이동은 [관련 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md)을 참고한다.
+
+### Layout — 배치·크기 조절
+
+| 목적 | 대표 키 | 동작 |
+|---|---|---|
+| 레이아웃 순환 | `Prefix Space` | 사전 정의된 Layout 순환 |
+| 균등 배치 | `Prefix E` | Pane을 고르게 분배 |
+| 지정 레이아웃 | `Prefix Alt+1..5` | even-horizontal / even-vertical / main-horizontal / main-vertical / tiled |
+| 크기 조절 | `Prefix Ctrl+←↑→↓` | Pane 크기 조절 |
+| 5칸 단위 조절 | `Prefix Alt+←↑→↓` | 방향별 크기 조절 |
+| Pane 회전 | `Prefix Ctrl+o` / `Prefix Alt+o` | 순방향 / 역방향 회전 |
+
+Layout은 **Pane을 새로 만드는 기능이 아니라 기존 Pane들의 배치를 바꾸는 기능**이다. `Prefix Alt+1..5`는 각 Layout의 기본 바인딩이며 실제 키맵을 확인한다.
 
 ## 3. 출력 탐색 — Copy Mode와 Buffer
 
-Copy Mode는 지나간 출력을 탐색하고 선택하는 상태이며, Buffer는 선택한 텍스트를 보관한다. 시스템 클립보드와의 연동은 별도 설정에 따라 달라진다.
+Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 복사한 텍스트를 보관한다. **Copy Mode의 기본 키는 Emacs 방식이며, Vi 방식은 `mode-keys vi` 설정 등에 따라 사용된다.** 시스템 클립보드 연동은 별도다.
 
 ### 대표 키
 
@@ -125,14 +126,14 @@ Copy Mode는 지나간 출력을 탐색하고 선택하는 상태이며, Buffer�
 | `Prefix [` | 복사 모드 진입 (스크롤 가능) |
 | `Prefix PgUp` | 복사 모드 진입 및 위로 스크롤 |
 | `q` | 복사 모드 종료 |
-| `Space` | 선택 시작 (Vi 모드) |
-| `Enter` | 선택 복사 (Vi 모드) |
+| `Space` (Vi) / `Ctrl+Space` (Emacs) | 선택 시작 |
+| `Enter` (Vi) / `Alt+w` (Emacs) | 선택 복사 |
 | `Prefix ]` | 최근 버퍼 붙여넣기 |
 | `Prefix #` | 모든 붙여넣기 버퍼 나열 |
 | `Prefix =` | 버퍼 목록에서 선택하여 붙여넣기 |
 | `Prefix -` | 가장 최근 버퍼 삭제 |
-| `Ctrl+u` / `Ctrl+d` | 반 페이지 위/아래 스크롤 |
-| `g` / `G` | 맨 위/아래로 이동 (Vi 모드) |
+| `Ctrl+u` / `Ctrl+d` (Vi) | 반 페이지 위/아래 스크롤 |
+| `g` / `G` (Vi) | 이력 맨 위/아래로 이동 |
 
 ## 4. 관찰·설정·자동화
 
@@ -144,6 +145,8 @@ Copy Mode는 지나간 출력을 탐색하고 선택하는 상태이며, Buffer�
 | Format | 상태값 참조·표현 | `#{session_name}`, `#{pane_id}` |
 | Hook | 이벤트 발생 시 명령 실행 | `set-hook`, `show-hooks` |
 | Config | 동작·키맵 변경 | `set-option`, `bind-key` |
+
+현재 바인딩은 `tmux list-keys`, Copy Mode의 Vi 키는 `tmux list-keys -T copy-mode-vi`로 확인한다.
 
 ### 공통 조작
 
@@ -160,6 +163,8 @@ Copy Mode는 지나간 출력을 탐색하고 선택하는 상태이며, Buffer�
 
 
 ## 필요한 경우 확장하기
+
+- **기본 키와 옵션의 정확한 동작:** [tmux 공식 매뉴얼](https://man7.org/linux/man-pages/man1/tmux.1.html)
 
 - **Pane·Window를 다른 Session으로 이동:** [target 지정과 join-pane / move-window](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md)
 - **OSC52 클립보드:** [터미널과 tmux의 클립보드 경계](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-06-10-tmux-clipboard-osc52-pbcopy-hangul.md)
