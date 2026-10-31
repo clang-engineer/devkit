@@ -26,7 +26,11 @@ journalctl -u app.service -f  # -u: unit, -f: follow
 
 Timer는 서비스 실행을 예약하는 별도 Unit이다. `systemctl`은 Unit 상태를 제어하고 `journalctl`은 기록을 읽는다.
 
-## 서비스 파일 위치
+## 1. Unit 정의 — 파일과 우선순위
+
+Unit은 서비스·타이머 등의 **선언된 관리 대상**이다. 파일을 수정했다면 `daemon-reload`로 정의를 다시 읽게 하고, 실제 서비스 실행 상태는 별도로 관리한다.
+
+### 서비스 파일 위치
 
 ### 시스템 유닛 (우선순위 높은 순)
 
@@ -44,7 +48,7 @@ Timer는 서비스 실행을 예약하는 별도 Unit이다. `systemctl`은 Unit
 | `/etc/systemd/user/` | 모든 사용자 대상 (관리자 설정) |
 | `/usr/lib/systemd/user/` | 패키지 제공 사용자 유닛 |
 
-## 서비스 파일 구조
+### 서비스 파일 구조
 
 ```ini
 [Unit]
@@ -63,7 +67,11 @@ Environment=NODE_ENV=production
 WantedBy=multi-user.target
 ```
 
-## systemctl 명령어
+## 2. Unit 상태 — systemctl
+
+`start`·`stop`은 **지금 실행**, `enable`·`disable`은 **자동 시작 연결**, `status`는 **관찰**이다.
+
+### 대표 명령
 
 | 명령어 | 설명 |
 |--------|------|
@@ -79,7 +87,7 @@ WantedBy=multi-user.target
 
 > 사용자 서비스: `systemctl --user start myapp.service`
 
-## 서비스 삭제
+### 서비스 삭제
 
 서비스가 실제로 이 경로의 **관리자 정의 Unit**인지 먼저 확인한다. 패키지 소유 Unit을 임의로 삭제하지 않는다. 시스템 Unit 수정에는 관리자 권한이 필요하다.
 
@@ -99,7 +107,7 @@ systemctl --user daemon-reload
 systemctl --user reset-failed
 ```
 
-## 사용자 서비스 유지 (로그아웃 후에도)
+### 사용자 서비스 유지 (로그아웃 후에도)
 
 ```bash
 loginctl enable-linger {username}
@@ -107,7 +115,9 @@ loginctl enable-linger {username}
 
 ---
 
-## Timer (cron 대체)
+## 3. 예약 실행 — Timer
+
+Timer는 스케줄을 선언하고 연결된 Service를 활성화한다. Timer 자체가 작업 명령을 실행하는 Service를 대체하지는 않는다.
 
 `.service` + `.timer` 파일 한 쌍. `.timer`가 일정에 맞춰 `.service`를 실행.
 
@@ -173,7 +183,9 @@ journalctl -u backup.service                   # 실행 로그
 
 ---
 
-## journalctl
+## 4. 기록 관찰 — journalctl
+
+`systemctl`이 Unit의 상태를 제어한다면 `journalctl`은 기록을 조회한다.
 
 systemd 로그 조회 도구.
 
