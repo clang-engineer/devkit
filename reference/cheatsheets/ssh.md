@@ -24,7 +24,11 @@ ssh -J bastion user@target
 ssh -L 8080:localhost:80 user@host
 ```
 
-## ssh-agent + ssh-add
+## 1. 인증 — Key · Agent · Server
+
+키 생성·Agent 등록·서버의 공개키 등록은 **서로 다른 단계**다. 인증 실패 시 어느 단계가 누락됐는지 구분한다.
+
+### ssh-agent + ssh-add
 
 ```sh
 pgrep -x ssh-agent             # 실행 중인지 확인
@@ -52,7 +56,7 @@ Host *
   ServerAliveInterval 60
 ```
 
-## SSH 키 생성 + 서버 등록
+### SSH 키 생성 + 서버 등록
 
 ```sh
 ssh-keygen -t ed25519 -C "email" -f ~/.ssh/id_ed25519
@@ -83,7 +87,11 @@ cat ~/.ssh/id_ed25519.pub | ssh user@host \
   'umask 077; mkdir -p ~/.ssh; cat >> ~/.ssh/authorized_keys; chmod 600 ~/.ssh/authorized_keys'
 ```
 
-## ~/.ssh/config
+## 2. 접속 대상 선택 — Host · Config · Jump
+
+`~/.ssh/config`는 별칭과 접속 옵션을 묶는다. Git의 SSH 주소도 이 별칭을 사용하지만 계정별 URL 재작성은 별도 운영 문제다.
+
+### ~/.ssh/config
 
 ```sshconfig
 Host github.com-personal
@@ -125,7 +133,7 @@ ssh -T git@github.com-personal  # 정확히 일치 → 의도한 키
 ssh -vT git@github.com 2>&1 | grep "Offering public key"   # 어떤 키 제공되는지
 ```
 
-## Git remote에 적용
+### Git remote에 적용
 
 ```sh
 git remote set-url origin git@github.com-personal:user/repo.git
@@ -151,7 +159,11 @@ git config --global \
 
 `insteadOf`는 문자 그대로 "대신에"라는 뜻으로, 뒤 URL로 시작하는 Git 주소를 앞 URL로 바꾼다. 계정 혼선을 막으려면 `github.com` 전체가 아니라 조직 경로까지 좁힌다.
 
-## 포트 포워딩 (터널링)
+## 3. 연결 경로 — Tunnel · Forwarding
+
+`-L`은 **로컬에서 듣고 원격을 통해 연결**, `-R`은 **원격에서 듣고 로컬 쪽으로 연결**, `-D`는 **동적 SOCKS 프록시**를 제공한다.
+
+### 포트 포워딩 (터널링)
 
 | 옵션 | 의미 | 예 |
 |---|---|---|
@@ -200,7 +212,11 @@ Host dbhost
   ExitOnForwardFailure yes   # 포워딩 실패 시 즉시 종료 → autossh가 재시도
 ```
 
-## SCP — SSH 채널 위 파일 복사
+## 4. 파일 전송 — SCP · rsync
+
+`scp`는 파일 복사, `rsync`는 변경된 부분을 효율적으로 동기화하는 도구다. 둘은 SSH 접속을 활용하지만 같은 명령 체계는 아니다.
+
+### SCP — SSH 채널 위 파일 복사
 
 ```sh
 scp ./local user@host:/remote/path/        # 로컬 → 원격
@@ -224,7 +240,7 @@ scp -i ~/.ssh/key file user@host:/path/    # 키 지정
 - OpenSSH 8.0+ scp 프로토콜은 "권장하지 않음", 9.0+은 내부적으로 SFTP 사용.
 - 새 코드라면 `sftp`나 `rsync` 우선 고려.
 
-## rsync — 큰 디렉토리·재전송
+### rsync — 큰 디렉토리·재전송
 
 ```sh
 rsync -az -e ssh ./src/ user@host:/dst/         # 압축 + 아카이브 모드
@@ -235,7 +251,9 @@ rsync -avz --exclude='node_modules' ./src/ user@host:/dst/
 
 scp와 달리 변경분만 보내고, 중단 시 이어받기 됨.
 
-## 트러블슈팅
+## 5. 진단 — 어느 단계에서 실패했는가?
+
+인증·호스트 선택·네트워크 경로를 나누어 확인한다.
 
 ### Permission denied (publickey)
 
