@@ -4,56 +4,32 @@
 > CLI git 명령을 외우지 않아도 거의 모든 워크플로가 가능.
 > 공식: https://github.com/jesseduffield/lazygit
 
-## 패널에 따라 키의 의미가 달라진다
+## 전체 구조 — 무엇을 조작하는가?
 
 ```text
 Git Repository
-  ├─ Files    → 변경 선택·Stage (Space)
-  ├─ Branches → 브랜치 선택·생성
-  ├─ Commits  → 이력 탐색·재작성
-  └─ Stash    → 임시 보관 변경 관리
+├─ Files      : 변경 선택 → Stage → Commit
+├─ Branches   : 브랜치·원격 참조 전환
+├─ Commits    : 이력 탐색·재작성
+├─ Stash      : 변경 임시 보관·복원
+└─ Main View  : 선택한 대상의 Diff·Log·상세
 ```
 
-**같은 키라도 현재 패널이 대상(context)**이다. 먼저 패널을 고르고, `?`로 해당 패널의 현재 키맵을 확인한다. `Space`는 Files에서 Stage 토글, Stash에서 보관 항목 적용처럼 대상에 따라 의미가 달라진다.
+**먼저 패널(대상)을 선택하고, 그 안에서 동작을 고른다.** 같은 키도 패널에 따라 의미가 달라진다. `?`로 현재 패널의 키맵을 확인한다. 아래 키는 기본 설정 기준이며 실제 설정과 버전에 따라 다를 수 있다.
 
-`c`는 커밋 입력, `C`는 에디터를 사용하는 커밋 입력 등 대소문자도 동작을 구분한다. 아래 키는 기본 설정을 기준으로 하며 실제 키맵이 우선한다.
+## 키를 읽는 법
 
-## 설치
-
-```sh
-brew install lazygit                            # macOS / Linux
-scoop install lazygit                           # Windows
-go install github.com/jesseduffield/lazygit@latest
+```text
+1..5 / ← → : 패널 선택
+[ / ]     : 패널 내부 탭 전환
+Space     : 현재 패널의 대상에 동작 (Stage / Checkout / Apply 등)
+Enter     : 선택 대상의 세부 화면으로 이동
+?         : 현재 컨텍스트의 키 확인
 ```
 
-## 실행
+`c`와 `C`처럼 대소문자가 다른 동작을 가리키기도 한다. Git의 Working Tree·Index·Commit 관계는 [Git 치트시트](git.md)를 참고한다.
 
-```sh
-lazygit         # Git 리포지토리 내부에서
-lg              # 흔한 alias
-```
-
-LazyVim에서: `<leader>gg` (cwd) / `<leader>gG` (root dir)
-
-## 인터페이스 구성
-
-```
-┌──────────┬─────────────┐
-│ 1 Status │             │
-├──────────┤             │
-│ 2 Files  │  Main view  │
-├──────────┤  (diff,     │
-│ 3 Branch │   commit,   │
-├──────────┤   log...)   │
-│ 4 Commits│             │
-├──────────┤             │
-│ 5 Stash  │             │
-└──────────┴─────────────┘
-```
-
-`1`~`5` 숫자키 또는 `←`/`→` 으로 패널 이동. 패널 **안의 탭** 전환은 `[`/`]`.
-
-## 주요 단축키
+## 1. 패널별 동작 — 대상에 맞는 키
 
 ### 전역
 
@@ -139,7 +115,7 @@ remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` �
 | `g` | pop |
 | `d` | drop |
 
-## 활용 시나리오
+## 2. 작업 흐름 — 기능을 조합하는 예시
 
 ### 1. Hunk 단위 커밋 (가장 자주)
 
@@ -179,7 +155,9 @@ red = 미포함이고 아직 push되지 않음을 뜻한다.
 > 커밋 색상과 그래프는 커밋 조상 관계를 보여준다. 따라서 regular merge와 fast-forward는 판별할 수 있지만,
 > 원래 커밋 SHA를 보존하지 않는 squash/rebase merge의 완료 여부는 PR 상태 등으로 확인해야 한다.
 
-## 설정 (`~/.config/lazygit/config.yml`)
+## 3. 설정과 진단
+
+### 설정 (`~/.config/lazygit/config.yml`)
 
 ```yaml
 gui:
@@ -202,7 +180,7 @@ git:
 LazyVim 통합 설정은 https://github.com/clang-engineer/dotfiles/blob/main/nvim/lazy/lua/plugins/lazygit.lua 참고
 (Windows에서 nvim-remote editPreset 비활성화 처리).
 
-## 트러블슈팅
+### 트러블슈팅
 
 | 문제 | 해결 |
 |------|------|
