@@ -17,13 +17,14 @@ Mode (키의 의미 결정) [1]
                          ▼
                     Buffer 변경
                          ├─ Register : 복사·삭제 내용 보관 [4]
-                         ├─ Undo / Dot / Macro : 변경 복원·반복 [5]
-                         └─ Search / Mark / Jump : 위치 탐색 [5]
+                         ├─ Dot / Macro / Undo : 변경 반복·복구 [6]
+                         └─ Search / Mark / Jump / Quickfix : 위치 탐색 [5]
                          │
-                  Window가 Buffer 표시 [6]
+                  Window가 Buffer 표시 [8]
                          └─ Tabpage : Window 배치 묶음
 
-설정·매핑·도움말 → 입력·동작 방식 확장 [7]
+Fold : Window의 줄 표시·접기 [7]
+설정·매핑·도움말 → 입력·동작 방식 확장 [9]
 ```
 
 **Vim은 키 자체보다 현재 Mode와 조작 대상이 중요하다.** Normal 모드에서 Operator는 동작, Motion·Text Object는 범위를 결정한다. 편집된 텍스트는 Buffer에 있고, Window·Tabpage는 이를 보여주는 화면 구성이다. 숫자는 아래 본문 절을 가리킨다.
@@ -108,38 +109,55 @@ y / d / c → Register → p / P
 
 `"ap`는 `a` 레지스터 붙여넣기, `"_diw`는 삭제 내용을 버리기, `"+y`는 지원 환경에서 시스템 클립보드에 복사한다. 레지스터 동작에는 번호 레지스터와 삭제 크기에 따른 추가 규칙이 있다.
 
-## 5. 탐색·위치·반복·접기
+## 5. 위치 탐색 — Search·Mark·Jump·Quickfix
 
-탐색·Mark·Jump는 **어디에서 작업할지**, Macro·Dot Repeat는 **어떤 동작을 반복할지**, Fold는 **어떻게 표시할지** 결정한다. 같은 기능 목록으로 외우기보다 서로 다른 조작 대상을 구분한다.
+**Search는 내용을 찾고, Mark는 위치를 기억하며, Jump List는 이동 이력을 따라간다.** Quickfix는 여러 파일·위치의 결과를 목록으로 다룬다.
+
+| 목적 | 대표 조작 | 기억할 차이 |
+|---|---|---|
+| 문자열 검색 | `/pattern`, `?pattern`, `n` / `N` | 앞·뒤 검색, 다음·이전 일치 |
+| 위치 기억 | `ma`, `'a`, `\`a` | Mark `a` 저장, 줄 시작 / 정확한 위치 복귀 |
+| 이동 이력 | `Ctrl-o` / `Ctrl-i` | Jump List 이전 / 다음 위치 |
+| 결과 목록 | `:copen`, `:cnext`, `:cprev` | Quickfix 열기·결과 이동 |
+
+**예시:** `ma`로 현재 위치를 저장 → `/TODO`로 검색 → `'a`로 표시한 줄에 복귀. 반면 `Ctrl-o`는 미리 이름 붙이지 않은 Jump 이력을 거슬러 간다. `:vimgrep /TODO/g **/*.md`로 여러 파일의 일치 위치를 Quickfix에 모아 `:cnext`로 순회할 수도 있다.
+
+## 6. 편집 반복·복구 — Dot·Macro·Undo
 
 ```text
-Vim의 탐색과 반복
-├─ Search      : 내용으로 위치 찾기 (/ ? n N)
-├─ Mark        : 특정 위치를 이름으로 기억 (m, ', `)
-├─ Jump List   : 이동 이력을 따라 앞뒤로 탐색 (Ctrl-o / Ctrl-i)
-├─ Quickfix    : 여러 위치의 결과 목록 (:cnext / :cprev)
-├─ Macro       : 키 입력 시퀀스를 Register에 기록·재생 (q / @)
-├─ Dot Repeat  : 마지막 변경을 반복 (.)
-├─ Undo Tree   : 변경 이력을 되돌리거나 다시 적용 (u / Ctrl-r)
-└─ Fold        : 텍스트를 지우지 않고 화면에서 접기 (z 계열)
+편집 동작
+├─ Dot (.)       → 마지막 변경을 다른 위치에 반복
+├─ Macro (q/@)   → 여러 키 입력을 Register에 기록·재생
+└─ Undo (u)      → Buffer 변경 이력을 되돌림
+   └─ Ctrl-r     → Undo한 변경 다시 적용
 ```
 
-| 기능 | 언제 필요한가 | 대표 진입점 |
+| 목적 | 대표 조작 | 예시 |
 |---|---|---|
-| Search | 같은 문자열을 찾을 때 | `/pattern`, `n` / `N` |
-| Mark | 지정한 위치로 나중에 돌아올 때 | `ma`, `'a`, `\`a` |
-| Jump List | 정의 이동·검색 등 이전 위치로 돌아갈 때 | `Ctrl-o` / `Ctrl-i` |
-| Quickfix | 검색·컴파일 결과를 차례로 탐색할 때 | `:copen`, `:cnext` |
-| Macro | 여러 키 입력을 순서대로 반복할 때 | `qa … q`, `@a` |
-| Dot Repeat | 직전 변경 동작을 반복할 때 | `.` |
-| Undo | 변경 이력을 되돌릴 때 | `u`, `Ctrl-r` |
-| Fold | 긴 코드의 일부를 접어 구조를 볼 때 | `za` 토글, `zc` 접기, `zo` 열기 |
+| 단일 변경 반복 | `.` | `ciw`로 단어 수정 후 다른 단어에서 `.` |
+| 여러 동작 기록 | `qa` … `q` | `a` 레지스터에 Macro 기록 |
+| 기록한 동작 실행 | `@a`, `@@` | `a` Macro 실행 / 직전 Macro 재실행 |
+| 반복 횟수 | `3@a` | Macro를 세 번 실행 |
+| 변경 복구 | `u`, `Ctrl-r` | Undo / Redo |
+| Undo 이력 탐색 | `:undolist`, `:earlier`, `:later` | 변경 이력과 시간·순서 기준 이동 |
 
-**Macro는 Register에 명령 시퀀스를 저장**하고, Mark는 **위치**를 기억한다. Jump List는 이동 이력, Fold는 표시 상태이므로 서로 역할이 다르다. Fold의 생성·유지 방식은 `foldmethod`에 따라 달라진다.
+**예시:** 같은 편집을 다른 위치에 반복할 때는 `.`이 간단하다. 이동·삽입 등 여러 키를 묶어 반복하려면 `qa`로 기록을 시작하고 작업 후 `q`로 종료한 다음 `@a`로 실행한다. Macro는 Register에 키 시퀀스를 저장하므로 텍스트를 복사하는 Register와 저장 공간을 공유한다.
 
-범위 치환은 `:%s/old/new/g`(전체 버퍼), `:s/old/new/g`(현재 줄)처럼 Ex 명령으로 수행한다. `gc`의 `c`는 치환 시 확인(confirm) 옵션이다.
+## 7. 화면 표시 — Fold
 
-## 6. 편집 대상의 계층 — Buffer / Window / Tab
+Fold는 **Buffer의 텍스트를 지우지 않고 Window에서 일부 줄을 접어 표시**한다. 큰 함수·문단을 접어 구조를 볼 때 사용한다.
+
+| 목적 | 대표 조작 |
+|---|---|
+| 접기·펼치기 토글 | `za` |
+| 접기 / 펼치기 | `zc` / `zo` |
+| 모두 접기 / 펼치기 | `zM` / `zR` |
+| 선택한 줄을 수동 접기로 지정 | Visual 선택 후 `zf` (`foldmethod=manual`) |
+| 접기 방식 확인 | `:set foldmethod?` |
+
+`foldmethod`는 manual·indent·syntax·expr·marker·diff 등 방식으로 접을 범위를 결정한다. **Fold는 편집 동작이 아니라 화면 표현**이므로 Undo·Macro와 구분한다.
+
+## 8. 편집 대상 — Buffer·Window·Tab
 
 **Buffer는 텍스트 상태, Window는 그 상태를 보여주는 뷰, Tabpage는 Window 배치**다. 같은 Buffer를 여러 Window에서 표시할 수 있으므로 파일·Buffer·Window·Tab을 1:1로 대응시키지 않는다.
 
@@ -160,7 +178,7 @@ Tabpage (Window 배치 묶음)
 
 **Tab은 파일 하나가 아니라 Window 레이아웃**이다. Window를 닫는 것과 Buffer를 지우는 것도 다르다.
 
-## 7. 설정과 도움말은 별도 명령 계열
+## 9. 설정과 도움말은 별도 명령 계열
 
 ```text
 :set number       → 옵션 설정
