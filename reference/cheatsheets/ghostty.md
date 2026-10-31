@@ -4,17 +4,18 @@
 >
 > 아래는 **macOS 기본 키맵** (`ghostty +list-keybinds` 실측). `⌘`=super, `⌥`=alt, `⌃`=ctrl, `⇧`=shift. 커스텀은 `⌘,`(open_config)로 연다.
 
-## 화면 배치와 세션의 경계
+## 전체 작동 모델 — 창에서 셸까지
 
 ```text
-Ghostty Window
-   ├─ Tab
-   │   └─ Split / Surface → Terminal / Shell
-   └─ Tab
+Ghostty Window (OS 창)
+└─ Tab (화면 전환)
+   └─ Split Layout (화면 배치)
+      ├─ Surface ── PTY ── Shell / Program
+      └─ Surface ── PTY ── Shell / Program
 
-Window  : OS 창       (기본 macOS ⌘N)
-Tab     : 창 안의 탭   (⌘T)
-Split   : 탭 내 화면 분할 (⌘D / ⌘⇧D)
+창·탭·분할 : 화면 구성 [1]
+출력 이력·클립보드 : 화면 탐색 [2]
+설정·키맵·진단 : 동작 제어 [3]
 ```
 
 Ghostty의 분할은 **화면 배치**이며 tmux의 Server·Session 보존 기능과 다르다. SSH 연결이 끊긴 뒤 원격 작업을 유지하려면 tmux 등 별도 세션 관리가 필요하다.
