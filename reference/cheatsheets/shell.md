@@ -25,19 +25,9 @@ Shell
 
 ## 1. 명령 구성 (Interpret)
 
-입력 문자열을 **실행할 명령과 인자**로 해석하는 영역이다. Quoting·Expansion·Globbing이 인자의 모양을 결정하고, Parameter Expansion은 변수 값을 가공한다.
+입력 문자열을 **실행할 명령과 인자**로 해석하는 영역이다. Quoting은 확장 범위를 제어하고, Expansion·Globbing은 실제 인자를 만든다. Word Splitting은 인용되지 않은 확장 결과를 여러 인자로 나눌 수 있다.
 
 ### Quoting · Expansion · Globbing — 입력을 인자로 바꾸기
-
-```text
-입력 문자열
-  ├─ Quoting           : 문자를 문자 그대로 둘까?
-  ├─ Expansion         : 변수·명령 결과·패턴을 펼칠까?
-  ├─ Word Splitting    : 확장 결과를 여러 인자로 나눌까?
-  └─ Filename Globbing : 파일명 패턴을 경로로 바꿀까?
-         ↓
-    명령 + 인자들 → 실행
-```
 
 | 목적 | 대표 문법 | 구분 |
 |---|---|---|
@@ -89,15 +79,6 @@ ${parameter...}
 
 **Redirection은 한 명령의 입출력 대상을 바꾸고, Pipeline은 여러 명령의 출력을 연결한다.** 종료 상태는 그 실행 결과를 조건 분기에 활용하는 값이다.
 
-```text
-명령 A ── stdout ── | ── stdin ── 명령 B
-          │
-          ├─ > file   : stdout을 파일로
-          └─ 2> file  : stderr를 파일로
-
-명령의 Exit Status → && / || / if 에서 판단
-```
-
 | 의도 | 대표 문법 | 핵심 |
 |---|---|---|
 | 순차 실행 | `a; b` | 앞의 성공 여부와 무관 |
@@ -112,7 +93,7 @@ ${parameter...}
 
 `cmd > log 2>&1`과 `cmd 2>&1 > log`는 다르다. **리다이렉션은 왼쪽에서 오른쪽 순서대로 적용**한다.
 
-### 여러 줄·파일 같은 입력
+### 여러 줄 입력 · 프로세스 치환
 
 | 문법 | 존재 이유 |
 |---|---|
@@ -132,15 +113,7 @@ diff <(sort old.txt) <(sort new.txt)
 
 ### Condition · Loop · Function — 다음 실행 결정
 
-`if`·`case`는 조건에 따라 실행 대상을 선택하고, `for`·`while`은 반복을 제어한다. 함수는 재사용할 명령 묶음으로, 조건·반복과 조합할 수 있다.
-
-```text
-Exit Status ──> if / && / ||
-값·패턴     ──> [[ ... ]] / case
-반복 대상   ──> for / while / until
-반복 로직   ──> function
-여러 값     ──> indexed / associative array
-```
+`if`·`case`는 조건에 따라 실행 대상을 선택하고, `for`·`while`은 반복을 제어한다. 함수는 재사용할 명령 묶음으로, 조건·반복과 조합할 수 있다. 배열은 반복할 여러 값을 보관한다.
 
 | 목적 | 대표 문법 | 기억할 점 |
 |---|---|---|
