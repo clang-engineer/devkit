@@ -2,20 +2,7 @@
 
 > chezmoi는 여러 환경의 설정 파일을 **Source에서 원하는 상태(Target)로 해석한 뒤 실제 홈(Destination)에 적용**한다. 명령보다 세 상태와 변환 규칙을 먼저 이해한다.
 
-## 전체 기능 지도
-
-```text
-chezmoi
-├─ 상태 관리     Source / Target / Destination
-├─ 파일 속성     dot_ / private_ / executable_ / symlink_ / exact_
-├─ 환경별 변환   Template / Data / Secret
-├─ 자동 실행     run_ / run_once_ / run_onchange_
-├─ 제외·보호     .chezmoiignore / age / GPG
-├─ 동기화        Git / init / update / re-add
-└─ 검증          diff / status / verify / doctor
-```
-
-## 세 상태와 명령의 방향
+## 전체 작동 모델 — Source·Target·Destination
 
 ```text
 실제 홈 파일 ── add / re-add ──> Source State (관리 원본)
@@ -31,9 +18,11 @@ chezmoi
 
 - `add`는 기존 파일을 관리 대상으로 편입, `edit`는 Source 수정, `re-add`는 Destination 변경을 Source에 다시 반영한다.
 - `diff`는 적용 전 차이를 확인하고 `apply`는 실제 파일을 변경한다.
+
+**예시:** `chezmoi add ~/.zshrc`로 관리 시작 → Source를 수정 → `chezmoi diff`로 Target과 실제 홈의 차이 확인 → `chezmoi apply`로 적용. 원본을 다시 가져올 때는 `re-add`를 사용한다.
 - `update`는 Source 저장소의 갱신과 적용을 연결한다. Source와 Destination은 자동 양방향 동기화되는 것이 아니다.
 
-## 파일 이름이 속성을 표현한다
+## 1. Source 규칙 — 파일명과 속성
 
 ```text
 Source name                    Destination
@@ -47,7 +36,7 @@ exact_dot_config/           → ~/.config/ (관리 대상과 일치하도록 조
 
 접두어는 **파일의 의미와 배포 방식**을 지정한다. `exact_`는 관리하지 않는 대상 파일을 삭제할 수 있으므로 특히 주의한다. 파일명 속성을 변경할 때는 `chattr`를 사용한다.
 
-## Template과 Data의 역할
+## 2. Target 생성 — Template·Data
 
 ```text
 Source Template (.tmpl)
@@ -67,7 +56,7 @@ Source Template (.tmpl)
 
 `chezmoi data`는 사용 가능한 데이터를 확인하고, `chezmoi cat <target>`은 렌더링 결과를 확인한다.
 
-## 파일 배포와 스크립트 실행은 다르다
+## 3. Destination 적용 — 파일·스크립트
 
 | 구분 | 역할 | 대표 형식 |
 |---|---|---|
@@ -80,7 +69,7 @@ Source Template (.tmpl)
 
 `run_once_`·`run_onchange_`는 단순한 시간 기반 스케줄러가 아니다. 스크립트 내용의 변화와 실행 상태를 기반으로 적용 여부를 판단한다.
 
-## Git·Secret·검증의 경계
+## 4. 버전·비밀값·검증
 
 ```text
 Git          → Source 버전·동기화
