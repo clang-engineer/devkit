@@ -8,26 +8,26 @@
 사용자 키 입력
       │
       ▼
-Mode (키의 의미 결정) [1]
-├─ Insert       → 텍스트 입력
-├─ Visual       → 범위 선택
-├─ Command-line → Ex 명령
-└─ Normal       → Operator + Motion / Text Object [2·3]
-                         │
-                         ▼
-                    Buffer 변경
-                         ├─ Register : 복사·삭제 내용 보관 [4]
-                         ├─ Dot / Macro / Undo : 변경 반복·복구 [6]
-                         └─ Search / Mark / Jump / Quickfix : 위치 탐색 [5]
-                         │
-                  Window가 Buffer 표시 [8]
-                         └─ Tabpage : Window 배치 묶음
+Mode : 키의 의미 결정 [1]
+      │
+      ├─ Normal → Operator + Motion / Text Object [2·3]
+      ├─ Insert → 텍스트 입력
+      ├─ Visual → 범위 선택
+      └─ Command-line → Ex 명령
+      │
+      ▼
+Buffer : 편집할 텍스트
+      ├─ Register : 복사·삭제 내용 저장 [4]
+      ├─ Search / Mark / Jump / Quickfix : 위치 탐색 [5]
+      └─ Dot / Macro / Undo : 변경 반복·복구 [6]
 
-Fold : Window의 줄 표시·접기 [7]
-설정·매핑·도움말 → 입력·동작 방식 확장 [9]
+Window : Buffer를 표시 [8]
+      ├─ Fold : 화면에서 줄 접기 [7]
+      └─ Tabpage : Window 배치 묶음 [8]
+
+설정·매핑·도움말 : 동작 방식 확인·확장 [9]
 ```
-
-**Vim은 키 자체보다 현재 Mode와 조작 대상이 중요하다.** Normal 모드에서 Operator는 동작, Motion·Text Object는 범위를 결정한다. 편집된 텍스트는 Buffer에 있고, Window·Tabpage는 이를 보여주는 화면 구성이다. 숫자는 아래 본문 절을 가리킨다.
+**Vim은 키 자체보다 현재 Mode와 조작 대상이 중요하다.** Normal 모드에서 Operator는 동작, Motion·Text Object는 범위를 결정한다. 편집된 텍스트는 Buffer에 있고, Window·Tabpage는 이를 보여주는 화면 구성이다. 대괄호 숫자는 아래 본문 절을 가리킨다. 이 그림의 가지는 **기능의 적용 대상**이며 모두 순차 실행되는 단계는 아니다.
 
 ## 1. 모드 — 키의 의미를 결정한다
 
