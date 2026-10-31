@@ -4,35 +4,24 @@
 
 Zsh는 배열 인덱스·확장·단어 분리 규칙이 다르다. Zsh 고유 기능은 [Zsh 치트시트](zsh.md)를 참고한다.
 
-## 셸의 큰 흐름 — 입력에서 다음 명령까지
+## 셸의 큰 그림 — 기능과 관계
 
 ```text
-사용자 입력 / Shell Script
-           │
-           ▼
-     명령 구문 해석
-     ├─ Quoting       : 무엇을 문자 그대로 둘까?
-     ├─ Expansion     : 변수·명령 결과를 어떻게 펼칠까?
-     └─ Globbing      : 어떤 파일명을 인자로 만들까?
-           │
-           ▼
-     명령 실행 준비
-     ├─ Builtin / Function / External Command
-     ├─ Redirection / Pipeline : 입출력 연결
-     └─ Foreground / Background: 작업 실행 방식
-           │
-           ▼
-     실행 결과 (Exit Status)
-           │
-           └── if / && / || / Loop → 다음 실행 결정
-
-     [실행 전반에 작용] Variable / Option / Environment
-     [실행 중 제어]     Job / Signal / Trap / Wait
+Shell
+├─ 1. 명령 구성 (Interpret)
+│  ├─ Quoting / Expansion / Globbing → 인자 생성
+│  └─ Parameter Expansion           → 변수 값 가공
+├─ 2. 명령 실행 (Execute)
+│  ├─ Builtin / Function / External → 실행 대상
+│  ├─ Redirection / Pipeline        → 입출력 연결
+│  ├─ Exit Status                   → 성공·실패 판단
+│  └─ if / case / for / while       → 실행 흐름 결정
+└─ 3. 실행 환경과 작업 관리 (Control)
+   ├─ Variable / Environment / Option → 실행 조건
+   └─ Job / Signal / Trap / Wait      → 실행 중 작업 관리
 ```
 
-**핵심 질문은 세 가지다.** 어떤 **인자**가 만들어지는가? 명령의 **입출력과 실행 방식**은 무엇인가? 실행 **결과**에 따라 다음 동작은 어떻게 달라지는가?
-
-이 그림은 이해를 위한 **개념적 흐름**이다. 실제 Bash의 구문 분석·확장·리다이렉션·실행에는 구체적인 순서와 예외가 있으며, `if`와 반복문은 실행이 끝난 뒤에만 작동하는 별도 단계가 아니라 명령 실행을 감싸고 제어하는 구문이다. 본문은 **명령 구성 → 명령 실행 → 실행 환경과 작업 관리**의 세 영역으로 묶었다. 마지막 영역은 실행이 끝난 뒤의 단계가 아니라 실행 전반에 작용하는 설정과 작업 제어다.
+이 그림은 **실행 순서가 아닌 기능 관계도**다. 명령을 구성하고 실행하는 동안 조건문·반복문이 흐름을 제어하며, 환경 설정과 작업 제어는 여러 단계에 걸쳐 작용한다. 아래 본문은 각 영역의 존재 이유와 대표 문법만 설명한다.
 
 ## 1. 명령 구성 (Interpret)
 
@@ -98,6 +87,8 @@ ${parameter...}
 
 ### Pipeline · Redirection · Exit Status
 
+**Redirection은 한 명령의 입출력 대상을 바꾸고, Pipeline은 여러 명령의 출력을 연결한다.** 종료 상태는 그 실행 결과를 조건 분기에 활용하는 값이다.
+
 ```text
 명령 A ── stdout ── | ── stdin ── 명령 B
           │
@@ -141,6 +132,8 @@ diff <(sort old.txt) <(sort new.txt)
 
 ### Condition · Loop · Function — 다음 실행 결정
 
+`if`·`case`는 조건에 따라 실행 대상을 선택하고, `for`·`while`은 반복을 제어한다. 함수는 재사용할 명령 묶음으로, 조건·반복과 조합할 수 있다.
+
 ```text
 Exit Status ──> if / && / ||
 값·패턴     ──> [[ ... ]] / case
@@ -167,6 +160,8 @@ Exit Status ──> if / && / ||
 셸 옵션과 환경은 명령 해석·실행에 **지속적으로 영향**을 주고, Job·Signal·Trap은 실행 중인 작업을 관리한다. 따라서 이 영역은 앞의 두 영역 뒤에 순서대로 실행되는 단계가 아니다.
 
 ### Job Control · Signal · Trap
+
+**Job Control은 작업의 전경·배경·정지 상태를 관리한다.** Signal은 프로세스에 전달되는 제어 신호이고, `trap`은 셸이 처리할 신호나 종료 시점에 실행할 동작을 등록한다.
 
 ```text
 Shell
