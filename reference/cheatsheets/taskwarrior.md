@@ -28,7 +28,11 @@ task 3 done                   # ID 3 완료
 task undo                     # 마지막 변경 취소
 ```
 
-## 설치와 최초 실행
+## 1. 시작·태스크 생성
+
+**Task는 상태와 속성을 가진 작업 단위**다. 생성한 작업은 필터로 찾아 선택하고, 명령으로 상태를 바꾼다.
+
+### 설치와 최초 실행
 
 ```sh
 brew install task                 # macOS
@@ -48,7 +52,7 @@ touch ~/.taskrc                   # 빈 파일로도 충분
 만들거나 `TASKRC`로 준비한 파일을 지정한다. `data.location`은 기본값을 바꿀 때만
 설정하면 된다.
 
-## 핵심 명령
+### 핵심 명령
 
 | 명령 | 동작 |
 |---|---|
@@ -68,7 +72,11 @@ touch ~/.taskrc                   # 빈 파일로도 충분
 `start`는 `start` 타임스탬프를 기록하고 `stop`은 이를 제거해 활성 상태를
 표시한다. 시작·중지 구간을 누적하는 시간 추적기가 아니다.
 
-## 속성
+## 2. 선택·수정 — 속성과 필터
+
+`filter`는 **어떤 태스크에**, `command`는 **무엇을 할지**, `attributes`는 **어떻게 바꿀지**를 지정한다.
+
+### 속성
 
 ```sh
 task add "릴리스 점검" project:devkit +docs due:fri priority:H
@@ -94,7 +102,7 @@ task add "주간 리뷰" due:fri recur:weekly
 `wait:`를 쓰고, 실행 가능 여부를 보고 싶으면 `task ready` 또는 `+READY` 필터를
 쓴다.
 
-## 필터와 일괄 작업
+### 필터와 일괄 작업
 
 명령 앞의 필터에 맞는 태스크만 조회하거나 변경한다. 일괄 변경 전에는 같은
 필터로 먼저 리포트를 확인한다.
@@ -122,7 +130,7 @@ task _get "$uuid".description
 설정 override다. 즉시 생성된 항목을 가리키는 `+LATEST` 같은 상태나 변동 가능한
 숫자 ID에 의존하지 않는 편이 안전하다.
 
-## 날짜
+### 날짜
 
 `due:`, `scheduled:`, `wait:` 등에 같은 날짜 표현을 쓴다.
 
@@ -138,7 +146,11 @@ task _get "$uuid".description
 입력할 때는 현재 설정을 확인하고, 스크립트와 교환 데이터에는 모호하지 않은 ISO
 형식을 우선한다.
 
-## Undo와 JSON export
+## 3. 기록·복구·동기화
+
+완료·삭제·수정 이력과 동기화는 작업 상태 변경과 별개로 이해한다.
+
+### Undo와 JSON export
 
 - `task undo`는 직전 변경의 diff를 보여 주고 확인을 받은 뒤 적용한다. 자동으로
   조용히 되돌리는 명령이 아니다.
@@ -154,7 +166,7 @@ task export > task-backup.json
 task project:devkit +PENDING export | jq '.[] | {uuid, description, due}'
 ```
 
-## 동기화와 데이터 안전
+### 동기화와 데이터 안전
 
 Taskwarrior 3은 과거 Taskserver인 **`taskd`를 지원하지 않는다.** 현재
 TaskChampion 동기화 백엔드는 다음과 같다.
@@ -171,7 +183,9 @@ Syncthing, rsync 등으로 `~/.task/` 또는 `taskchampion.sqlite3`를 장치 �
 동기화하면 충돌하거나 손상될 수 있다. 단순 백업도 일관된 `task export` 결과를
 별도로 보관하는 방식이 안전하다.
 
-## 선택 사항: 일상 화면에 노출하기
+## 4. 외부 표시·연동
+
+### 선택 사항: 일상 화면에 노출하기
 
 Taskwarrior 자체 동작에 필요한 설정은 아니다. 직접 `task`를 여는 습관이 없다면
 이미 보는 화면에 소량만 노출하는 운영 레시피로 선택해 적용한다.
