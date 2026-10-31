@@ -24,7 +24,11 @@ eval "$(mise activate zsh)"
 mise current
 ```
 
-## 설치 & 활성화
+## 1. 런타임 준비 — 선언·설치·활성화
+
+**버전 선언·바이너리 설치·셸에서 선택**은 서로 다른 단계다. 프로젝트 설정과 실제 실행 버전이 다른 경우 이 경계를 확인한다.
+
+### 설치 & 활성화
 
 ```sh
 brew install mise                       # macOS
@@ -34,7 +38,7 @@ eval "$(mise activate zsh)"             # ~/.zshrc 에 추가 (bash면 activate 
 - `activate`는 셸 훅(precmd/chpwd)을 심어, 프롬프트가 뜰 때·디렉토리를 옮길 때 PATH를 재계산한다.
 - 대화형 셸에서 `node` 등을 직접 호출하려면 activation 또는 shims가 필요하다. `mise exec`·`mise run`은 activation 없이도 config의 도구와 환경변수를 적용한다.
 
-## 일상 명령어
+### 일상 명령어
 
 | 명령 | 동작 |
 |------|------|
@@ -55,7 +59,11 @@ eval "$(mise activate zsh)"             # ~/.zshrc 에 추가 (bash면 activate 
 | `mise doctor` | 환경 진단 |
 | `mise trust` | 현재 디렉토리 config 신뢰 (미신뢰 config는 자동 실행 안 됨) |
 
-## config.toml — 선언 문법
+## 2. 설정 — 파일·우선순위
+
+설정은 프로젝트와 사용자 범위에서 읽히므로 어떤 파일이 우선하는지 확인한다.
+
+### config.toml — 선언 문법
 
 `~/.config/mise/config.toml`(글로벌) 또는 프로젝트 루트 `mise.toml`.
 
@@ -76,7 +84,7 @@ run = "npm run build"
 - **버전 지정자**: `"22"`(메이저 최신) · `"lts"` · `"latest"` · `"3.4.2"`(고정) · `"prefix:3.4"`.
 - java 배포판: `temurin-21`(Eclipse Adoptium, 가장 대중적) · `corretto-21`(Amazon) · `openjdk-21` · `zulu-21`.
 
-## config 우선순위 (가까운 것이 이김)
+### config 우선순위 (가까운 것이 이김)
 
 `mise.local.toml` > `mise.toml` / `.mise.toml` > `~/.config/mise/config.toml`(글로벌).
 `.tool-versions`(asdf)는 기본적으로 읽는다. `.nvmrc`·`.ruby-version`·`.python-version` 같은 언어별 파일은 기본적으로 비활성화되어 있으므로 필요한 도구만 글로벌 설정에서 켠다.
@@ -89,7 +97,9 @@ mise settings add idiomatic_version_file_enable_tools python
 
 → 글로벌은 기본값이다. activation을 설정한 대화형 셸에서는 프로젝트 디렉토리로 이동할 때 해당 config가 적용된다 (`nvm use` 수동 호출 불필요).
 
-## Apple Silicon에서 레거시 x64 Node 설치
+## 3. 환경별 예외·진단
+
+### Apple Silicon에서 레거시 x64 Node 설치
 
 Node 14처럼 공식 ARM64 바이너리가 없는 버전은 native ARM64 mise가 소스 빌드를 시도한다. Rosetta에서 쓸 별도 x64 mise를 설치하면 기존 x64 바이너리를 바로 받을 수 있다.
 
@@ -107,7 +117,7 @@ mise exec -- npm ci
 
 ARM64 `mise` 바이너리를 `arch -x86_64 mise ...`로 감싸는 방식은 실행 파일 자체의 아키텍처가 달라 실패한다. 공식 권장 방식은 x64 mise를 별도로 두는 것이다.
 
-## 함정
+### 함정
 
 - **activation은 대화형 셸 통합 수단이지 필수 실행 조건은 아니다.** 스크립트·CI에서는 `mise exec -- <명령>`이나 `mise run <태스크>`를 사용할 수 있다.
 - **IDE·GUI 앱은 셸 rc를 안 거친다** → activate가 안 먹는다. 이 경우 shim 방식 필요: `~/.local/share/mise/shims`를 PATH에 넣거나 `mise activate --shims`.
