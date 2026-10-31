@@ -72,6 +72,29 @@ Plugin Spec의 `opts`는 플러그인 옵션 구성, `dependencies`는 플러그
 
 **조합 예시:** `<leader>ff`로 파일을 선택한 뒤 `gd`로 정의를 따라간다. 첫 단계는 Picker가 파일 후보를 찾는 것이고, 두 번째는 LSP 등 코드 탐색 기능이 의미 정보를 활용하는 것이다. Root(프로젝트 범위)와 `cwd`(현재 작업 디렉터리)가 다르면 검색 범위가 예상과 다를 수 있다.
 
+### 탐색 결과는 어디에 보관되고 표시되는가?
+
+```text
+       결과 생성               결과 관리              결과 표시
+  Search / :make ──────────> Quickfix ─────────┐
+  LSP / Linter ────────────> Diagnostics ──────┼─> Trouble
+  LSP References ──────────> Picker / Trouble ─┘
+```
+
+**Quickfix는 Vim/Neovim의 기본 위치 목록**, **Diagnostics는 Neovim이 관리하는 코드 진단**, **Trouble은 이들을 보여주는 탐색 UI**다. LSP 진단은 자동으로 Quickfix에 들어가지 않으며 Trouble은 Diagnostics를 직접 표시할 수 있다. Picker도 검색·LSP 결과를 직접 표시할 수 있으므로 모든 결과가 Quickfix를 거치지는 않는다.
+
+| 상황 | 우선 사용할 기능 | 대표 진입점 |
+|---|---|---|
+| 파일·문자열을 찾아 한 곳으로 이동 | Picker | `<leader>ff`, `<leader>sg` |
+| 여러 검색·빌드 결과를 목록으로 순회 | Quickfix | `:copen`, `:cnext`, `:cprev` |
+| LSP 오류·경고를 모아 확인 | Trouble (Diagnostics) | `<leader>xx` |
+| Quickfix를 Trouble UI로 확인 | Trouble (Quickfix) | `<leader>xQ` |
+| 정의·참조 등 코드 의미 탐색 | LSP / Picker / Trouble | `gd`, `<leader>cS` (설정 확인) |
+
+**빌드 결과 예시:** `makeprg`에 외부 빌드 명령을 설정 → `:make` 실행 → `errorformat`에 따라 오류 위치를 Quickfix에 수집한다. `:vimgrep`은 검색 위치를 Quickfix에 넣는다. 실제 키맵과 Picker 구현은 LazyVim 버전·설정에 따라 달라진다.
+
+더 자세한 개념과 사용법은 [Neovim 코드 진단과 결과 탐색](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-05-04-lazyvim-leader-x-trouble.md), Vim 기본 탐색 모델은 [Vim 치트시트](vim.md)를 참고한다.
+
 ## 3. 개발 기능 — 누가 무엇을 제공하는가?
 
 | 기능 | 담당하는 역할 | 대표 진입점 |
