@@ -2,7 +2,7 @@
 
 `git diff`와 `git show` 출력을 읽기 쉽게 만드는 syntax-highlighting pager. 실행 파일 이름은 `delta`, Homebrew 패키지는 `git-delta`다.
 
-## Git과 pager의 역할
+## 전체 작동 모델 — Diff 생성과 표시 분리
 
 ```text
 git diff / git show
@@ -14,7 +14,7 @@ git diff / git show
        └─ side-by-side / navigation
 ```
 
-`git`이 변경 내용을 계산하고 `delta`는 그 출력을 읽기 좋게 표시한다. 따라서 Git 명령을 delta 명령으로 바꿔 외울 필요가 없다.
+`git`이 변경 내용을 계산하고 `delta`는 그 출력을 읽기 좋게 표시한다. **Pager가 바뀌어도 Git의 Index·Commit·Working Tree는 변경되지 않는다.** 따라서 Git 명령을 delta 명령으로 바꿔 외울 필요가 없다.
 
 ```sh
 git config --global core.pager delta
@@ -39,16 +39,6 @@ Git이 diff를 계산하고 delta는 결과를 **표시**한다. Pager 설정은
     side-by-side = false
 ```
 
-### 출력과 의미를 구분
-
-```text
-Git이 diff를 계산 → delta가 화면에 표시
-         │                   │
-      변경 내용           구문 강조·줄 번호·레이아웃
-```
-
-`delta`의 `--color-only`는 Git의 interactive diff 필터에서 색상 표현만 적용할 때 유용하다. **pager 설정은 사람이 읽는 출력에 적용**하며, diff를 파싱하는 스크립트의 입력 형식과 혼동하지 않는다.
-
 ## 2. 표시·탐색 — Diff를 읽기 쉽게
 
 ### 자주 쓰는 명령
@@ -70,6 +60,8 @@ Git이 diff를 계산 → delta가 화면에 표시
 | `--navigate` | hunk/file 단위 이동 지원 |
 | `--syntax-theme NAME` | 테마 지정 |
 | `--color-only` | Git interactive add 등에서 색상만 적용 |
+
+**예시:** `git diff --staged`는 Index에 올라간 변경을 Git이 계산하고, 설정된 `delta`가 이를 표시한다. 출력 모양과 Stage 상태는 별개다.
 
 ## 3. 사용 경계·진단
 
