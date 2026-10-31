@@ -3,7 +3,7 @@
 > Bash 쓰던 사람이 Windows에서 PowerShell 만났을 때 손 안 닿는 부분 위주.
 > 대상: Windows PowerShell 5.1 + PowerShell 7 (PSCore). 차이가 있으면 표기.
 
-### 객체 파이프라인과 명령 문법
+## 전체 작동 모델 — 객체가 명령 사이를 흐른다
 
 ```text
 Verb-Noun [-Parameter Value] | Verb-Noun ...
@@ -56,7 +56,7 @@ Remove-Item Env:FOO                    # 환경변수 삭제
 Get-ChildItem Env:                     # 모든 환경변수
 ```
 
-## 객체 파이프라인
+### 객체 파이프라인
 
 ```powershell
 Get-Process | Where-Object { $_.CPU -gt 100 }              # 필터
