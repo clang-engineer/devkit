@@ -2,30 +2,27 @@
 
 > Python **프로젝트·환경·도구**를 관리하는 CLI. 명령어는 먼저 **무엇을 관리하는지**로 구분한다.
 
-## 세 가지 대상
+## 전체 작동 모델 — 선언에서 실행까지
 
 ```text
-uv
-├─ 프로젝트 (pyproject.toml / uv.lock)
-│  ├─ init           프로젝트 시작
-│  ├─ add / remove   의존성 선언 변경
-│  ├─ lock           의존성 버전 해석·잠금
-│  ├─ sync           환경을 잠금 상태에 맞춤
-│  └─ run            프로젝트 환경에서 명령 실행
-│
-├─ 직접 환경 조작 (pip 호환)
-│  ├─ venv           가상환경 생성
-│  └─ pip
-│     ├─ install / uninstall
-│     └─ freeze
-│
-└─ 독립 CLI 도구 (tool)
-   ├─ run (= uvx)    도구를 필요할 때 실행
-   ├─ install        도구를 지속 설치
-   └─ list           설치한 도구 조회
+Python Project
+  pyproject.toml (의존성 선언)
+       │ uv lock / uv add
+       ▼
+  uv.lock (해결된 버전)
+       │ uv sync
+       ▼
+  .venv (실제 설치 환경) ── uv run ──> 실행
+
+별도 관리 대상
+├─ uv pip  : 선택한 환경에 직접 설치
+├─ uv tool : 독립 CLI 도구 실행·설치
+└─ uv python : Python 런타임 설치·관리
 ```
 
-## 프로젝트의 상태 변화
+**선언·잠금·설치·실행은 서로 다른 상태**다. 아래 명령은 어느 상태를 변경하는지 기준으로 읽는다.
+
+## 1. 프로젝트 — 선언·잠금·동기화·실행
 
 ```text
 uv add requests
@@ -47,9 +44,11 @@ uv remove requests
 uv run pytest
 ```
 
+**예시:** `uv add requests`로 선언·잠금·환경을 갱신한 뒤 `uv run python -c 'import requests; print(requests.__version__)'`로 프로젝트 환경에서 확인한다.
+
 **구분:** `uv add`는 프로젝트 의존성 선언을 관리한다. `uv pip install`은 선택한 Python 환경에 직접 패키지를 설치한다. 둘을 단순한 동의어로 외우지 않는다.
 
-## 같은 단어, 다른 대상
+## 2. 별도 환경과 도구 — pip·tool·python
 
 | 명령 패턴 | 대상·의미 |
 |---|---|
@@ -63,7 +62,7 @@ uv run pytest
 
 `uv`는 Python 설치·버전 관리도 지원한다. `mise`·`pyenv` 등과 병행한다면 **누가 Python 버전을 선택하는지**를 먼저 정한다.
 
-## 문제가 생기면
+## 3. 진단 — 선언과 실행 환경의 불일치
 
 - 다른 Python이 실행된다 → `uv run python --version`, `.python-version` 및 프로젝트 설정 확인
 - 환경이 선언과 다르다 → `uv sync`로 동기화 상태 확인
