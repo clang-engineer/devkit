@@ -23,7 +23,11 @@ Vault나 cloud secret manager가 더 적합하다. 설정 파일을 Git에 안�
 
 SOPS는 파일별 Data Key로 값을 암호화하고, recipient의 age 공개키나 KMS 키로 Data Key를 보호한다. 파일명·필드 이름·구조는 기본적으로 노출될 수 있다. **recipient 변경과 데이터 키 교체는 다른 작업**이므로 아래 회전 절차를 구분한다.
 
-## 설치
+## 1. 키 준비 — 설치와 Age
+
+**SOPS는 데이터를 암호화하고, Age·KMS 등의 Recipient는 Data Key를 보호한다.** 키를 준비하는 단계와 암호화 파일을 만드는 단계는 구분한다.
+
+### 설치
 
 ```sh
 # macOS
@@ -34,7 +38,7 @@ sops --version
 age-keygen --version
 ```
 
-## age 키 준비
+### Age 키 준비
 
 로컬이나 소규모 팀에서는 별도 cloud 없이 쓸 수 있는 age가 간단하다.
 
@@ -59,7 +63,11 @@ export SOPS_AGE_KEY_FILE="$HOME/secure/age-keys.txt"
 Git에 commit하지 않는다. 개인키를 잃으면 파일을 복구할 수 없으므로 password manager나
 별도의 안전한 매체에 백업한다.
 
-## .sops.yaml
+## 2. 암호화 정책과 파일 생성
+
+`.sops.yaml`은 새 파일에 적용할 Recipient 선택 규칙이다. 기존 파일의 Recipient 변경은 별도 갱신이 필요하다.
+
+### .sops.yaml
 
 저장소 root에 암호화 규칙을 둔다. SOPS는 대상 경로와 처음 일치하는 `creation_rules`를
 새 파일 암호화에 사용한다.
@@ -83,7 +91,7 @@ creation_rules:
 기본 구성에서는 등록된 개인키 중 하나만 있어도 data key를 복호화할 수 있다. 여러 키를
 동시에 요구하는 정책이 필요하면 SOPS key group과 Shamir threshold를 별도로 구성한다.
 
-## 파일 만들기
+### 파일 만들기
 
 처음 한 번은 평문 파일을 만든 뒤 즉시 암호화한다. 암호화 전에 add나 commit하지 않는다.
 
@@ -106,7 +114,11 @@ sops filestatus secrets/app.sops.yaml
 sops encrypt plain.yaml > secrets/app.sops.yaml
 ```
 
-## Neovim으로 편집
+## 3. 암호화 파일 사용 — 편집·조회·전달
+
+파일을 평문으로 영구 저장하지 않고 편집·조회·프로세스에 전달하는 경로를 구분한다.
+
+### Neovim으로 편집
 
 암호화된 파일은 일반 editor로 직접 고치지 않고 SOPS를 통해 연다.
 
@@ -125,7 +137,7 @@ sops secrets/app.sops.yaml
 `SOPS_EDITOR`가 없으면 `EDITOR`를 사용하며, 둘 다 없으면 설치된 `vim`, `nano`, `vi`
 중 하나를 찾는다.
 
-## 조회
+### 조회
 
 ```sh
 # 전체 내용을 stdout으로 복호화
@@ -143,7 +155,7 @@ sops filestatus secrets/app.sops.yaml
 stdout 출력은 terminal scrollback, pipe 대상, CI log에 남을 수 있다. 필요한 값만
 `--extract`로 읽고 출력 결과를 log에 기록하지 않는다.
 
-## 프로세스에 전달
+### 프로세스에 전달
 
 dotenv 파일은 복호화한 값을 환경 변수로 넣어 명령을 실행할 수 있다.
 
@@ -162,7 +174,7 @@ sops exec-file secrets/app.sops.yaml 'my-app --config {}'
 기본 `exec-file`은 가능한 환경에서 FIFO를 사용한다. 실제 임시 파일이 필요한 프로그램에만
 `--no-fifo`를 사용한다.
 
-## recipient 변경과 key 회전
+## 4. 키 관리 — Recipient 변경과 Data Key 회전
 
 `.sops.yaml`을 수정해도 기존 파일 metadata는 자동으로 바뀌지 않는다. 이전 개인키로
 복호화할 수 있을 때 `updatekeys`를 실행한다.
@@ -186,7 +198,9 @@ sops rotate --in-place secrets/app.sops.yaml
 secret을 이미 읽었을 가능성이 있으면 실제 credential도 함께 교체한다. 암호화 키 변경만으로
 과거에 노출된 비밀번호가 무효화되지는 않는다.
 
-## Git에서 확인할 것
+## 5. 검증과 진단
+
+### Git에서 확인할 것
 
 ```sh
 # 암호화 상태 확인
@@ -210,7 +224,7 @@ git diff -- secrets .sops.yaml
 - 복호화해 만든 임시 평문 파일
 - `sops decrypt ... > plain.yaml`로 생성한 출력
 
-## 흔한 문제
+### 흔한 문제
 
 ### no matching creation rules
 
