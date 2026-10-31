@@ -3999,7 +3999,7 @@
           }
         ],
         "custom": {
-          "label": "devkit Shell Cheatsheet",
+          "label": "Shell — 명령 실행과 작업 제어",
           "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/shell.md"
         },
         "file": "shell.md",
@@ -4019,7 +4019,7 @@
         "file": "tools-dictionary.md",
         "official": [],
         "custom": {
-          "label": "devkit CLI 도구 발견 지도",
+          "label": "CLI 도구 지도 — 역할과 대체·보완 관계",
           "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tools-dictionary.md"
         },
         "kind": "guide",
@@ -4027,6 +4027,23 @@
           "curl",
           "docker",
           "systemd"
+        ]
+      },
+      {
+        "slug": "tiling-window-management",
+        "name": "Tiling Window Management",
+        "desc": "창 배치·워크스페이스·포커스와 i3·Sway·AeroSpace·yabai의 관계를 설명하는 개념지도",
+        "official": [],
+        "custom": {
+          "label": "Tiling Window Management — 창 배치와 작업 공간",
+          "url": "https://clang-engineer.github.io/posts/developer-tools/2026-10-05-window-management-map/"
+        },
+        "kind": "guide",
+        "related_tools": [
+          "i3",
+          "sway",
+          "aerospace",
+          "yabai"
         ]
       }
     ]
