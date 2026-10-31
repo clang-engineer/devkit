@@ -5,17 +5,20 @@
 ## 접속 구조와 명령 계열
 
 ```text
-Client ── ssh [options] user@host ──> Server
-   │          │
-   │          ├─ -i KEY : identity file
-   │          ├─ -p PORT: 서버 포트
-   │          ├─ -J HOST: jump host 경유
-   │          └─ -L / -R / -D : 터널 방향·방식
-   ├─ ~/.ssh/config : Host 별칭·접속 기본값
-   └─ ssh-agent     : 개인키 사용 지원 (ssh-add로 등록)
-```
+SSH Client ── ~/.ssh/config : Host·User·Port·Identity 선택 [2]
+     │
+     ├─ 개인키 / ssh-agent ── 인증 요청 ──> SSH Server [1]
+     │                                      └─ authorized_keys 확인
+     │
+     └─ 암호화된 SSH 연결 (직접 / Jump Host 경유) [2]
+                 │
+                 ├─ 원격 Shell·명령 실행
+                 ├─ Port Forwarding [3] : -L / -R / -D
+                 └─ 파일 전송 [4]       : scp / rsync over SSH
 
-`ssh-keygen`은 키 생성, `ssh-copy-id`는 공개키 등록, `ssh`는 접속, `scp`는 복사, `rsync -e ssh`는 SSH를 통한 파일 동기화다. **키를 생성하는 것과 agent에 올리는 것은 별개**다.
+접속·인증·터널 문제 → 단계별 진단 [5]
+```
+**설정 선택 → 서버 연결 → 인증 → 원격 작업**의 흐름을 먼저 이해한다. `ssh-keygen`은 키 생성, `ssh-copy-id`는 공개키 등록, `ssh`는 접속, `scp`는 복사, `rsync -e ssh`는 SSH를 통한 파일 동기화다. **키를 생성하는 것과 agent에 올리는 것은 별개**다.
 
 ```sh
 ssh-keygen -t ed25519
