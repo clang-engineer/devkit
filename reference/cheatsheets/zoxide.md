@@ -13,7 +13,11 @@ yazi                  → 파일 트리를 직접 탐색
 
 `z`는 방문 이력에 기반한 점프, `zi`는 interactive 선택이다. `fzf`의 `Alt-C`는 파일 시스템에서 후보를 찾는 반면 `zi`는 zoxide가 학습한 경로를 사용한다.
 
-## 자주 쓰는 명령
+## 1. 경로 선택 — 기록 기반 점프
+
+방문 이력을 점수화해 목적지 후보를 고른다. `z`는 바로 이동하고 `zi`는 후보를 선택한다.
+
+### 대표 명령
 
 | 목적 | 명령 |
 |---|---|
@@ -26,7 +30,9 @@ yazi                  → 파일 트리를 직접 탐색
 | 경로 추가 | `zoxide add /path/to/dir` |
 | 경로 제거 | `zoxide remove /path/to/dir` |
 
-## Shell 통합
+## 2. 셸 통합·진단
+
+### Shell 통합
 
 ```zsh
 eval "$(zoxide init zsh)"
@@ -34,7 +40,7 @@ eval "$(zoxide init zsh)"
 
 기본 alias/function으로 `z`와 `zi`가 제공된다.
 
-## 문제 해결
+### 문제 해결
 
 | 증상 | 확인 |
 |---|---|
