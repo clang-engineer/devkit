@@ -2,22 +2,25 @@
 
 > jj는 Git 명령어의 별칭 집합이 아니다. **Change(논리적 변경)**와 **Revision(그 변경의 특정 상태)**을 구분하는 버전 관리 시스템이다.
 
-## 먼저 이해할 대상
+## 전체 작동 모델 — Change·Revision·Operation
 
 ```text
-Change (논리적 작업)
-   ├─ Change ID  : 수정·재작성 후에도 작업을 추적
-   └─ Revision   : 특정 시점의 스냅샷
-        └─ Commit ID
+Working Copy (현재 작업)
+      │ 자동 스냅샷
+      ▼
+Working-copy Revision (@) ── Change ID (논리적 변경 추적)
+      │
+      ├─ describe / edit / squash / rebase → 새 Revision
+      │                                     └─ Commit ID 변경 가능
+      └─ new → 다음 작업 Revision
 
-Working-copy commit @ : 현재 작업의 revision
-Bookmark              : 이름 붙은 참조 (Git 원격 연동)
-Operation log          : jj 저장소 조작 이력
+Operation Log ── undo → 저장소 조작 되돌리기
+Bookmark ── git fetch / push → Git 원격 참조
 ```
 
-Git의 index에 매번 `add`하는 모델과 달리 jj는 working copy 변경을 자동으로 스냅샷한다. **스냅샷은 원격 push가 아니다.**
+**Change ID는 논리적 작업의 식별자이고 Commit ID는 특정 Revision의 식별자**다. 변경을 재작성해도 Change ID를 통해 같은 작업을 추적할 수 있다. Working Copy의 자동 스냅샷은 원격 Push와 다르다.
 
-## 명령어를 동작별로 조합하기
+## 1. Revision 조작 — 관찰·작성·재구성·복구
 
 ```text
 jj
@@ -40,9 +43,11 @@ jj op log                 # jj 조작 이력
 jj undo                   # 직전 jj 조작 취소
 ```
 
+**작업 예시:** `jj new`로 새 Revision을 시작하고 파일을 수정한 뒤 `jj diff`로 변경을 확인한다. `jj describe -m "작업 설명"`으로 메시지를 붙이고 `jj log`로 Revision 관계를 살핀다.
+
 `-m`은 message, `-r`은 revision을 지정할 때 쓰는 옵션이다. 상세 인자와 대상 선택은 `jj help <command>`에서 확인한다.
 
-## Git 원격과 만나는 지점
+## 2. 협업 — Bookmark와 Git 원격
 
 ```text
 jj revision graph
