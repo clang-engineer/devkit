@@ -6,12 +6,22 @@
 ## 전체 작동 모델 — 객체가 명령 사이를 흐른다
 
 ```text
-Verb-Noun [-Parameter Value] | Verb-Noun ...
-Get-Process               | Where-Object ... | Select-Object ...
+Get-Process (프로세스 객체 생성)
+      │
+      ▼
+Where-Object (속성 CPU로 필터링)
+      │  .NET 객체 전달
+      ▼
+Select-Object (Name·CPU 속성 선택)
+      │
+      ▼
+출력 / Format-* / Export-* 등
 
-Bash Pipeline       : 주로 텍스트 스트림
-PowerShell Pipeline : .NET 객체 (속성·메서드)
+Cmdlet : Verb-Noun + Parameter [1·2]
+조건·반복·오류 처리 : 실행 흐름 제어 [3]
+Profile·Module·환경변수 : 실행 환경 [4]
 ```
+파이프라인에서는 **객체가 전달되므로 다음 명령이 속성을 직접 읽어 필터·변환**할 수 있다. 단, 출력 형식 지정은 객체 처리와 구분하며 외부 실행 파일은 텍스트 스트림을 사용할 수 있다.
 
 Cmdlet은 보통 **동사-대상**으로 읽는다. `Get-ChildItem`(자식 항목 조회), `Set-Content`(내용 설정), `Where-Object`(객체 필터), `Select-Object`(속성 선택)처럼 계열화한다.
 
