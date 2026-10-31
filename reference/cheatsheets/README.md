@@ -12,7 +12,7 @@
 3단계: 공식 문서 / tldr → 추가 옵션과 실제 예제가 필요한가?
 ```
 
-**도구 이름을 모르더라도 작업 목적에서 출발할 수 있도록** tools-dictionary.md가 연결한다. 개별 명령어의 전체 옵션은 공식 문서에서 확인한다.
+**도구 이름을 모르더라도 작업 목적에서 출발할 수 있도록** ../tools-dictionary.md가 연결한다. 개별 명령어의 전체 옵션은 공식 문서에서 확인한다.
 
 ## 콘텐츠 소유권
 
@@ -26,7 +26,7 @@
 
 | 파일 | 설명 |
 |------|------|
-| [tools-dictionary.md](tools-dictionary.md) | 작업 목적별 CLI 발견 지도 — 도구 역할·대체/보완·파이프라인 |
+| [CLI 도구 발견 지도](../tools-dictionary.md) | 작업 목적별 CLI 발견 지도 — 도구 역할·대체/보완·파이프라인 |
 
 ## 에디터 & TUI
 
@@ -46,7 +46,6 @@
 | [rg.md](rg.md) | ripgrep 검색 범위·패턴·출력의 조합 |
 | [httpie.md](httpie.md) | HTTPie 요청 구분자·헤더·JSON 필드 |
 | [just.md](just.md) | just Recipe·인자·의존성 |
-| [hyperfine.md](hyperfine.md) | hyperfine 반복 측정·워밍업·비교 |
 
 ## 셸
 
@@ -71,7 +70,6 @@
 | 파일 | 설명 |
 |------|------|
 | [aerospace.md](aerospace.md) | macOS 타일링 WM |
-| [hammerspoon.md](hammerspoon.md) | macOS 자동화/윈도우 관리 (Lua) |
 
 ## 데이터
 
@@ -87,7 +85,6 @@
 |------|------|
 | [git.md](git.md) | Git Working Tree·Index·Repository 상태 변화 |
 | [jj.md](jj.md) | Jujutsu(jj) — change, revision, operation log 및 Git 원격 연동 |
-| [git-delta.md](git-delta.md) | git-delta — Git diff pager |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 |
 
 ## 보안 & 비밀정보
@@ -106,6 +103,12 @@
 | [claude-code.md](claude-code.md) | Claude Code CLI |
 | [opencode.md](opencode.md) | opencode — 터미널 AI 코딩 에이전트 |
 
+
+## 블로그로 이동한 주제
+
+- [hyperfine 반복 벤치마크](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/2026-10-31-hyperfine-benchmark-methodology.md)
+- [Hammerspoon 이벤트 자동화](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/2026-10-31-hammerspoon-event-automation.md)
+- [delta 공식 문서](https://github.com/dandavison/delta) — Git 출력 표시 도구
 
 ## 문서 경계
 
