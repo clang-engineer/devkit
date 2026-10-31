@@ -5,13 +5,21 @@ macOS용 i3 스타일 타일링 윈도우 매니저. SIP 비활성화 없이 기
 ## 전체 구조 — 무엇을 배치하는가?
 
 ```text
-AeroSpace
-├─ Workspace  : 창을 묶고 전환하는 작업 공간
-│  └─ Window  : 배치·이동할 GUI 창
-├─ Focus      : 조작 대상 선택
-├─ Layout     : Tiling / Accordion / Floating
-├─ Mode       : Main / Service 등 키맵 전환
-└─ Automation : on-window-detected / CLI / Config
+사용자 키 입력 / CLI / 창 감지 규칙
+              │
+              ▼
+        AeroSpace 명령
+              │
+     ┌────────┼──────────┐
+     ▼        ▼          ▼
+   Focus    Move       Layout
+     │        │          │
+     └────────┴──────────┘
+              ▼
+Workspace ── 관리 ──> Window 배치·전환
+
+Mode   : 입력 키의 명령 매핑을 전환 [3]
+Config : 키·규칙·기본 동작을 정의 [4]
 ```
 
 AeroSpace는 **GUI 창의 공간 배치**를 관리한다. tmux의 Session·Pane 유지와는 별개다. 이 그림은 실행 순서가 아니라 기능 관계도다.
