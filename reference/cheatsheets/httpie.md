@@ -4,7 +4,7 @@
 
 ## 요청의 구성
 
-\`\`\`text
+```text
 CLI 입력: http [METHOD] URL [ITEM ...]
                          │
                구분자로 ITEM 해석
@@ -19,7 +19,8 @@ CLI 입력: http [METHOD] URL [ITEM ...]
              Status + Headers + Body
                          │
                  출력 형식 / 종료 상태
-\`\`\`
+```
+
 ```sh
 http GET example.com
 http GET example.com/search q==hello
