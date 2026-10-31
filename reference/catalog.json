@@ -3700,8 +3700,8 @@
               }
             ],
             "custom": {
-              "label": "devkit Hammerspoon Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/hammerspoon.md"
+              "label": "Hammerspoon 이벤트 자동화",
+              "url": "https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/2026-10-31-hammerspoon-event-automation.md"
             },
             "file": "hammerspoon.md"
           }
@@ -3777,10 +3777,10 @@
               }
             ],
             "custom": {
-              "label": "devkit git-delta Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/git-delta.md"
+              "label": "delta 공식 문서",
+              "url": "https://github.com/dandavison/delta"
             },
-            "file": "git-delta.md",
+            "external_reference": "https://github.com/dandavison/delta",
             "tool_id": "delta"
           },
           {
@@ -3979,8 +3979,8 @@
               }
             ],
             "custom": {
-              "label": "devkit hyperfine Cheatsheet",
-              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/hyperfine.md"
+              "label": "hyperfine 벤치마크 방법론",
+              "url": "https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/2026-10-31-hyperfine-benchmark-methodology.md"
             },
             "file": "hyperfine.md"
           }
@@ -4019,8 +4019,8 @@
         "file": "tools-dictionary.md",
         "official": [],
         "custom": {
-          "label": "CLI 도구 지도 — 역할과 대체·보완 관계",
-          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/tools-dictionary.md"
+          "label": "CLI 도구 발견 지도",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/tools-dictionary.md"
         },
         "kind": "guide",
         "related_tools": [
