@@ -93,7 +93,7 @@ Plugin Spec의 `opts`는 플러그인 옵션 구성, `dependencies`는 플러그
 
 **빌드 결과 예시:** `makeprg`에 외부 빌드 명령을 설정 → `:make` 실행 → `errorformat`에 따라 오류 위치를 Quickfix에 수집한다. `:vimgrep`은 검색 위치를 Quickfix에 넣는다. 실제 키맵과 Picker 구현은 LazyVim 버전·설정에 따라 달라진다.
 
-더 자세한 개념과 사용법은 [Neovim 코드 진단과 결과 탐색](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-05-04-lazyvim-leader-x-trouble.md), Vim 기본 탐색 모델은 [Vim 치트시트](vim.md)를 참고한다.
+더 자세한 개념과 사용법은 [Neovim 코드 진단과 결과 탐색](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-05-04-neovim-code-diagnostics-and-navigation.md), Vim 기본 탐색 모델은 [Vim 치트시트](vim.md)를 참고한다.
 
 ## 3. 개발 기능 — 누가 무엇을 제공하는가?
 
