@@ -17,7 +17,11 @@ macOS 자동화 런타임. Lua로 창 관리·키바인딩·알림·이벤트 �
 
 Hammerspoon은 고정된 키맵을 외우는 도구가 아니라 **이벤트 → Lua 함수 → macOS 동작**을 조합하는 런타임이다. `hs.reload()`는 설정 재로드, `hs.ipc.cliInstall()`은 CLI 접근을 설치한다.
 
-## 필수 조작
+## 1. 런타임·설정 — 이벤트와 Lua
+
+Hammerspoon은 **이벤트를 받아 Lua Callback을 실행하는 자동화 환경**이다. 키를 외우기보다 이벤트·대상·동작을 조합한다.
+
+### 필수 조작
 
 | 작업 | 방법 |
 |---|---|
@@ -28,7 +32,9 @@ Hammerspoon은 고정된 키맵을 외우는 도구가 아니라 **이벤트 →
 
 > `hs.ipc.cliInstall()`은 닭-달걀 문제가 있다. 이 줄을 넣어도 최초 한 번은 메뉴바에서 수동 리로드해야 `hs` CLI가 생긴다. 그 뒤로는 CLI로 원격 리로드 가능.
 
-## 창 힌트 (window hint)
+## 2. 창 조작 — Window Hint
+
+Window Hint는 화면의 창을 빠르게 선택하는 기능으로, 창 배치·타일링과는 별개다.
 
 화면의 모든 창에 라벨을 띄우고 키 입력으로 즉시 포커스 전환.
 
@@ -39,7 +45,9 @@ hs.hotkey.bind({'shift'}, 'F1', hs.hints.windowHints)
 - `hs.hints.windowHints` — 열린 창마다 문자 라벨을 오버레이. 해당 문자를 누르면 그 창으로 이동.
 - AeroSpace 같은 WM의 방향 포커스(`Alt+H/J/K/L`)로 안 잡히는 창을 한 번에 고를 때 유용.
 
-## 전역 키 리매핑 (stock API)
+## 3. 입력 자동화 — Hotkey와 Remapping
+
+키 입력을 다른 동작에 연결하는 기능이며 시스템 전체 입력 처리에는 접근 권한·제약이 있다.
 
 `hs.eventtap.keyStroke`로 실제 키 입력을 프로그램적으로 발생시켜 임의의 키를 다른 키로 remap.
 
