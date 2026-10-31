@@ -1,6 +1,6 @@
 # Vim — 편집 문법 치트시트
 
-> **동작(Operator)과 범위(Motion / Text Object)를 조합**하면 명령을 유추할 수 있다. 예외적인 명령과 Ex 명령은 별도의 계열로 이해한다.
+> **동작(Operator)과 범위(Motion / Text Object)를 조합**하면 명령을 유추할 수 있다. 예외적인 명령과 Ex 명령은 별도의 계열로 이해한다. Neovim의 내장 확장 API는 [Neovim 치트시트](neovim.md)에서 다룬다.
 
 ## 전체 작동 모델 — 입력·편집·표시
 
