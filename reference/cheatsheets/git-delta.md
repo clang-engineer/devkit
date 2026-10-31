@@ -22,7 +22,11 @@ git config --global interactive.diffFilter 'delta --color-only'
 git diff
 ```
 
-## 기본 설정
+## 1. 출력 연결 — Git과 Pager
+
+Git이 diff를 계산하고 delta는 결과를 **표시**한다. Pager 설정은 Git의 변경 상태 자체를 바꾸지 않는다.
+
+### 기본 설정
 
 ```ini
 [core]
@@ -35,7 +39,7 @@ git diff
     side-by-side = false
 ```
 
-## 출력과 의미를 구분
+### 출력과 의미를 구분
 
 ```text
 Git이 diff를 계산 → delta가 화면에 표시
@@ -45,7 +49,9 @@ Git이 diff를 계산 → delta가 화면에 표시
 
 `delta`의 `--color-only`는 Git의 interactive diff 필터에서 색상 표현만 적용할 때 유용하다. **pager 설정은 사람이 읽는 출력에 적용**하며, diff를 파싱하는 스크립트의 입력 형식과 혼동하지 않는다.
 
-## 자주 쓰는 명령
+## 2. 표시·탐색 — Diff를 읽기 쉽게
+
+### 자주 쓰는 명령
 
 | 목적 | 명령 |
 |---|---|
@@ -55,7 +61,7 @@ Git이 diff를 계산 → delta가 화면에 표시
 | 두 파일 비교 | `delta old.txt new.txt` |
 | no-index 비교 | `git diff --no-index --color=always a b \| delta` |
 
-## 유용한 옵션
+### 유용한 옵션
 
 | 옵션 | 의미 |
 |---|---|
@@ -65,13 +71,15 @@ Git이 diff를 계산 → delta가 화면에 표시
 | `--syntax-theme NAME` | 테마 지정 |
 | `--color-only` | Git interactive add 등에서 색상만 적용 |
 
-## 권장 사용 기준
+## 3. 사용 경계·진단
+
+### 권장 사용 기준
 
 - Git pager로 등록해 평소에는 `git diff`, `git show`를 그대로 쓴다.
 - script에서 diff 출력을 파싱해야 하면 delta를 끼우지 않는다.
 - 파이프 뒤에서 pager가 억제되면 `--color=always | delta`를 명시한다.
 
-## 문제 해결
+### 문제 해결
 
 | 증상 | 확인 |
 |---|---|
