@@ -4,17 +4,22 @@
 
 ## 요청의 구성
 
-```text
-http [METHOD] URL [ITEM ...]
-      │       │       │
-      │       │       ├─ Header       Name:Value
-      │       │       ├─ JSON field   name=value
-      │       │       ├─ Raw field    name:=JSON
-      │       │       └─ Query param  name==value
-      │       └─ 요청 주소
-      └─ 생략하면 데이터 유무에 따라 GET/POST 선택
-```
-
+\`\`\`text
+CLI 입력: http [METHOD] URL [ITEM ...]
+                         │
+               구분자로 ITEM 해석
+               ├─ Name:Value → Header
+               ├─ name==value → Query
+               └─ name=value / := → JSON Body
+                         │
+                         ▼
+                 HTTP Request ──> Server
+                         │
+                         ▼
+             Status + Headers + Body
+                         │
+                 출력 형식 / 종료 상태
+\`\`\`
 ```sh
 http GET example.com
 http GET example.com/search q==hello
@@ -22,7 +27,7 @@ http POST example.com/users name=Kim active:=true
 http GET example.com Authorization:'Bearer TOKEN'
 ```
 
-## 구분자를 이해하면 외울 것이 줄어든다
+## 1. 요청 조립 — 구분자로 대상 구분
 
 | 문법 | 의미 | 예 |
 |---|---|---|
@@ -31,9 +36,11 @@ http GET example.com Authorization:'Bearer TOKEN'
 | `:=` | JSON 리터럴 값 | `active:=true`, `count:=3` |
 | `==` | URL 쿼리 파라미터 | `page==2` |
 
+**예시:** `http GET example.com/search q==hello`는 URL Query를 만들고, `http POST example.com/users name=Kim active:=true`는 문자열과 Boolean 값을 가진 JSON Body를 만든다. 같은 단어라도 구분자에 따라 전송 위치와 타입이 달라진다.
+
 `name=value`는 기본 JSON 요청 데이터에 사용된다. 파일 업로드·폼 요청은 별도 옵션과 문법을 사용한다.
 
-## HTTP 동작과 표시를 분리
+## 2. 응답 해석 — HTTP 동작과 표시 구분
 
 ```text
 METHOD + URL + Header + Body → 서버 요청
