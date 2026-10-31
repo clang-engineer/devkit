@@ -1,409 +1,180 @@
-# Shell Cheatsheet
+# Shell — 명령 해석·실행·작업 제어 지도
 
-> Bash 기준 — 스크립트 안정성, 연산자·확장 문법, 잡 관리. 매번 검색하는 heredoc·`${...}` 확장·`<(cmd)`·배열·반복 표 한 곳에.
+> **Bash 기준.** 셸은 입력을 해석해 명령과 인자를 만들고, 실행 결과와 프로세스를 제어한다. 이 문서는 기능을 발견하고 문법을 유추하는 압축 지도다. 전체 구문과 예외는 `help`, `man bash`에서 확인한다.
 
-예제는 Bash에서 실행한다. 공통 문법도 있지만 Zsh는 배열 인덱스·파라미터 확장·단어 분리 규칙이 다르므로 그대로 복사하지 않는다. Zsh 고유 기능은 [zsh.md](zsh.md)를 참고한다.
+Zsh는 배열 인덱스·확장·단어 분리 규칙이 다르다. Zsh 고유 기능은 [Zsh 치트시트](zsh.md)를 참고한다.
 
-## 셸 명령이 실행되기까지
+## 전체 기능 지도
 
 ```text
-입력 → 토큰·인용·확장 → 명령·인자
-                           │
-               ┌───────────┴────────────┐
-               ▼                        ▼
-          Builtin/Function         External Process
-               │                        │
-               └──── Exit Status ───────┘
-                         │
-                   && / || / if
+Shell
+├─ 입력·해석       Quoting / Expansion / Globbing
+├─ 실행·연결       Builtin / Function / External / Pipe / Redirect
+├─ 흐름 제어       Exit Status / if / case / loop / function
+├─ 데이터 표현     Variable / Parameter Expansion / Array
+├─ 작업·신호       Foreground / Background / Job / wait / trap
+└─ 실행 환경       Option (set) / Environment / Script
 ```
 
-`|`는 프로세스 사이 입출력을 연결하고, `>`·`<`는 파일과 입출력을 연결한다. `&&`는 앞 명령 성공 시, `||`는 실패 시 다음 명령을 실행한다. `&`는 비동기 작업 실행이며 `&&`와 무관하다.
+위는 **기능 분류**다. 실제 파싱·확장의 정확한 실행 순서가 아니다. 셸의 두 질문은 **“어떤 인자가 만들어지는가?”**와 **“그 명령을 언제·어디서 실행하는가?”**다.
 
-```sh
-echo "$HOME"   # 변수 확장, 공백 포함 한 인자 유지
-echo '$HOME'   # 문자 그대로
-a && b        # a 성공 시 b
-a || b        # a 실패 시 b
+## 1. 입력을 명령과 인자로 바꾸기
+
+```text
+입력 문자열
+  ├─ Quoting           : 문자를 문자 그대로 둘까?
+  ├─ Expansion         : 변수·명령 결과·패턴을 펼칠까?
+  ├─ Word Splitting    : 확장 결과를 여러 인자로 나눌까?
+  └─ Filename Globbing : 파일명 패턴을 경로로 바꿀까?
+         ↓
+    명령 + 인자들 → 실행
 ```
 
-## 스크립트 안전 헤더
-
-```sh
-#!/usr/bin/env bash
-set -euo pipefail
-```
-
-- `-e`(errexit): **일부 실패 상황에서** 종료한다. `if` 조건, `&&`/`||` 목록의 일부, `!` 등 예외가 있어 모든 오류를 잡는 장치가 아니다.
-- `-u`(nounset): 미설정 변수 사용을 오류로 처리한다. `-o pipefail`: 파이프라인에서 마지막이 아닌 명령의 실패도 종료 상태에 반영한다.
-- `IFS`를 전역으로 바꾸는 것은 안전성의 필수 조건이 아니다. 입력 분리는 `read` 등의 필요한 위치에서 명시한다.
-- 디버그: `set -x` (실행 추적).
-
-## `set` — 셸 동작 제어
-
-`-`로 활성, `+`로 비활성.
-
-| 옵션 | 이름 | 의미 |
+| 목적 | 대표 문법 | 구분 |
 |---|---|---|
-| `-e` | errexit | 예외 문맥을 제외한 명령 실패에서 종료 |
-| `-u` | nounset | 정의되지 않은 변수 접근 시 종료 |
-| `-o pipefail` | pipefail | 가장 오른쪽의 0이 아닌 종료 상태를 파이프라인 결과로 사용 |
-| `-x` | xtrace | 실행되는 명령 출력 (디버그) |
-| `-v` | verbose | 입력 라인 그대로 출력 |
-| `-n` | noexec | 실행하지 않고 문법 검사만 |
-| `-f` | noglob | glob 패턴 비활성화 |
+| 리터럴 보존 | `'$HOME'` | 확장하지 않음 |
+| 변수 확장, 인자 보존 | `"$HOME"` | 공백이 있어도 한 인자 |
+| 명령 결과 사용 | `"$(date)"` | 명령 치환 |
+| 파일명 선택 | `*.log` | glob |
+| 문자열 후보 생성 | `file{A,B}.txt` | brace expansion |
+| 다른 명령 출력을 파일처럼 전달 | `<(sort a.txt)` | process substitution (Bash·Zsh) |
 
-```sh
-set -o      # 활성/비활성 옵션 표시
-echo $-     # 현재 활성화된 옵션 문자
+`"$@"`는 전달받은 각 인자를 그대로 보존한다. 반대로 인용하지 않은 `$var`는 Bash에서 단어 분리와 파일명 확장의 영향을 받을 수 있다.
 
-# 임시 해제
-set +e
-risky_command
-result=$?
-set -e
+## 2. Parameter Expansion — 변수를 어떻게 가공하나?
+
+```text
+\${parameter...}
+├─ 기본값·검증     :-  :=  :?  :+
+├─ 길이·부분 추출  #   :offset:length
+├─ 앞/뒤 패턴 제거 #   ##   %   %%
+├─ 치환            /   //
+└─ 대소문자        ^^  ,,  (Bash 4+)
 ```
 
-## 연결 연산자
+| 문제 | 대표 표현 | 의미 |
+|---|---|---|
+| 값이 없으면 기본값 | `\${name:-guest}` | 미설정 또는 빈 값일 때 대체 |
+| 필수 값 검사 | `\${name:?required}` | 값이 없으면 오류 |
+| 문자열 길이 | `\${#name}` | 문자 수 |
+| 경로에서 파일명 | `\${path##*/}` | 마지막 `/` 앞까지 제거 |
+| 경로에서 디렉터리 | `\${path%/*}` | 마지막 `/` 뒤 제거 |
+| 문자열 치환 | `\${name/old/new}` | 첫 일치 치환 |
 
-| 구문 | 실행 조건 |
-|---|---|
-| `a &` | `a` 백그라운드, 즉시 다음 명령 |
-| `a ; b` | 순차 실행 (`a` 성공 여부 무관) |
-| `a && b` | `a` 성공 시 `b` |
-| `a \|\| b` | `a` 실패 시 `b` |
-| `{ a; b; }` | 그룹 (현재 셸에서 실행) |
-| `( a; b )` | 그룹 (서브셸에서 실행, 환경 격리) |
+`#`·`##`는 **앞에서**, `%`·`%%`는 **뒤에서** 패턴을 제거한다. 긴 형태(`##`, `%%`)는 가장 긴 일치를 제거한다. `:-`는 값을 읽을 때만 대체하고 `:=`는 변수에 대입한다.
 
-```sh
-mkdir test && cd test
-risky || echo "failed"
-{ cd /tmp; pwd; }              # 현재 셸의 cwd 바뀜
-( cd /tmp; pwd ); pwd          # 서브셸 → 원래 cwd 유지
+## 3. 실행 결과를 연결하기
+
+```text
+명령 A ── stdout ── | ── stdin ── 명령 B
+          │
+          ├─ > file   : stdout을 파일로
+          └─ 2> file  : stderr를 파일로
+
+명령의 Exit Status → && / || / if 에서 판단
 ```
 
-## Heredoc — 여러 줄 입력
+| 의도 | 대표 문법 | 핵심 |
+|---|---|---|
+| 순차 실행 | `a; b` | 앞의 성공 여부와 무관 |
+| 성공 시 다음 실행 | `a && b` | 종료 상태 0 |
+| 실패 시 다음 실행 | `a || b` | 종료 상태 0이 아님 |
+| 출력 연결 | `a | b` | stdout → stdin |
+| 출력 덮어쓰기 / 추가 | `> file` / `>> file` | stdout |
+| 오류 출력 분리 | `2> err.log` | stderr |
+| 출력과 오류 합치기 | `> log 2>&1` | 리다이렉션 순서 중요 |
+| 현재 셸에서 그룹 실행 | `{ a; b; }` | 현재 셸 환경 |
+| 서브셸에서 그룹 실행 | `( a; b )` | 환경 분리 |
 
-| 구문 | 의미 |
+`cmd > log 2>&1`과 `cmd 2>&1 > log`는 다르다. **리다이렉션은 왼쪽에서 오른쪽 순서대로 적용**한다.
+
+### 여러 줄·파일 같은 입력
+
+| 문법 | 존재 이유 |
 |---|---|
-| `<<EOF` | 변수·명령 치환 **됨** |
-| `<<'EOF'` | 변수·명령 치환 **안 됨** (리터럴) |
-| `<<-EOF` | 줄 앞 **탭** 들여쓰기 제거 (스페이스는 X) |
-| `<<<"문자열"` | here-string (한 줄만) |
+| `<<EOF` | 여러 줄을 표준 입력으로 전달 (확장 가능) |
+| `<<'EOF'` | 확장하지 않고 원문 전달 |
+| `<<-EOF` | 앞쪽 탭 들여쓰기 제거 |
+| `<<<"$value"` | 한 문자열을 표준 입력으로 전달 (here-string) |
+| `<(cmd)` / `>(cmd)` | 명령 출력을 파일 경로가 필요한 자리에 연결 |
 
-```sh
-cat <<EOF
-홈: $HOME
-시간: $(date +%H:%M)
-EOF
-
+```bash
 cat <<'EOF'
-$HOME은 그대로 출력 — 치환 안 됨
+$HOME은 확장되지 않는다.
 EOF
 
-# 탭 들여쓰기는 살리고, 출력에선 제거
-if true; then
-    cat <<-EOF
-	들여쓴 본문
-	실제 출력엔 들여쓰기 없음
-	EOF
-fi
-
-# here-string — 한 단어/문자열 입력
-grep "pattern" <<<"$LINE"
+diff <(sort old.txt) <(sort new.txt)
 ```
 
-## 파라미터 확장 (`${...}`)
+## 4. 흐름 제어와 데이터
 
-자주 찾는 표 — `var=hello/world.txt` 기준.
+```text
+Exit Status ──> if / && / ||
+값·패턴     ──> [[ ... ]] / case
+반복 대상   ──> for / while / until
+반복 로직   ──> function
+여러 값     ──> indexed / associative array
+```
 
-| 패턴 | 결과 | 의미 |
+| 목적 | 대표 문법 | 기억할 점 |
 |---|---|---|
-| `${var:-default}` | `hello/world.txt` | 미정의/빈값이면 `default` |
-| `${var:=default}` | `hello/world.txt` | 위 + var에 대입 |
-| `${var:?msg}` | (에러) | 미정의/빈값이면 에러로 종료 |
-| `${var:+x}` | `x` | 정의돼있을 때만 `x` |
-| `${#var}` | `15` | 길이 |
-| `${var:6}` | `world.txt` | offset 6부터 |
-| `${var:6:5}` | `world` | offset 6부터 5글자 |
-| `${var#*/}` | `world.txt` | 앞에서 짧은 매치 제거 |
-| `${var##*/}` | `world.txt` | 앞에서 긴 매치 제거 → basename |
-| `${var%/*}` | `hello` | 뒤에서 짧은 매치 제거 → dirname |
-| `${var%%.*}` | `hello/world` | 뒤에서 긴 매치 제거 |
-| `${var/l/L}` | `heLlo/world.txt` | 첫 번째만 치환 |
-| `${var//l/L}` | `heLLo/worLd.txt` | 모든 매치 치환 |
-| `${var/#hello/HI}` | `HI/world.txt` | 시작 매치만 |
-| `${var/%txt/md}` | `hello/world.md` | 끝 매치만 |
-| `${var^^}` | `HELLO/WORLD.TXT` | 대문자 (Bash 4+) |
-| `${var,,}` | (소문자) | 소문자 (Bash 4+) |
+| 상태 조건 | `if cmd; then ...; fi` | 명령 종료 상태 검사 |
+| 문자열·파일 검사 | `[[ -n $s ]]`, `[[ -f $f ]]` | Bash·Zsh 구문 |
+| 여러 패턴 분기 | `case "$x" in ... esac` | 패턴별 분기 |
+| 값 목록 반복 | `for x in ...; do ...; done` | 항목마다 실행 |
+| 조건 반복 | `while cmd; do ...; done` | 성공하는 동안 반복 |
+| 함수 | `f() { ...; }` | 인자 `$1`, `"$@"`; 상태는 `return` |
+| 인덱스 배열 | `arr=(a b)`, `"\${arr[@]}"` | Bash는 0부터 시작 |
+| 연관 배열 | `declare -A map` | Bash 4+ |
 
-Zsh의 대소문자 변환은 `${(U)var}` / `${(L)var}`를 사용한다. macOS 기본 Bash 3.2에서는 위 Bash 4+ 문법을 사용할 수 없다.
+`return`은 **종료 상태**를 반환한다. 함수의 데이터 결과는 stdout 등 별도 경로로 전달한다. 파일을 줄 단위로 읽을 때는 `while IFS= read -r line; do ...; done < file` 패턴을 알아두면 좋다.
 
-```sh
-file=/path/to/log.txt
-echo "${file##*/}"       # log.txt
-echo "${file%/*}"        # /path/to
-echo "${file%.*}"        # /path/to/log
-echo "${file##*.}"       # txt (확장자만)
+## 5. Job Control — 실행 중인 작업은 누가 관리하나?
+
+```text
+Shell
+├─ Foreground Job ── Ctrl+Z ──> Stopped
+│                                  │
+│                             fg / bg
+└─ Background Job <── cmd & ── 실행
+       ├─ jobs : 현재 셸의 작업 조회
+       ├─ wait : 완료 대기
+       └─ disown : 셸의 job 테이블에서 제거
 ```
 
-## 프로세스 치환 `<(cmd)` / `>(cmd)`
-
-명령의 입출력을 파일처럼 다루는 자리. Bash·Zsh 전용 (POSIX sh 아님).
-
-```sh
-# 두 명령의 출력을 비교
-diff <(sort a.txt) <(sort b.txt)
-
-# rg 결과를 grep 형식이 아닌 vim의 quickfix로
-nvim -q <(rg --vimgrep "TODO")
-
-# tee로 두 곳에 동시 기록
-echo "log" | tee >(gzip > out.gz) >(wc -l > count.txt)
-```
-
-## Brace 확장
-
-```sh
-echo {1..5}              # 1 2 3 4 5
-echo {01..10}            # 01 02 ... 10 (zero-pad)
-echo {a..e}              # a b c d e
-echo {1..10..2}          # 1 3 5 7 9 (step)
-echo file{A,B,C}.txt     # fileA.txt fileB.txt fileC.txt
-cp file.txt{,.bak}       # file.txt → file.txt.bak (복사)
-mv file.txt{.bak,}       # 반대 (.bak 떼기)
-mkdir -p project/{src,tests,docs}
-```
-
-## 배열
-
-Bash 배열은 0부터 시작한다. 기본 Zsh 배열은 1부터 시작하며 `${!arr[@]}`도 지원하지 않는다. 아래 인덱스·슬라이스·삭제 예제는 Bash 전용이다.
-
-```sh
-# 정의
-arr=(apple banana cherry)
-arr[3]="date"
-
-# 접근
-echo "${arr[0]}"           # apple
-echo "${arr[@]}"           # 전체 (단어별 분리)
-echo "${arr[*]}"           # 전체 (한 문자열, IFS로 결합)
-echo "${#arr[@]}"          # 길이
-echo "${!arr[@]}"          # 인덱스 목록
-
-# 슬라이스
-echo "${arr[@]:1:2}"       # banana cherry
-
-# 추가 / 제거
-arr+=("elderberry")
-unset 'arr[1]'             # 인덱스 1 제거 (희소 배열 됨)
-
-# 반복
-for item in "${arr[@]}"; do
-    echo "$item"
-done
-```
-
-연관 배열 (Bash 4+; 기본 Zsh의 선언은 `typeset -A`, 키 목록은 `${(k)user}`):
-
-```sh
-declare -A user
-user[name]="alice"
-user[age]=30
-echo "${user[name]}"
-for k in "${!user[@]}"; do
-    echo "$k = ${user[$k]}"
-done
-```
-
-## 반복문
-
-```sh
-# C 스타일
-for ((i=0; i<10; i++)); do echo $i; done
-
-# 범위
-for i in {1..5}; do echo $i; done
-
-# 파일 글로빙
-for f in *.log; do
-    echo "$f → ${f%.log}.gz"
-done
-
-# 명령 출력
-for user in $(awk -F: '{print $1}' /etc/passwd); do
-    echo "$user"
-done
-
-# while로 한 줄씩 (큰 파일)
-while IFS= read -r line; do
-    echo "[$line]"
-done < input.txt
-
-# until
-until ping -c1 host >/dev/null; do sleep 1; done
-```
-
-## 조건문
-
-```sh
-# if + 종료 코드
-if grep -q pattern file; then
-    echo "found"
-elif [[ -n "$VAR" ]]; then
-    echo "var set"
-else
-    echo "not found"
-fi
-
-# case
-case "$1" in
-    start|up)   echo "starting" ;;
-    stop|down)  echo "stopping" ;;
-    *)          echo "usage: $0 {start|stop}" ;;
-esac
-```
-
-### `[[ ... ]]` 테스트 (Bash·Zsh, **POSIX `[ ... ]`보다 안전**)
-
-| 표현 | 의미 |
-|---|---|
-| `[[ -e f ]]` | 파일/디렉터리 존재 |
-| `[[ -f f ]]` | 일반 파일 존재 |
-| `[[ -d d ]]` | 디렉터리 존재 |
-| `[[ -s f ]]` | 비어있지 않음 |
-| `[[ -r/-w/-x f ]]` | 읽기/쓰기/실행 권한 |
-| `[[ -z $s ]]` | 빈 문자열 |
-| `[[ -n $s ]]` | 비어있지 않은 문자열 |
-| `[[ $a = $b ]]` | 문자열 동등 |
-| `[[ $a != $b ]]` | 문자열 다름 |
-| `[[ $a < $b ]]` | 사전식 비교 |
-| `[[ $s =~ ^[0-9]+$ ]]` | 정규식 매치 |
-| `[[ $a -eq 0 ]]` | 정수 비교 (`-ne -lt -le -gt -ge`) |
-| `(( a > b ))` | 산술 비교 (C스타일) |
-
-```sh
-# 정규식 매치 + 캡처 (Bash; Zsh는 기본적으로 $match 배열 사용)
-if [[ "user42" =~ ^([a-z]+)([0-9]+)$ ]]; then
-    echo "${BASH_REMATCH[1]} / ${BASH_REMATCH[2]}"
-fi
-```
-
-## 함수
-
-```sh
-greet() {
-    local name="${1:-world}"
-    echo "hello, $name"
-}
-
-greet              # hello, world
-greet alice        # hello, alice
-
-# 반환값은 echo로, 종료 코드는 return
-parse_port() {
-    local val="$1"
-    [[ "$val" =~ ^[0-9]+$ ]] || return 1
-    (( val > 0 && val < 65536 )) || return 2
-    echo "$val"
-}
-
-if port=$(parse_port "$1"); then
-    echo "using $port"
-else
-    echo "invalid port: $1" >&2
-    exit 1
-fi
-```
-
-## 쿼팅 / 변수 인용
-
-| 표현 | 처리 |
-|---|---|
-| `'literal'` | 어떤 확장도 없음 |
-| `"$var"` | 변수·명령 확장, **단어 분리 차단** |
-| `$var` | 변수 확장 + 단어 분리 (위험) |
-| `"$@"` | 인자 그대로 (각 단어 보존) |
-| `"$*"` | 인자를 IFS로 합친 한 문자열 |
-
-```sh
-# 거의 항상 "$var" — 공백 들어간 경로/인자 안 깨짐
-cp "$src" "$dst"
-
-# "$@" — 함수에 인자 전달
-log() { logger -t myapp -- "$@"; }
-```
-
-## 입출력 리다이렉션
-
-| 구문 | 의미 |
-|---|---|
-| `> file` | stdout → 파일 (덮어쓰기) |
-| `>> file` | stdout → 파일 (이어쓰기) |
-| `2> file` | stderr → 파일 |
-| `2>&1` | stderr → stdout (순서 중요) |
-| `&> file` | stdout+stderr → 파일 (Bash 단축) |
-| `&>> file` | stdout+stderr → 파일 (이어쓰기) |
-| `< file` | stdin ← 파일 |
-| `> /dev/null` | 버리기 |
-| `\|&` | stdout+stderr 파이프 (`2>&1 \|`와 동일) |
-
-```sh
-# stderr만 따로 보기
-cmd 2>/tmp/err >/dev/null
-
-# 출력 + 에러 모두 로그로 + 화면에도
-cmd 2>&1 | tee app.log
-```
-
-> `cmd > log 2>&1`과 `cmd 2>&1 > log`는 다르다 — 순서대로 처리되기 때문. 후자는 stderr가 화면으로 간다.
-
-## Job 관리
-
-| 명령 | 의미 |
+| 명령 | 존재 이유 |
 |---|---|
 | `cmd &` | 백그라운드 실행 |
-| `Ctrl+Z` | foreground 일시 중지 |
-| `jobs` / `jobs -l` | 현재 셸 job 목록 |
-| `fg %n` | n번 job foreground로 |
-| `bg %n` | n번 job background에서 재개 |
-| `kill %n` | n번 job 종료 (`%` 없으면 PID — 주의) |
-| `disown %n` | 셸의 job 테이블에서 제거; 프로세스 지속은 SIGHUP·입출력 조건에도 좌우됨 |
-| `nohup cmd &` | hangup 무시 + 백그라운드 |
-| `nohup cmd </dev/null > log 2>&1 &` | tty 입력 분리(백그라운드 정지 방지) + 로그 분리 |
-| `wait` | 모든 백그라운드 job 종료 대기 |
-| `wait $!` | 직전 백그라운드 job 종료 대기 |
+| `jobs` | 현재 셸의 작업 확인 |
+| `fg %1` / `bg %1` | 작업을 전경으로 / 배경에서 재개 |
+| `wait` / `wait $!` | 작업 완료 대기 |
+| `disown %1` | 셸의 작업 관리 목록에서 분리 |
+| `nohup cmd ... &` | SIGHUP 무시하고 실행 |
+| `trap 'cleanup' EXIT` | 종료·시그널 시 정리 작업 |
 
-```sh
-# 병렬 실행 후 모두 끝날 때까지 대기
-for url in "${urls[@]}"; do
-    curl -O "$url" &
-done
-wait
+**Job ≠ Process ≠ Service.** `disown`은 생존을 보장하지 않고, `nohup`도 자동 재시작을 제공하지 않는다. `tmux`는 터미널 세션을, `systemd`는 서비스 수명주기를 관리한다. 실제 장애 사례는 [nohup 백그라운드 작업 정지 진단](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-07-28-nohup-dev-server-suspended.md)을 참고한다.
+
+## 6. Shell Option — 실행 규칙을 바꾸기
+
+```text
+set -옵션  → 켜기
+set +옵션  → 끄기
+set -o     → 옵션 상태 조회
 ```
 
-### 백그라운드 작업과 서비스의 경계
+| 옵션 | 역할 |
+|---|---|
+| `-e` (errexit) | 일부 명령 실패 시 종료 (조건문 등 예외 있음) |
+| `-u` (nounset) | 미설정 변수 접근 오류 |
+| `-o pipefail` | 파이프라인 내부 실패를 종료 상태에 반영 |
+| `-x` (xtrace) | 실행 명령 추적 |
+| `-n` (noexec) | 명령 실행 없이 문법 검사 |
 
-`nohup`은 SIGHUP을 무시하도록 실행하지만 **프로세스 유지·입출력 분리·자동 재시작을 보장하지 않는다.** `disown`은 셸의 작업 목록에서 제거하며, `tmux`는 터미널 세션을 유지하고, `systemd` 등 서비스 관리자는 재시작 정책을 관리한다.
+`#!/usr/bin/env bash`는 Bash 실행기를 선택하는 shebang이다. `set -euo pipefail`은 흔한 안전 설정이지만 **모든 오류를 잡는 보증이 아니다**. `set -e`를 임시로 끄고 켜는 대신 실패를 명시적으로 처리해야 하는 곳은 `if`나 `||`로 표현하는 편이 의도가 명확하다.
 
-```sh
-nohup ./run.sh </dev/null >app.log 2>&1 &
-```
+## 더 알아보기
 
-프로세스가 살아 있지만 응답하지 않는 경우는 [nohup 백그라운드 작업 정지 진단](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-07-28-nohup-dev-server-suspended.md)을 참고한다. `sudo` 인증과 백그라운드 작업 제어는 별도로 확인한다.
-
-## trap — 종료 시 정리
-
-```sh
-tmpfile=$(mktemp)
-trap 'rm -f "$tmpfile"' EXIT
-trap 'echo interrupted; exit 130' INT TERM
-```
-
-자주 쓰는 시그널: `EXIT`(스크립트 종료), `INT`(Ctrl+C), `TERM`(kill), `HUP`(터미널 끊김), `ERR`(`set -e`와 함께 명령 실패 시).
-
-## 참고
-
-- `man bash`, `help <builtin>` (예: `help if`)
-- [Bash Hackers Wiki (미러)](https://flokoe.github.io/bash-hackers-wiki/) — 깊은 레퍼런스 (원본 wiki.bash-hackers.org는 오프라인)
-- [ShellCheck](https://www.shellcheck.net/) — 스크립트 정적 분석 (필수)
+- `help` / `help set` / `man bash` — Bash 내장 명령·전체 문법
+- [Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html) — 확장 순서, 조건문, 예외와 옵션의 정확한 정의
+- [ShellCheck](https://www.shellcheck.net/) — 셸 스크립트 정적 분석
+- [Zsh 치트시트](zsh.md) — ZLE·History·Glob·Completion 등 Zsh 고유 기능
