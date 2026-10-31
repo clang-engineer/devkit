@@ -8,14 +8,22 @@
 
 ```text
 Git Repository
-├─ Files      : 변경 선택 → Stage → Commit
-├─ Branches   : 브랜치·원격 참조 전환
-├─ Commits    : 이력 탐색·재작성
-├─ Stash      : 변경 임시 보관·복원
-└─ Main View  : 선택한 대상의 Diff·Log·상세
+    │
+    ├─ Working Tree ── Stage ──> Index ── Commit ──> History
+    │       │                     │                   │
+    │       └──── Stash (임시 보관)                   └─ Branch / Remote
+    │
+    └─ LazyGit TUI : 패널로 대상 선택 → 키로 작업 수행
+        ├─ Files    : Working Tree / Index [1]
+        ├─ Commits  : Commit / History     [1]
+        ├─ Branches : Branch / Remote      [1]
+        ├─ Stash    : 임시 보관·복원       [1]
+        └─ Main View: 선택 대상의 상세·Diff
+
+작업 흐름 예시 [2] → 설정·진단 [3]
 ```
 
-**먼저 패널(대상)을 선택하고, 그 안에서 동작을 고른다.** 같은 키도 패널에 따라 의미가 달라진다. `?`로 현재 패널의 키맵을 확인한다. 아래 키는 기본 설정 기준이며 실제 설정과 버전에 따라 다를 수 있다.
+**Git 상태(Working Tree·Index·Commit)를 이해한 뒤 패널(대상)을 선택하고, 그 안에서 동작을 고른다.** 같은 키도 패널에 따라 의미가 달라진다. `?`로 현재 패널의 키맵을 확인한다. 아래 키는 기본 설정 기준이며 실제 설정과 버전에 따라 다를 수 있다.
 
 ## 키를 읽는 법
 
@@ -27,7 +35,7 @@ Enter     : 선택 대상의 세부 화면으로 이동
 ?         : 현재 컨텍스트의 키 확인
 ```
 
-`c`와 `C`처럼 대소문자가 다른 동작을 가리키기도 한다. Git의 Working Tree·Index·Commit 관계는 [Git 치트시트](git.md)를 참고한다.
+`c`와 `C`처럼 대소문자가 다른 동작을 가리키기도 한다. Files의 Stage는 Working Tree의 변경을 Index에 올리는 동작이며, Commit은 Index의 스냅샷을 기록한다. 상세한 Git 상태 모델은 [Git 치트시트](git.md)를 참고한다.
 
 ## 1. 패널별 동작 — 대상에 맞는 키
 
@@ -117,14 +125,18 @@ remote 브랜치 checkout: Remotes 탭 → remote(`origin`) 선택 → `Enter` �
 
 ## 2. 작업 흐름 — 기능을 조합하는 예시
 
-### 1. Hunk 단위 커밋 (가장 자주)
+### 1. Hunk 단위 커밋 — 일부 변경만 기록
+
+파일 전체가 아니라 선택한 Hunk만 **Index에 올려 Commit**하는 흐름이다.
 
 1. Files 패널에서 파일 위에 커서
 2. `Enter`로 들어가서 hunk별 `Space`
 3. 더 잘게 쪼개고 싶으면 `Enter`(line mode)에서 `Space`
 4. `Esc`로 나와서 `c` → 메시지 → Enter
 
-### 2. 인터랙티브 리베이스 (커밋 정리)
+### 2. 인터랙티브 리베이스 — 기존 이력 재작성
+
+선택한 Commit을 기준으로 이후 이력을 수정한다. 공유된 Commit은 SHA가 바뀔 수 있으므로 주의한다.
 
 1. Commits 패널에서 베이스 커밋 위에 커서 → `e`
 2. 각 커밋에 `s`(squash) / `f`(fixup) / `d`(drop) / `r`(reword)
