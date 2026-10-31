@@ -12,16 +12,21 @@ Vault나 cloud secret manager가 더 적합하다. 설정 파일을 Git에 안�
 ## 키와 파일의 관계
 
 ```text
-평문 값 ── Data Key로 암호화 ──> SOPS 파일 ──> Git
-              │                     │
-              └─ age/KMS recipient ─┘
-                   (Data Key 보호)
+암호화할 파일 ── SOPS ── Data Key로 값 암호화 [2]
+                  │
+                  ├─ age / KMS Recipient로 Data Key 보호 [1·2]
+                  │
+                  ▼
+             SOPS 파일 ── Git 저장 [2]
+                  │
+       편집·조회·실행 시 복호화 [3]
+                  │
+          Recipient 변경 / Data Key 교체 [4]
 
-암호화된 값 + 공개 가능한 메타데이터 → 저장소
-개인키·KMS 접근 권한               → 저장소 밖
+Git에 저장: 암호문 + 메타데이터
+Git 밖에 보관: 개인키·KMS 접근 권한
 ```
-
-SOPS는 파일별 Data Key로 값을 암호화하고, recipient의 age 공개키나 KMS 키로 Data Key를 보호한다. 파일명·필드 이름·구조는 기본적으로 노출될 수 있다. **recipient 변경과 데이터 키 교체는 다른 작업**이므로 아래 회전 절차를 구분한다.
+SOPS는 파일별 Data Key로 값을 암호화하고, recipient의 age 공개키나 KMS 키로 Data Key를 보호한다. **암호화한 파일을 저장하는 것과 복호화 권한을 배포하는 것은 별도 작업**이다. 파일명·필드 이름·구조는 기본적으로 노출될 수 있다. **recipient 변경과 데이터 키 교체는 다른 작업**이므로 아래 회전 절차를 구분한다.
 
 ## 1. 키 준비 — 설치와 Age
 
