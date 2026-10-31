@@ -5,15 +5,24 @@
 ## 버전 선택과 실행의 관계
 
 ```text
-mise.toml / .tool-versions
-      │ 버전 선언 (mise use)
-      ▼
-mise install ──> 런타임 설치
-      │
-mise activate <shell> ──> 셸 통합·PATH 선택
-      │
-      └─ 디렉터리·설정 변경에 맞춰 활성 버전 결정
+프로젝트 / 사용자 설정 (mise.toml 등) [2]
+                │ 버전·환경 선택
+                ▼
+       mise 버전 해석·신뢰 검사
+                │
+       mise install → 런타임 설치 [1]
+                │
+        ┌───────┴──────────┐
+        ▼                  ▼
+   Shell activate       mise exec / run
+   (PATH 갱신)          (명령별 환경)
+        └─────────┬────────┘
+                  ▼
+          선택된 런타임 실행
+
+환경 차이·버전 불일치 → which / current / doctor [3]
 ```
+**설정 선택 → 버전 해석 → 설치 → 실행 환경 적용**의 흐름이다. `activate`는 필수 선행 단계가 아니라 셸 통합 경로이며 `mise exec`는 별도로 실행할 수 있다.
 
 `use`는 버전을 **선언하며 필요 시 설치도 수행**한다. `install`은 도구 설치, `activate`는 셸 통합을 담당한다. 버전 선언·설치·활성화는 서로 구분되는 역할이다.
 
