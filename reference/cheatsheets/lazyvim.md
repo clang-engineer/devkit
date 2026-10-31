@@ -95,6 +95,28 @@ Plugin Spec의 `opts`는 플러그인 옵션 구성, `dependencies`는 플러그
 
 더 자세한 개념과 사용법은 [Neovim 코드 진단과 결과 탐색](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-05-04-neovim-code-diagnostics-and-navigation.md), Vim 기본 탐색 모델은 [Vim 치트시트](vim.md)를 참고한다.
 
+### Trouble이 보여주는 결과의 종류
+
+Trouble은 **진단 전용 도구가 아니라 여러 코드 위치 목록을 탐색하는 UI**다. 정보의 출처와 표시 기능을 구분한다.
+
+| 결과 종류 | 무엇을 보여주나 | 대표 진입점 |
+|---|---|---|
+| Diagnostics | 프로젝트·버퍼의 오류·경고·힌트 | `<leader>xx` / `<leader>xX` |
+| Quickfix | 검색·빌드 등에서 수집한 전역 위치 목록 | `<leader>xQ` |
+| Location List | 현재 Window에 연결된 위치 목록 | `<leader>xL` |
+| LSP References / Definitions 등 | 심볼의 사용처·정의 등 코드 관계 | `<leader>cS` |
+| LSP Symbols | 현재 문서의 함수·클래스 등 구조 | `<leader>cs` |
+| TODO Comments | TODO·FIXME 등 주석 위치 (관련 플러그인) | `<leader>xt` / `<leader>xT` |
+
+```text
+진단 상태 ───────────┐
+Quickfix / Loclist ──┼──> Trouble ──> 그룹·미리보기·위치 이동
+LSP 탐색 결과 ───────┤
+TODO 주석 결과 ───────┘
+```
+
+Trouble이 직접 언어를 분석하는 것은 아니다. **Diagnostics는 Neovim에서 읽고, LSP 탐색 결과는 LSP Client를 통해 요청할 수 있다.** Picker와 Trouble은 같은 LSP 결과를 표시할 수 있지만, Picker는 빠른 검색·선택, Trouble은 패널을 유지하며 목록을 순회하는 데 초점이 있다. 위 키는 LazyVim 기본 Trouble 구성 기준이며 사용자 설정에 따라 달라질 수 있다.
+
 ## 3. 개발 기능 — 누가 무엇을 제공하는가?
 
 | 기능 | 담당하는 역할 | 대표 진입점 |
