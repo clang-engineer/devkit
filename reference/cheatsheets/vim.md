@@ -2,6 +2,32 @@
 
 > **동작(Operator)과 범위(Motion / Text Object)를 조합**하면 명령을 유추할 수 있다. 예외적인 명령과 Ex 명령은 별도의 계열로 이해한다.
 
+## 전체 작동 모델 — 입력에서 편집 결과까지
+
+```text
+사용자 키 입력
+      │
+      ▼
+Mode (키의 의미 결정) [1]
+├─ Insert       → 텍스트 입력
+├─ Visual       → 범위 선택
+├─ Command-line → Ex 명령
+└─ Normal       → Operator + Motion / Text Object [2·3]
+                         │
+                         ▼
+                    Buffer 변경
+                         ├─ Register : 복사·삭제 내용 보관 [4]
+                         ├─ Undo / Dot / Macro : 변경 복원·반복 [5]
+                         └─ Search / Mark / Jump : 위치 탐색 [5]
+                         │
+                  Window가 Buffer 표시 [6]
+                         └─ Tabpage : Window 배치 묶음
+
+설정·매핑·도움말 → 입력·동작 방식 확장 [7]
+```
+
+**Vim은 키 자체보다 현재 Mode와 조작 대상이 중요하다.** Normal 모드에서 Operator는 동작, Motion·Text Object는 범위를 결정한다. 편집된 텍스트는 Buffer에 있고, Window·Tabpage는 이를 보여주는 화면 구성이다. 숫자는 아래 본문 절을 가리킨다.
+
 ## 1. 모드 — 키의 의미를 결정한다
 
 ```text
@@ -19,6 +45,8 @@ Command-line ── Esc → 명령 입력 취소 후 Normal
 - `v`는 문자, `V`는 줄, `Ctrl-v`는 블록 선택이다.
 
 ## 2. Normal 모드 — 동작과 범위의 조합
+
+**대표 실행 흐름:** Normal 모드에서 `ciw` → 현재 단어 내부를 삭제하고 Insert 모드로 전환 → 새 텍스트 입력 → `Esc`로 Normal 복귀. 같은 범위를 `yiw`로 복사하거나 `diw`로 삭제할 수 있다.
 
 ```text
 ["register] [count] operator [count] motion/text-object
@@ -66,6 +94,8 @@ Visual에서는 `viw`, `va(`처럼 Text Object로 범위를 선택한 뒤 `d`, `
 
 ## 4. 레지스터 — 변경 내용의 저장 위치
 
+레지스터는 Buffer가 아니라 **복사·삭제한 내용을 임시 보관하는 저장소**다. 명시적으로 레지스터를 고르지 않아도 기본 레지스터 규칙이 적용된다.
+
 ```text
 y / d / c → Register → p / P
                 │
@@ -79,6 +109,8 @@ y / d / c → Register → p / P
 `"ap`는 `a` 레지스터 붙여넣기, `"_diw`는 삭제 내용을 버리기, `"+y`는 지원 환경에서 시스템 클립보드에 복사한다. 레지스터 동작에는 번호 레지스터와 삭제 크기에 따른 추가 규칙이 있다.
 
 ## 5. 탐색·위치·반복·접기
+
+탐색·Mark·Jump는 **어디에서 작업할지**, Macro·Dot Repeat는 **어떤 동작을 반복할지**, Fold는 **어떻게 표시할지** 결정한다. 같은 기능 목록으로 외우기보다 서로 다른 조작 대상을 구분한다.
 
 ```text
 Vim의 탐색과 반복
@@ -108,6 +140,8 @@ Vim의 탐색과 반복
 범위 치환은 `:%s/old/new/g`(전체 버퍼), `:s/old/new/g`(현재 줄)처럼 Ex 명령으로 수행한다. `gc`의 `c`는 치환 시 확인(confirm) 옵션이다.
 
 ## 6. 편집 대상의 계층 — Buffer / Window / Tab
+
+**Buffer는 텍스트 상태, Window는 그 상태를 보여주는 뷰, Tabpage는 Window 배치**다. 같은 Buffer를 여러 Window에서 표시할 수 있으므로 파일·Buffer·Window·Tab을 1:1로 대응시키지 않는다.
 
 ```text
 Buffer (파일·텍스트 상태)
