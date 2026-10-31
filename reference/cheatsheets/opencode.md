@@ -1,46 +1,80 @@
-# OpenCode — 명령 체계 치트시트
+# OpenCode — 코딩 에이전트의 구성·실행 지도
 
-> 코딩 에이전트의 **실행 방식·모델 공급자·외부 도구**를 구분한다. 상세한 모델 지원과 인증 정책은 버전·계정에 따라 달라지므로 공식 문서에서 확인한다.
+> OpenCode는 모델을 선택하는 UI만이 아니라 **요청을 Agent가 해석하고 도구를 호출해 작업하는 환경**이다. CLI·TUI·설정의 역할을 구분하고, Provider 인증과 MCP 도구 연결을 혼동하지 않는다.
 
-## 세 가지 제어 층
-
-```text
-Shell CLI                      OpenCode TUI                 Config
-opencode                       /connect                     provider / model
-opencode run "요청"             /models                      mcp
-opencode auth login            대화·작업                     프로젝트 / 사용자 설정
-opencode mcp list
-       │                            │                            │
-       └──────── 실행·관리 ─────────┴──────── 선택·지속 설정 ────┘
-```
-
-**셸의 `opencode auth login`과 TUI의 `/connect`는 입력하는 위치가 다르다.** `opencode`는 대화형 화면을 열고, `opencode run`은 단일 요청을 실행한다.
-
-## Provider와 Model은 다르다
+## 전체 작동 모델 — 요청에서 도구 실행까지
 
 ```text
-Provider ── 인증·접근 권한 ──> Model ── 추론
-   │                            │
-   └─ auth login / /connect     └─ /models 또는 --model
+사용자 요청 (TUI / CLI)
+          │
+          ▼
+OpenCode Session
+          │ Config → Provider / Model 선택 [1]
+          ▼
+Agent (Build / Plan / 사용자 정의) [2]
+          │
+          ├─ Model : 추론·다음 동작 선택
+          ├─ Permission : 도구 실행 허용·확인·거부
+          └─ Tool : 파일·Shell·MCP [3]
+                       │
+                  외부 작업 실행
+                       │
+                  결과 → Session에 반영
+
+Config : 모델·Agent·Permission·MCP 연결 정의 [4]
 ```
 
-`provider/model`은 모델 식별 방식이다. **Provider에 인증했다고 모든 모델이 사용 가능한 것은 아니다.** 실제 목록·요금·조직 정책은 공급자 설정에 따른다.
+**Provider는 모델 접근 경로, Model은 추론 엔진, Agent는 지침·도구·권한을 묶은 작업 역할**이다. MCP는 외부 도구를 추가하며 Provider 인증을 대신하지 않는다. 이 그림은 모든 요청이 반드시 도구를 호출한다는 뜻은 아니다.
+
+## 1. 시작·모델 선택 — CLI·TUI·Provider
+
+| 목적 | 진입점 | 역할 |
+|---|---|---|
+| 대화형 시작 | `opencode` | TUI에서 세션 진행 |
+| 단일 요청 | `opencode run "요청"` | CLI로 요청 실행 |
+| Provider 연결 | `opencode auth login` / TUI `/connect` | 모델 접근 인증 |
+| 인증 확인 | `opencode auth list` | 연결 상태 조회 |
+| 모델 선택 | TUI `/models` / CLI `--model` | 실행할 모델 지정 |
 
 ```sh
-opencode auth login                    # Provider 인증
-opencode auth list                     # 인증 상태 확인
-opencode run --model provider/model "요청"
+opencode auth login
+opencode auth list
+opencode run --model provider/model "코드 구조를 요약해줘"
 ```
 
-TUI에서는 `/connect`로 Provider를 연결하고 `/models`로 모델을 선택한다. 기본 모델은 OpenCode 설정의 `model` 필드로 지정할 수 있다.
+**예시:** Provider 인증 후 `/models`에서 모델을 선택해도 Agent의 파일 수정 권한이 자동으로 바뀌지는 않는다. 모델 선택과 작업 권한은 별개다. 모델 ID·지원 범위는 설치 버전과 공급자에 따라 확인한다.
 
-## MCP — 모델과 외부 도구의 연결
+## 2. Agent — 역할·도구·권한
+
+Primary Agent는 현재 세션의 주 작업을 맡고, Subagent는 특정 작업을 위임받아 수행한다. 대표적으로 Build는 구현, Plan은 분석·계획에 초점을 둔다. <https://opencode.ai/docs/agents/>
 
 ```text
-OpenCode
-   └─ MCP Client
-       ├─ Local Server  → 로컬 프로세스 실행
-       └─ Remote Server → URL로 연결
+Primary Agent (Build / Plan)
+       │
+       ├─ 지침·모델·권한 설정
+       ├─ 내장 Tool 호출
+       └─ Subagent에 특정 작업 위임
+                     │
+                 결과 반환
+```
+
+| 요소 | 의미 |
+|---|---|
+| Agent | 작업별 지침·모델·권한·도구 구성 |
+| Permission | `allow` / `ask` / `deny`로 작업 제한 |
+| Primary / Subagent | 주 세션 수행 / 하위 작업 위임 |
+| Session | 요청과 도구 결과가 이어지는 작업 맥락 |
+
+**예시:** 코드 수정 없이 구조만 조사하려면 Plan Agent를 선택한다. 파일 편집이 필요할 때는 허용된 Agent와 권한을 사용한다. 실제 도구 권한은 설치 버전·사용자 설정에 따라 확인한다.
+
+## 3. Tool·MCP — 실행 범위 확장
+
+```text
+Agent
+├─ Built-in Tool → 파일 읽기·수정·Shell 등
+└─ MCP Client
+   ├─ Local Server  → command로 실행
+   └─ Remote Server → url로 연결
 ```
 
 ```json
@@ -61,16 +95,21 @@ OpenCode
 ```
 
 ```sh
-opencode mcp list           # 등록 서버 확인
-opencode mcp auth <name>    # 인증 지원 서버의 인증
+opencode mcp list
+opencode mcp auth <name>
 ```
 
-`command`는 인자 배열, `url`은 원격 서버 주소다. MCP 연결은 **모델 선택이나 Provider 인증을 대신하지 않는다.**
+MCP를 등록해도 모든 도구를 항상 호출하는 것은 아니다. Agent의 도구·권한 설정과 서버 연결 상태를 함께 확인한다. 외부 도구가 많아지면 세션 컨텍스트 사용량도 늘 수 있다.
 
-## 기억할 경계
+## 4. Config·진단 — 무엇이 동작을 결정하는가?
 
-- **CLI / TUI / Config**는 명령을 입력하는 위치와 적용 범위가 다르다.
-- 인증 정보 파일을 직접 삭제해 초기화하기보다 공식 인증 관리 명령을 사용한다.
-- 모델 ID·권한·사용량·설정 경로는 현재 버전에서 확인한다.
+```text
+Provider / Model  → 모델 접근·선택
+Agent / Permission → 실행 역할·허용 범위
+MCP              → 외부 도구 등록
+CLI / TUI        → 요청 입력·세션 조작
+```
 
-공식 문서: [Providers](https://opencode.ai/docs/providers/) · [Models](https://opencode.ai/docs/models/) · [MCP](https://opencode.ai/docs/mcp-servers/)
+**진단 예시:** 모델이 목록에 없다면 Provider 연결과 모델 식별자를 확인하고, 모델은 작동하지만 파일을 수정하지 못한다면 Agent의 Permission을 확인한다. MCP 도구가 보이지 않으면 서버 등록·연결·권한을 순서대로 점검한다.
+
+Config의 실제 키·경로·우선순위는 설치된 OpenCode 버전의 공식 문서에서 확인한다. [Agents](https://opencode.ai/docs/agents/) · [Providers](https://opencode.ai/docs/providers/) · [MCP](https://opencode.ai/docs/mcp-servers/) · [Config](https://opencode.ai/docs/config/)
