@@ -2,32 +2,34 @@
 
 > **동작(Operator)과 범위(Motion / Text Object)를 조합**하면 명령을 유추할 수 있다. 예외적인 명령과 Ex 명령은 별도의 계열로 이해한다.
 
-## 전체 작동 모델 — 입력에서 편집 결과까지
+## 전체 작동 모델 — 입력·편집·표시
 
 ```text
-사용자 키 입력
-      │
-      ▼
-Mode : 키의 의미 결정 [1]
-      │
-      ├─ Normal → Operator + Motion / Text Object [2·3]
-      ├─ Insert → 텍스트 입력
-      ├─ Visual → 범위 선택
-      └─ Command-line → Ex 명령
-      │
-      ▼
-Buffer : 편집할 텍스트
-      ├─ Register : 복사·삭제 내용 저장 [4]
-      ├─ Search / Mark / Jump / Quickfix : 위치 탐색 [5]
-      └─ Dot / Macro / Undo : 변경 반복·복구 [6]
+                  사용자 키 입력
+                        │
+                 Mode가 의미 결정
+         ┌──────────────┼───────────────┐
+         ▼              ▼               ▼
+       Normal         Insert         Visual / Ex
+         │              │               │
+  Operator + 범위    텍스트 입력      선택 / 명령 실행
+         └──────────────┴───────────────┘
+                        │
+                        ▼
+                 Buffer (텍스트 상태)
+                   ▲           │
+          Register │           ├─ Undo : 변경 이력
+          복사·삭제 내용        └─ Dot / Macro : 동작 반복
+                        │
+                 Window (표시 뷰)
+                   ├─ Fold : 줄 접기
+                   └─ Tabpage : Window 배치 묶음
 
-Window : Buffer를 표시 [8]
-      ├─ Fold : 화면에서 줄 접기 [7]
-      └─ Tabpage : Window 배치 묶음 [8]
-
-설정·매핑·도움말 : 동작 방식 확인·확장 [9]
+탐색·위치 기억: Search / Mark / Jump / Quickfix
+설정·키맵·도움말: 동작 방식 제어·발견
 ```
-**Vim은 키 자체보다 현재 Mode와 조작 대상이 중요하다.** Normal 모드에서 Operator는 동작, Motion·Text Object는 범위를 결정한다. 편집된 텍스트는 Buffer에 있고, Window·Tabpage는 이를 보여주는 화면 구성이다. 대괄호 숫자는 아래 본문 절을 가리킨다. 이 그림의 가지는 **기능의 적용 대상**이며 모두 순차 실행되는 단계는 아니다.
+
+위 그림은 **입력에서 텍스트 변경·표시까지의 중심 흐름**을 보여준다. Register·Undo·Macro·탐색은 그 과정에서 쓰이는 서로 다른 보조 메커니즘이며, 모두 순서대로 실행되는 단계는 아니다. Window는 Buffer를 표시하고 Tabpage는 Window 배치를 관리한다.
 
 ## 1. 모드 — 키의 의미를 결정한다
 
