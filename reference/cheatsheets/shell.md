@@ -57,14 +57,13 @@ Zsh는 배열 인덱스·확장·단어 분리 규칙이 다르다. Zsh 고유 �
 | 명령 결과 사용 | `"$(date)"` | 명령 치환 |
 | 파일명 선택 | `*.log` | glob |
 | 문자열 후보 생성 | `file{A,B}.txt` | brace expansion |
-| 다른 명령 출력을 파일처럼 전달 | `<(sort a.txt)` | process substitution (Bash·Zsh) |
 
 `"$@"`는 전달받은 각 인자를 그대로 보존한다. 반대로 인용하지 않은 `$var`는 Bash에서 단어 분리와 파일명 확장의 영향을 받을 수 있다.
 
 ### Parameter Expansion — 변수 값을 가공하기
 
 ```text
-\${parameter...}
+${parameter...}
 ├─ 기본값·검증     :-  :=  :?  :+
 ├─ 길이·부분 추출  #   :offset:length
 ├─ 앞/뒤 패턴 제거 #   ##   %   %%
@@ -74,18 +73,28 @@ Zsh는 배열 인덱스·확장·단어 분리 규칙이 다르다. Zsh 고유 �
 
 | 문제 | 대표 표현 | 의미 |
 |---|---|---|
-| 값이 없으면 기본값 | `\${name:-guest}` | 미설정 또는 빈 값일 때 대체 |
-| 필수 값 검사 | `\${name:?required}` | 값이 없으면 오류 |
-| 문자열 길이 | `\${#name}` | 문자 수 |
-| 경로에서 파일명 | `\${path##*/}` | 마지막 `/` 앞까지 제거 |
-| 경로에서 디렉터리 | `\${path%/*}` | 마지막 `/` 뒤 제거 |
-| 문자열 치환 | `\${name/old/new}` | 첫 일치 치환 |
+| 값이 없으면 기본값 | `${name:-guest}` | 미설정 또는 빈 값일 때 대체 |
+| 필수 값 검사 | `${name:?required}` | 값이 없으면 오류 |
+| 문자열 길이 | `${#name}` | 문자 수 |
+| 경로에서 파일명 | `${path##*/}` | 마지막 `/` 앞까지 제거 |
+| 경로에서 디렉터리 | `${path%/*}` | 마지막 `/` 뒤 제거 |
+| 문자열 치환 | `${name/old/new}` | 첫 일치 치환 |
 
 `#`·`##`는 **앞에서**, `%`·`%%`는 **뒤에서** 패턴을 제거한다. 긴 형태(`##`, `%%`)는 가장 긴 일치를 제거한다. `:-`는 값을 읽을 때만 대체하고 `:=`는 변수에 대입한다.
 
 ## 2. 명령 실행 (Execute)
 
 만들어진 명령을 실행하고 **입출력을 연결**하며, 종료 상태와 조건에 따라 다음 명령을 선택한다. 조건문·반복문은 실행 이후의 별도 단계가 아니라 명령 실행을 제어하는 구문이다.
+
+### 실행 대상 — Builtin · Function · External
+
+| 대상 | 존재 이유 | 예 |
+|---|---|---|
+| Builtin | 셸 자신의 상태를 직접 변경하거나 제어 | `cd`, `export`, `set` |
+| Function | 반복할 셸 명령을 이름으로 묶음 | `f() { ...; }` |
+| External Command | 별도 프로그램 실행 | `rg`, `git`, `python` |
+
+`cd`처럼 현재 셸의 작업 디렉터리를 바꾸는 명령과 외부 프로세스 실행은 효과 범위가 다르다. 함수도 셸의 실행 대상이며, 아래 흐름 제어 절에서는 함수의 **인자·종료 상태**를 다시 다룬다.
 
 ### Pipeline · Redirection · Exit Status
 
@@ -120,7 +129,7 @@ Zsh는 배열 인덱스·확장·단어 분리 규칙이 다르다. Zsh 고유 �
 | `<<'EOF'` | 확장하지 않고 원문 전달 |
 | `<<-EOF` | 앞쪽 탭 들여쓰기 제거 |
 | `<<<"$value"` | 한 문자열을 표준 입력으로 전달 (here-string) |
-| `<(cmd)` / `>(cmd)` | 명령 출력을 파일 경로가 필요한 자리에 연결 |
+| `<(cmd)` / `>(cmd)` | 명령의 입출력을 파일 경로가 필요한 자리에 연결 |
 
 ```bash
 cat <<'EOF'
@@ -148,7 +157,7 @@ Exit Status ──> if / && / ||
 | 값 목록 반복 | `for x in ...; do ...; done` | 항목마다 실행 |
 | 조건 반복 | `while cmd; do ...; done` | 성공하는 동안 반복 |
 | 함수 | `f() { ...; }` | 인자 `$1`, `"$@"`; 상태는 `return` |
-| 인덱스 배열 | `arr=(a b)`, `"\${arr[@]}"` | Bash는 0부터 시작 |
+| 인덱스 배열 | `arr=(a b)`, `"${arr[@]}"` | Bash는 0부터 시작 |
 | 연관 배열 | `declare -A map` | Bash 4+ |
 
 `return`은 **종료 상태**를 반환한다. 함수의 데이터 결과는 stdout 등 별도 경로로 전달한다. 파일을 줄 단위로 읽을 때는 `while IFS= read -r line; do ...; done < file` 패턴을 알아두면 좋다.
@@ -181,6 +190,16 @@ Shell
 | `trap 'cleanup' EXIT` | 종료·시그널 시 정리 작업 |
 
 **Job ≠ Process ≠ Service.** `disown`은 생존을 보장하지 않고, `nohup`도 자동 재시작을 제공하지 않는다. `tmux`는 터미널 세션을, `systemd`는 서비스 수명주기를 관리한다. 실제 장애 사례는 [nohup 백그라운드 작업 정지 진단](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-07-28-nohup-dev-server-suspended.md)을 참고한다.
+
+### Variable · Environment — 값의 전달 범위
+
+```text
+Shell Variable ── export ──> Environment Variable
+                                   │
+                                   └─ 자식 프로세스에 전달
+```
+
+`name=value`는 셸 변수 설정, `export name`은 자식 프로세스가 받을 환경에 포함한다. `name=value command`는 해당 명령 실행에 환경 값을 지정한다. 자식 프로세스가 부모 셸의 변수를 직접 수정하는 것은 아니다.
 
 ### Shell Option — 실행 규칙 설정
 
