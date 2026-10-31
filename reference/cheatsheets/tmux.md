@@ -4,25 +4,26 @@
 >
 > **Prefix**는 기본 `Ctrl+b`를 뜻한다. 키 바인딩과 Copy Mode 동작은 tmux 버전·설정에 따라 달라질 수 있다.
 
-## 전체 구조 — 무엇을 관리하는가?
+## 전체 구조 — 접속·작업·화면
 
 ```text
-tmux Server
-├─ Client          : 세션에 접속 / 분리 (attach / detach)
-├─ Session         : 작업을 유지하는 단위
-│  └─ Window       : 화면 전환 단위
-│     └─ Pane      : 명령·프로세스를 실행하는 분할 영역
-├─ Layout          : Pane 배치·크기·확대
-├─ Copy Mode       : 출력 이력 탐색·선택
-├─ Buffer          : 복사한 텍스트 저장·붙여넣기
-└─ 동작 확장
-   ├─ Status Line  : 상태 표시
-   ├─ Format       : #{...} 상태값 표현
-   ├─ Hook         : 이벤트에 반응
-   └─ Config       : Option·Key Binding
+Terminal의 tmux Client
+         │ attach / detach
+         ▼
+     tmux Server
+         └─ Session       : 작업 유지          [1]
+             └─ Window    : 화면 전환          [2]
+                 └─ Pane  : 화면 분할          [2]
+                     └─ PTY ── 실행 프로그램
+
+주요 기능 (포함 계층이 아니라 위 대상에 작용)
+├─ Layout              : Pane 배치·크기        [2]
+├─ Copy Mode / Buffer  : 출력 탐색·텍스트 보관 [3]
+└─ Status / Format / Hook / Config            [4]
+   └─ 상태 표시·값 표현·이벤트·설정
 ```
 
-**핵심 구분:** Client를 detach해도 Server가 살아 있는 동안 Session·Window·Pane은 유지된다. Pane 분할은 화면 배치이고, Session 유지와는 다른 기능이다. 위 그림은 실행 순서가 아닌 **관리 대상과 기능 관계**다.
+**Client는 Server에 접속하는 주체**이며 Session의 하위 대상이 아니다. Pane은 PTY를 통해 Shell·프로그램을 실행한다. Client를 detach해도 Server가 유지되는 동안 작업은 계속될 수 있다. 대괄호 번호는 아래 본문 절을 가리키며, 위 그림은 **포함 관계와 기능 적용 관계를 구분**한다.
 
 ## 명령을 읽는 법
 
@@ -36,7 +37,7 @@ tmux <command> [options] [arguments]
 
 ## 1. 작업 유지 — Client와 Session
 
-Session은 작업을 유지하고 Client는 접속·분리한다. **Detach는 종료가 아니다.**
+tmux Server는 Session·Window·Pane의 상태를 관리하고, Client는 Terminal에서 Server에 접속해 화면을 표시한다. **Detach는 연결 해제이지 Session 종료가 아니다.**
 
 ### 대표 명령
 
@@ -80,7 +81,7 @@ Window는 화면 전환 단위, Pane은 화면 내부의 실행 영역, Layout�
 
 ### Pane — 생성·선택·이동
 
-Pane은 각자 실행 프로그램을 가지며, Window 안에서 나눠 보거나 다른 Window로 옮길 수 있다.
+Pane은 PTY(의사 터미널)를 통해 Shell·프로그램을 실행하는 영역이다. Window 안에서 나눠 보거나 다른 Window로 옮길 수 있다.
 
 | 목적 | 대표 키·명령 | 동작 |
 |---|---|---|
