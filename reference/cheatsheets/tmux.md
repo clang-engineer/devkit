@@ -2,8 +2,7 @@
 
 > **terminal multiplexer** — 하나의 터미널에서 여러 세션/윈도우/패널을 관리. 클라이언트를 분리해도 서버가 유지되는 동안 작업을 계속 실행할 수 있다.
 >
-> **Prefix Key**: `Ctrl+b` (기본 설정 기준)  
-> 아래 `Prefix`는 기본 키인 `Ctrl+b`를 뜻한다. 실제 바인딩은 설정에 따라 달라진다.
+> **Prefix**는 기본 `Ctrl+b`를 뜻한다. 키 바인딩과 Copy Mode 동작은 tmux 버전·설정에 따라 달라질 수 있다.
 
 ## 전체 구조 — 무엇을 관리하는가?
 
@@ -33,13 +32,7 @@ tmux <command> [options] [arguments]
        target: session:window.pane
 ```
 
-`new-session` / `list-sessions` / `kill-session`처럼 **대상(Session) + 동작(생성·조회·종료)**을 조합한다. `-t`는 대체로 target, `-s`는 명령에 따라 session name 또는 source이므로 명령별로 확인한다. `Prefix`는 기본 `Ctrl+b`이며 실제 키는 설정에 따라 달라진다.
-
-```sh
-tmux new -s work     # Session 생성
-tmux ls              # Session 조회
-tmux attach -t work  # Client 재연결
-```
+`new-session` / `list-sessions` / `kill-session`처럼 **대상(Session) + 동작(생성·조회·종료)**을 조합한다. `-t`는 대체로 target, `-s`는 명령에 따라 session name 또는 source이므로 명령별로 확인한다. 키 입력은 `Prefix` 뒤에 누르고, 셸에서 실행하는 `tmux ...` 명령과 구분한다.
 
 ## 1. 작업 유지 — Client와 Session
 
@@ -60,7 +53,9 @@ Session은 작업을 유지하고 Client는 접속·분리한다. **Detach는 �
 | `Prefix $` | 현재 세션 이름 변경 |
 | `Prefix : new-session -s <name>` | 세션 안에서 새 세션 생성 |
 | `tmux new-session -d -s <name>` | detached로 새 세션 생성 |
-| `tmux switch-client -t <name>` | 다른 세션으로 전환 |
+| `tmux switch-client -t <name>` | 연결된 Client를 다른 세션으로 전환 |
+
+**작업 유지 예시:** `tmux new -s work` → 작업 실행 → `Prefix d` → `tmux attach -t work`. Detach는 프로세스를 종료하지 않지만 tmux Server나 호스트가 종료되면 작업 유지도 보장되지 않는다.
 
 ## 2. 화면 구성 — Window·Pane·Layout
 
@@ -108,16 +103,16 @@ Pane은 각자 실행 프로그램을 가지며, Window 안에서 나눠 보거�
 |---|---|---|
 | 레이아웃 순환 | `Prefix Space` | 사전 정의된 Layout 순환 |
 | 균등 배치 | `Prefix E` | Pane을 고르게 분배 |
-| 지정 레이아웃 | `Prefix Alt+1..5` | even-horizontal / even-vertical / main-horizontal / main-vertical / tiled |
+| 지정 레이아웃 | `Prefix Alt+1..5` | even-horizontal / even-vertical / main-horizontal / main-vertical / tiled (추가 레이아웃은 버전별 확인) |
 | 크기 조절 | `Prefix Ctrl+←↑→↓` | Pane 크기 조절 |
 | 5칸 단위 조절 | `Prefix Alt+←↑→↓` | 방향별 크기 조절 |
 | Pane 회전 | `Prefix Ctrl+o` / `Prefix Alt+o` | 순방향 / 역방향 회전 |
 
-Layout은 **Pane을 새로 만드는 기능이 아니라 기존 Pane들의 배치를 바꾸는 기능**이다. `Prefix Alt+1..5`는 각 Layout의 기본 바인딩이며 실제 키맵을 확인한다.
+Layout은 **Pane을 새로 만드는 기능이 아니라 기존 Pane들의 배치를 바꾸는 기능**이다. `Prefix Alt+1..5`는 대표 Layout의 기본 바인딩이다. 일부 최신 버전은 추가 Layout도 지원하므로 실제 키맵을 확인한다.
 
 ## 3. 출력 탐색 — Copy Mode와 Buffer
 
-Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 복사한 텍스트를 보관한다. **Copy Mode의 기본 키는 Emacs 방식이며, Vi 방식은 `mode-keys vi` 설정 등에 따라 사용된다.** 시스템 클립보드 연동은 별도다.
+Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 복사한 텍스트를 보관한다. **Copy Mode는 Emacs·Vi 키 테이블이 다르다.** `mode-keys vi` 설정이나 환경에 따라 선택되므로 현재 설정을 확인한다. 시스템 클립보드 연동은 별도다.
 
 ### 대표 키
 
@@ -125,15 +120,17 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 |--------|------|
 | `Prefix [` | 복사 모드 진입 (스크롤 가능) |
 | `Prefix PgUp` | 복사 모드 진입 및 위로 스크롤 |
-| `q` | 복사 모드 종료 |
+| `q` (Vi) / `Escape` (Emacs) | 복사 모드 종료 |
 | `Space` (Vi) / `Ctrl+Space` (Emacs) | 선택 시작 |
-| `Enter` (Vi) / `Alt+w` (Emacs) | 선택 복사 |
+| `Enter` (Vi) / `Ctrl+w` (Emacs) | 선택 복사 후 종료 |
 | `Prefix ]` | 최근 버퍼 붙여넣기 |
 | `Prefix #` | 모든 붙여넣기 버퍼 나열 |
 | `Prefix =` | 버퍼 목록에서 선택하여 붙여넣기 |
 | `Prefix -` | 가장 최근 버퍼 삭제 |
 | `Ctrl+u` / `Ctrl+d` (Vi) | 반 페이지 위/아래 스크롤 |
 | `g` / `G` (Vi) | 이력 맨 위/아래로 이동 |
+
+**복사 흐름:** `Prefix [` → 이동·선택 → 복사 → `Prefix ]`로 붙여넣기. 복사한 내용은 tmux Buffer에 저장되며 OS 클립보드와는 별개다.
 
 ## 4. 관찰·설정·자동화
 
@@ -146,18 +143,16 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 | Hook | 이벤트 발생 시 명령 실행 | `set-hook`, `show-hooks` |
 | Config | 동작·키맵 변경 | `set-option`, `bind-key` |
 
-현재 바인딩은 `tmux list-keys`, Copy Mode의 Vi 키는 `tmux list-keys -T copy-mode-vi`로 확인한다.
+**설정 확인 예시:** `tmux list-keys`로 현재 바인딩을 확인하고, `tmux list-keys -T copy-mode-vi`로 Vi Copy Mode를 확인한다. `tmux display-message -p '#{session_name}:#{window_index}.#{pane_index}'`는 현재 대상을 Format으로 표시한다.
 
 ### 공통 조작
 
 | 명령어 | 설명 |
 |--------|------|
 | `Prefix ?` | 키 바인딩 목록 |
-| `Prefix /` | 특정 키 바인딩 설명 보기 |
 | `Prefix t` | 시계 표시 |
 | `Prefix ~` | 최근 메시지 확인 |
 | `Prefix :` | 명령어 프롬프트 |
-| `Prefix r` | 현재 클라이언트 리프레시 |
 | `Prefix Ctrl+z` | tmux 클라이언트 일시 중지 |
 | `tmux source-file ~/.tmux.conf` | 설정 파일 리로드 |
 
@@ -165,7 +160,6 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 ## 필요한 경우 확장하기
 
 - **기본 키와 옵션의 정확한 동작:** [tmux 공식 매뉴얼](https://man7.org/linux/man-pages/man1/tmux.1.html)
-
 - **Pane·Window를 다른 Session으로 이동:** [target 지정과 join-pane / move-window](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md)
 - **OSC52 클립보드:** [터미널과 tmux의 클립보드 경계](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-06-10-tmux-clipboard-osc52-pbcopy-hangul.md)
 - **Hook의 이벤트와 대상:** [Hook의 함정](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-07-11-hook-window-id-kill-pane.md)
