@@ -6,15 +6,16 @@
 ## 파일 작업의 구조
 
 ```text
-Parent Directory | Current Directory | Preview
-       h          j/k : 항목 이동       J/K : 미리보기
-       l : 디렉터리 진입
-                    │
-              Space : 항목 선택
-                    │
-            y(copy) / x(cut) → p(paste)
-                    │
-            s(파일명 검색) / S(내용 검색)
+Parent Directory ← Current Directory → Preview
+                          │
+                    항목 탐색·선택 [1]
+                          │
+                ┌─────────┴─────────┐
+                ▼                   ▼
+          파일 작업 [2]        검색·이동 [3]
+          y / x → p           / / s / S / z
+                          │
+                 설정·확장·진단 [4]
 ```
 
 **탐색 → 선택 → 작업**의 세 단계로 읽는다. `y`와 `x`는 선택한 항목에 대한 복사·이동 준비, `p`는 현재 디렉터리에 적용한다. `s`와 `S`는 검색 대상이 다르다. 기본 키는 버전·사용자 keymap 설정에 따라 확인한다.
@@ -22,73 +23,6 @@ Parent Directory | Current Directory | Preview
 ## 경계
 
 왼쪽은 부모 디렉터리, 가운데는 현재 디렉터리의 항목, 오른쪽은 미리보기다. Yazi를 종료한 뒤 **부모 셸의 작업 디렉터리까지 바꾸려면** 공식 `y` shell wrapper가 필요하다.
-
-## 설치 · 확장 준비
-
-```bash
-brew install yazi          # macOS, 기본 설치
-cargo install --force yazi-build  # Rust 소스에서 빌드
-```
-
-검색·이동과 풍부한 미리보기를 사용하려면 필요한 도구만 추가한다.
-
-```bash
-brew install fd ripgrep fzf zoxide  # 검색·이동
-brew install ffmpeg-full sevenzip jq poppler resvg imagemagick-full \
-  font-symbols-only-nerd-font       # 미디어·압축·문서 미리보기와 아이콘
-brew link ffmpeg-full imagemagick-full -f --overwrite
-```
-
-## 설정과 확장
-
-기본 설정 전체를 복사하지 않아도 된다. 아래 파일에 바꿀 항목만 작성하면 Yazi 기본값 위에 병합된다.
-
-| 파일 | 역할 |
-|---|---|
-| `~/.config/yazi/yazi.toml` | 파일 관리, 정렬, opener, previewer 등 일반 동작 |
-| `~/.config/yazi/keymap.toml` | 키맵 추가·변경 |
-| `~/.config/yazi/theme.toml` | 색상과 Flavor 선택 |
-| `~/.config/yazi/init.lua` | Lua 플러그인 초기화 |
-| `~/.config/yazi/package.toml` | `ya pkg`가 관리하는 패키지 버전 잠금 |
-
-```toml
-# ~/.config/yazi/yazi.toml
-[mgr]
-show_hidden = true
-```
-
-기본 키맵을 유지하면서 사용자 키를 추가하려면 `prepend_keymap` 또는 `append_keymap`을 사용한다.
-
-## 플러그인과 Flavor
-
-Yazi는 Lua 플러그인으로 명령, 메타데이터 수집, 사전 로딩과 미리보기를 확장한다. 공식 문서 기준 Plugin과 Flavor는 아직 Beta다. Flavor는 외형만 묶은 배포 가능한 테마 패키지다.
-
-```bash
-ya pkg add yazi-rs/plugins:git       # 공식 저장소의 Git 플러그인
-ya pkg add yazi-rs/flavors:dracula  # Dracula Flavor
-
-ya pkg list                          # 관리 중인 패키지
-ya pkg upgrade                       # 전체 업그레이드
-ya pkg delete yazi-rs/plugins:git   # 패키지 제거
-ya pkg install                       # package.toml의 잠금 버전 설치
-```
-
-새 환경에서는 dotfiles의 `package.toml`을 가져온 뒤 `ya pkg install`로 같은 버전을 복원한다. `ya`와 `yazi`의 버전은 정확히 같아야 한다.
-
-```lua
--- ~/.config/yazi/init.lua
-require("my-plugin"):setup {
-  key = "value",
-}
-```
-
-```toml
-# ~/.config/yazi/theme.toml
-[flavor]
-dark = "dracula"
-```
-
-직접 설치한 플러그인은 `~/.config/yazi/plugins/<name>.yazi/main.lua`, Flavor는 `~/.config/yazi/flavors/<name>.yazi/flavor.toml`을 진입점으로 사용한다.
 
 ## 1. 탐색·선택 — 패널과 대상
 
@@ -146,7 +80,78 @@ dark = "dracula"
 | `cf` | 파일명 복사 |
 | `cn` | 확장자를 제외한 파일명 복사 |
 
-## 4. 설정·진단
+## 4. 설정·확장·진단
+
+설정은 파일 관리 동작을 바꾸고, Plugin·Flavor는 기능과 외형을 확장한다. 필요한 확장만 선택한다.
+
+### 설치 · 확장 준비
+
+```bash
+brew install yazi          # macOS, 기본 설치
+cargo install --force yazi-build  # Rust 소스에서 빌드
+```
+
+검색·이동과 풍부한 미리보기를 사용하려면 필요한 도구만 추가한다.
+
+```bash
+brew install fd ripgrep fzf zoxide  # 검색·이동
+brew install ffmpeg-full sevenzip jq poppler resvg imagemagick-full \
+  font-symbols-only-nerd-font       # 미디어·압축·문서 미리보기와 아이콘
+brew link ffmpeg-full imagemagick-full -f --overwrite
+```
+
+### 설정과 확장
+
+기본 설정 전체를 복사하지 않아도 된다. 아래 파일에 바꿀 항목만 작성하면 Yazi 기본값 위에 병합된다.
+
+| 파일 | 역할 |
+|---|---|
+| `~/.config/yazi/yazi.toml` | 파일 관리, 정렬, opener, previewer 등 일반 동작 |
+| `~/.config/yazi/keymap.toml` | 키맵 추가·변경 |
+| `~/.config/yazi/theme.toml` | 색상과 Flavor 선택 |
+| `~/.config/yazi/init.lua` | Lua 플러그인 초기화 |
+| `~/.config/yazi/package.toml` | `ya pkg`가 관리하는 패키지 버전 잠금 |
+
+```toml
+# ~/.config/yazi/yazi.toml
+[mgr]
+show_hidden = true
+```
+
+기본 키맵을 유지하면서 사용자 키를 추가하려면 `prepend_keymap` 또는 `append_keymap`을 사용한다.
+
+### 플러그인과 Flavor
+
+Yazi는 Lua 플러그인으로 명령, 메타데이터 수집, 사전 로딩과 미리보기를 확장한다. 공식 문서 기준 Plugin과 Flavor는 아직 Beta다. Flavor는 외형만 묶은 배포 가능한 테마 패키지다.
+
+```bash
+ya pkg add yazi-rs/plugins:git       # 공식 저장소의 Git 플러그인
+ya pkg add yazi-rs/flavors:dracula  # Dracula Flavor
+
+ya pkg list                          # 관리 중인 패키지
+ya pkg upgrade                       # 전체 업그레이드
+ya pkg delete yazi-rs/plugins:git   # 패키지 제거
+ya pkg install                       # package.toml의 잠금 버전 설치
+```
+
+새 환경에서는 dotfiles의 `package.toml`을 가져온 뒤 `ya pkg install`로 같은 버전을 복원한다. `ya`와 `yazi`의 버전은 정확히 같아야 한다.
+
+```lua
+-- ~/.config/yazi/init.lua
+require("my-plugin"):setup {
+  key = "value",
+}
+```
+
+```toml
+# ~/.config/yazi/theme.toml
+[flavor]
+dark = "dracula"
+```
+
+직접 설치한 플러그인은 `~/.config/yazi/plugins/<name>.yazi/main.lua`, Flavor는 `~/.config/yazi/flavors/<name>.yazi/flavor.toml`을 진입점으로 사용한다.
+
+
 
 ### 기타
 
