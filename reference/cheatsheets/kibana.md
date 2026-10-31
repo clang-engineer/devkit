@@ -2,30 +2,32 @@
 
 > Kibana는 Elasticsearch에 저장된 데이터를 **찾고, 해석하고, 시각화하고, 공유하는 인터페이스**다. 데이터를 직접 저장하는 검색 엔진이 아니며, Discover·Lens·Dashboard·Dev Tools의 역할이 다르다.
 
-## 전체 작동 모델 — 데이터에서 대시보드까지
+## 전체 작동 모델 — 조회·분석·공유
 
 ```text
-Elasticsearch Index / Data Stream
-              │
-              ▼
-       Data View (데이터 범위·필드)
-              │
-       Query / Filter / Time Range
-              │
-        ┌─────┼──────────┐
-        ▼     ▼          ▼
-     Discover Lens    Dev Tools
-     문서 탐색  집계·차트  API 요청
-              │
-              ▼
-          Dashboard
-       시각화·필터·공유
+Elasticsearch Index / Data Stream (실제 데이터)
+                    │
+             Data View (조회 대상)
+                    │
+             Time Range / KQL / Filter
+                    │
+             Elasticsearch 검색
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+     Discover                 Lens
+     문서·필드 탐색           집계·시각화
+        │                       │
+        └───────────┬───────────┘
+                    ▼
+              Dashboard
+           필터·차트·공유
 
-Saved Objects : Data View·Dashboard·Visualization 등 구성 저장
-Space / Role : 콘텐츠 분리·접근 권한
+별도 경로: Dev Tools Console → Elasticsearch REST API
+구성 관리: Saved Objects / Spaces / Privileges
 ```
 
-**Data View는 데이터를 복사한 저장소가 아니라 Elasticsearch 데이터에 접근할 논리적 범위**다. Discover는 개별 문서·필드 탐색, Lens는 집계·시각화, Dashboard는 여러 시각화를 결합한다. Dev Tools Console은 Elasticsearch API를 실행하는 인터페이스다. UI 메뉴 이름은 Kibana 버전에 따라 달라질 수 있다.
+**Discover·Lens는 분석 경로이고 Dev Tools는 별도의 API 실행 경로**다. 세 기능이 모두 Dashboard의 하위 단계는 아니다. Data View는 데이터를 복사하지 않고, Dashboard도 원본 데이터를 별도로 저장하지 않는다.
 
 ## 1. 데이터 접근 — Data View·시간 범위·필터
 
@@ -66,6 +68,8 @@ KQL / Filter → Elasticsearch 조회
 KQL은 **필터링 중심의 언어**이며, Elasticsearch Query DSL의 모든 기능을 표현하지는 않는다. 검색창의 언어 모드(KQL·Lucene 등)를 확인한다. 필드 타입(`keyword`·`text`·숫자·날짜)에 따라 매칭 결과가 달라진다.
 
 ## 3. 시각화 — Lens에서 Dashboard까지
+
+Lens는 Elasticsearch의 집계 결과를 시각화한다. Discover에서 문서와 필드가 예상대로 보이는지 확인한 뒤 차트의 시간 간격·집계 대상·분할 필드를 결정한다.
 
 **Lens는 필드를 차트로 집계하는 곳**, Dashboard는 여러 시각화와 필터를 한 화면에서 사용하는 곳이다.
 
