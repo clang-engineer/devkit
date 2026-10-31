@@ -1,131 +1,108 @@
-# LazyVim — 편집·탐색·코드 작업의 작동 지도
+# LazyVim — 개발 환경 구성과 기능 발견 지도
 
-> **LazyVim은 Neovim의 편집 모델에 플러그인·키맵·설정을 조합한 배포판**이다. 기능을 단순 나열하기보다 **무엇을 편집하고, 어떻게 탐색하며, 어떤 계층이 기능을 제공하는지** 이해한다. Vim의 Operator·Motion 문법은 [Vim 치트시트](vim.md)를 참고한다.
+> **LazyVim은 Neovim 위에 플러그인·설정·키맵을 통합한 개발 환경 배포판**이다. Vim 편집 문법을 반복하기보다, 기능이 **어디서 제공되고 어떻게 활성화·호출되는지** 이해한다. 기본 편집 원리는 [Vim 치트시트](vim.md)에 맡긴다.
 
-## 전체 작동 모델 — 편집 대상에서 기능 확장까지
+## 전체 작동 모델 — 구성에서 실제 기능까지
 
 ```text
-사용자 입력 (Mode에 따라 키 의미 변화)
-           │
-           ▼
-Neovim 편집 모델
-├─ Buffer : 실제 편집 텍스트
-├─ Window : Buffer를 보여 주는 화면 영역
-└─ Tab    : Window 배치의 묶음
-           │
-           ├─ Vim Operator + Motion / Text Object → 텍스트 변경 [1]
-           ├─ Explorer / Picker / Search         → 대상 발견 [2]
-           └─ LSP / Treesitter / Formatter       → 코드 이해·변환 [3]
-                         │
-LazyVim 설정·키맵·플러그인 → 위 기능을 연결·확장 [4]
-                         │
-                Extras로 선택적 기능 활성화
+Neovim (편집기·Buffer·Window·Mode)
+             │
+             ▼
+lazy.nvim (플러그인 로드·설정 관리)
+             │
+    ┌────────┼────────────────┐
+    ▼        ▼                ▼
+LazyVim 기본 구성       User Plugin Spec       Extras
+(기본 플러그인·키맵)    (추가·변경·비활성화)   (선택적 기능 묶음)
+    └────────┬────────────────┘
+             ▼
+      실제 활성 플러그인·키맵 [1]
+             │
+       사용자가 기능 호출
+             │
+    ┌────────┼──────────────┐
+    ▼        ▼              ▼
+탐색·이동 [2]   코드 기능 [3]   편집·Git·UI [3]
+    │        │              │
+    └────────┴──────────────┘
+             ▼
+       Neovim Buffer·Window
+
+기능 문제 → 키맵 / Plugin / LSP / Root 상태 확인 [4]
 ```
 
-**Neovim이 편집 대상과 상태를 관리하고, LazyVim은 그 위에 기능을 연결한다.** Buffer·Window·Tab은 포함 관계가 아니다. Window는 Buffer를 표시하며 Tab은 Window 배치의 묶음이다. 위 숫자는 본문의 기능 영역을 가리킨다.
+이 그림은 단일 명령의 내부 실행 순서가 아니라 **설정·기능 제공·호출의 관계**다. Neovim은 편집 상태를 관리하고, lazy.nvim은 플러그인 로딩을 맡으며, LazyVim은 그 위의 기본 구성을 제공한다. Extra는 별도 편집기가 아니라 추가 Plugin Spec 묶음이다.
 
-## 1. 편집 — Mode·Operator·Text Object
+## 1. 기능이 구성되는 방식 — Plugin·Spec·Extra·Keymap
 
-Vim의 **Mode는 입력의 의미**를 결정하고, Operator는 **무엇을 할지**, Motion·Text Object는 **어느 범위에 적용할지** 결정한다. LazyVim은 이 문법을 유지하면서 Flash·Surround·Treesitter 기반 선택 등을 추가한다.
-
-| 대상·목적 | 대표 조작 | 의미 |
+| 요소 | 역할 | 확인 위치 |
 |---|---|---|
-| 범위 변경 | `ciw`, `dap` | 단어 내부 변경 / 문단 삭제 (Vim) |
-| 빠른 위치 이동 | `s` | Flash로 화면 내 위치 선택 |
-| 구조 선택 | `S` | Flash Treesitter (활성 플러그인 기준) |
-| 둘러싸기 | Surround 플러그인 | 따옴표·괄호 추가·교체·삭제 |
-| 창 이동 | `Ctrl+h/j/k/l` | 인접 Window로 Focus 이동 |
-| Buffer 전환 | `Shift+h/l` | 이전·다음 Buffer |
+| Neovim | Buffer·Window·Mode와 편집 API 제공 | `:help` |
+| lazy.nvim | Plugin Spec 해석·설치·로딩 | `:Lazy` |
+| LazyVim | 기본 플러그인·옵션·키맵 구성 | [공식 설정 문서](https://www.lazyvim.org/configuration) |
+| User Spec | 플러그인 추가·설정 재정의·비활성화 | `lua/plugins/*.lua` |
+| Extra | 언어·디버깅·테스트 등 기능 묶음 활성화 | `:LazyExtras` |
+| Keymap | 활성 기능을 키 입력과 연결 | `<leader>sk`, `<leader>?` |
 
-**예시:** `ciw`는 현재 단어 내부를 바꾸는 Vim 조합이고, Flash의 `s`는 **편집 범위를 바꾸는 것이 아니라 이동할 위치를 찾는 기능**이다. 둘을 연결하면 이동 후 원하는 범위를 편집할 수 있다.
+**구성 예시:** `:LazyExtras`에서 필요한 언어 지원을 활성화 → 해당 Plugin Spec이 로딩 대상에 포함 → 플러그인·외부 도구가 준비되면 관련 기능과 키맵을 사용할 수 있다. Extra 활성화만으로 언어 서버나 디버거 실행 파일까지 반드시 설치되는 것은 아니다.
 
-## 2. 탐색 — Explorer·Picker·Search·Root
+Plugin Spec의 `opts`는 플러그인 옵션 구성, `dependencies`는 플러그인 의존 관계, `keys`는 키맵·지연 로딩 선언 등에 쓰인다. `init`·`config`는 로딩 시점과 설정 실행에 관여한다. 세부 병합·로드 순서는 [lazy.nvim Spec](https://lazy.folke.io/spec)을 따른다.
+
+## 2. 탐색 — 대상에 따라 다른 진입점
 
 ```text
-파일·심볼·문자열을 찾고 싶다
-           │
-      ┌────┼───────────┐
-      ▼    ▼           ▼
-  Explorer Picker     LSP Navigation
-  파일 트리  후보 검색  정의·참조·구현
-      │    │           │
-      └────┴───────────┘
-           ▼
-       Buffer 열기
-           │
-       Window에 표시
+무엇을 찾는가?
+├─ 파일·문자열·심볼 후보 → Picker
+├─ 파일 트리·디렉터리   → Explorer
+├─ 화면 내 위치         → Flash
+└─ 정의·참조·구현       → LSP Navigation
+                              │
+                        Buffer·Window 이동
 ```
-
-**Explorer**는 파일 트리를 따라가고, **Picker**는 파일·내용·심볼 등의 후보를 찾아 선택한다. **LSP Navigation**은 코드 의미에 기반해 위치를 이동한다. Root는 검색·프로젝트 범위의 기준이고 `cwd`는 Neovim의 현재 작업 디렉터리다. 두 값은 같지 않을 수 있다.
 
 | 목적 | 대표 키 |
 |---|---|
 | 파일 탐색기 | `<leader>e` |
-| 프로젝트 파일 찾기 | `<leader>ff` |
-| 프로젝트 내용 검색 | `<leader>sg` |
-| Buffer 목록 | `<leader>,` |
-| 정의로 이동 | `gd` |
-| 참조 찾기 | `gr` |
+| 파일 찾기 | `<leader>ff` |
+| 내용 검색 | `<leader>sg` |
+| Buffer 선택 | `<leader>,` |
+| 화면 위치 이동 | `s` (Flash) |
+| 정의 이동 | `gd` |
+| 참조 찾기 | `gr` (설정·버전 확인) |
 
-**예시:** `<leader>ff`로 파일을 찾고 `gd`로 정의를 따라간다. 파일 탐색은 Picker가, 정의 탐색은 LSP가 담당한다. LSP 연결이나 기능 지원이 없다면 `gd`가 기대대로 동작하지 않을 수 있다.
+**조합 예시:** `<leader>ff`로 파일을 선택한 뒤 `gd`로 정의를 따라간다. 첫 단계는 Picker가 파일 후보를 찾는 것이고, 두 번째는 LSP 등 코드 탐색 기능이 의미 정보를 활용하는 것이다. Root(프로젝트 범위)와 `cwd`(현재 작업 디렉터리)가 다르면 검색 범위가 예상과 다를 수 있다.
 
-## 3. 코드 기능 — LSP·Treesitter·Formatter·DAP
+## 3. 개발 기능 — 누가 무엇을 제공하는가?
 
-| 기능 | 작동 대상 | 존재 이유 |
+| 기능 | 담당하는 역할 | 대표 진입점 |
 |---|---|---|
-| LSP | 언어 서버가 제공하는 코드 의미 정보 | 정의·참조·진단·Rename·Code Action |
-| Completion | 입력 위치와 후보 | 코드·문자열 완성 |
-| Treesitter | 파싱된 구문 트리 | 구조 인식·선택·하이라이트 |
-| Formatter | 파일 또는 선택 범위 | 코드 형식 변환 |
-| Diagnostics | 코드 문제의 위치·메시지 | 오류·경고 탐색 |
-| DAP (Extra) | 실행 중인 프로그램·디버거 | Breakpoint·Step·상태 관찰 |
-| Git 통합 | 파일의 변경 Hunk·상태 | 변경 탐색·비교·복구 |
+| 편집·Text Object | Vim·Neovim 편집 문법, 플러그인 확장 | `ciw`, Surround |
+| LSP | 코드 의미·정의·참조·Rename·Code Action | `gd`, `<leader>ca` |
+| Completion | 입력 후보 제공·선택 | Insert Mode |
+| Treesitter | 구문 트리·구조 기반 하이라이트·선택 | 활성 플러그인 |
+| Formatter | 코드 스타일 변환 | `<leader>cf` (키맵 확인) |
+| Diagnostics / Trouble | 진단 제공·목록 표시·탐색 | `]d`, `[d`, `<leader>xx` |
+| Git | Hunk·변경 상태 탐색 및 Git TUI 연동 | `]h`, `[h`, LazyGit |
+| DAP / Test | 디버깅·테스트 실행·상태 확인 | 해당 Extra 활성화 |
 
-**진단 정보의 제공자와 표시 UI는 다르다.** LSP 등이 문제를 보고하면 Neovim·플러그인이 표시하거나 목록으로 탐색할 수 있다. Treesitter는 LSP를 대신하지 않고, Formatter는 코드 의미 분석과 다른 책임을 가진다.
+**기능 제공자와 화면 UI는 구분한다.** LSP가 제공하는 진단을 Neovim이 수집하고 Trouble 같은 UI가 목록으로 보여줄 수 있다. Treesitter는 LSP의 대체재가 아니며 Formatter도 코드 의미 탐색과 다른 기능이다.
 
-대표적으로 `<leader>ca`는 Code Action, `<leader>cr`는 Rename, `<leader>xx`는 Diagnostics 목록이다. `]d`·`[d`는 진단 위치 이동이며, 활성 플러그인과 버전에 따라 키가 달라질 수 있다.
+Vim의 `Operator + Motion` 원리는 [Vim 치트시트](vim.md)를 참고한다. LazyVim에서는 그 위에 어떤 기능이 추가되고, 어떤 플러그인이 담당하는지 파악하는 데 집중한다.
 
-## 4. 확장·설정 — Plugin·Extra·Keymap
-
-```text
-Neovim 기본 동작
-       │
-       ├─ LazyVim 기본 플러그인·키맵
-       ├─ User Config / lazy.nvim Plugin Spec
-       └─ Extras (선택적으로 기능 추가)
-                    │
-                    ▼
-             실제 활성 기능·키맵
-```
-
-**Plugin은 기능 구현, Extra는 관련 플러그인·설정 묶음, Keymap은 사용자가 기능을 호출하는 경로**다. `init`·`opts`·`config`는 lazy.nvim 설정에서 서로 다른 역할을 하며, 실제 병합·로드는 [lazy.nvim 공식 문서](https://lazy.folke.io/spec)를 따른다.
-
-### 키맵을 발견하는 패턴
+## 4. 기능 발견과 진단 — 키맵·플러그인·환경
 
 ```text
-<leader> (기본 Space)
-  ├─ f : File / Find
-  ├─ s : Search
-  ├─ b : Buffer
-  ├─ c : Code
-  ├─ g : Git
-  ├─ w : Window
-  ├─ x : Diagnostics
-  └─ u : UI / Toggle
-
-] / [ + 대상 → 다음 / 이전 위치
+키를 눌렀는데 동작하지 않는다
+      │
+      ├─ 키맵이 있는가?      → <leader>sk / <leader>?
+      ├─ Plugin이 로드됐나?  → :Lazy
+      ├─ Extra가 활성인가?   → :LazyExtras
+      ├─ LSP가 연결됐나?     → :checkhealth vim.lsp
+      └─ Root·cwd가 맞는가?  → :pwd / 프로젝트 탐색
 ```
 
-이것은 **암기용 공통 패턴이지 모든 키가 이 문법을 따른다는 뜻은 아니다.** 실제 키맵은 which-key와 설치된 플러그인 설정이 결정한다.
+**대표 패턴:** `<leader>`(기본 Space) 다음에 `f`(Find), `s`(Search), `b`(Buffer), `c`(Code), `g`(Git), `w`(Window), `x`(Diagnostics), `u`(UI) 같은 그룹이 이어진다. `]d`·`[d`처럼 대상 앞뒤로 이동하는 패턴도 있다. 모든 키가 동일한 규칙을 따르는 것은 아니다.
 
-| 확인할 것 | 진입점 |
-|---|---|
-| 현재 키맵 검색 | `<leader>sk` / `<leader>?` |
-| 플러그인 로드 상태 | `:Lazy` |
-| 활성 Extras | `:LazyExtras` |
-| LSP 연결 | `:LspInfo` / `<leader>cl` |
-| 기능별 도움말 | `:help`, `:helpgrep` |
+**진단 예시:** `gd`가 동작하지 않는다면 키맵을 먼저 확인하고, 파일 형식과 LSP 연결을 점검한다. `:Lazy`에서 플러그인 상태를 확인하되 **플러그인이 설치되어 있다는 사실과 해당 Buffer에서 기능이 동작한다는 사실은 다르다.**
 
-**진단 예시:** 정의 이동이 안 된다면 먼저 해당 Buffer의 파일 형식과 LSP 연결 상태를 확인하고, 그다음 `gd`의 실제 키맵을 확인한다. 키맵 존재와 기능 제공 여부는 별개의 문제다.
-
-전체 키 목록은 [LazyVim 공식 Keymaps](https://www.lazyvim.org/keymaps), [설정별 키맵 변경](https://www.lazyvim.org/configuration/keymaps)을 참고한다. 관련 개념은 [Neovim 로드맵](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-06-16-00-neovim-roadmap.md)에서 더 깊게 다룬다.
+기본 키는 버전·설정에 따라 달라질 수 있다. 전체 키 목록은 [LazyVim Keymaps](https://www.lazyvim.org/keymaps), 프로젝트 구조와 편집기 내부 원리는 [Neovim 로드맵](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-06-16-00-neovim-roadmap.md)에서 확인한다.
