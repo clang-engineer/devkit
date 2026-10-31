@@ -4,29 +4,42 @@
 > 재작성된 것은 아니며, 3.x에서는 Rust 라이브러리 **TaskChampion**이 저장·동기화
 > 코어를 담당한다.
 
-## 명령 문법과 태스크 상태
+## 전체 작동 모델 — Task 선택·상태 변경·저장
 
 ```text
 task [filter] <command> [attributes]
-       │         │            └─ project:work / due:tomorrow / +tag
-       │         ├─ add / modify / done / delete
-       │         └─ list / next / info / undo
-       └─ ID / status:pending / project:work / +tag
+       │         │            │
+       │         │            └─ 바꿀 속성: due / project / tag
+       │         └─ 조회·추가·수정·완료·삭제
+       └─ 대상 선택: ID / UUID / 조건식
+                    │
+                    ▼
+               TaskChampion 저장
+                    │
+       ┌────────────┼─────────────┐
+       ▼            ▼             ▼
+   Pending       Completed      Deleted
+       │
+       ├─ start / stop : active 상태를 나타내는 시간 속성
+       ├─ due / wait / scheduled : 일정·표시 조건
+       └─ project / tag / priority : 분류·우선순위
 
-Pending ── start ──> Active ── done ──> Completed
-   │                                  (완료)
-   └────────────── delete ──────────> Deleted
+조회: list / next / ready / info
+복구·이동: undo / export / sync
 ```
 
-`filter`는 **어떤 태스크에**, `command`는 **무엇을**, `attributes`는 **어떤 값으로** 적용할지를 나타낸다. 모든 명령이 모든 필터·속성을 받는 것은 아니다.
+**Pending·Completed·Deleted는 태스크 상태이며, Active는 별도 완료 단계가 아니라 Pending 태스크의 시작 시각 속성으로 표현된다.** Filter는 대상 선택, Command는 작업, Attribute는 속성 지정이다. 아래 본문은 생성·선택·변경·보관 흐름을 설명한다.
 
 ```sh
 task add "문서 검토" project:dev due:tomorrow
-task project:dev list          # 대상 필터
-task 3 modify priority:H      # ID 3의 속성 변경
-task 3 done                   # ID 3 완료
-task undo                     # 마지막 변경 취소
+task project:dev list
+task 3 modify priority:H
+task 3 start
+task 3 stop
+task 3 done
 ```
+
+위 `3`은 예시 ID로, 실제 ID는 `task list` 출력에서 확인한다. **일괄 수정 전에는 같은 Filter로 먼저 조회**한다.
 
 ## 1. 시작·태스크 생성
 
