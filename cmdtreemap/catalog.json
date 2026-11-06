@@ -3380,6 +3380,14 @@
           "tags": [
             "base"
           ]
+        },
+        {
+          "name": "OMP",
+          "tool_id": "omp",
+          "description": "모델·계획·도구 승인·세션을 연결하는 터미널 AI 코딩 에이전트.",
+          "tags": [
+            "base"
+          ]
         }
       ],
       "relations": [],

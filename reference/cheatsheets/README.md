@@ -102,6 +102,7 @@
 | [taskwarrior.md](taskwarrior.md) | Taskwarrior 3.5 — 태스크 관리 |
 | [claude-code.md](claude-code.md) | Claude Code CLI |
 | [opencode.md](opencode.md) | opencode — 터미널 AI 코딩 에이전트 |
+| [omp.md](omp.md) | OMP — 모델·계획·도구 승인·세션 운영 |
 
 
 ## 블로그로 이동한 주제

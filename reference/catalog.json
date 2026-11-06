@@ -3346,6 +3346,14 @@
             "tags": [
               "base"
             ]
+          },
+          {
+            "name": "OMP",
+            "tool_id": "omp",
+            "description": "모델·계획·도구 승인·세션을 연결하는 터미널 AI 코딩 에이전트.",
+            "tags": [
+              "base"
+            ]
           }
         ],
         "relations": [],
@@ -3897,6 +3905,22 @@
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/opencode.md"
             },
             "file": "opencode.md"
+          },
+          {
+            "slug": "omp",
+            "name": "OMP",
+            "desc": "모델·계획·도구 승인·세션을 연결하는 터미널 AI 코딩 에이전트.",
+            "official": [
+              {
+                "label": "OMP documentation",
+                "url": "https://github.com/can1357/oh-my-pi"
+              }
+            ],
+            "custom": {
+              "label": "OMP — 실행·계획·승인",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/omp.md"
+            },
+            "file": "omp.md"
           }
         ]
       },
