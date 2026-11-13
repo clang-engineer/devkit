@@ -28,6 +28,23 @@ Git 밖에 보관: 개인키·KMS 접근 권한
 ```
 SOPS는 파일별 Data Key로 값을 암호화하고, recipient의 age 공개키나 KMS 키로 Data Key를 보호한다. **암호화한 파일을 저장하는 것과 복호화 권한을 배포하는 것은 별도 작업**이다. 파일명·필드 이름·구조는 기본적으로 노출될 수 있다. **recipient 변경과 데이터 키 교체는 다른 작업**이므로 아래 회전 절차를 구분한다.
 
+### 대칭키와 공개키·개인키의 역할
+
+| 구분 | 암호화에 쓰는 것 | 복호화에 쓰는 것 | SOPS+age에서 보호하는 대상 |
+|---|---|---|---|
+| 대칭키 암호화 | 비밀인 데이터 키 | 같은 데이터 키 | 설정값 |
+| 공개키 암호화 | recipient의 공개키 (`age1...`) | 대응하는 개인키 (`AGE-SECRET-KEY-...`, 일반 X25519 키 기준) | SOPS 데이터 키 |
+
+공개키는 암호화할 사람이나 시스템에 전달할 수 있다. 예를 들어 배포 담당자가 운영팀 공개키를 받아 설정 파일을 암호화하면, 운영팀은 대응하는 개인키로 복호화할 수 있다. recipient 변경으로 이후 암호화본을 열 수 있는 사람이 달라지므로 `.sops.yaml`의 recipient 변경도 리뷰한다.
+
+### 암호화부터 복호화까지
+
+1. **SOPS가 파일을 암호화한다.** 새 파일에 무작위 256비트 데이터 키를 만들고, YAML·JSON의 암호화 대상 값을 AES-256-GCM으로 보호한다. GCM은 복호화할 때 암호문의 변조도 검증하는 인증 암호화 방식이다.
+2. **age가 데이터 키를 보호한다.** SOPS는 데이터 키를 age에 입력하고, age 암호문을 SOPS 메타데이터에 기록한다. 일반 X25519 recipient를 쓰면 age는 임시 개인키와 recipient 공개키로 공유 비밀을 계산한다. 여기서 유도한 대칭키로 age 내부의 파일 키를 보호하고, age의 암호화 본문에 SOPS 데이터 키를 담는다. age 내부 파일 키와 SOPS 데이터 키는 별개의 값이다.
+3. **복호화는 키부터 푼다.** age는 recipient 개인키와 암호문에 포함된 임시 공개키로 같은 공유 비밀을 계산해 내부 파일 키를 얻는다. age가 SOPS 데이터 키를 복원하면 SOPS가 그 키로 값을 복호화하고 무결성을 검증한다.
+
+이처럼 데이터는 대칭키로 암호화하고, 그 키를 별도 수단으로 보호하는 구성을 봉투 암호화(envelope encryption)라고 한다. 기본 SOPS 구성에서 age recipient를 추가하면 같은 SOPS 데이터 키를 열 수 있는 경로가 하나 더 생긴다. 각 recipient에 대해 설정값 전체를 다시 암호화할 필요는 없다. AWS KMS나 Vault Transit을 쓰는 경우에는 서비스 API가 데이터 키를 보호하며, 해당 서비스의 복호화 권한으로 파일을 열 수 있다. [SOPS 보안 모델](https://getsops.io/docs/security/) · [age 파일 형식 명세](https://c2sp.org/age)
+
 ## 1. 키 준비 — 설치와 Age
 
 **SOPS는 데이터를 암호화하고, Age·KMS 등의 Recipient는 Data Key를 보호한다.** 키를 준비하는 단계와 암호화 파일을 만드는 단계는 구분한다.
@@ -261,3 +278,7 @@ age-keygen -y "$SOPS_AGE_KEY_FILE"
 - [SOPS 공식 저장소](https://github.com/getsops/sops)
 - [SOPS 공식 문서](https://getsops.io/)
 - [age 공식 저장소](https://github.com/FiloSottile/age)
+
+## 관련 글
+
+- [비밀번호는 어디에 보관할까? SOPS+age, Bitwarden, 1Password](https://clang-engineer.github.io/posts/security/2026-11-13-password-storage-sops-bitwarden-1password/)
