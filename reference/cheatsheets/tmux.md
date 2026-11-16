@@ -133,6 +133,18 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 
 **복사 흐름:** `Prefix [` → 이동·선택 → 복사 → `Prefix ]`로 붙여넣기. 복사한 내용은 tmux Buffer에 저장되며 OS 클립보드와는 별개다.
 
+### extrakto — 출력에서 텍스트 고르기 (플러그인)
+
+`Prefix Tab`으로 실행하고 검색어를 입력한다. **Filter는 무엇을 추출할지**, **Grab은 어느 Pane의 어느 범위를 읽을지** 정한다. 둘은 독립적이며 화면 하단에 `[word] [window full]`처럼 표시된다.
+
+| 조작 | 선택지 | 용도 |
+|---|---|---|
+| `Ctrl+f` (Filter) | `word` → `all` → `line` | 어절 / 설정된 패턴(기본: 경로·URL·인용문 등) / 화면의 한 줄 전체 |
+| `Ctrl+g` (Grab) | `recent` · `full` · `window recent` · `window full` | 현재 Pane 또는 현재 Window의 모든 Pane × 최근 화면 또는 스크롤백 |
+| `Tab` / `Enter` | 삽입 / 복사 | 선택 항목을 원래 Pane에 입력 / tmux 버퍼와 시스템 클립보드에 복사 |
+
+기본 `all`은 `word`와 `line`을 **포함하지 않는다**. 한글 문장을 통째로 고를 때는 `line`, 긴 스크롤백 때문에 후보가 너무 많으면 `recent`가 유용하다. `line`은 터미널에서 줄바꿈된 문장을 다시 합치지는 않는다. 기본 최소 길이는 5자여서 짧은 어절·줄은 빠질 수 있고, 기본 경로 패턴은 한글 경로에 맞춰져 있지 않다. `full`은 무제한이 아닌 기본 최근 2,000줄 요청이다. 자세한 필터·범위 옵션은 [extrakto README](https://github.com/laktak/extrakto)와 [도움말](https://github.com/laktak/extrakto/blob/master/HELP.md)을 참고한다.
+
 ## 4. 관찰·설정·자동화
 
 **Status Line**은 현재 상태를 표시하고 **Format**은 그 값을 표현한다. **Hook**은 이벤트에 tmux 명령으로 반응하고 **Config**는 옵션·키 바인딩을 정의한다. 세부 이벤트·표현식은 공식 문서를 참고한다.
