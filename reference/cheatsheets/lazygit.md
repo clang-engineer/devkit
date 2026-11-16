@@ -200,6 +200,14 @@ LazyVim 통합 설정은 https://github.com/clang-engineer/dotfiles/blob/main/nv
 | 한글/아이콘 깨짐 | NerdFont 사용 |
 | diff 색상 이상 | `config.yml` pager 설정 (delta 미설치 시 제거) |
 
+커밋 실패가 메시지 규칙처럼 보여도 Git Hook의 **첫 에러**부터 구분한다. 같은 오류가 셸의 `git commit`에서도 재현되면 LazyGit 키 문제가 아니다. `lazygit --debug`로 시작하고 별도 터미널에서 `lazygit --logs`를 확인하면 실행한 Git 명령과 Hook 실패 단계를 볼 수 있다. 예컨대 `Failed to parse .pre-commit-config.yaml`이면 `commit-msg` 형식을 바꾸기 전에 YAML의 해당 줄을 고친다. 쉼표·콜론을 포함한 명령형 `entry:` 값은 YAML 문자열로 인용한다:
+
+```yaml
+entry: "ruby -ryaml -e 'ARGV.each { |f| YAML.safe_load_file(f, aliases: true) }' --"
+```
+
+Hook이 사용하는 설정과 실제 파서로 문법을 먼저 확인하고, 메시지 검사는 파싱 오류가 해결된 뒤 별도로 판단한다. 개인 Hook 경로나 실무 저장소 이름은 공개 레시피에 넣지 않는다.
+
 ## 더 보기
 
 - `?` (lazygit 안에서)

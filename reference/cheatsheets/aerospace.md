@@ -98,6 +98,16 @@ aerospace workspace 3          # workspace 3으로 전환
 
 `[[on-window-detected]]` 블록으로 앱이 뜰 때 워크스페이스 이동·레이아웃을 자동 적용할 수 있다. `if`는 문자열이 아니라 **테이블**(`if.app-id = '...'`)이고, `if` 생략은 "모든 창 매칭"(catch-all)이다. 규칙은 위에서부터 검사해 첫 매칭에서 멈춘다. 앱별 배치 규칙 작성은 공식 config 문서 참조.
 
+**새 키가 안 먹을 때:** 설정 파일에서 해당 바인딩만 찾지 말고 먼저 `aerospace reload-config`의 파싱 오류를 읽는다. 다른 곳의 잘못된 TOML/필드 타입 때문에 새 설정 전체가 거부되어 이전 유효 설정이 남을 수 있다. 예컨대 `if = 'true'`는 `if`가 테이블이어야 하므로 잘못된 표현이고, 마지막 catch-all 규칙은 `if`를 생략한다:
+
+```toml
+[[on-window-detected]]
+run = ['layout floating']
+```
+
+catch-all은 앞의 구체 규칙 뒤에 둔다. `reload-config`가 오류를 출력하면 해당 블록과 필드를 고친 뒤 다시 로드한다. 파일을 dotfiles 도구로 관리한다면 소스를 변경하고 live 파일 반영과 앱 리로드를 각각 확인한다.
+
+
 ## 관련 글
 
 - [Tiling Window Management — 창 배치와 작업 공간의 구조](https://clang-engineer.github.io/posts/developer-tools/2026-10-05-window-management-map/) — i3·Sway·AeroSpace·yabai의 계층과 관계, tmux와의 경계

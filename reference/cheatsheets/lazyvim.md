@@ -72,6 +72,9 @@ Plugin Spec의 `opts`는 플러그인 옵션 구성, `dependencies`는 플러그
 
 **조합 예시:** `<leader>ff`로 파일을 선택한 뒤 `gd`로 정의를 따라간다. 첫 단계는 Picker가 파일 후보를 찾는 것이고, 두 번째는 LSP 등 코드 탐색 기능이 의미 정보를 활용하는 것이다. Root(프로젝트 범위)와 `cwd`(현재 작업 디렉터리)가 다르면 검색 범위가 예상과 다를 수 있다.
 
+`s`는 LazyVim의 Flash가 화면 안의 여러 위치를 **라벨로 점프**하는 진입점이다. `f/F/t/T`는 기본 Vim에서 현재 줄의 **한 문자**를 찾는 Motion이며, Flash의 char 모드가 켜진 구성이라면 그 키의 표시·후속 선택을 강화할 수 있다. 두 기능을 같은 “Flash 점프”로 묶지 않는다. 플러그인·버전에 따라 `f` 계열 통합 여부가 달라질 수 있으므로 `:map f`, `:map s`와 [Flash 문서](https://github.com/folke/flash.nvim)를 확인한다. 기본 Motion의 방향·정지 위치는 [Vim 문자 Motion](vim.md#문자-하나를-찾는-기본-motion-fftt)을 참고한다.
+
+
 ### 결과 관리와 탐색 UI
 
 ```text

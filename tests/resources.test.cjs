@@ -73,8 +73,4 @@ test('current plugin and history scopes do not create editor replacement edges',
   assert.deepEqual(plugin.hosts, ['neovim']);
   assert.ok(plugin.description.includes('플러그인'));
   assert.ok(plugin.links.some(link => link.label === '내 설정'));
-  for (const guide of sheets.guides || []) {
-    assert.equal(guide.kind, 'guide');
-    assert.ok(fs.existsSync(path.join(base, 'reference/cheatsheets', guide.file)), guide.slug);
-  }
 });

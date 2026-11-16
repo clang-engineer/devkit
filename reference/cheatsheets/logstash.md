@@ -94,6 +94,28 @@ bin/logstash --config.reload.automatic -f pipeline.conf # 설정 변경 감지
 
 여러 파이프라인은 `pipelines.yml`에서 각 파이프라인의 설정 파일과 Worker·Queue 설정을 분리할 수 있다. **Input·Filter·Output의 선언 순서와 이벤트 처리 순서는 구분**해야 하며, 병렬 Worker 설정에 따라 이벤트의 전체 순서가 보장되지 않을 수 있다. `-f` 실행과 `pipelines.yml` 적용 방식은 실행 옵션에 따라 달라진다.
 
+### JDBC 증분 적재 — tracking column과 체크포인트
+
+JDBC Input의 `:sql_last_value`는 `last_run_metadata_path`에 저장되어 다음 실행의 조회 하한이 된다. `use_column_value => true`이면 선택한 `tracking_column`의 값이 체크포인트에 반영된다. SQL의 **행 순서가 보장되지 않으면** 마지막으로 처리된 행이 최댓값이라고 가정할 수 없다. 예시에서는 tracking column을 오름차순으로 정렬한다.
+
+```conf
+input {
+  jdbc {
+    jdbc_connection_string => "jdbc:postgresql://db.example.invalid:5432/app"
+    jdbc_driver_class => "org.postgresql.Driver"
+    jdbc_driver_library => "/path/to/postgresql-jdbc.jar"
+    jdbc_user => "reader"
+    statement => "SELECT id, updated_at FROM items WHERE id > :sql_last_value ORDER BY id ASC"
+    use_column_value => true
+    tracking_column => "id"
+    tracking_column_type => "numeric"
+    last_run_metadata_path => "/path/to/state/items-last-run.yml"
+  }
+}
+```
+
+여러 JDBC Input은 **각각 별도** `last_run_metadata_path`를 사용한다. paging을 쓰면 페이지 경계의 순서·고유성도 확인한다. 체크포인트가 예상보다 과거여서 중복 적재가 발생하면 결과 행 정렬, 추적 컬럼 값, 타입·시간대 설정, 저장된 state를 순서대로 진단한다. 운영 중 파일에 날짜를 직접 덮어쓰면 미처리 행을 누락할 수 있으므로 먼저 백업·실제 소스의 최댓값·재처리 정책을 확정한다. [Elastic JDBC Input 문서](https://www.elastic.co/docs/reference/logstash/plugins/plugins-inputs-jdbc).
+
 ## 4. Queue·오류·운영 관찰
 
 ```text

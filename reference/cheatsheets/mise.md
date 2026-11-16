@@ -47,6 +47,12 @@ eval "$(mise activate zsh)"             # ~/.zshrc 에 추가 (bash면 activate 
 - `activate`는 셸 훅(precmd/chpwd)을 심어, 프롬프트가 뜰 때·디렉토리를 옮길 때 PATH를 재계산한다.
 - 대화형 셸에서 `node` 등을 직접 호출하려면 activation 또는 shims가 필요하다. `mise exec`·`mise run`은 activation 없이도 config의 도구와 환경변수를 적용한다.
 
+기존 `nvm`·`rbenv`·`jenv`·`pyenv`에서 옮길 때는 **선언(`config.toml`) → 설치(`mise install`) → 활성화(`mise activate zsh`)** 세 단계를 구분한다. 선언만 추가하고 셸 초기화를 빠뜨리면 대화형 셸의 PATH가 바뀌지 않는다. 반대로 Homebrew가 다른 앱의 의존성으로 보유한 JDK는 셸용 JDK를 mise로 옮겼다는 이유만으로 제거하지 않는다. `brew uses --installed openjdk@21`로 의존 패키지를 먼저 확인한다.
+
+이주 후 정리는 설치 단계와 별도로 진행한다. Brewfile에 모든 수동 설치 항목이 없으면 `brew bundle cleanup`이 mise와 관계없는 패키지까지 제거할 수 있다. 제거 전 `brew uses --installed <formula>`로 의존 관계를 보고 대상 패키지만 명시적으로 처리한다. 예전 버전 매니저 디렉터리 삭제에서 권한 오류가 나면 소유권을 확인하고, 홈 디렉터리 전체를 무조건 관리자 권한으로 지우지 않는다.
+
+
+
 ### 일상 명령어
 
 | 명령 | 동작 |

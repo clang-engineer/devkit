@@ -44,6 +44,18 @@ ZLE는 **실행 전 입력줄**을 편집하고 History Expansion은 **기존 �
 
 > 이 표는 Emacs 키바인딩 기준이다 (`bindkey -e`). `bindkey -v`로 Vi 키바인딩을 사용하면 일부 키가 달라진다. 예를 들어 Vi 입력 모드의 `Ctrl+U`는 삽입 모드에 들어온 위치까지 삭제하는 `vi-kill-line`이다. 현재 설정은 `bindkey '^U'`, `bindkey '^L'`로 확인한다.
 
+**Alt/Ctrl+화살표가 단어 이동을 하지 않으면:** ZLE의 `bindkey`부터 확인하고, 터미널 → tmux → zsh 순서로 실제 전달 시퀀스를 좁힌다. Emacs 모드 기본 `Alt+B/F`와 화살표 조합은 별개다. 프롬프트에서 `Ctrl+V` 뒤 대상 키를 눌러 들어온 시퀀스를 보고, 다음은 **레거시 xterm 시퀀스를 받는 경우에만** `.zshrc`에 추가한다:
+
+```zsh
+bindkey $'\e[1;3D' backward-word   # Alt+Left
+bindkey $'\e[1;3C' forward-word    # Alt+Right
+bindkey $'\e[1;5D' backward-word   # Ctrl+Left
+bindkey $'\e[1;5C' forward-word    # Ctrl+Right
+```
+
+`Ctrl+V` 표시의 `^[`는 Escape 바이트이며 위의 `\e`가 실제 ESC 바이트를 만든다. 자신의 터미널 출력과 다르면 바인딩 문자열도 바꾼다. `tmux-256color`의 terminfo에 해당 특수 키 항목이 없더라도 raw 시퀀스로 등록한 ZLE 바인딩은 작동할 수 있다. Ghostty의 Option 처리와 tmux 키 프로토콜 설정도 함께 확인한다.
+
+
 ### 히스토리 확장 (`!` 시리즈)
 
 bash와 호환되는 csh 스타일 확장. 명령 중간에서도 동작.
@@ -160,6 +172,9 @@ setopt no_beep             # 비프음 끄기
 
 확인: `setopt` (켜진 것만), `set -o` (전체).
 
+프레임워크 없이 쓸 때는 `HISTSIZE`(메모리 내 기록 수)와 `SAVEHIST`(파일에 보존할 수)를 **둘 다** 명시적으로 정한다. `fzf` 등의 `Ctrl+R` 검색을 쓰면서 `SAVEHIST`가 작으면 오래된 명령이 빨리 사라진다. 현 상태는 `print -r -- "$HISTSIZE $SAVEHIST"`와 `setopt`로 확인한다. `auto_pushd` 같은 선택 옵션은 `zoxide` 등과 기능이 중복되는지 보고 결정한다.
+
+
 ## 4. 실행 환경·진단
 
 ### 명령어 해시 & 오타 교정 (`rehash`)
@@ -185,6 +200,20 @@ export LESS='-R'
 ```
 
 > 실전에서는 `starship` 같은 외부 프롬프트를 쓰는 게 표준. `eval "$(starship init zsh)"`.
+
+Starship·powerlevel10k는 프롬프트를 만드는 **엔진**, Catppuccin 등은 색 **팔레트**, Oh My Zsh는 셸 설정·플러그인 **프레임워크**다. 같은 “테마”라는 이름으로 다른 계층을 혼동하지 않는다. 프롬프트 엔진은 하나를 골라 초기화하고, 색 통일은 가능한 한 터미널 팔레트에서 관리한다. 외부 프롬프트·히스토리 검색·디렉터리 이동을 각각 별도 도구로 쓰면 프레임워크 자체는 필수가 아니지만, 기존 프레임워크를 제거할 때는 히스토리 크기·키바인딩처럼 함께 제공하던 기본값을 점검한다.
+
+프리셋을 비교하려면 현재 `~/.config/starship.toml`을 바로 덮지 말고 별도 파일로 출력해 같은 디렉터리에서 렌더링한다. Powerline 프리셋에는 Nerd Font가 필요하다.
+
+```sh
+starship preset catppuccin-powerline -o /tmp/starship-preview.toml
+STARSHIP_CONFIG=/tmp/starship-preview.toml starship prompt
+starship prompt                       # 현재 설정과 비교
+```
+
+[Starship 공식 프리셋](https://starship.rs/presets/catppuccin-powerline).
+
+
 
 ### Oh My Zsh와 역할 구분
 

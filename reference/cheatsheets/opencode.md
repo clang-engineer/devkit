@@ -101,6 +101,21 @@ opencode mcp auth <name>
 
 MCP를 등록해도 모든 도구를 항상 호출하는 것은 아니다. Agent의 도구·권한 설정과 서버 연결 상태를 함께 확인한다. 외부 도구가 많아지면 세션 컨텍스트 사용량도 늘 수 있다.
 
+### 모델·세션 키맵 (OpenCode V2 CLI 기본값)
+
+현재 공식 [CLI keybinds](https://opencode.ai/docs/cli/keybinds/) 기준이다. 설치된 버전과 사용자 설정을 먼저 확인한다. `<leader>`는 기본 `Ctrl+X`이며 `~/.config/opencode/cli.json`의 `keybinds`에서 바꿀 수 있다. V1의 `tui.json`과 V2의 `cli.json`을 혼용하지 않는다.
+
+| 위치 | 키 | 동작 |
+|---|---|---|
+| 전체 | `Ctrl+P` | 명령 팔레트 |
+| 세션 | `<leader>n` / `Ctrl+R` | 새 세션 / 현재 세션 이름 변경 |
+| 세션 | `Ctrl+O` | 최근 세션·프로젝트 메뉴 |
+| 모델 | `<leader>m` / `F2` / `Shift+F2` | 모델 목록 / 최근 사용 모델 순방향·역방향 순환 |
+| 모델 목록 내부 | `Ctrl+A` / `Ctrl+F` | Provider 목록 / 모델 즐겨찾기 토글 |
+| 에이전트 | `Shift+Tab` / `Ctrl+T` | 에이전트 / 모델 variant 순환 |
+
+예: `Ctrl+X` 다음 `m`을 눌러 모델 목록을 열고, 그 **모델 목록 안에서** `Ctrl+A`로 Provider를 고른다. `Ctrl+A`를 모든 화면에서 모델 선택 키로 오해하지 않는다. `Ctrl+N`, `Ctrl+W`, `Ctrl+S`, `Ctrl+T`(새 탭)처럼 임의의 범용 UI 단축키는 공식 기본값으로 가정하지 않는다.
+
 ## 4. Config·진단 — 무엇이 동작을 결정하는가?
 
 ```text

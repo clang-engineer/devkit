@@ -71,6 +71,12 @@
 |------|------|
 | [aerospace.md](aerospace.md) | macOS 타일링 WM |
 
+## 웹 UI
+
+| 파일 | 설명 |
+|------|------|
+| [font-awesome.md](font-awesome.md) | Font Awesome Pack·Family·Style과 웹 아이콘 선택 |
+
 ## 데이터
 
 | 파일 | 설명 |
@@ -78,6 +84,7 @@
 | [logstash.md](logstash.md) | Logstash 이벤트 수집·변환·출력 파이프라인 |
 | [elasticsearch.md](elasticsearch.md) | Elasticsearch 분산 저장·검색·운영 |
 | [kibana.md](kibana.md) | Kibana 데이터 탐색·KQL·시각화·대시보드 |
+| [harlequin.md](harlequin.md) | Harlequin 터미널 SQL IDE·Python Adapter 설치 및 진단 |
 
 ## Git & 버전 관리
 

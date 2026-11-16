@@ -170,6 +170,17 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 | `tmux source-file ~/.tmux.conf` | 설정 파일 리로드 |
 
 
+### 실제 기본값과 실행 중 서버의 키맵 비교
+
+`source-file`은 설정에서 삭제한 바인딩을 실행 중 서버에서 자동 해제하지 않는다. 현재 `list-keys` 결과를 stock 키맵으로 착각하지 말고 **임시 소켓 + 빈 설정 + 살아 있는 세션**을 하나의 tmux 명령으로 조회한다:
+
+```sh
+tmux -L "stock-$$" -f /dev/null new-session -d \; \
+  list-keys -T copy-mode-vi \; kill-server
+```
+
+`-L` 없이 `-f /dev/null`만 주면 이미 실행 중인 기본 소켓 서버에 접속할 수 있고, 세션 없는 `start-server`를 후속 별도 명령으로 조회하면 서버가 재시작하면서 실제 config를 읽을 수 있다. 옵션 기본값도 같은 방식으로 `list-keys ...` 대신 `show -gv <option>`을 사용한다. `copy-mode-vi`와 `copy-mode`는 별도 키 테이블이다. 특정 키가 기본으로 묶였는지와 **동작이 같은지**(예: 복사 후 copy mode 유지 여부)를 각각 비교한다. 설정 리로드 후에도 옛 바인딩이 남으면 `unbind-key -T <table> <key>`로 명시적으로 해제한다.
+
 ## 필요한 경우 확장하기
 
 - **기본 키와 옵션의 정확한 동작:** [tmux 공식 매뉴얼](https://man7.org/linux/man-pages/man1/tmux.1.html)

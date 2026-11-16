@@ -115,6 +115,10 @@ task add "주간 리뷰" due:fri recur:weekly
 `wait:`를 쓰고, 실행 가능 여부를 보고 싶으면 `task ready` 또는 `+READY` 필터를
 쓴다.
 
+### Urgency — 단일 priority보다 많은 신호를 합산
+
+`task next`는 **urgency 점수 내림차순**으로 정렬한다. 프로젝트·태그·우선순위·기한·기다림·의존성 등의 항목에 계수를 적용해 합산하며, 가까운 기한은 더 급해지고 waiting/blocked는 감점된다. 점수는 기한 자체나 중요도의 절대값이 아니라 **정렬을 돕는 휴리스틱**이다. 한 개 태그와 한 개 annotation의 가점은 계수에 각각 0.8이 적용되는 등 단순 항목 개수 합산과 다르다. 개인 정책은 `~/.taskrc`의 `urgency.*.coefficient`에서 조정할 수 있지만 먼저 기본 `next` 결과를 써 보고 한 번에 한 항목씩 조정한다. [공식 Urgency 설명](https://taskwarrior.org/docs/urgency/).
+
 ### 필터와 일괄 작업
 
 명령 앞의 필터에 맞는 태스크만 조회하거나 변경한다. 일괄 변경 전에는 같은

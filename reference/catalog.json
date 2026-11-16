@@ -2678,15 +2678,25 @@
       },
       {
         "id": "search-engines",
-        "name": "Search Engines",
+        "name": "Search Stack",
         "domain": "domain:database",
         "aliases": [],
-        "why": "",
+        "why": "검색 데이터를 수집·색인하고 탐색하는 각 계층을 구분한다",
         "commands": [
           {
             "name": "Elasticsearch",
             "tool_id": "elasticsearch",
             "description": "Query DSL, bulk, _cat API와 운영 확인 명령."
+          },
+          {
+            "name": "Logstash",
+            "tool_id": "logstash",
+            "description": "이벤트 입력·변환 후 Elasticsearch 등으로 보내는 파이프라인"
+          },
+          {
+            "name": "Kibana",
+            "tool_id": "kibana",
+            "description": "Elasticsearch 색인의 조회·시각화 UI"
           }
         ],
         "relations": []
@@ -3739,6 +3749,22 @@
               "label": "Kibana — 데이터 탐색과 시각화",
               "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/kibana.md"
             }
+          },
+          {
+            "slug": "harlequin",
+            "name": "Harlequin",
+            "desc": "터미널 SQL IDE의 Adapter 환경과 설정 경로를 진단한다.",
+            "official": [
+              {
+                "label": "Harlequin documentation",
+                "url": "https://harlequin.sh/docs/getting-started"
+              }
+            ],
+            "custom": {
+              "label": "Harlequin — 터미널 SQL IDE와 Adapter",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/harlequin.md"
+            },
+            "file": "harlequin.md"
           }
         ]
       },
@@ -4023,6 +4049,24 @@
           "docker",
           "systemd"
         ]
+      },
+      {
+        "slug": "font-awesome",
+        "name": "Font Awesome",
+        "desc": "아이콘 Pack·Family·Style 구분과 웹 클래스 선택.",
+        "official": [
+          {
+            "label": "Font Awesome icon styles",
+            "url": "https://docs.fontawesome.com/web/dig-deeper/styles"
+          }
+        ],
+        "custom": {
+          "label": "Font Awesome — 아이콘 계층과 선택",
+          "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/font-awesome.md"
+        },
+        "file": "font-awesome.md",
+        "kind": "guide",
+        "related_tools": []
       },
       {
         "slug": "tiling-window-management",

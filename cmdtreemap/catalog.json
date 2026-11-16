@@ -2705,15 +2705,25 @@
     },
     {
       "id": "search-engines",
-      "name": "Search Engines",
+      "name": "Search Stack",
       "domain": "domain:database",
       "aliases": [],
-      "why": "",
+      "why": "검색 데이터를 수집·색인하고 탐색하는 각 계층을 구분한다",
       "commands": [
         {
           "name": "Elasticsearch",
           "tool_id": "elasticsearch",
           "description": "Query DSL, bulk, _cat API와 운영 확인 명령."
+        },
+        {
+          "name": "Logstash",
+          "tool_id": "logstash",
+          "description": "이벤트 입력·변환 후 Elasticsearch 등으로 보내는 파이프라인"
+        },
+        {
+          "name": "Kibana",
+          "tool_id": "kibana",
+          "description": "Elasticsearch 색인의 조회·시각화 UI"
         }
       ],
       "relations": []
