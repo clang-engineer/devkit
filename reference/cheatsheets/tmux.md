@@ -58,6 +58,43 @@ tmux Server는 Session·Window·Pane의 상태를 관리하고, Client는 Termin
 
 **작업 유지 예시:** `tmux new -s work` → 작업 실행 → `Prefix d` → `tmux attach -t work`. Detach는 프로세스를 종료하지 않지만 tmux Server나 호스트가 종료되면 작업 유지도 보장되지 않는다.
 
+### sessionx — 검색·미리보기로 세션과 윈도우 선택 (플러그인)
+
+[`tmux-sessionx`](https://github.com/omerxx/tmux-sessionx)는 기존 Session을 검색해 전환하고, 이름 변경·종료와 Window 탐색을 같은 팝업에서 처리한다. **세션을 전환하는 도구이지 작업 상태를 저장·복원하는 도구는 아니다.**
+
+**설치:** TPM과 `fzf`·`fzf-tmux`·`bat`이 필요하다. zoxide는 디렉터리 이력을 사용할 때의 선택 의존성이다. tmux 설정에 아래 선언을 추가하고 리로드한 뒤 `Prefix I`로 설치한다. Oh My Tmux에서는 `.tmux.conf.local`에 선언하며 TPM 초기화 구문을 중복 추가하지 않는다.
+
+```tmux
+set -g @plugin 'omerxx/tmux-sessionx'
+```
+
+**기본 흐름:** `Prefix Shift+o` (`O`) → 검색 → `Enter`로 전환. 기존 세션에 없는 새 이름을 입력해 확정하면 세션을 생성한다. 대문자 `O`이므로 소문자 `Prefix o`의 다음 Pane 이동과 구분한다.
+
+아래 키는 **sessionx 팝업 안에서** 누르며 Prefix를 다시 붙이지 않는다.
+
+| 키 | 대상·동작 |
+|---|---|
+| `Ctrl+p` / `Ctrl+n` | 위 / 아래 후보 선택 |
+| `Enter` | 선택한 세션·윈도우로 전환, 디렉터리나 새 이름이면 세션 생성 |
+| `Ctrl+w` | 전체 윈도우 목록과 미리보기로 전환 |
+| `Ctrl+t` | 미리보기를 세션·윈도우 트리로 변경 |
+| `Ctrl+b` | 초기 세션 목록으로 돌아가기 |
+| `Ctrl+r` | 선택한 세션의 새 이름 입력 |
+| `Alt+Backspace` | 선택한 세션 종료 — 실행 중인 프로그램도 종료될 수 있음 |
+| `Ctrl+x` / `Ctrl+e` | `~/.config` / 현재 작업 디렉터리 아래의 디렉터리 탐색 |
+| `Ctrl+f` | zoxide 디렉터리 이력으로 후보 전환 (zoxide 필요) |
+| `Ctrl+u` / `Ctrl+d` | 미리보기 반 페이지 위 / 아래 이동 |
+| `?` / `Esc` | 미리보기 표시 토글 / 팝업 닫기 |
+
+팝업 안에서는 `Ctrl+b` **한 번**으로 초기 목록에 복귀한다. 팝업을 여는 tmux Prefix 입력과 구분한다.
+
+**자주 확인할 옵션:**
+- `@sessionx-bind`: 실행 키 변경. 기본값은 `O`.
+- `@sessionx-filter-current`: 기본 `true`로 현재 세션을 목록에서 제외한다. `false`면 포함한다.
+- `@sessionx-zoxide-mode`: 기본 `off`. `on`이면 기존 세션과 매칭되지 않는 입력을 zoxide로 경로 조회해 새 세션의 작업 디렉터리로 사용한다. `Ctrl+f`로 이력 목록을 여는 동작과 구분한다.
+
+전체 옵션은 [공식 README의 Configure 절](https://github.com/omerxx/tmux-sessionx), 세션 도구의 선택 기준은 [플러그인 비교 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md)을 참고한다.
+
 ## 2. 화면 구성 — Window·Pane·Layout
 
 Window는 화면 전환 단위, Pane은 화면 내부의 실행 영역, Layout은 Pane 배치 규칙이다.
