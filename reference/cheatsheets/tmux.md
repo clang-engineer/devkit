@@ -133,6 +133,25 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 
 **복사 흐름:** `Prefix [` → 이동·선택 → 복사 → `Prefix ]`로 붙여넣기. 복사한 내용은 tmux Buffer에 저장되며 OS 클립보드와는 별개다.
 
+### 텍스트 오브젝트 — 커스텀 키 테이블
+
+tmux의 Vi Copy Mode는 Vim의 텍스트 오브젝트를 기본 제공하지 않지만, 이동·선택 명령을 별도 키 테이블로 조합할 수 있다. 아래는 [커스텀 키바인딩 예시](https://github.com/clang-engineer/dotfiles/blob/main/chezmoi/dot_config/tmux/keybindings.conf)를 로드했을 때의 동작이다. 기본 키맵으로 오해하지 않는다.
+
+**사용 흐름:** `Prefix [` → 커서를 대상 내부로 이동 → `v`(OMT) 또는 `Space`로 선택 시작 → `i`/`a` → 대상 키. 이후 `y`로 복사하거나, tmux-open을 쓴다면 `o`·`Ctrl+o`로 열 수 있다.
+
+| 선택 대상 | 안쪽 선택 | 구분자 포함 선택 |
+|---|---|---|
+| 단어 / 공백 구분 WORD / 단락 | `iw` / `iW` / `ip` | — |
+| 소괄호 `()` | `i(` / `i)` / `ib` | `a(` / `a)` / `ab` |
+| 중괄호 `{}` | `i{` / `i}` / `iB` | `a{` / `a}` / `aB` |
+| 대괄호 `[]` | `i[` / `i]` | `a[` / `a]` |
+| 꺾쇠 `<>` | `i<` / `i>` | `a<` / `a>` |
+| 큰따옴표 / 작은따옴표 | `i"` / `i'` | `a"` / `a'` |
+
+- **취소:** `i`/`a` 다음 대상 키를 기다릴 때 `Escape`·`Ctrl+c`·`q` 또는 미지원 키를 누르면 대기만 취소한다. Copy Mode와 기존 선택은 유지한다.
+- **Vim과의 차이:** 구분자 선택은 **같은 줄의 비어 있지 않은 단순 쌍 내부**에서 사용한다. 중첩·이스케이프·여러 줄 구분자·구분자 위의 커서는 처리하지 않는다. `iw`·`iW`·`ip`는 tmux 경계를 사용하며, `ip`는 경계의 빈 줄도 포함한다.
+
+
 ### extrakto — 출력에서 텍스트 고르기 (플러그인)
 
 `Prefix Tab`으로 실행하고 검색어를 입력한다. **Filter는 무엇을 추출할지**, **Grab은 어느 Pane의 어느 범위를 읽을지** 정한다. 둘은 독립적이며 화면 하단에 `[word] [window full]`처럼 표시된다.
@@ -144,6 +163,31 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 | `Tab` / `Enter` | 삽입 / 복사 | 선택 항목을 원래 Pane에 입력 / tmux 버퍼와 시스템 클립보드에 복사 |
 
 기본 `all`은 `word`와 `line`을 **포함하지 않는다**. 한글 문장을 통째로 고를 때는 `line`, 긴 스크롤백 때문에 후보가 너무 많으면 `recent`가 유용하다. `line`은 터미널에서 줄바꿈된 문장을 다시 합치지는 않는다. 기본 최소 길이는 5자여서 짧은 어절·줄은 빠질 수 있고, 기본 경로 패턴은 한글 경로에 맞춰져 있지 않다. `full`은 무제한이 아닌 기본 최근 2,000줄 요청이다. 자세한 필터·범위 옵션은 [extrakto README](https://github.com/laktak/extrakto)와 [도움말](https://github.com/laktak/extrakto/blob/master/HELP.md)을 참고한다.
+
+### tmux-open — 선택한 파일·URL 열기 (플러그인)
+
+[tmux-open](https://github.com/tmux-plugins/tmux-open)은 **Copy Mode에서 선택한 텍스트를 열기·편집·웹 검색으로 연결**한다. extrakto가 후보 목록에서 텍스트를 찾는다면, tmux-open은 원래 화면에서 직접 선택한 텍스트에 동작한다.
+
+| Copy Mode 키 | 선택한 텍스트에 적용할 동작 |
+|---|---|
+| `o` | 파일·URL을 OS 기본 앱으로 열기 (`open` / `xdg-open`) |
+| `Ctrl+o` | 파일을 `$EDITOR` 또는 `@open-editor-command`로 지정한 편집기에서 열기 |
+| `Shift+s` (`S`) | `@open-S`에 지정한 검색 엔진으로 웹 검색 |
+
+**Vi Copy Mode 사용 흐름:** `Prefix [` → 경로·URL·문구로 이동 → `Space`로 선택 시작 → 이동하여 범위 지정 → 위 키 입력. Copy Mode 안의 동작 키 앞에는 Prefix를 다시 누르지 않는다.
+
+TPM 설정 예시 — 편집기는 Neovim, 검색은 Google로 명시한다. 플러그인 설치는 `Prefix I`:
+
+```tmux
+set -g @open-editor-command 'nvim'
+set -g @open-S 'https://www.google.com/search?q='
+set -g @plugin 'tmux-plugins/tmux-open'
+```
+
+- **키 충돌:** Vi Copy Mode의 기본 `o`는 선택 영역의 반대쪽 끝으로 이동하는 `other-end`다. tmux-open 설치 시 열기로 바뀐다. 기존 동작을 유지하려면 플러그인의 `@open`으로 열기 키를 바꾼다.
+- **편집기 실행 위치:** `Ctrl+o`는 원래 Pane에 편집기 명령과 Enter를 입력한다. 반드시 **셸 프롬프트에서** 사용하고, 실행 중인 다른 프로그램에 명령을 보내지 않도록 주의한다.
+- **웹 검색:** 선택 문구가 외부 검색 엔진으로 전송되므로 토큰·개인정보 포함 여부를 먼저 확인한다.
+
 
 ## 4. 관찰·설정·자동화
 
@@ -186,5 +230,6 @@ tmux -L "stock-$$" -f /dev/null new-session -d \; \
 - **기본 키와 옵션의 정확한 동작:** [tmux 공식 매뉴얼](https://man7.org/linux/man-pages/man1/tmux.1.html)
 - **Pane·Window를 다른 Session으로 이동:** [target 지정과 join-pane / move-window](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md)
 - **OSC52 클립보드:** [터미널과 tmux의 클립보드 경계](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-06-10-tmux-clipboard-osc52-pbcopy-hangul.md)
+- **플러그인 비교·선택:** [추출·관리·기록 플러그인 비교](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md)
 - **Hook의 이벤트와 대상:** [Hook의 함정](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/reference/troubleshooting/2026-07-11-hook-window-id-kill-pane.md)
 - **설정·세션 재현:** [tmux 구성](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2021-11-30-tmux-config.md) · [세션 부트스트랩](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-02-21-tmux-bootstrap.md)
