@@ -43,6 +43,35 @@ omp --resume                     # 저장 세션 선택
 
 첫 요청에 파일을 붙이려면 `omp @파일 '이 코드 설명해줘'`를 쓴다. TUI 안에서는 `/model` 또는 `Alt+M`으로 모델을 고른다. `/model` 같은 슬래시 명령은 셸의 `omp models`와 다르다. 현재 키맵은 `/hotkeys`로 확인한다.
 
+## 추론 강도
+
+**모델은 누가 처리하는지, 추론 강도(thinking level)는 그 모델이 얼마나 깊이 추론할지**를 정한다. 단계는 절대적인 시간·토큰 보장이 아니며, 높은 강도는 대체로 지연과 사용량을 늘린다.
+
+| 값 | 의미 | 용도·주의점 |
+|---|---|---|
+| `off` | 별도 추론 모드를 끔 | 모델 자체의 문제 해결 능력이 사라진다는 뜻은 아님; 모델이 지원해야 사용 가능 |
+| `minimal` | 최소한의 추론 | 아주 단순한 요청; `off`와 달리 추론은 활성화 |
+| `low` | 낮은 추론 강도 | 간단한 질문·국소 수정·가벼운 보조 작업 |
+| `medium` | 중간 추론 강도 | 일반적인 구현·설명 |
+| `high` | 높은 추론 강도 | 복잡한 디버깅·설계·리뷰; OMP 18.16.0의 기본값 |
+| `xhigh` | 더 높은 추론 강도 | 어려운 다단계 분석 |
+| `max` | 가장 높은 추론 강도 | 가장 깊은 분석이 필요한 작업; 더 느려질 수 있음 |
+| `auto` | OMP가 요청에 맞춰 강도를 선택 | 고정 단계가 아닌 자동 선택 정책; 항상 빠르거나 낮은 강도를 선택하는 것은 아님 |
+
+**모델별 지원 단계가 다르다.** 예를 들어 로컬 OMP 18.16.0 카탈로그에서 확인한 `gpt-6.1-sol`의 명시적 단계는 `low` → `medium` → `high` → `xhigh` → `max`다. `off`·`minimal`을 이 모델의 지원 단계로 간주하지 않는다. `auto`는 이 사다리와 별개인 OMP의 선택 정책이다. 현재 모델 정보는 `omp models <provider> --json`으로 확인한다.
+
+```sh
+omp --thinking medium                       # 이번 실행만 지정
+omp config set defaultThinkingLevel auto     # 전역 기본값을 자동 선택으로 변경
+omp config get defaultThinkingLevel          # 기본 설정 확인 (현재 세션의 실제 강도와 구분)
+omp config set statusLine.compactThinkingLevel false  # 아이콘 대신 강도 이름 표시
+```
+
+- **실행 중 전환:** 입력창에서 `Shift+Tab`으로 강도를 순환한다. 키가 다르게 동작하면 `/hotkeys`에서 현재 바인딩을 확인한다. `/model`의 `default`·`smol`·`slow` 등은 강도 이름이 아니라 **모델 역할**이다.
+- **자동 선택 상한:** `providers.autoThinkingMaxEffort` 기본값은 `xhigh`다. `auto`는 무조건 `max`까지 쓰는 정책이 아니다. `ultrathink`는 별도의 최고 강도 요청이며, 지원 단계·분류기별 제약은 [공식 설정 문서](https://github.com/can1357/oh-my-pi/blob/main/docs/settings.md)를 따른다.
+- **역할별 고정:** `modelRoles` 값에 `:low`·`:high` 등을 붙이면 해당 역할의 강도를 명시할 수 있다. 예: `smol: "@default:low"`, `plan: "@default:high"`. 기본값을 `auto`로 바꿔도 역할에 명시한 강도는 유지된다. [역할 별칭·강도 규칙](https://github.com/can1357/oh-my-pi/blob/main/docs/models.md).
+- **표시와 연산은 별개:** `Ctrl+T`나 `--hide-thinking`은 추론 블록을 숨길 뿐 추론 강도를 낮추지 않는다. 기본값 변경 후 새 세션에서 확인하며, 재개한 세션은 저장된 강도를 유지할 수 있다.
+
 ## 플랜 모드와 도구 승인
 
 | 대상 | 조작 | 의미 |
