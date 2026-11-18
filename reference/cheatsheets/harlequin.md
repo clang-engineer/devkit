@@ -10,6 +10,16 @@ uv tool install 'harlequin[postgres]'        # Postgres Adapter와 함께 설치
 harlequin --version                          # 설치된 Adapter 목록 확인
 harlequin --help                             # 실제 설치된 Adapter의 옵션 확인
 harlequin -a sqlite                          # SQLite Adapter로 시작
+harlequin -P local-postgres                  # 저장된 프로필로 접속
+harlequin -P local-postgres -d example_db    # 같은 서버·인증 설정으로 DB만 변경
+```
+
+`local-postgres`와 `example_db`는 미리 준비한 프로필·DB 이름으로 바꾼다. PostgreSQL에서 다른 DB로 전환하려면 `Ctrl+Q`로 종료한 뒤 `-d`로 다시 접속한다. 카탈로그 선택이나 새 SQL 탭은 DB 전환이 아니다.
+
+접속 후 현재 DB·사용자 확인:
+
+```sql
+SELECT current_database(), current_user;
 ```
 
 **중요:** `command -v harlequin`으로 실행 파일을 확인한다. Homebrew와 uv에 각각 설치돼 있으면, 다른 Python 환경에 설치된 Adapter는 현재 실행 중인 Harlequin에 보이지 않는다.
@@ -22,7 +32,7 @@ harlequin -a sqlite                          # SQLite Adapter로 시작
 harlequin --profile None -a sqlite
 ```
 
-1. 오른쪽 위 **Query Editor**에 아래 SQL을 입력한다.
+1. `F2`로 오른쪽 위 **Query Editor**에 이동하고 `Ctrl+N`으로 새 SQL 탭을 연 뒤 아래 SQL을 입력한다. `--profile None`으로 시작해도 이전 SQL 탭은 복원될 수 있다.
 2. `Ctrl+Enter` 또는 `Ctrl+J`로 실행한다. 키가 터미널에 가로채이면 **Run Query** 버튼을 클릭한다.
 3. 아래 **Results Viewer**에서 `id = 1`, `label = hello`인 한 행을 확인한다.
 4. `F2`로 편집기로 돌아간다. 종료는 `Ctrl+Q`다.
@@ -37,18 +47,27 @@ SELECT 1 AS id, 'hello' AS label;
 
 아래는 기본 `vscode` keymap 기준이다. 사용자 keymap이나 버전에 따라 다르면 `F7`로 **현재 포커스의 키 목록**을 확인한다.
 
-| 작업 | 키 |
-| --- | --- |
-| 도움말 / 현재 영역 키 목록 | `F1` / `F7` |
-| 편집기 / 결과 / 카탈로그로 이동 | `F2` / `F5` / `F6` |
-| 쿼리 실행 — 편집기에서 | `Ctrl+Enter` 또는 `Ctrl+J` |
-| 카탈로그 새로고침 | `Ctrl+R` |
-| 사이드바 숨김·표시 | `Ctrl+B` 또는 `F9` |
-| 현재 영역 전체 화면·복원 | `F10` |
-| 실행 이력 열기 | `F8` |
-| 종료 | `Ctrl+Q` |
+| 작업 | 키 | 사용 위치·주의 |
+| --- | --- | --- |
+| 쿼리 편집기로 이동 | `F2` | SQL 입력·편집 |
+| 결과로 이동 | `F5` | 조회 결과 탐색·복사 |
+| 카탈로그로 이동 | `F6` | DB·스키마·테이블 탐색 |
+| 현재 영역의 키 목록 | `F7` | 포커스를 옮긴 뒤 확인 |
+| 쿼리 실행 | `Ctrl+J` 또는 `Ctrl+Enter` | **편집기**에서 |
+| 선택한 이름을 편집기에 삽입 | `Ctrl+J` 또는 `Ctrl+Enter` | **카탈로그**에서 |
+| 항목 펼치기·접기 / 동작 메뉴 | `Enter`·`Space` / `.` | 카탈로그에서 |
+| 새 SQL 탭 / 현재 SQL 탭 닫기 / 다음 SQL 탭 | `Ctrl+N` / `Ctrl+W` / `Ctrl+K` | 편집기에서 |
+| 이전 탭 / 다음 탭 | `j` / `k` | 카탈로그·결과 영역에서. 편집기에서는 문자 입력 |
+| 선택한 결과 복사 / 결과 내보내기 | `Ctrl+C` / `Ctrl+E` | 결과에서 복사할 셀·범위를 먼저 선택 |
+| 실행 이력 열기 | `F8` | 항목 선택 후 `Enter`로 새 SQL 탭에 복원 |
+| 카탈로그 새로고침 | `Ctrl+R` | DDL 실행 후 목록 갱신 |
+| 사이드바 숨김·표시 | `Ctrl+B` 또는 `F9` | |
+| 현재 영역 전체 화면·복원 | `F10` | |
+| 도움말 / 종료 | `F1` / `Ctrl+Q` | |
 
 macOS에서도 위 표는 `Cmd`가 아니라 `Ctrl` 기준이다. 기능 키가 시스템 동작에 잡히면 키보드 설정에 따라 `Fn`을 함께 누르거나 하단 버튼을 사용한다.
+
+**`j`와 `Ctrl+J`는 다르다.** 쿼리 실행은 `F2` → `Ctrl+J`, 테이블 탐색은 `F6` → 방향키 → `Enter`·`.` 순서로 사용한다.
 
 ### 카탈로그에서 테이블 찾기
 
@@ -63,7 +82,7 @@ DDL 실행 뒤 목록이 오래된 상태면 `Ctrl+R`로 갱신한다. PostgreSQ
 
 | 작업 | 키·조작 |
 | --- | --- |
-| 새 SQL 탭 / 현재 탭 닫기 / 다음 SQL 탭 | `Ctrl+N` / `Ctrl+W` / `Ctrl+K` |
+| SQL 탭 생성·닫기·전환 | [자주 쓰는 기본 키](#자주-쓰는-기본-키) 참고 |
 | SQL 파일 열기 / 저장 | `Ctrl+O` / `Ctrl+S` |
 | SQL 포맷 / 검색 / 다음 검색 결과 | `F4` / `Ctrl+F` / `F3` |
 | 편집기에서 줄 번호로 이동 | `Ctrl+G` |
@@ -126,24 +145,56 @@ uv로 설치한 `harlequin-odbc`가 `pyodbc`를 쓴다면 해당 격리 환경�
 
 ## 설정 파일과 연결 프로필
 
-Harlequin은 현재 디렉터리·사용자 설정 디렉터리의 TOML 파일을 읽고 병합한다. 자동 탐색 경로와 별개로 `--config-path`에 지정한 파일이 가장 높은 우선순위다:
+### 설정 파일 위치
+
+직접 만들거나 `harlequin --config` 마법사로 생성·수정한다. 자주 쓰는 위치:
+
+- 사용자 공통: `~/.harlequin.toml`
+- 프로젝트 전용: 실행 디렉터리의 `.harlequin.toml`
+- OS 설정 디렉터리: macOS는 `~/Library/Application Support/harlequin/config.toml`, Linux는 `~/.config/harlequin/config.toml` (`XDG_CONFIG_HOME` 설정 시 해당 경로 기준)
+
+여러 파일이 있으면 읽어서 병합하며, 우선순위는 **명시한 파일 → 실행 디렉터리 → OS 설정 디렉터리 → 홈 디렉터리**다. 파일 위치를 확실히 지정하려면:
 
 ```sh
-harlequin --config-path /path/to/harlequin.toml
-# 또는: HARLEQUIN_CONFIG_PATH=/path/to/harlequin.toml harlequin
+harlequin --config-path /path/to/harlequin.toml -P local-postgres
+# 또는: HARLEQUIN_CONFIG_PATH=/path/to/harlequin.toml harlequin -P local-postgres
 ```
 
-프로필의 **이름만 공유**한다고 자격증명이 안전해지는 것은 아니다. 공개 예제에는 실제 host·DB 이름·토큰을 넣지 말고, 개인/조직 connection catalog 및 기본 프로필 선택 정책은 비공개 설정에서 관리한다. [공식 설정 발견 순서](https://harlequin.sh/docs/config-file/discovery) · [공식 Adapter 목록](https://harlequin.sh/docs/adapters) · [설치 방법](https://harlequin.sh/docs/getting-started).
+### 프로필 정의
 
-기존 Harlequin 프로필을 선택하거나 기본 프로필 없이 시작하려면:
+일반 TOML 설정 파일의 최소 예시다. PostgreSQL Adapter와 접속 가능한 DB가 준비되어 있어야 하며, 아래 접속 값은 자신의 환경에 맞게 바꾼다:
+
+```toml
+default_profile = "local-postgres"
+
+[profiles.local-postgres]
+adapter = "postgres"
+host = "localhost"
+port = "5432"
+username = "example_user"
+dbname = "example_db"
+
+[profiles.scratch]
+adapter = "sqlite"
+```
+
+`[profiles.<이름>]` 하나가 접속 옵션 묶음이다. `default_profile`은 **프로필 테이블 밖, 파일 상단**에 둔다. 비밀번호는 예제처럼 생략하고 PostgreSQL의 `~/.pgpass` 등 별도 인증 수단을 사용한다. `scratch`는 외부 서버 없이 쓰는 메모리 SQLite 프로필이다.
+
+실제 접속 정보가 있는 파일은 공개 저장소에 커밋하지 않는다. `pyproject.toml`에 넣을 때는 별도 `[tool.harlequin]` 구조가 필요하므로 이 예제를 그대로 붙이지 않는다.
+
+### 프로필 선택·일회성 변경
 
 ```sh
-harlequin --profile local-postgres
-harlequin --profile None -a sqlite
-harlequin --config                          # 설정 생성·수정 마법사
+harlequin                                  # default_profile로 접속
+harlequin -P local-postgres                 # 이름으로 선택 (--profile과 동일)
+harlequin -P scratch                        # 다른 프로필로 시작
+harlequin -P local-postgres -d example_db    # 프로필은 유지하고 이번 접속 DB만 변경
+harlequin -P None -a sqlite                 # 기본 프로필 없이 메모리 SQLite로 시작
 ```
 
-`local-postgres`는 미리 만들어 둔 프로필의 예시 이름이다. Harlequin 자체 TOML은 `[profiles.<이름>]` 구조이며, CLI 옵션이 프로필의 같은 옵션보다 우선한다. 외부 연결 선택기가 사용하는 TOML은 별도 형식일 수 있으므로 그대로 `--config-path`에 넘길 수 있다고 가정하지 않는다. [공식 프로필 선택 문서](https://harlequin.sh/docs/config-file/profiles).
+`-P`에는 DB 이름이 아니라 **정의한 프로필 이름**을 준다. CLI 옵션은 프로필의 같은 옵션보다 우선하며 설정 파일을 수정하지 않는다. 실행 중 프로필을 바꾸려면 종료 후 원하는 `-P`로 다시 실행한다.
+
+외부 연결 선택기가 사용하는 TOML은 별도 형식일 수 있으므로 그대로 `--config-path`에 넘길 수 있다고 가정하지 않는다. 전체 파일 탐색 규칙·다른 설정 옵션은 [공식 설정 발견 순서](https://harlequin.sh/docs/config-file/discovery)와 [프로필 선택 문서](https://harlequin.sh/docs/config-file/profiles)를 참고한다.
 
 ## PostgreSQL — DB 목록과 실제 접속 DB는 다르다
 
