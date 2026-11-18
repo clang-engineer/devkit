@@ -3753,7 +3753,7 @@
           {
             "slug": "harlequin",
             "name": "Harlequin",
-            "desc": "터미널 SQL IDE의 Adapter 환경과 설정 경로를 진단한다.",
+            "desc": "SQL 실행·카탈로그·결과 내보내기와 PostgreSQL DB 선택, Adapter 환경 진단을 정리한다.",
             "official": [
               {
                 "label": "Harlequin documentation",

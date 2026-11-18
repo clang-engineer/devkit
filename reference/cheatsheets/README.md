@@ -84,7 +84,7 @@
 | [logstash.md](logstash.md) | Logstash 이벤트 수집·변환·출력 파이프라인 |
 | [elasticsearch.md](elasticsearch.md) | Elasticsearch 분산 저장·검색·운영 |
 | [kibana.md](kibana.md) | Kibana 데이터 탐색·KQL·시각화·대시보드 |
-| [harlequin.md](harlequin.md) | Harlequin 터미널 SQL IDE·Python Adapter 설치 및 진단 |
+| [harlequin.md](harlequin.md) | Harlequin 기본 조작·SQL 실행·결과 내보내기·PostgreSQL DB 선택·Adapter 진단 |
 
 ## Git & 버전 관리
 
