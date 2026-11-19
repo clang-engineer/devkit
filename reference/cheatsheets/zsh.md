@@ -55,6 +55,28 @@ bindkey $'\e[1;5C' forward-word    # Ctrl+Right
 
 `Ctrl+V` 표시의 `^[`는 Escape 바이트이며 위의 `\e`가 실제 ESC 바이트를 만든다. 자신의 터미널 출력과 다르면 바인딩 문자열도 바꾼다. `tmux-256color`의 terminfo에 해당 특수 키 항목이 없더라도 raw 시퀀스로 등록한 ZLE 바인딩은 작동할 수 있다. Ghostty의 Option 처리와 tmux 키 프로토콜 설정도 함께 확인한다.
 
+#### Alt+Backspace 뒤 입력이 Vi 명령 모드처럼 동작할 때
+
+**자동완성 중이 아닌 일반 입력에서도 발생하면 기본 키맵부터 확인한다.** 터미널이 Alt+Backspace를 `Esc + Backspace`로 보내고 Vi 입력 키맵에 해당 조합이 없으면, `Esc`가 명령 모드 전환으로 처리될 수 있다. Visual 선택 모드나 히스토리 검색창이 열린 것과는 구분한다.
+
+```zsh
+bindkey -lL main              # 기본 키맵: emacs 또는 viins에 연결되는지 확인
+bindkey -M viins '^[^?'       # Esc + DEL 조합의 Vi 입력 모드 바인딩
+bindkey -M emacs '^[^?'       # 기본 Emacs 키맵에서는 backward-kill-word
+```
+
+Zsh는 **시작할 때 상속받은** `EDITOR`/`VISUAL` 값에 `vi`가 포함되면 기본 키맵으로 `viins`를 선택할 수 있다 (`vim`, `nvim` 포함). `.zshrc`에서 나중에 `EDITOR=nvim`을 설정했다고 현재 셸이 즉시 전환되는 것은 아니지만, 여기서 실행한 새 셸은 그 값을 상속받는다. 자세한 선택 규칙은 [공식 ZLE Keymaps 문서](https://zsh.sourceforge.io/Doc/Release/Zsh-Line-Editor.html#Keymaps-1)를 참고한다.
+
+Vi 방식의 셸 편집을 의도하지 않았다면 현재 셸에서 복구한다:
+
+```zsh
+bindkey -e
+```
+
+새 셸에서도 유지하려면 같은 줄을 `~/.zshrc`의 **fzf·Atuin 등 키를 등록하는 초기화보다 앞**에 둔다. 이후에 다른 설정이 `bindkey -v`를 실행하면 다시 바뀔 수 있다. 이는 셸 입력 편집만 바꾸며 Vim/Neovim의 모드나 기본 편집기 선택은 바꾸지 않는다.
+
+**Oh My Zsh 제거 후 달라졌다면:** Oh My Zsh는 [기본 키 설정에서 `bindkey -e`를 실행한다](https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/key-bindings.zsh). 프레임워크만 제거하고 이 설정을 별도로 남기지 않으면 이전과 다른 기본 키맵이 드러날 수 있다. 재설치 대신 필요한 키맵을 명시하면 된다. 키맵이 정상인데도 문제가 남으면 앞 절의 `Ctrl+V` 확인법으로 터미널이 실제 보내는 시퀀스를 확인한다.
+
 
 ### 히스토리 확장 (`!` 시리즈)
 
