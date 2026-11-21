@@ -25,15 +25,7 @@ Terminal의 tmux Client
 
 **Client는 Server에 접속하는 주체**이며 Session의 하위 대상이 아니다. Pane은 PTY를 통해 Shell·프로그램을 실행한다. Client를 detach해도 Server가 유지되는 동안 작업은 계속될 수 있다. 대괄호 번호는 아래 본문 절을 가리키며, 위 그림은 **포함 관계와 기능 적용 관계를 구분**한다.
 
-## 설치와 설정 파일
-
-```sh
-brew install tmux            # macOS
-sudo apt-get install tmux    # Debian / Ubuntu
-sudo dnf install tmux        # Fedora / RHEL 계열
-```
-
-설정은 보통 `~/.tmux.conf` 또는 `$XDG_CONFIG_HOME/tmux/tmux.conf`에 둔다. `tmux new`·`tmux new-session`은 새 세션 생성, `tmux a`·`tmux attach-session`은 `tmux attach`의 별칭이다. **새 세션 생성과 기존 세션 재접속을 구분**한다.
+설치와 환경별 설정은 [공식 README](https://github.com/tmux/tmux)에서 확인한다. 기본 설정 파일은 `~/.tmux.conf`다.
 
 ## 명령을 읽는 법
 
@@ -55,21 +47,7 @@ tmux <command> [options] [arguments]
 
 `-t 1` 같은 단일 숫자는 명령의 target 타입에 따라 해석이 달라진다. 자동화에서는 `:1`, `:.1` 또는 고유 ID로 명시한다. Window 이름도 쓸 수 있다. `work:editor`는 `editor` 창이며, `target-pane`을 받는 명령에서 pane을 생략하면 해당 창의 active Pane을 뜻한다.
 
-## 확장 기능 — 어떤 작업을 보완하나?
-
-tmux 기본 명령과 플러그인 조작은 구분한다. 플러그인은 **필요한 작업을 기준으로 선택**하며 상세 키맵·설치·옵션은 각 공식 문서를 확인한다.
-
-| 작업 | 대표 확장 |
-|---|---|
-| 세션·윈도우 검색 | [sessionx](https://github.com/omerxx/tmux-sessionx) |
-| 세션·Pane·키바인딩 등 객체 선택 | [tmux-fzf](https://github.com/sainnhe/tmux-fzf) |
-| 출력의 경로·URL·해시 추출 | [extrakto](https://github.com/laktak/extrakto) |
-| Copy Mode에서 Vim식 텍스트 객체 선택 | [tmux-vim-copy](https://github.com/clang-engineer/tmux-vim-copy) |
-| 선택한 파일·URL 열기 | [tmux-open](https://github.com/tmux-plugins/tmux-open) |
-| Pane 출력·이력 저장 | [tmux-logging](https://github.com/tmux-plugins/tmux-logging) |
-| 세션 상태 저장·자동 복원 | [resurrect](https://github.com/tmux-plugins/tmux-resurrect) · [continuum](https://github.com/tmux-plugins/tmux-continuum) |
-
-전체 목록·대안은 [devkit 리소스 카탈로그](https://github.com/clang-engineer/devkit/blob/main/reference/catalog.json), 선택 기준은 [플러그인 비교 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md) 참고.
+플러그인은 tmux 기본 기능과 구분한다. 종류·역할·대안은 [devkit 리소스 카탈로그](https://github.com/clang-engineer/devkit/blob/main/reference/catalog.json)와 [플러그인 비교 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md)을 참고한다.
 
 ## 1. 작업 유지 — Client와 Session
 
@@ -138,16 +116,7 @@ Pane은 PTY(의사 터미널)를 통해 Shell·프로그램을 실행하는 영�
 
 `swap-pane`·`join-pane`은 키 하나로 외우기보다 **Source(`-s`) → Target(`-t`)** 관계로 이해한다. Session 간 이동은 [관련 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md)을 참고한다.
 
-```sh
-tmux join-pane -s source:editor -t work:logs -h # source의 Pane을 work의 창으로 이동
-tmux break-pane -d -s work:logs.1              # 지정 Pane을 새 창으로 분리
-tmux swap-pane -s work:editor.0 -t work:logs.0 # 두 Pane의 위치 교환
-tmux swap-window -s work:1 -t work:2           # 두 Window의 위치 교환
-tmux move-window -s source:2 -t work:5         # 빈 Window index로 이동
-tmux move-window -r -t work:                  # Window index의 빈칸 재정렬
-```
-
-`join-pane -h`는 좌우, `-v`는 상하 배치이며 `-b`를 더하면 왼쪽/위로 붙인다. 프로세스를 합치는 것이 아니라 기존 Pane의 배치를 바꾼다.
+**Pane·Window 이동 패턴:** `join-pane -s <source> -t <target>`은 Pane을 다른 Window로 옮기고, `break-pane`은 Pane을 새 Window로 분리한다. `swap-pane` / `swap-window`는 위치를 교환하고 `move-window`는 Window를 이동한다. 실제 대상 지정과 예시는 [관련 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md) 참고.
 
 ### Layout — 배치·크기 조절
 
@@ -211,10 +180,7 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 | 명령어 | 설명 |
 |--------|------|
 | `Prefix ?` | 키 바인딩 목록 |
-| `Prefix t` | 시계 표시 |
-| `Prefix ~` | 최근 메시지 확인 |
 | `Prefix :` | 명령어 프롬프트 |
-| `Prefix Ctrl+z` | tmux 클라이언트 일시 중지 |
 | `tmux source-file ~/.tmux.conf` | 설정 파일 리로드 |
 
 ### 자주 조정하는 옵션
@@ -239,38 +205,7 @@ bind s choose-tree -Zs -O name
 - `pane-border-format`: Pane 번호와 현재 명령을 테두리에 표시한다.
 - `choose-tree -O name`: 트리를 이름순으로 정렬한다. 버전별 지원 옵션은 `tmux list-commands`와 공식 매뉴얼로 확인한다.
 
-### 내부 TERM과 외부 RGB 지원
-
-먼저 `infocmp -x tmux-256color`로 해당 terminfo가 설치돼 있는지 확인한 뒤 내부 터미널 종류를 설정한다.
-
-```tmux
-set -g default-terminal "tmux-256color"
-```
-
-이것은 **tmux 안의 프로그램에 보여 줄 터미널 종류**다. terminfo가 없는 시스템에서는 설치하거나 사용 가능한 `screen-256color` 등으로 맞춘다. 색이 깨지는 원인이 항상 terminfo 부재인 것은 아니므로 바깥 터미널의 기능도 따로 확인한다.
-
-tmux 3.2+에서 바깥 터미널의 RGB 지원을 선언할 때는 `terminal-features`를 쓴다. **tmux 밖의** `echo "$TERM"`에 맞는 패턴을 선택하고, 해당 터미널이 실제로 24비트 색을 지원할 때만 적용한다.
-
-```tmux
-set -as terminal-features ",xterm*:RGB"
-```
-
-구버전까지 고려하는 대안은 `set -as terminal-overrides ",xterm*:Tc"`다. `RGB`는 공식 terminfo capability, `Tc`는 tmux 확장이다. 위 `xterm*`은 예시이지 모든 환경의 기본값이 아니다. 내부 `TERM=tmux-256color`만으로 외부 RGB 지원이 보장되거나 `RGB` 항목이 모든 시스템의 해당 terminfo에 내장된 것은 아니다. 근거는 [tmux 공식 FAQ](https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-rgb-colour), OMT 자동 감지의 분석은 [설정 상속 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-12-oh-my-tmux.md)을 참고한다.
-
-### 플러그인 관리
-
-[TPM](https://github.com/tmux-plugins/tpm)은 선택적 플러그인 관리자다. `set -g @plugin 'owner/repo'`로 선언하고 TPM 초기화 후 `Prefix I`로 설치한다. Oh My Tmux처럼 TPM을 이미 통합한 설정에서는 초기화를 중복하지 않는다. 상세 설정은 [TPM 문서](https://github.com/tmux-plugins/tpm) 참고.
-
-### 실제 기본값과 실행 중 서버의 키맵 비교
-
-`source-file`은 설정에서 삭제한 바인딩을 실행 중 서버에서 자동 해제하지 않는다. 현재 `list-keys` 결과를 stock 키맵으로 착각하지 말고 **임시 소켓 + 빈 설정 + 살아 있는 세션**을 하나의 tmux 명령으로 조회한다:
-
-```sh
-tmux -L "stock-$$" -f /dev/null new-session -d \; \
-  list-keys -T copy-mode-vi \; kill-server
-```
-
-`-L` 없이 `-f /dev/null`만 주면 이미 실행 중인 기본 소켓 서버에 접속할 수 있고, 세션 없는 `start-server`를 후속 별도 명령으로 조회하면 서버가 재시작하면서 실제 config를 읽을 수 있다. 옵션 기본값도 같은 방식으로 `list-keys ...` 대신 `show -gv <option>`을 사용한다. `copy-mode-vi`와 `copy-mode`는 별도 키 테이블이다. 특정 키가 기본으로 묶였는지와 **동작이 같은지**(예: 복사 후 copy mode 유지 여부)를 각각 비교한다. 설정 리로드 후에도 옛 바인딩이 남으면 `unbind-key -T <table> <key>`로 명시적으로 해제한다.
+설정·자동화의 대표 명령은 `set-option`, `bind-key`, `set-hook`, `display-message -p`다. 터미널 색상·TERM 호환성은 [tmux FAQ](https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-rgb-colour)와 [설정 상속 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-12-oh-my-tmux.md)을 참고한다. 플러그인 설치는 [TPM](https://github.com/tmux-plugins/tpm)에서 다룬다.
 
 ## 필요한 경우 확장하기
 
