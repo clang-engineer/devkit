@@ -509,7 +509,6 @@
         "commands": [
           {
             "name": "yazi",
-            "description": "Rust 기반 비동기 파일 탐색·미리보기·플러그인을 제공하는 현대적 TUI",
             "url": "https://github.com/sxyazi/yazi",
             "tags": [
               "tui",
@@ -621,6 +620,18 @@
             "why": "Rust 기반 파일 탐색기로 Lua를 통해 동작과 키맵을 깊게 구성할 수 있다",
             "boundary": "파일 탐색·관리 목적은 겹치지만 키맵·미리보기·설정·확장 모델이 다르므로 완전 호환 대체재로 취급하지 않는다.",
             "url": "https://github.com/sayanarijit/xplr"
+          }
+        ],
+        "tags": [
+          {
+            "id": "tui",
+            "name": "TUI",
+            "aliases": []
+          },
+          {
+            "id": "file-manager",
+            "name": "파일 매니저",
+            "aliases": []
           }
         ]
       },
