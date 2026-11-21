@@ -55,19 +55,34 @@ Alt + Shift + 1..9     → Window를 Workspace로 이동
 | `Alt + -` | 크기 축소 (-50) |
 | `Alt + =` | 크기 확대 (+50) |
 
-## 3. 모드 — 자주 쓰는 키와 관리 동작 분리
+## 3. 명령어 모드 — Mode · Binding
 
-저빈도·위험(되돌리기 번거로운) 동작을 메인 키맵에서 격리한 서브모드. `Alt + Shift + ;` 로 진입하며, 각 키는 동작 후 **자동으로 메인 모드로 복귀**한다. 키는 **소문자 그대로**(Shift 불필요) 누른다. 설계 의도와 모드형 키맵 관점은 [AeroSpace 서비스 모드 글](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/)에서 따로 정리한다.
+**Mode는 키 입력에 적용할 명령 바인딩 집합**이다. `main`이 기본 모드이며, `service`는 설정으로 정의하는 사용자 모드다. 모드를 전환하면 같은 키도 다른 명령을 실행할 수 있다.
 
-| 키 | 명령 | 설명 |
-|---|---|---|
-| `esc` | `reload-config` | 설정 리로드 + 메인 모드 복귀 |
-| `r` | `flatten-workspace-tree` | 레이아웃 초기화 (분할 트리 평탄화) |
-| `f` | `layout floating tiling` | 플로팅↔타일링 토글 |
-| `backspace` | `close-all-windows-but-current` | 현재 창 제외 모두 닫기 |
-| `alt-shift-h/j/k/l` | `join-with left/down/up/right` | 인접 창과 컨테이너로 묶기 |
+```text
+main (일상적인 창 조작)
+  └─ Alt+Shift+; → mode service
+                       ├─ f   → layout floating tiling
+                       ├─ r   → flatten-workspace-tree
+                       └─ Esc → mode main
+```
 
-> **바인딩은 병합이 아니라 대체다.** `[mode.main.binding]`을 하나라도 정의하면 나머지 기본 바인딩은 폴백되지 않고 **빈 테이블로 사라진다**(다른 설정 키는 기본값 폴백되는 것과 반대). 서비스 모드도 `[mode.service.binding]`을 직접 안 적으면 통째로 못 쓴다 → 원하는 stock 키는 config에 명시적으로 나열해야 한다.
+```toml
+# ~/.aerospace.toml — 사용자 모드 정의 예시
+[mode.main.binding]
+alt-shift-semicolon = 'mode service'
+
+[mode.service.binding]
+f = ['layout floating tiling', 'mode main']
+r = ['flatten-workspace-tree', 'mode main']
+esc = 'mode main'
+```
+
+- `mode <name>`: 지정한 모드로 전환하는 **AeroSpace 명령**. 새 모드는 `[mode.<name>.binding]`으로 정의한다.
+- 모드 전환 후 **자동 복귀하는 것이 아니다**. 예시처럼 각 명령 뒤에 `mode main`을 명시해야 한 번 실행 후 돌아온다.
+- `[mode.main.binding]`을 직접 정의하면 기본 키맵 전체를 자동 상속하지 않는다. 실제 설정에서 사용할 기본 키를 함께 선언해야 한다.
+
+**현재 구성의 service 모드:** `Alt+Shift+;`로 진입해 `f`(플로팅 전환), `r`(트리 평탄화), `backspace`(현재 창 외 닫기), `alt-shift-h/j/k/l`(창 묶기) 등을 사용한다. 키와 복귀 방식은 실제 `~/.aerospace.toml`에 따라 달라진다. 자세한 설계는 [서비스 모드 글](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/) 참고.
 
 ## 4. 관찰과 자동화 — CLI · Config · Rules
 
