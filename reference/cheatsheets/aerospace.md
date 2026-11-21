@@ -60,7 +60,7 @@ AeroSpace는 Workspace 안의 **트리 구조**로 창을 배치한다. 창 선�
 
 | 목적 | AeroSpace 명령 | 대표 키·진입점 |
 |---|---|---|
-| 분할 방향·방식 | `layout tiles horizontal` / `layout accordion vertical` | `Alt+/` / `Alt+,` |
+| 분할 방향·방식 | `layout h_tiles` / `layout v_accordion` | `Alt+/` / `Alt+,` |
 | 창 위치 변경 | `move left/right/up/down` | `Alt+Shift+H/J/K/L` |
 | 이웃과 묶기 | `join-with left/right/up/down` | 사용자 정의 service 모드 |
 | 크기 조절 | `resize smart -50` / `resize smart +50` | `Alt+-` / `Alt+=` |
@@ -68,9 +68,37 @@ AeroSpace는 Workspace 안의 **트리 구조**로 창을 배치한다. 창 선�
 | 트리 평탄화 | `flatten-workspace-tree` | service 모드 `r` |
 | 플로팅 전환 | `layout floating tiling` | service 모드 `f` |
 
-**Join은 단순한 창 이동이 아니다.** 지정 방향의 이웃 창과 함께 묶도록 배치 트리를 재구성한다. `layout`은 `tiles`·`accordion` 같은 방식과 `horizontal`·`vertical` 같은 방향을 선택한다. `flatten-workspace-tree`는 중첩을 평탄화하지만 Join의 정확한 역연산이나 Undo는 아니다.
+**Join은 단순한 창 이동이 아니다.** `join-with <direction>`은 현재 창과 지정 방향의 가장 가까운 노드를 공통 부모 컨테이너 아래로 묶는다. 방향 인자는 **묶을 상대의 위치**이지, 새 컨테이너의 분할 방향이 아니다.
 
-예를 들어 `join-with right`는 현재 창과 오른쪽 이웃을 묶도록 컨테이너 관계를 바꾼다. **실제 생성·재배치되는 컨테이너는 기존 트리와 Layout에 따라 달라지므로**, 단순히 두 창의 위치를 교환하는 `move`와 구분한다. 단축키는 기본 설정과 사용자 service 모드 설정이 섞여 있으므로 `~/.aerospace.toml`을 기준으로 확인한다.
+```text
+처음: h_tiles (좌우 배치)
+┌──────┬──────┬──────┐
+│  A   │  B*  │  C   │
+└──────┴──────┴──────┘
+
+B에서 join-with right
+┌──────┬──────┐
+│      │  B*  │
+│  A   ├──────┤
+│      │  C   │
+└──────┴──────┘
+
+트리: h_tiles
+      ├─ A
+      └─ v_tiles
+         ├─ B*
+         └─ C
+```
+
+위는 **기본 정규화 설정에서의 대표 사례**다. 중첩 컨테이너의 방향은 부모와 반대가 되도록 정규화될 수 있으며, 기존 트리·설정에 따라 결과가 달라진다. `flatten-workspace-tree`는 복잡한 중첩 구조를 평탄화하지만 Join의 Undo는 아니다.
+
+| 명령 | 차이 |
+|---|---|
+| `move right` | 현재 창을 오른쪽으로 재배치하며 트리가 바뀔 수 있음 |
+| `swap right` | 오른쪽 이웃 창과 자리 교환 |
+| `join-with right` | 오른쪽 이웃과 공통 컨테이너 구성 |
+
+**Layout 문법:** `layout h_tiles`는 가로 타일 배치를 지정한다. `layout tiles horizontal vertical`처럼 여러 인자를 쓰면 각각을 동시에 적용하는 것이 아니라, **현재 상태와 다른 첫 번째 후보를 선택**한다. [공식 Join·Layout 명령 문서](https://nikitabobko.github.io/AeroSpace/commands#join-with) 참고.
 
 ## 3. 명령어 모드 — Mode · Binding
 
