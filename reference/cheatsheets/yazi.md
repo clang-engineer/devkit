@@ -90,22 +90,6 @@ Parent Directory  ←  Current Directory  →  Preview
 
 설정은 파일 관리 동작을 바꾸고, Plugin·Flavor는 기능과 외형을 확장한다. 필요한 확장만 선택한다.
 
-### 설치 · 확장 준비
-
-```bash
-brew install yazi          # macOS, 기본 설치
-cargo install --force yazi-build  # Rust 소스에서 빌드
-```
-
-검색·이동과 풍부한 미리보기를 사용하려면 필요한 도구만 추가한다.
-
-```bash
-brew install fd ripgrep fzf zoxide  # 검색·이동
-brew install ffmpeg-full sevenzip jq poppler resvg imagemagick-full \
-  font-symbols-only-nerd-font       # 미디어·압축·문서 미리보기와 아이콘
-brew link ffmpeg-full imagemagick-full -f --overwrite
-```
-
 ### 설정과 확장
 
 기본 설정 전체를 복사하지 않아도 된다. 아래 파일에 바꿀 항목만 작성하면 Yazi 기본값 위에 병합된다.
@@ -128,36 +112,7 @@ show_hidden = true
 
 ### 플러그인과 Flavor
 
-Yazi는 Lua 플러그인으로 명령, 메타데이터 수집, 사전 로딩과 미리보기를 확장한다. 공식 문서 기준 Plugin과 Flavor는 아직 Beta다. Flavor는 외형만 묶은 배포 가능한 테마 패키지다.
-
-```bash
-ya pkg add yazi-rs/plugins:git       # 공식 저장소의 Git 플러그인
-ya pkg add yazi-rs/flavors:dracula  # Dracula Flavor
-
-ya pkg list                          # 관리 중인 패키지
-ya pkg upgrade                       # 전체 업그레이드
-ya pkg delete yazi-rs/plugins:git   # 패키지 제거
-ya pkg install                       # package.toml의 잠금 버전 설치
-```
-
-새 환경에서는 dotfiles의 `package.toml`을 가져온 뒤 `ya pkg install`로 같은 버전을 복원한다. `ya`와 `yazi`의 버전은 정확히 같아야 한다.
-
-```lua
--- ~/.config/yazi/init.lua
-require("my-plugin"):setup {
-  key = "value",
-}
-```
-
-```toml
-# ~/.config/yazi/theme.toml
-[flavor]
-dark = "dracula"
-```
-
-직접 설치한 플러그인은 `~/.config/yazi/plugins/<name>.yazi/main.lua`, Flavor는 `~/.config/yazi/flavors/<name>.yazi/flavor.toml`을 진입점으로 사용한다.
-
-
+`ya pkg add <owner/repo:name>`으로 패키지를 추가하고, `ya pkg list` / `ya pkg upgrade` / `ya pkg install`로 조회·업데이트·복원한다. Plugin은 기능, Flavor는 외형을 확장한다. 상세 설치·의존성·버전은 [Yazi 공식 문서](https://yazi-rs.github.io/docs/plugins/overview)를 참고한다.
 
 ### 기타
 
@@ -169,12 +124,6 @@ dark = "dracula"
 | `:` | 셸 명령을 실행하고 끝날 때까지 대기 |
 | `w` | 백그라운드 작업 목록 |
 | `F1` 또는 `~` | 전체 키 도움말 |
-
-### 문제 해결
-
-| 증상 | 원인 | 해결 |
-|---|---|---|
-| SVG 미리보기에서 `Failed to start \`resvg\`` / `No such file or directory (os error 2)` | Yazi가 SVG 렌더링을 위해 호출하는 외부 도구 `resvg`가 없음 | `brew install resvg` |
 
 ## 더 보기
 
