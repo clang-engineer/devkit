@@ -232,6 +232,15 @@
             "tldr": "rg",
             "url": "https://github.com/BurntSushi/ripgrep"
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "search-tool",
+            "query": "topic:search-tool",
+            "url": "https://github.com/search?q=topic%3Asearch-tool&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -499,6 +508,15 @@
             "tldr": "fzf",
             "url": "https://github.com/junegunn/fzf"
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "directory-navigation",
+            "query": "topic:directory-navigation",
+            "url": "https://github.com/search?q=topic%3Adirectory-navigation&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -632,6 +650,15 @@
             "id": "file-manager",
             "name": "파일 매니저",
             "aliases": []
+          }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "terminal-file-manager",
+            "query": "topic:terminal-file-manager",
+            "url": "https://github.com/search?q=topic%3Aterminal-file-manager&type=repositories&s=stars&o=desc"
           }
         ]
       },
@@ -868,6 +895,15 @@
             "boundary": "Warp와 Ghostty는 서로 다른 설계 우선순위의 터미널이다. Warp를 Ghostty의 후계나 완전한 대체로 보지 않으며 계정·서비스 기능과 플랫폼 지원을 확인한다.",
             "tldr": "warp",
             "url": "https://www.warp.dev/"
+          }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "terminal-emulator",
+            "query": "topic:terminal-emulator",
+            "url": "https://github.com/search?q=topic%3Aterminal-emulator&type=repositories&s=stars&o=desc"
           }
         ]
       },
@@ -1230,6 +1266,15 @@
               "map-32"
             ]
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "terminal-multiplexer",
+            "query": "topic:terminal-multiplexer",
+            "url": "https://github.com/search?q=topic%3Aterminal-multiplexer&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -1517,6 +1562,15 @@
               "Shell Plugins",
               "map-21"
             ]
+          }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "shell",
+            "query": "topic:shell",
+            "url": "https://github.com/search?q=topic%3Ashell&type=repositories&s=stars&o=desc"
           }
         ]
       },
@@ -2407,6 +2461,15 @@
               "map-31"
             ]
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "text-editor",
+            "query": "topic:text-editor",
+            "url": "https://github.com/search?q=topic%3Atext-editor&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -3251,6 +3314,15 @@
             "tldr": "yabai",
             "url": "https://github.com/koekeishiya/yabai"
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "window-manager",
+            "query": "topic:window-manager",
+            "url": "https://github.com/search?q=topic%3Awindow-manager&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -3286,7 +3358,16 @@
             "description": "dotfiles를 source/target 모델로 선언적으로 관리한다."
           }
         ],
-        "relations": []
+        "relations": [],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "dotfiles",
+            "query": "topic:dotfiles",
+            "url": "https://github.com/search?q=topic%3Adotfiles&type=repositories&s=stars&o=desc"
+          }
+        ]
       },
       {
         "id": "task-management",
@@ -3334,6 +3415,15 @@
             "install": "brew install just",
             "tldr": "just",
             "url": "https://github.com/casey/just"
+          }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "task-runner",
+            "query": "topic:task-runner",
+            "url": "https://github.com/search?q=topic%3Atask-runner&type=repositories&s=stars&o=desc"
           }
         ]
       },
@@ -3584,6 +3674,15 @@
             "tldr": "lazydocker",
             "url": "https://github.com/jesseduffield/lazydocker"
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "container",
+            "query": "topic:container",
+            "url": "https://github.com/search?q=topic%3Acontainer&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -3746,6 +3845,15 @@
               "map-30"
             ]
           }
+        ],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "ai-coding",
+            "query": "topic:ai-coding",
+            "url": "https://github.com/search?q=topic%3Aai-coding&type=repositories&s=stars&o=desc"
+          }
         ]
       },
       {
@@ -3763,7 +3871,16 @@
             "description": "age와 함께 설정 파일을 암호화해 Git에서 관리한다."
           }
         ],
-        "relations": []
+        "relations": [],
+        "discovery_links": [
+          {
+            "label": "GitHub · 분야별 인기 프로젝트",
+            "provider": "github",
+            "topic": "secrets-management",
+            "query": "topic:secrets-management",
+            "url": "https://github.com/search?q=topic%3Asecrets-management&type=repositories&s=stars&o=desc"
+          }
+        ]
       }
     ],
     "domains": [
