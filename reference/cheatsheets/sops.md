@@ -246,32 +246,14 @@ git diff -- secrets .sops.yaml
 - 복호화해 만든 임시 평문 파일
 - `sops decrypt ... > plain.yaml`로 생성한 출력
 
-### 흔한 문제
+### 흔한 문제 — 원인별 확인
 
-### no matching creation rules
-
-대상 경로가 `.sops.yaml`의 `path_regex`와 일치하지 않는다. 저장소 root에서 실행했는지,
-명령에 넘긴 상대 경로가 regex와 맞는지 확인한다.
-
-### no identity matched any recipient
-
-현재 age 개인키가 파일 metadata의 recipient와 맞지 않는다. 키 경로와 공개 recipient를
-확인한다.
-
-```sh
-age-keygen -y "$SOPS_AGE_KEY_FILE"
-```
-
-### MAC mismatch
-
-암호화 파일이 SOPS 밖에서 잘못 수정되었거나 merge 과정에서 손상되었을 가능성이 높다.
-정상 버전으로 되돌린 뒤 SOPS를 통해 다시 편집한다. `--ignore-mac`은 무결성 검사를
-우회하므로 일반적인 해결책으로 사용하지 않는다.
-
-### 새 recipient가 기존 파일에 적용되지 않음
-
-`.sops.yaml`은 새 파일 생성 규칙이다. 기존 파일에는 `sops updatekeys <file>`을 실행해야
-한다.
+| 증상 | 확인 대상 |
+|---|---|
+| `no matching creation rules` | `.sops.yaml`의 `path_regex`와 대상 경로 |
+| `no identity matched any recipient` | age 개인키와 파일 recipient |
+| `MAC mismatch` | 파일 손상·SOPS 밖에서의 수정; 무결성 검사를 우회하지 않음 |
+| 새 recipient가 적용되지 않음 | 기존 파일은 `sops updatekeys <file>` 실행 |
 
 ## 참고
 
