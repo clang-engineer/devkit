@@ -833,6 +833,24 @@
             "tldr": "tmux",
             "tags": [
               "base"
+            ],
+            "links": [
+              {
+                "label": "tmux.app · 명령어·설정 레퍼런스",
+                "url": "https://tmux.app/"
+              },
+              {
+                "label": "tmux.app · 플러그인 가이드",
+                "url": "https://tmux.app/plugins/"
+              },
+              {
+                "label": "tmux.app · Neovim 연동",
+                "url": "https://tmux.app/doc/neovim-tmux/"
+              },
+              {
+                "label": "tmux.app · Ghostty 연동",
+                "url": "https://tmux.app/doc/ghostty-tmux/"
+              }
             ]
           },
           {
