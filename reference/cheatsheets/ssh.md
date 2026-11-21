@@ -254,39 +254,15 @@ rsync -avz --exclude='node_modules' ./src/ user@host:/dst/
 
 scp와 달리 변경분만 보내고, 중단 시 이어받기 됨.
 
-## 5. 진단 — 어느 단계에서 실패했는가?
-
-인증·호스트 선택·네트워크 경로를 나누어 확인한다.
-
-### Permission denied (publickey)
+## 5. 진단 — 호스트·키·경로 확인
 
 ```sh
-ssh-add -l                              # 키 등록 확인
-ssh-add ~/.ssh/id_ed25519               # 없으면 추가
-ssh -vT git@github.com-personal         # 상세 로그
+ssh -G myhost | grep -Ei '^(hostname|user|identityfile|identitiesonly) ' # 적용 설정
+ssh-add -l        # Agent에 등록된 키
+ssh -vvv myhost   # 인증·연결 상세 로그
 ```
 
-### 의도하지 않은 키로 인증됨
-
-`IdentitiesOnly yes` 추가 또는 `ssh-add -D` 후 원하는 순서로 재등록.
-
-### 너무 많은 키
-
-```sh
-ssh-add -D
-ssh-add ~/.ssh/id_main                  # 자주 쓰는 것만
-```
-
-또는 Host별 `IdentitiesOnly yes`.
-
-## SSH 동작 순서 요약
-
-```
-1. ~/.ssh/config에서 Host 매칭 찾기
-   ├─ 매칭 성공 → IdentityFile의 키 사용
-   └─ 매칭 실패 → ssh-add -l의 키를 순서대로 시도 (최대 5개)
-2. 각 키로 인증 시도, 첫 성공 시 그 키로 로그인
-```
+**확인 순서:** `Host` 매칭 → 실제 `HostName`·`User` → `IdentityFile`·Agent → 네트워크·서버 인증 정책. `IdentitiesOnly yes`는 지정한 인증서·키만 사용하도록 제한한다. 인증 시도 횟수는 서버 설정에 따라 다르므로 고정값으로 가정하지 않는다.
 
 ## 참고
 
