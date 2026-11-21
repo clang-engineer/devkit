@@ -147,18 +147,7 @@ uv로 설치한 `harlequin-odbc`가 `pyodbc`를 쓴다면 해당 격리 환경�
 
 ### 설정 파일 위치
 
-직접 만들거나 `harlequin --config` 마법사로 생성·수정한다. 자주 쓰는 위치:
-
-- 사용자 공통: `~/.harlequin.toml`
-- 프로젝트 전용: 실행 디렉터리의 `.harlequin.toml`
-- OS 설정 디렉터리: macOS는 `~/Library/Application Support/harlequin/config.toml`, Linux는 `~/.config/harlequin/config.toml` (`XDG_CONFIG_HOME` 설정 시 해당 경로 기준)
-
-여러 파일이 있으면 읽어서 병합하며, 우선순위는 **명시한 파일 → 실행 디렉터리 → OS 설정 디렉터리 → 홈 디렉터리**다. 파일 위치를 확실히 지정하려면:
-
-```sh
-harlequin --config-path /path/to/harlequin.toml -P local-postgres
-# 또는: HARLEQUIN_CONFIG_PATH=/path/to/harlequin.toml harlequin -P local-postgres
-```
+`harlequin --config`로 설정을 만들거나 수정한다. 사용자·프로젝트 설정 파일의 탐색 순서와 병합 우선순위는 [공식 설정 문서](https://harlequin.sh/docs/config-file/discovery)를 참고한다. 특정 파일은 `harlequin --config-path <path>`로 지정한다.
 
 ### 프로필 정의
 
@@ -185,16 +174,11 @@ adapter = "sqlite"
 ### 프로필 선택·일회성 변경
 
 ```sh
-harlequin                                  # default_profile로 접속
-harlequin -P local-postgres                 # 이름으로 선택 (--profile과 동일)
-harlequin -P scratch                        # 다른 프로필로 시작
-harlequin -P local-postgres -d example_db    # 프로필은 유지하고 이번 접속 DB만 변경
-harlequin -P None -a sqlite                 # 기본 프로필 없이 메모리 SQLite로 시작
+harlequin -P local-postgres               # 저장된 연결 프로필 선택
+harlequin -P local-postgres -d example_db # 프로필은 유지하고 DB만 변경
 ```
 
-`-P`에는 DB 이름이 아니라 **정의한 프로필 이름**을 준다. CLI 옵션은 프로필의 같은 옵션보다 우선하며 설정 파일을 수정하지 않는다. 실행 중 프로필을 바꾸려면 종료 후 원하는 `-P`로 다시 실행한다.
-
-외부 연결 선택기가 사용하는 TOML은 별도 형식일 수 있으므로 그대로 `--config-path`에 넘길 수 있다고 가정하지 않는다. 전체 파일 탐색 규칙·다른 설정 옵션은 [공식 설정 발견 순서](https://harlequin.sh/docs/config-file/discovery)와 [프로필 선택 문서](https://harlequin.sh/docs/config-file/profiles)를 참고한다.
+`-P`는 프로필 이름, `-d`는 PostgreSQL 접속 DB 이름이다. CLI 옵션은 해당 실행에만 적용한다. [프로필 공식 문서](https://harlequin.sh/docs/config-file/profiles).
 
 ## PostgreSQL — DB 목록과 실제 접속 DB는 다르다
 
@@ -205,35 +189,13 @@ harlequin -P None -a sqlite                 # 기본 프로필 없이 메모리 
 - 다른 DB 조회: Harlequin을 종료하고 대상 DB로 다시 실행한다. 카탈로그 선택이나 새 SQL 탭은 DB 전환이 아니다.
 - 여러 DB 동시 사용: 터미널 탭마다 별도 Harlequin을 실행해 각각 연결한다. PostgreSQL용 DB 이름 옵션은 단일 값이며 배열·반복 지정으로 여러 DB에 동시 연결할 수 없다.
 
-### 연결 정보는 유지하고 DB만 바꾸기
+연결 정보를 복제하지 않고 `harlequin -P local-postgres -d example_db`로 DB만 바꿀 수 있다. 데이터베이스 목록 표시와 실제 접속은 다르다. [공식 다중 DB 제약](https://harlequin.sh/docs/postgres/multiple).
 
-**기존 PostgreSQL 프로필이 있다면 접속 정보를 통째로 복제할 필요가 없다.** `-d`(긴 옵션 `--dbname`)로 DB만 덮어쓴다:
+## 진단
 
-```sh
-# local-postgres 프로필의 서버·포트·인증 설정은 유지하고 DB만 변경
-harlequin --profile local-postgres -d example_db
+실행·복사 키는 **현재 포커스**, 테이블 목록은 **카탈로그 갱신·트랜잭션**, 접속 문제는 **Adapter·실제 DB**를 차례로 확인한다. `SELECT current_database();`로 PostgreSQL 연결 대상을 확인할 수 있다.
 
-# 기존 DSN으로 접속할 때도 DB 이름만 재정의 가능
-# PG_DSN은 비공개 환경에서 준비한 접속 문자열이다.
-harlequin -a postgres "$PG_DSN" -d example_db
-```
-
-`example_db`는 예시 이름이며 해당 계정에 대상 DB의 접속·조회 권한이 있어야 한다. DSN에 비밀번호를 넣으면 확장된 값이 프로세스 인자에 노출될 수 있으므로 PostgreSQL의 passfile 등 적절한 인증 방식을 사용한다.
-
-외부 연결 선택기를 거쳐 실행한다면 **추가 CLI 옵션 전달 지원을 별도로 확인**한다. Harlequin 자체의 `-d` 지원이 선택기의 지원을 뜻하지는 않는다. [공식 다중 DB 제약](https://harlequin.sh/docs/postgres/multiple) · [PostgreSQL 접속 옵션](https://harlequin.sh/docs/postgres).
-
-## 문제 해결 — 키·결과·접속 구분
-
-| 증상 | 먼저 확인할 것 |
-| --- | --- |
-| 실행 키가 동작하지 않음 | `F2`로 편집기 포커스 확인 → `Ctrl+J` 또는 Run Query 버튼. 터미널 키 가로채기도 확인 |
-| 복사·붙여넣기가 안 됨 | 현재 영역과 선택 범위 확인. 원격 세션·터미널의 클립보드 지원 확인 |
-| 테이블을 만들었는데 목록에 없음 | `Ctrl+R`로 갱신. PostgreSQL Manual 모드라면 커밋 여부도 확인 |
-| DB 이름은 있는데 하위 스키마가 안 열림 | `SELECT current_database();`로 실제 접속 DB 확인. 다른 DB라면 재접속 |
-| 변경 SQL이 즉시 반영됨 | 접속 계정 권한과 Adapter의 Auto/Manual 모드 확인. 편집기 자체는 조회 전용이 아님 |
-| Adapter 로드 실패 | [설치 환경 진단](#구조--실행-파일과-adapter의-환경은-하나)부터 확인 |
-
-키·클립보드 상세: [키 입력 문제](https://harlequin.sh/docs/troubleshooting/key-bindings) · [복사·붙여넣기 문제](https://harlequin.sh/docs/troubleshooting/copying-and-pasting).
+상세: [키 입력 문제](https://harlequin.sh/docs/troubleshooting/key-bindings) · [복사·붙여넣기 문제](https://harlequin.sh/docs/troubleshooting/copying-and-pasting).
 
 ## 관련 문서
 
