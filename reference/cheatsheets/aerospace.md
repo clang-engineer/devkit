@@ -37,23 +37,46 @@ Alt + 1..9             → Workspace 전환
 Alt + Shift + 1..9     → Window를 Workspace로 이동
 ```
 
-## 2. 배치 — Layout · Resize
+## 2. 배치 — Layout · Move · Join · Resize
 
-**Layout은 창의 포함 계층이 아니라 Workspace 내부의 창 배치 방식**이다. Tiling은 창을 분할 구조로 배치하고 Accordion은 겹쳐 넘겨보는 방식이며, Floating은 타일 배치에서 제외한다.
+AeroSpace는 Workspace 안의 **트리 구조**로 창을 배치한다. 창 선택(Focus), 위치 이동(Move), 컨테이너 구성(Join), 배치 방식(Layout)은 서로 다른 조작이다.
 
-| 단축키 | 설명 |
-|---|---|
-| `Alt + /` | 타일 레이아웃 토글 (수평/수직) |
-| `Alt + ,` | 아코디언 레이아웃 토글 |
+```text
+배치 트리
+├─ Layout   : Tiles / Accordion, 수평 / 수직
+├─ Move     : 현재 창의 배치 위치 변경
+├─ Join     : 이웃 창과 같은 컨테이너로 묶기
+├─ Resize   : 현재 창 크기 조정
+├─ Balance  : 크기 균등화
+└─ Flatten  : 중첩 컨테이너 평탄화
+```
 
-> 플로팅↔타일 토글은 메인 모드에 기본 단축키가 없다. 서비스 모드(`Alt + Shift + ;`)의 `F`로 전환한다.
+| 목적 | AeroSpace 명령 | 대표 키·진입점 |
+|---|---|---|
+| 분할 방향·방식 | `layout tiles horizontal vertical` / `layout accordion horizontal vertical` | `Alt+/` / `Alt+,` |
+| 창 위치 변경 | `move left/right/up/down` | `Alt+Shift+H/J/K/L` |
+| 이웃과 묶기 | `join-with left/right/up/down` | 사용자 정의 service 모드 |
+| 크기 조절 | `resize smart -50` / `resize smart +50` | `Alt+-` / `Alt+=` |
+| 크기 균등화 | `balance-sizes` | CLI 또는 사용자 키맵 |
+| 트리 평탄화 | `flatten-workspace-tree` | service 모드 `r` |
+| 플로팅 전환 | `layout floating tiling` | service 모드 `f` |
 
-### 창 크기 조절
+**Join은 단순한 창 이동이 아니다.** 현재 창과 지정 방향의 이웃 창을 같은 컨테이너로 묶어 배치 트리를 변경한다. `flatten-workspace-tree`는 중첩을 평탄화하지만 Join의 정확한 역연산이나 Undo는 아니다.
 
-| 단축키 | 설명 |
-|---|---|
-| `Alt + -` | 크기 축소 (-50) |
-| `Alt + =` | 크기 확대 (+50) |
+```text
+기존: Workspace
+      ├─ A
+      ├─ B
+      └─ C
+
+A에서 join-with right
+      ├─ Container
+      │  ├─ A
+      │  └─ B
+      └─ C
+```
+
+위 그림은 **구조 변화의 개념도**이며 실제 화면 배치와 트리 재구성은 기존 레이아웃에 따라 달라진다. 단축키는 기본 설정 예시와 사용자 service 모드 설정이 섞여 있으므로 `~/.aerospace.toml`을 기준으로 확인한다.
 
 ## 3. 명령어 모드 — Mode · Binding
 
