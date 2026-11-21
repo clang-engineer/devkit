@@ -91,42 +91,8 @@ ghostty +list-keybinds --plain | rg -n "alt\\+arrow_left|alt\\+arrow_right"
 
 > 설정 파일: `~/.config/ghostty/config`. `keybind = super+d=new_split:right` 형식으로 재정의, `keybind = super+d=unbind`로 해제.
 
-### 설정 파일 위치 · Option 키
+### 설정 파일과 Option 키
 
-macOS에서 Ghostty는 **두 경로의 config를 모두 읽어 병합**한다 — 충돌 키는 뒤에 로드되는 **App Support 쪽이 이긴다**:
+설정은 `~/.config/ghostty/config` 또는 macOS Application Support 경로에서 읽을 수 있다. 실제 설정은 `ghostty +show-config`로 확인하고, 키맵은 `ghostty +list-keybinds`로 조회한다.
 
-| 경로 | 비고 |
-|---|---|
-| `~/.config/ghostty/config` | XDG 표준. dotfiles로 관리하기 좋음 |
-| `~/Library/Application Support/com.mitchellh.ghostty/config` | 첫 실행 시 config 없으면 자동 생성하는 템플릿 |
-
-```sh
-ghostty +show-config | grep <key>   # 병합된 실효값 (어느 파일이 이겼는지 판별)
-```
-
-> `+show-config`는 실행 중인 창의 라이브 상태가 아니라 **디스크 config를 다시 파싱**해 보여준다. 파일이 유효한데도 화면이 그대로면 원인은 파일이 아니라 리로드(창이 옛 설정 사용 중).
-
-> 함정: 한 파일을 고쳤는데 안 먹으면 다른 파일이 같은 키를 덮고 있을 수 있다. 실설정은 한 곳(XDG)으로 통합하는 게 안전.
-
-`chezmoi apply`의 성공은 **디스크 파일 반영**이고 Ghostty 실행 중 창의 설정 재로드와는 별개다. `+show-config`가 기대한 테마를 보여주는데 화면이 그대로라면 `⌘ ⇧ ,`로 재로드하고, 필요하면 앱을 재시작한다. 그래도 색이 다르면 **tmux 밖의 새 Ghostty 창**에서 같은 색인지 비교한다. 밖에서는 바뀌고 tmux 안에서만 다르면 tmux 상태바/ANSI 팔레트나 그 테마 설정을 살펴본다.
-
-
-### 키바인드 충돌 체크
-
-```sh
-ghostty +show-config | rg -n "macos-option-as-alt|theme"
-ghostty +list-keybinds --plain | rg -n "alt\\+arrow_left|alt\\+arrow_right"
-```
-
-- `alt+arrow_left=esc:b`, `alt+arrow_right=esc:f`가 보이면 Option+화살표 단어 이동이 유효.
-- 안 보이면 `~/Library/Application Support/com.mitchellh.ghostty/config` 경로의 충돌 라인을 우선 점검.
-
-**`macos-option-as-alt`** — 기본 꺼짐이라 Option 키가 Alt로 안 가고 macOS 특수문자(´, ¬…)를 낸다. tmux `M-` 바인딩이나 셸 단어 이동(`Alt-b`/`f`/`d`)을 쓰려면 켜야 한다:
-
-```conf
-macos-option-as-alt = left   # 왼쪽 Option만 Alt, 오른쪽은 특수문자 입력 보존
-# = true  → 양쪽 다 Alt / = right → 오른쪽만
-```
-
-> 적용은 config 리로드(`⌘ ⇧ ,`)로 부족할 수 있고 **완전 재시작(`⌘ Q`)이 필요한 경우가 많다**.
-
+`macos-option-as-alt = left`는 왼쪽 Option을 Alt로 전달하는 설정 예시다. 설정 적용·키 충돌·tmux 색상 차이 등 환경별 문제는 [Ghostty 공식 설정 문서](https://ghostty.org/docs/config)에서 확인한다.
