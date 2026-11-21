@@ -129,36 +129,30 @@ esc = 'mode main'
 
 **현재 구성의 service 모드:** `Alt+Shift+;`로 진입해 `f`(플로팅 전환), `r`(트리 평탄화), `backspace`(현재 창 외 닫기), `alt-shift-h/j/k/l`(창 묶기) 등을 사용한다. 키와 복귀 방식은 실제 `~/.aerospace.toml`에 따라 달라진다. 자세한 설계는 [서비스 모드 글](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/) 참고.
 
-## 4. 관찰과 자동화 — CLI · Config · Rules
+## 4. 설정·자동화 — CLI · Config · Rules
 
-**작동 예시:** `aerospace list-windows --all`로 대상을 조회하고, `aerospace workspace 3`으로 작업 공간을 전환한다. 창을 선택한 상태에서 `aerospace move-node-to-workspace 2`를 실행하면 그 창을 다른 Workspace로 옮긴다. 조회·전환·이동은 서로 다른 동작이다.
-
-
-```bash
-open -a AeroSpace              # 앱 실행
-aerospace list-workspaces      # 워크스페이스 목록
-aerospace list-windows --all   # 모든 창 목록
-aerospace list-apps            # 열린 앱 + bundle ID 확인
-aerospace reload-config        # 설정 리로드
-aerospace move-node-to-workspace 2  # 현재 창을 workspace 2로 이동
-aerospace workspace 3          # workspace 3으로 전환
+```text
+CLI     → 현재 상태 조회·명령 실행
+Config  → Mode·Binding·기본 동작 설정
+Rules   → 창 감지 조건 → 자동 배치 명령
 ```
 
-### 특정 창 지정 · 포맷 출력
-
-포커스와 무관하게 **특정 창**을 옮기거나, 스크립트용으로 필드를 뽑을 때.
-
-| 플래그 | 설명 |
+| 목적 | 대표 명령 |
 |---|---|
-| `move-node-to-workspace --window-id <id> <ws>` | 포커스된 창이 아니라 지정한 `window-id`를 이동 |
-| `move-node-to-workspace --fail-if-noop <ws>` | 이미 그 워크스페이스면 아무 동작 안 함 (불필요한 포커스 변화 방지) |
-| `list-windows --all --format '%{window-id}\|%{app-bundle-id}'` | 창 목록을 커스텀 포맷으로. `%{...}` 플레이스홀더로 필드 선택 |
+| Workspace·창 조회 | `aerospace list-workspaces` · `aerospace list-windows --all` |
+| Workspace 전환·창 이동 | `aerospace workspace <name>` · `aerospace move-node-to-workspace <name>` |
+| 설정 다시 읽기 | `aerospace reload-config` |
+| 특정 창 지정·출력 형식 | `--window-id <id>` · `--format '%{window-id}'` |
 
-### 자동 창 배치 (on-window-detected)
+**자동 배치:** `[[on-window-detected]]`는 새 창의 앱·제목 등을 조건으로 Workspace 이동이나 Layout 변경 명령을 실행한다.
 
-`[[on-window-detected]]` 블록으로 앱이 뜰 때 워크스페이스 이동·레이아웃을 자동 적용할 수 있다. `if`는 문자열이 아니라 **테이블**(`if.app-id = '...'`)이고, `if` 생략은 "모든 창 매칭"(catch-all)이다. 규칙은 위에서부터 검사해 첫 매칭에서 멈춘다. 앱별 배치 규칙 작성은 공식 config 문서 참조.
+```toml
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = ['move-node-to-workspace 2:Terminal']
+```
 
-**설정 검증:** `aerospace reload-config`에서 오류를 확인한다. 창 감지 규칙은 위에서부터 평가되며, 일반 규칙보다 구체적인 규칙을 앞에 둔다. 세부 설정·오류 사례는 [공식 설정 문서](https://nikitabobko.github.io/AeroSpace/guide#configuring-aerospace)를 참고한다.
+규칙은 위에서부터 평가하므로 구체적인 조건을 먼저 둔다. `if`는 테이블이며, 모든 창에 적용하는 규칙은 `if = {}`처럼 빈 조건으로 정의할 수 있다. 상세 옵션·오류 진단은 [공식 설정 문서](https://nikitabobko.github.io/AeroSpace/guide#configuring-aerospace) 참고.
 
 ## 관련 글
 
