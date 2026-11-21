@@ -44,39 +44,7 @@ ZLE는 **실행 전 입력줄**을 편집하고 History Expansion은 **기존 �
 
 > 이 표는 Emacs 키바인딩 기준이다 (`bindkey -e`). `bindkey -v`로 Vi 키바인딩을 사용하면 일부 키가 달라진다. 예를 들어 Vi 입력 모드의 `Ctrl+U`는 삽입 모드에 들어온 위치까지 삭제하는 `vi-kill-line`이다. 현재 설정은 `bindkey '^U'`, `bindkey '^L'`로 확인한다.
 
-**Alt/Ctrl+화살표가 단어 이동을 하지 않으면:** ZLE의 `bindkey`부터 확인하고, 터미널 → tmux → zsh 순서로 실제 전달 시퀀스를 좁힌다. Emacs 모드 기본 `Alt+B/F`와 화살표 조합은 별개다. 프롬프트에서 `Ctrl+V` 뒤 대상 키를 눌러 들어온 시퀀스를 보고, 다음은 **레거시 xterm 시퀀스를 받는 경우에만** `.zshrc`에 추가한다:
-
-```zsh
-bindkey $'\e[1;3D' backward-word   # Alt+Left
-bindkey $'\e[1;3C' forward-word    # Alt+Right
-bindkey $'\e[1;5D' backward-word   # Ctrl+Left
-bindkey $'\e[1;5C' forward-word    # Ctrl+Right
-```
-
-`Ctrl+V` 표시의 `^[`는 Escape 바이트이며 위의 `\e`가 실제 ESC 바이트를 만든다. 자신의 터미널 출력과 다르면 바인딩 문자열도 바꾼다. `tmux-256color`의 terminfo에 해당 특수 키 항목이 없더라도 raw 시퀀스로 등록한 ZLE 바인딩은 작동할 수 있다. Ghostty의 Option 처리와 tmux 키 프로토콜 설정도 함께 확인한다.
-
-#### Alt+Backspace 뒤 입력이 Vi 명령 모드처럼 동작할 때
-
-**자동완성 중이 아닌 일반 입력에서도 발생하면 기본 키맵부터 확인한다.** 터미널이 Alt+Backspace를 `Esc + Backspace`로 보내고 Vi 입력 키맵에 해당 조합이 없으면, `Esc`가 명령 모드 전환으로 처리될 수 있다. Visual 선택 모드나 히스토리 검색창이 열린 것과는 구분한다.
-
-```zsh
-bindkey -lL main              # 기본 키맵: emacs 또는 viins에 연결되는지 확인
-bindkey -M viins '^[^?'       # Esc + DEL 조합의 Vi 입력 모드 바인딩
-bindkey -M emacs '^[^?'       # 기본 Emacs 키맵에서는 backward-kill-word
-```
-
-Zsh는 **시작할 때 상속받은** `EDITOR`/`VISUAL` 값에 `vi`가 포함되면 기본 키맵으로 `viins`를 선택할 수 있다 (`vim`, `nvim` 포함). `.zshrc`에서 나중에 `EDITOR=nvim`을 설정했다고 현재 셸이 즉시 전환되는 것은 아니지만, 여기서 실행한 새 셸은 그 값을 상속받는다. 자세한 선택 규칙은 [공식 ZLE Keymaps 문서](https://zsh.sourceforge.io/Doc/Release/Zsh-Line-Editor.html#Keymaps-1)를 참고한다.
-
-Vi 방식의 셸 편집을 의도하지 않았다면 현재 셸에서 복구한다:
-
-```zsh
-bindkey -e
-```
-
-새 셸에서도 유지하려면 같은 줄을 `~/.zshrc`의 **fzf·Atuin 등 키를 등록하는 초기화보다 앞**에 둔다. 이후에 다른 설정이 `bindkey -v`를 실행하면 다시 바뀔 수 있다. 이는 셸 입력 편집만 바꾸며 Vim/Neovim의 모드나 기본 편집기 선택은 바꾸지 않는다.
-
-**Oh My Zsh 제거 후 달라졌다면:** Oh My Zsh는 [기본 키 설정에서 `bindkey -e`를 실행한다](https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/key-bindings.zsh). 프레임워크만 제거하고 이 설정을 별도로 남기지 않으면 이전과 다른 기본 키맵이 드러날 수 있다. 재설치 대신 필요한 키맵을 명시하면 된다. 키맵이 정상인데도 문제가 남으면 앞 절의 `Ctrl+V` 확인법으로 터미널이 실제 보내는 시퀀스를 확인한다.
-
+**키가 예상과 다르면:** `bindkey`로 현재 ZLE 바인딩을 확인한다. 터미널·tmux에서 전달한 키 시퀀스가 다른 경우는 [ZLE 공식 문서](https://zsh.sourceforge.io/Doc/Release/Zsh-Line-Editor.html#Keymaps-1)와 터미널 설정을 참고한다. Vi 입력 모드가 의도치 않게 활성화되면 `bindkey -e`로 Emacs 키맵을 명시할 수 있다.
 
 ### 대화형 작업 팁 — 명령줄 편집·임시 보관·파일 작업
 
@@ -250,27 +218,7 @@ hash -r       # 동치
 
 ### 프롬프트 / 환경
 
-```sh
-export EDITOR=nvim
-export PATH=$HOME/.local/bin:$PATH
-export LESS='-R'
-```
-
-> 실전에서는 `starship` 같은 외부 프롬프트를 쓰는 게 표준. `eval "$(starship init zsh)"`.
-
-Starship·powerlevel10k는 프롬프트를 만드는 **엔진**, Catppuccin 등은 색 **팔레트**, Oh My Zsh는 셸 설정·플러그인 **프레임워크**다. 같은 “테마”라는 이름으로 다른 계층을 혼동하지 않는다. 프롬프트 엔진은 하나를 골라 초기화하고, 색 통일은 가능한 한 터미널 팔레트에서 관리한다. 외부 프롬프트·히스토리 검색·디렉터리 이동을 각각 별도 도구로 쓰면 프레임워크 자체는 필수가 아니지만, 기존 프레임워크를 제거할 때는 히스토리 크기·키바인딩처럼 함께 제공하던 기본값을 점검한다.
-
-프리셋을 비교하려면 현재 `~/.config/starship.toml`을 바로 덮지 말고 별도 파일로 출력해 같은 디렉터리에서 렌더링한다. Powerline 프리셋에는 Nerd Font가 필요하다.
-
-```sh
-starship preset catppuccin-powerline -o /tmp/starship-preview.toml
-STARSHIP_CONFIG=/tmp/starship-preview.toml starship prompt
-starship prompt                       # 현재 설정과 비교
-```
-
-[Starship 공식 프리셋](https://starship.rs/presets/catppuccin-powerline).
-
-
+`EDITOR`, `PATH` 같은 환경 변수는 [Shell 치트시트](shell.md)에서 다룬다. Zsh 자체의 프롬프트는 `PROMPT`·`RPROMPT`로 설정하며, Starship·Powerlevel10k는 외부 프롬프트 엔진, Oh My Zsh는 설정 프레임워크다. 테마·프리셋과 개인 설정은 [Starship 공식 문서](https://starship.rs/)와 dotfiles를 참고한다.
 
 ### 성능 진단
 
