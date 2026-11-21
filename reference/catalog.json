@@ -266,7 +266,13 @@
           {
             "name": "jq",
             "description": "JSON 데이터를 필터링·변환·조회하는 명령줄 프로세서",
-            "tldr": "jq"
+            "tldr": "jq",
+            "links": [
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://jq.cheatly.dev/"
+              }
+            ]
           },
           {
             "name": "fx",
@@ -429,6 +435,10 @@
               {
                 "label": "Yazi 플러그인·연동 자료",
                 "url": "https://yazi-rs.github.io/docs/resources/"
+              },
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://yazi.cheatly.dev/"
               }
             ]
           },
@@ -440,7 +450,13 @@
           {
             "name": "fzf",
             "description": "표준 입력 등의 목록을 퍼지 검색으로 좁혀 대화형으로 선택하는 CLI 필터다. 파일·명령 이력·브랜치 등 여러 작업에 조합할 수 있으며 목록 생성은 다른 도구가 맡는다.",
-            "tldr": "fzf"
+            "tldr": "fzf",
+            "links": [
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://fzf.cheatly.dev/"
+              }
+            ]
           }
         ],
         "relations": [
@@ -507,6 +523,10 @@
               {
                 "label": "Yazi 플러그인·연동 자료",
                 "url": "https://yazi-rs.github.io/docs/resources/"
+              },
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://yazi.cheatly.dev/"
               }
             ]
           },
@@ -706,7 +726,13 @@
             "tldr": "atuin"
           },
           {
-            "name": "fzf"
+            "name": "fzf",
+            "links": [
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://fzf.cheatly.dev/"
+              }
+            ]
           }
         ],
         "relations": [
@@ -750,7 +776,13 @@
           {
             "name": "ghostty",
             "description": "GPU 가속과 네이티브 경험에 중점을 둔 터미널 에뮬레이터",
-            "tldr": "ghostty"
+            "tldr": "ghostty",
+            "links": [
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://ghostty.cheatly.dev/"
+              }
+            ]
           },
           {
             "name": "warp",
@@ -870,6 +902,10 @@
               {
                 "label": "tmux.app · Ghostty 연동",
                 "url": "https://tmux.app/doc/ghostty-tmux/"
+              },
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://tmux.cheatly.dev/"
               }
             ]
           },
@@ -1112,6 +1148,12 @@
               "base",
               "frameworks",
               "prompt"
+            ],
+            "links": [
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://zsh.cheatly.dev/"
+              }
             ]
           },
           {
@@ -1393,6 +1435,10 @@
               {
                 "label": "LazyVim 공식 문서",
                 "url": "https://www.lazyvim.org/"
+              },
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://nvim.cheatly.dev/"
               }
             ]
           },
@@ -2881,6 +2927,10 @@
               {
                 "label": "Git 공식 레퍼런스",
                 "url": "https://git-scm.com/docs"
+              },
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://git.cheatly.dev/"
               }
             ]
           },
@@ -2892,6 +2942,10 @@
               {
                 "label": "Lazygit 연동·설정 레퍼런스",
                 "url": "https://lazygit.dev/resources/"
+              },
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://lazygit.cheatly.dev/"
               }
             ]
           },
@@ -3372,7 +3426,13 @@
           {
             "name": "docker",
             "description": "컨테이너와 이미지를 관리하는 Docker CLI",
-            "tldr": "docker"
+            "tldr": "docker",
+            "links": [
+              {
+                "label": "cheatly · 실전 치트시트",
+                "url": "https://docker.cheatly.dev/"
+              }
+            ]
           },
           {
             "name": "lazydocker",
