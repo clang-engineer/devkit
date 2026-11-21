@@ -2,40 +2,32 @@
 
 macOS용 i3 스타일 타일링 윈도우 매니저. SIP 비활성화 없이 기본 타일링을 사용할 수 있다.
 
-## 전체 구조 — 입력과 배치 트리
+## 전체 구조 — 입력·명령과 배치 트리
 
 ```text
-키 입력 / CLI / 창 감지 규칙
-           │
-     Mode · Binding / Config
-           │
-           ▼
-       AeroSpace 명령
-           │
-    ┌──────┼──────────────────┐
-    ▼      ▼                  ▼
-  Focus   Move             Layout / Join
-  선택    위치 변경         구조·배치 변경
-           │                  │
-           └────────┬─────────┘
-                    ▼
-             Workspace [1·2]
-                 └─ Layout Tree
-                     ├─ Container (Tiles / Accordion)
-                     │   ├─ Window A
-                     │   └─ Window B
-                     └─ Window C
-
-Resize / Balance / Flatten → 크기·트리 조정 [2]
-Mode / Binding             → 키 입력의 명령 매핑 [3]
-Config / Rules             → 키·자동 배치 설정 [4]
+키 입력 ─→ Mode / Binding ─┐
+CLI ───────────────────────┼─→ AeroSpace 명령
+창 감지 ─→ Config / Rules ─┘        │
+                                  ▼
+                            조작 대상·상태
+                             ├─ Focus : 대상 창 선택
+                             ├─ Window: Move / Swap / Resize
+                             └─ Workspace
+                                 └─ Layout Tree
+                                     ├─ Container (Tiles / Accordion)
+                                     │   ├─ Window A
+                                     │   └─ Window B
+                                     └─ Window C
+                                        ↑
+                              Join / Layout / Balance / Flatten
+                              (트리·배치 변경)
 ```
 
-Workspace는 창을 배치하는 작업 공간이고, **Layout Tree는 컨테이너와 Window의 배치 관계**를 나타낸다. Focus는 조작할 대상을 고르고, Move는 위치를 바꾸며, Join·Layout은 트리 구조·배치 방식에 작용한다. 위 그림은 대표적인 **대상 관계와 명령의 적용 위치**이지 모든 명령의 실행 순서는 아니다. tmux의 세션·프로세스 유지와는 별개다.
+**Workspace는 창을 배치하는 작업 공간**, **Layout Tree는 컨테이너와 창의 포함·배치 관계**다. 위쪽 화살표는 명령 전달, 트리의 가지는 포함 관계, 아래쪽 화살표는 배치 변경 대상이라는 뜻이다. Focus는 대상 선택이고 Move·Swap·Join·Layout은 창 또는 배치 구조를 바꾼다.
 
 ## 1. 탐색과 이동 — Focus · Window · Workspace
 
-같은 방향키에 **Shift를 더하면 Focus 이동 대신 Window 이동**으로 바뀌는 키맵 패턴을 기억한다. 아래는 기본 설정 예시이며 실제 바인딩은 `~/.aerospace.toml`을 따른다.
+같은 방향키에 **Shift를 더하면 Focus 이동 대신 Window 이동**으로 바뀌는 키맵 패턴을 기억한다. 아래는 **현재 dotfiles의 키맵 예시**이며 AeroSpace의 고정 단축키가 아니다. 실제 바인딩은 `~/.aerospace.toml`을 따른다.
 
 ```text
 Alt + H/J/K/L          → Focus 이동
@@ -48,20 +40,10 @@ Alt + Shift + 1..9     → Window를 Workspace로 이동
 
 AeroSpace는 Workspace 안의 **트리 구조**로 창을 배치한다. 창 선택(Focus), 위치 이동(Move), 컨테이너 구성(Join), 배치 방식(Layout)은 서로 다른 조작이다.
 
-```text
-배치 트리
-├─ Layout   : Tiles / Accordion, 수평 / 수직
-├─ Move     : 현재 창의 배치 위치 변경
-├─ Join     : 이웃 창과 같은 컨테이너로 묶기
-├─ Resize   : 현재 창 크기 조정
-├─ Balance  : 크기 균등화
-└─ Flatten  : 중첩 컨테이너 평탄화
-```
-
 | 목적 | AeroSpace 명령 | 대표 키·진입점 |
 |---|---|---|
-| 분할 방향·방식 | `layout h_tiles` / `layout v_accordion` | `Alt+/` / `Alt+,` |
-| 창 위치 변경 | `move left/right/up/down` | `Alt+Shift+H/J/K/L` |
+| 분할 방향·방식 | `layout h_tiles` / `layout v_accordion` | `Alt+/` / `Alt+,` (개인 키맵) |
+| 창 위치 변경 | `move left/right/up/down` | `Alt+Shift+H/J/K/L` (개인 키맵) |
 | 이웃과 묶기 | `join-with left/right/up/down` | 사용자 정의 service 모드 |
 | 크기 조절 | `resize smart -50` / `resize smart +50` | `Alt+-` / `Alt+=` |
 | 크기 균등화 | `balance-sizes` | CLI 또는 사용자 키맵 |
@@ -127,7 +109,7 @@ esc = 'mode main'
 - 모드 전환 후 **자동 복귀하는 것이 아니다**. 예시처럼 각 명령 뒤에 `mode main`을 명시해야 한 번 실행 후 돌아온다.
 - `[mode.main.binding]`을 직접 정의하면 기본 키맵 전체를 자동 상속하지 않는다. 실제 설정에서 사용할 기본 키를 함께 선언해야 한다.
 
-**현재 구성의 service 모드:** `Alt+Shift+;`로 진입해 `f`(플로팅 전환), `r`(트리 평탄화), `backspace`(현재 창 외 닫기), `alt-shift-h/j/k/l`(창 묶기) 등을 사용한다. 키와 복귀 방식은 실제 `~/.aerospace.toml`에 따라 달라진다. 자세한 설계는 [서비스 모드 글](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/) 참고.
+**개인 dotfiles의 service 모드 예시:** `Alt+Shift+;`로 진입해 `f`(플로팅 전환), `r`(트리 평탄화), `backspace`(현재 창 외 닫기), `alt-shift-h/j/k/l`(창 묶기) 등을 사용한다. 키와 복귀 방식은 실제 `~/.aerospace.toml`에 따라 달라진다. 자세한 설계는 [서비스 모드 글](https://clang-engineer.github.io/posts/macos/2026-07-14-aerospace-service-mode/) 참고.
 
 ## 4. 설정·자동화 — CLI · Config · Rules
 
