@@ -84,7 +84,34 @@ LSP 탐색 ────> References 등 ─────┘
                    └────────────────> Picker (검색·선택)
 ```
 
-Quickfix는 Vim의 **범용 위치 목록**, Diagnostics는 Neovim의 **진단 상태 관리**, Trouble은 이를 비롯한 여러 위치 결과를 표시하는 **플러그인 UI**다. LSP 진단은 자동으로 Quickfix에 등록되지 않는다. Picker 역시 자체 검색·LSP 결과를 직접 표시할 수 있다.
+Quickfix는 Vim의 **범용 위치 목록**, Location List는 **Window별 위치 목록**, Diagnostics는 Neovim의 **진단 상태 관리**다. 이들은 결과를 보관·관리하는 모델이고, **Picker와 Trouble은 결과를 보여주고 이동하는 UI**다. LSP 진단은 자동으로 Quickfix에 등록되지 않는다. Picker는 파일·Grep·LSP 결과를 직접 조회할 수도 있으므로 반드시 Quickfix를 거치는 것은 아니다.
+
+### Picker·Trouble·위치 목록의 경계
+
+```text
+데이터·결과 원천
+├─ 파일 시스템 / Grep ────────────────┐
+├─ LSP 정의·참조·심볼 ────────────────┤
+├─ LSP·Linter → Diagnostics ──────────┤
+└─ :make / :vimgrep → Quickfix·Loclist┤
+                                      ▼
+                          결과 표시·탐색 UI
+                          ├─ Picker: 검색·필터·선택
+                          │   ├─ Snacks.picker (LazyVim 기본 구성)
+                          │   ├─ Telescope
+                          │   └─ fzf-lua
+                          └─ Trouble: 목록 유지·순회
+                                      │
+                                      ▼
+                              Buffer / Window 이동
+```
+
+**같은 데이터가 여러 UI에 나타날 수 있다.** 예를 들어 LSP References는 Picker에서 후보를 좁혀 선택하거나 Trouble에서 목록을 유지하며 순회할 수 있다. Quickfix·Loclist도 Trouble에서 표시할 수 있지만 Trouble이 목록 자체를 대체하는 것은 아니다. Telescope·fzf-lua·Snacks.picker는 같은 **Picker 계층의 대안**이지, 동시에 모두 설치해야 하는 구성 요소가 아니다.
+
+- **Picker 상세 비교:** [Telescope vs fzf — 퍼지 파인더의 경계선](https://clang-engineer.github.io/) (블로그에서 제목 검색)
+- **결과 모델과 Trouble:** [코드 진단과 결과 탐색](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/neovim/2026-05-04-neovim-code-diagnostics-and-navigation.md)
+- **내장 API·Diagnostics:** [Neovim 치트시트](neovim.md)
+- **Vim의 Quickfix·Location List:** [Vim 치트시트](vim.md)
 
 | 결과·작업 | 대표 진입점 | 의미 |
 |---|---|---|
