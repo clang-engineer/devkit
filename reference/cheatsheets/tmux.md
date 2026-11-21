@@ -96,42 +96,13 @@ tmux Server는 Session·Window·Pane의 상태를 관리하고, Client는 Termin
 
 **작업 유지 예시:** `tmux new -s work` → 작업 실행 → `Prefix d` → `tmux attach -t work`. Detach는 프로세스를 종료하지 않지만 tmux Server나 호스트가 종료되면 작업 유지도 보장되지 않는다.
 
-### sessionx — 검색·미리보기로 세션과 윈도우 선택 (플러그인)
+### sessionx — 세션·윈도우 검색 (플러그인)
 
-[`tmux-sessionx`](https://github.com/omerxx/tmux-sessionx)는 기존 Session을 검색해 전환하고, 이름 변경·종료와 Window 탐색을 같은 팝업에서 처리한다. **세션을 전환하는 도구이지 작업 상태를 저장·복원하는 도구는 아니다.**
+[tmux-sessionx](https://github.com/omerxx/tmux-sessionx)는 세션·윈도우를 검색·미리보기로 선택한다. 상태 저장·복원 도구는 아니다.
 
-**설치:** TPM과 `fzf`·`fzf-tmux`·`bat`이 필요하다. zoxide는 디렉터리 이력을 사용할 때의 선택 의존성이다. tmux 설정에 아래 선언을 추가하고 리로드한 뒤 `Prefix I`로 설치한다. Oh My Tmux에서는 `.tmux.conf.local`에 선언하며 TPM 초기화 구문을 중복 추가하지 않는다.
-
-```tmux
-set -g @plugin 'omerxx/tmux-sessionx'
-```
-
-**기본 흐름:** `Prefix Shift+o` (`O`) → 검색 → `Enter`로 전환. 기존 세션에 없는 새 이름을 입력해 확정하면 세션을 생성한다. 대문자 `O`이므로 소문자 `Prefix o`의 다음 Pane 이동과 구분한다.
-
-아래 키는 **sessionx 팝업 안에서** 누르며 Prefix를 다시 붙이지 않는다.
-
-| 키 | 대상·동작 |
-|---|---|
-| `Ctrl+p` / `Ctrl+n` | 위 / 아래 후보 선택 |
-| `Enter` | 선택한 세션·윈도우로 전환, 디렉터리나 새 이름이면 세션 생성 |
-| `Ctrl+w` | 전체 윈도우 목록과 미리보기로 전환 |
-| `Ctrl+t` | 미리보기를 세션·윈도우 트리로 변경 |
-| `Ctrl+b` | 초기 세션 목록으로 돌아가기 |
-| `Ctrl+r` | 선택한 세션의 새 이름 입력 |
-| `Alt+Backspace` | 선택한 세션 종료 — 실행 중인 프로그램도 종료될 수 있음 |
-| `Ctrl+x` / `Ctrl+e` | `~/.config` / 현재 작업 디렉터리 아래의 디렉터리 탐색 |
-| `Ctrl+f` | zoxide 디렉터리 이력으로 후보 전환 (zoxide 필요) |
-| `Ctrl+u` / `Ctrl+d` | 미리보기 반 페이지 위 / 아래 이동 |
-| `?` / `Esc` | 미리보기 표시 토글 / 팝업 닫기 |
-
-팝업 안에서는 `Ctrl+b` **한 번**으로 초기 목록에 복귀한다. 팝업을 여는 tmux Prefix 입력과 구분한다.
-
-**자주 확인할 옵션:**
-- `@sessionx-bind`: 실행 키 변경. 기본값은 `O`.
-- `@sessionx-filter-current`: 기본 `true`로 현재 세션을 목록에서 제외한다. `false`면 포함한다.
-- `@sessionx-zoxide-mode`: 기본 `off`. `on`이면 기존 세션과 매칭되지 않는 입력을 zoxide로 경로 조회해 새 세션의 작업 디렉터리로 사용한다. `Ctrl+f`로 이력 목록을 여는 동작과 구분한다.
-
-전체 옵션은 [공식 README의 Configure 절](https://github.com/omerxx/tmux-sessionx), 세션 도구의 선택 기준은 [플러그인 비교 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md)을 참고한다.
+- **시작:** `Prefix O`(대문자) → 검색 → `Enter`로 전환·생성.
+- **팝업 내부:** `Ctrl+w` 윈도우 목록 · `Ctrl+t` 트리 미리보기 · `Ctrl+r` 이름 변경 · `Esc` 닫기. 팝업 키에는 Prefix를 다시 붙이지 않는다.
+- **설치·옵션:** TPM에 `set -g @plugin 'omerxx/tmux-sessionx'` 추가. `fzf` 등 의존성 및 전체 키·옵션은 [공식 README](https://github.com/omerxx/tmux-sessionx) 확인.
 
 ## 2. 화면 구성 — Window·Pane·Layout
 
@@ -201,25 +172,13 @@ Layout은 **Pane을 새로 만드는 기능이 아니라 기존 Pane들의 배�
 
 <a id="plugin-fzf"></a>
 
-### tmux-fzf — 객체를 찾아 이동·관리 (플러그인)
+### tmux-fzf — tmux 객체 선택 (플러그인)
 
-[`tmux-fzf`](https://github.com/sainnhe/tmux-fzf)는 **대상 종류 → 동작 → 대상 항목** 순서로 고르는 tmux 관리 UI다. 출력 문자열을 고르는 extrakto와 다르며 `fzf`가 필요하다. TPM 선언은 `set -g @plugin 'sainnhe/tmux-fzf'`다.
+[tmux-fzf](https://github.com/sainnhe/tmux-fzf)는 **객체 종류 → 동작 → 대상** 순서로 세션·윈도우·Pane·키바인딩·버퍼를 검색한다. 출력 텍스트 추출용 extrakto와 구분한다.
 
-**시작:** `Prefix Shift+f` (`F`). 팝업에서 검색어를 입력하고 `Enter`로 확정한다. 취소는 `Esc`·`Ctrl+c` 또는 `[cancel]` 선택이다. 일부 복수 선택 동작에서는 `Tab`·`Shift+Tab`으로 대상을 표시한다.
-
-| 작업 상황 | 메뉴에서 고를 순서 |
-|---|---|
-| 다른 작업 세션으로 이동 | `session` → `switch` → 세션 |
-| 이름으로 윈도우 찾기 | `window` → `switch` → 윈도우 |
-| 여러 세션에 흩어진 Pane 찾기 | `pane` → `switch` → Pane |
-| 기존 단축키의 동작을 찾아 실행 | `keybinding` → 바인딩 |
-| tmux 버퍼를 찾아 붙여넣기 | `clipboard` → 항목 |
-
-예를 들어 서버를 실행한 Pane의 위치가 기억나지 않으면 `pane` → `switch`에서 윈도우 이름·실행 명령으로 후보를 좁히고 선택한다. **정상 결과는 해당 세션·윈도우·Pane으로 이동하는 것**이며 새 작업 환경을 생성하는 과정은 아니다. 기본적으로 현재 대상은 전환 후보에서 빠질 수 있다.
-
-- **키 충돌:** OMT의 PathPicker도 `Prefix F`를 사용한다. 둘을 유지하려면 `TMUX_FZF_LAUNCH_KEY`로 실행 키를 바꾼다. PathPicker를 쓰지 않으면 tmux-fzf에 이 키를 맡길 수 있다.
-- **클립보드 범위:** CopyQ가 있으면 시스템 클립보드 이력을 사용하고, 없으면 tmux 버퍼를 사용한다. OS 클립보드 전체 이력을 기본 제공하는 것은 아니다.
-- **종료 동작:** `kill`·프로세스 종료는 실행 중인 작업을 끝낼 수 있다. 이동만 하려면 `switch`를 고른다. 윈도우 `kill`은 `unlink-window -k`를 사용하므로 여러 세션에 연결된 윈도우는 연결만 해제될 수 있다.
+- **시작:** `Prefix F` → 예: `pane` → `switch` → 대상 선택. 복수 선택은 지원되는 메뉴에서 `Tab`.
+- **주의:** OMT PathPicker도 `Prefix F`를 사용할 수 있으므로 바인딩을 확인한다. `kill`은 작업 종료를 유발할 수 있다.
+- **설치:** `fzf` 및 TPM 선언 `set -g @plugin 'sainnhe/tmux-fzf'`. [전체 동작](https://github.com/sainnhe/tmux-fzf).
 
 ## 3. 출력 탐색 — Copy Mode와 Buffer
 
@@ -250,113 +209,61 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 
 ### 텍스트 오브젝트 — 커스텀 키 테이블
 
-아래는 [`tmux-vim-copy`](https://github.com/clang-engineer/tmux-vim-copy) 플러그인을 설치했을 때의 동작이다. tmux 기본 키맵과 구분한다. tmux 3.7+와 Python 3.9+가 필요하며, 별도 뷰어 없이 기존 Copy Mode를 확장한다.
+[tmux-vim-copy](https://github.com/clang-engineer/tmux-vim-copy)는 **기본 tmux Copy Mode에 없는** Vim식 텍스트 오브젝트 선택을 추가한다.
 
-**사용 흐름:** `Prefix [` → 대상 내부 또는 구분자로 이동 → `v` 또는 `Space`로 선택 시작 → `i`/`a` → 대상 키. 이후 `y`로 복사하거나, tmux-open을 쓴다면 `o`·`Ctrl+o`로 열 수 있다.
+`Prefix [` → 대상 근처로 이동 → `v` → `i`(안쪽) 또는 `a`(구분자 포함) → 대상 키 → `y` 복사.
 
-**따옴표 안 경로 복사 예:** 출력에 `"src/main.py"`가 있으면 Copy Mode에서 `?src/main.py` → `Enter`로 찾아간 뒤 `v` → `i"` → `y`를 누른다. 결과는 따옴표 없는 `src/main.py`가 tmux 버퍼에 들어가는 것이다. 기본 복사 정책에서는 Copy Mode가 종료된다. `a"`를 선택하면 따옴표도 포함한다. 파일명을 찾는 데 `/`·`?` 같은 기존 tmux 검색을 그대로 쓸 수 있다.
-
-| 선택 대상 | 안쪽 선택 | 구분자 포함 선택 |
+| 대상 | 안쪽 | 포함 |
 |---|---|---|
-| 단어 / 공백 구분 WORD / 문단 | `iw` / `iW` / `ip` | `aw` / `aW` / `ap` |
-| 소괄호 `()` | `i(` / `i)` / `ib` | `a(` / `a)` / `ab` |
-| 중괄호 `{}` | `i{` / `i}` / `iB` | `a{` / `a}` / `aB` |
-| 대괄호 `[]` | `i[` / `i]` | `a[` / `a]` |
-| 꺾쇠 `<>` | `i<` / `i>` | `a<` / `a>` |
-| 큰따옴표 / 작은따옴표 / 백틱 | `i"` / `i'` / `` i` `` | `a"` / `a'` / `` a` `` |
+| 단어·WORD | `iw` · `iW` | `aw` · `aW` |
+| 괄호 | `i(` · `i{` · `i[` | `a(` · `a{` · `a[` |
+| 따옴표 | `i"` · `i'` | `a"` · `a'` |
 
-| 추가 키 | 플러그인 동작 |
-|---|---|
-| `v` / `V` / `Ctrl+v` | 문자 / 줄 / 블록 선택 전환. 같은 선택 키를 다시 누르면 선택 해제 |
-| `y` / `yy` | 선택 복사 / 선택이 없을 때 현재 줄 복사 |
-| `O` | 선택 양 끝 교환. tmux-open의 `o`·`Ctrl+o`·`Shift+s`는 유지 |
-| `gg` / `ge` / `gE` | 이력 처음 / 이전 단어 끝 / 이전 WORD 끝 |
-| `zt` / `zz` / `zb` | 커서 줄을 화면 위 / 가운데 / 아래에 배치 |
-
-- **복사 정책:** 기본은 복사 후 Copy Mode 종료. `set -g @vim-copy-yank-exit off`이면 선택·Copy Mode를 유지한다.
-- **취소:** `i`/`a`/`g`/`z`와 선택 없는 첫 `y` 뒤에는 `Escape`·`Ctrl+c`·`q` 또는 미지원 키로 대기만 취소한다.
-- **텍스트 경계:** 괄호는 중첩과 여러 줄을 처리하고 터미널 폭 줄바꿈은 원문으로 합친다. 따옴표는 논리적인 한 줄에서 찾는다. 빈 안쪽 객체·짝 없는 괄호는 기존 선택을 유지한다. `ip`는 빈 구분 줄을 제외한 문단을 줄 단위로, `ap`는 인접 빈 줄까지 선택한다.
-- **제약:** 언어 문법이나 Vim `iskeyword`를 해석하지 않는다. 복합 emoji가 있는 줄의 helper 선택은 거부하고 기본 선택을 사용하게 한다. `3w` 같은 기존 tmux 숫자 반복은 유지하지만 새 helper 동작의 숫자 접두사는 지원하지 않는다. 단일 `g`·`z` 대신 `gg`·`zz`를 사용한다.
-
+예: `"src/main.py"`에서 `vi"y` → 따옴표를 제외한 경로 복사. `v/V/Ctrl+v`는 문자·줄·블록 선택, `O`는 선택 끝 교환이다. 요구 버전·키 충돌·예외 동작은 [플러그인 문서](https://github.com/clang-engineer/tmux-vim-copy) 참고.
 
 <a id="plugin-extrakto"></a>
 
-### extrakto — 출력에서 텍스트 고르기 (플러그인)
+### extrakto — 출력 텍스트 추출 (플러그인)
 
-`Prefix Tab`으로 실행하고 검색어를 입력한다. **Filter는 무엇을 추출할지**, **Grab은 어느 Pane의 어느 범위를 읽을지** 정한다. 둘은 독립적이며 화면 하단에 `[word] [window full]`처럼 표시된다.
+[extrakto](https://github.com/laktak/extrakto)는 Pane 출력에서 경로·URL·해시·문구를 **검색해 삽입하거나 복사**한다.
 
-| 조작 | 선택지 | 용도 |
-|---|---|---|
-| `Ctrl+f` (Filter) | `word` → `all` → `line` | 어절 / 설정된 패턴(기본: 경로·URL·인용문 등) / 화면의 한 줄 전체 |
-| `Ctrl+g` (Grab) | `recent` · `full` · `window recent` · `window full` | 현재 Pane 또는 현재 Window의 모든 Pane × 최근 화면 또는 스크롤백 |
-| `Tab` / `Enter` | 삽입 / 복사 | 원래 Pane에 입력 / 선택한 Clipboard 모드로 복사 |
-| `Ctrl+t` | Clipboard 모드 전환 | 시스템 클립보드(`bg`/`fg`), tmux 버퍼(`buffer`), OSC52(`tmux_osc52`) 구분 |
-| `Shift+Tab` | 복수 항목 표시 | 여러 후보를 선택 |
-| `Esc` / `Ctrl+c` | 취소 | 팝업을 닫고 원래 Pane으로 복귀 |
+| 키 | 의미 |
+|---|---|
+| `Prefix Tab` | 후보 검색 시작 |
+| `Ctrl+f` | Filter: 단어·패턴·줄 선택 |
+| `Ctrl+g` | Grab: 현재 Pane/Window와 최근 출력/이력 범위 |
+| `Tab` / `Enter` | 원래 Pane에 삽입 / 복사 |
+| `Ctrl+t` | 클립보드 대상 변경 |
 
-기본 `all`은 `word`와 `line`을 **포함하지 않는다**. 한글 문장을 통째로 고를 때는 `line`, 긴 스크롤백 때문에 후보가 너무 많으면 `recent`가 유용하다. `line`은 터미널에서 줄바꿈된 문장을 다시 합치지는 않는다. 기본 최소 길이는 5자여서 짧은 어절·줄은 빠질 수 있고, 기본 경로 패턴은 한글 경로에 맞춰져 있지 않다. `full`은 무제한이 아닌 기본 최근 2,000줄 요청이다. 자세한 필터·범위 옵션은 [extrakto README](https://github.com/laktak/extrakto)와 [도움말](https://github.com/laktak/extrakto/blob/master/HELP.md)을 참고한다.
-
-**해시를 명령에 넣는 흐름:** 셸 프롬프트에 `git show `까지만 입력 → `Prefix Tab` → 출력에 있던 해시 일부로 검색 → `Tab`. 원래 명령줄에 해시가 붙은 것을 확인한 뒤 직접 `Enter`로 실행한다. 복사만 필요하면 팝업에서 `Enter`를 선택하고, tmux 버퍼로 복사했다면 `Prefix ]`로 붙여넣는다.
-
-**문장 전체가 필요할 때:** `Ctrl+f`로 `line`을 고르고, `Ctrl+g`로 현재 Pane 또는 Window 전체와 읽을 범위를 정한 뒤 검색·복사한다. `Tab`은 원래 Pane에 입력하므로 셸이 아닌 프로그램이 실행 중이면 입력을 받을 대상부터 확인한다.
+예: 셸에 `git show ` 입력 → `Prefix Tab` → 출력 해시 검색 → `Tab`으로 삽입. 삽입 대상이 셸인지 먼저 확인한다. 필터 기본값·줄 제한은 [공식 도움말](https://github.com/laktak/extrakto/blob/master/HELP.md) 참고.
 
 <a id="plugin-open"></a>
 
-### tmux-open — 선택한 파일·URL 열기 (플러그인)
+### tmux-open — 선택한 텍스트 열기 (플러그인)
 
-[tmux-open](https://github.com/tmux-plugins/tmux-open)은 **Copy Mode에서 선택한 텍스트를 열기·편집·웹 검색으로 연결**한다. extrakto가 후보 목록에서 텍스트를 찾는다면, tmux-open은 원래 화면에서 직접 선택한 텍스트에 동작한다.
+[tmux-open](https://github.com/tmux-plugins/tmux-open)은 **Copy Mode에서 직접 선택한 텍스트**에 동작한다. 후보를 검색하는 extrakto와 구분한다.
 
-| Copy Mode 키 | 선택한 텍스트에 적용할 동작 |
+| Copy Mode 키 | 동작 |
 |---|---|
-| `o` | 파일·URL을 OS 기본 앱으로 열기 (`open` / `xdg-open`) |
-| `Ctrl+o` | 파일을 `$EDITOR` 또는 `@open-editor-command`로 지정한 편집기에서 열기 |
-| `Shift+s` (`S`) | `@open-S`에 지정한 검색 엔진으로 웹 검색 |
+| `o` | 파일·URL을 기본 앱으로 열기 |
+| `Ctrl+o` | 파일을 편집기로 열기 |
+| `S` | 선택 문구로 웹 검색 |
 
-**Vi Copy Mode 사용 흐름:** `Prefix [` → 경로·URL·문구로 이동 → `Space`로 선택 시작 → 이동하여 범위 지정 → 위 키 입력. Copy Mode 안의 동작 키 앞에는 Prefix를 다시 누르지 않는다.
-
-**인용된 파일 경로 열기:** tmux-vim-copy와 함께 쓴다면 경로 안으로 이동 → `v` → `i"`로 따옴표를 제외해 선택 → `Ctrl+o`로 편집한다. 플러그인 선언은 tmux-open 뒤에 tmux-vim-copy를 두고, 실제 편집기는 아래 설정으로 정한다. **tmux-open은 선택한 문자열에 동작할 뿐 파일 경로를 자동으로 찾아 주지는 않는다.**
-
-TPM 설정 예시 — 편집기는 Neovim, 검색은 Google로 명시한다. 플러그인 설치는 `Prefix I`:
-
-```tmux
-set -g @open-editor-command 'nvim'
-set -g @open-S 'https://www.google.com/search?q='
-set -g @plugin 'tmux-plugins/tmux-open'
-```
-
-- **키 충돌:** Vi Copy Mode의 기본 `o`는 선택 영역의 반대쪽 끝으로 이동하는 `other-end`다. tmux-open 설치 시 열기로 바뀐다. 기존 동작을 유지하려면 플러그인의 `@open`으로 열기 키를 바꾼다.
-- **편집기 실행 위치:** `Ctrl+o`는 원래 Pane에 편집기 명령과 Enter를 입력한다. 반드시 **셸 프롬프트에서** 사용하고, 실행 중인 다른 프로그램에 명령을 보내지 않도록 주의한다.
-- **웹 검색:** 선택 문구가 외부 검색 엔진으로 전송되므로 토큰·개인정보 포함 여부를 먼저 확인한다.
+`Prefix [` → 텍스트 선택 → 동작 키. `Ctrl+o`는 원래 Pane에 명령을 입력할 수 있으므로 셸 프롬프트에서 사용한다. `o`는 기본 Copy Mode 키와 충돌할 수 있다. [설정·키 변경](https://github.com/tmux-plugins/tmux-open).
 
 <a id="plugin-logging"></a>
 
-### tmux-logging — Pane 출력·화면·이력 저장 (플러그인)
+### tmux-logging — 출력 기록·화면 저장 (플러그인)
 
-[`tmux-logging`](https://github.com/tmux-plugins/tmux-logging)은 **앞으로 나올 출력의 연속 기록**과 **현재 화면·남아 있는 이력의 일회성 저장**을 구분한다. 설치만으로 모든 Pane의 로깅이 시작되지는 않는다.
+[tmux-logging](https://github.com/tmux-plugins/tmux-logging)은 **이후 출력의 연속 기록**과 **이미 남은 출력의 일회성 저장**을 구분한다.
 
-| Prefix 뒤의 키 | 현재 Pane에서 저장하는 범위 |
+| Prefix 키 | 저장 범위 |
 |---|---|
-| `Shift+p` (`P`) | 로깅 시작·중지. 켠 시점부터 출력 기록 |
-| `Alt+p` | 현재 보이는 화면을 텍스트로 저장 |
-| `Alt+Shift+p` | 화면과 tmux에 남아 있는 스크롤백 저장 |
-| `Alt+c` | 스크롤백 삭제 — 파일 저장 기능이 아님 |
+| `P` | 이후 출력 기록 시작·중지 |
+| `Alt+p` | 현재 보이는 화면 저장 |
+| `Alt+Shift+p` | 화면과 남은 스크롤백 저장 |
 
-TPM 설정 예시 — 기본 저장 위치는 홈 디렉터리이며, 아래는 세 종류의 파일을 모두 전용 폴더에 모은다. Oh My Tmux에서는 `.tmux.conf.local`에 추가하고, 설정 리로드 후 `Prefix I`로 설치한다.
-
-```tmux
-set -g @logging-path "$HOME/tmux-logs"
-set -g @screen-capture-path "$HOME/tmux-logs"
-set -g @save-complete-history-path "$HOME/tmux-logs"
-set -g @plugin 'tmux-plugins/tmux-logging'
-```
-
-- **작업 전부터 기록:** `Prefix P` → 빌드·배포 등 작업 실행 → 다시 `Prefix P`로 중지. 지정 폴더의 `tmux-*.log`에 켠 뒤의 출력이 들어갔는지 확인한다.
-- **이미 실패한 출력 보관:** `Prefix Alt+Shift+p`로 남아 있는 이력을 저장한다. 지금 보이는 화면만 필요하면 `Prefix Alt+p`를 사용한다. 파일명은 각각 `tmux-history-*.log`·`tmux-screen-capture-*.log`다.
-- **이력 한계:** 전체 이력 저장도 `history-limit` 안에 남은 내용만 읽는다. 이미 버려진 출력은 복구하지 못한다.
-- **macOS:** `brew install ansifilter`를 권장한다. 연속 로그에서 ANSI 색상 코드를 제거하며, 없으면 플러그인이 `sed`를 사용한다.
-- **키 충돌:** 플러그인의 `Prefix P`는 tmux 기본 버퍼 선택 키를 덮어쓴다. 필요하면 `@logging_key`로 바꾼다.
-- **민감정보:** 화면에 출력된 토큰·개인정보도 파일에 남을 수 있다. 명령 이력이나 AI 대화를 구조화해 저장하는 도구는 아니다.
-
+이미 사라진 이력은 복구하지 못하며 로그에 토큰·개인정보가 포함될 수 있다. `Prefix P`는 기본 바인딩과 충돌할 수 있다. [설정·저장 경로](https://github.com/tmux-plugins/tmux-logging).
 
 ## 4. 관찰·설정·자동화
 
