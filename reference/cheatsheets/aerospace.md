@@ -2,29 +2,36 @@
 
 macOS용 i3 스타일 타일링 윈도우 매니저. SIP 비활성화 없이 기본 타일링을 사용할 수 있다.
 
-## 전체 구조 — 무엇을 배치하는가?
+## 전체 구조 — 입력과 배치 트리
 
 ```text
-사용자 키 입력 / CLI / 창 감지 규칙
-              │
-              ▼
-        AeroSpace 명령
-              │
-     ┌────────┼──────────┐
-     ▼        ▼          ▼
-   Focus    Move       Layout
-     │        │          │
-     └────────┴──────────┘
-              ▼
-Workspace (작업 공간)
-    └─ Window (배치 대상)
-        └─ Layout Tree (분할·정렬 구조)
+키 입력 / CLI / 창 감지 규칙
+           │
+     Mode · Binding / Config
+           │
+           ▼
+       AeroSpace 명령
+           │
+    ┌──────┼──────────────────┐
+    ▼      ▼                  ▼
+  Focus   Move             Layout / Join
+  선택    위치 변경         구조·배치 변경
+           │                  │
+           └────────┬─────────┘
+                    ▼
+             Workspace [1·2]
+                 └─ Layout Tree
+                     ├─ Container (Tiles / Accordion)
+                     │   ├─ Window A
+                     │   └─ Window B
+                     └─ Window C
 
-Mode   : 입력 키의 명령 매핑을 전환 [3]
-Config : 키·규칙·기본 동작을 정의 [4]
+Resize / Balance / Flatten → 크기·트리 조정 [2]
+Mode / Binding             → 키 입력의 명령 매핑 [3]
+Config / Rules             → 키·자동 배치 설정 [4]
 ```
 
-AeroSpace는 **GUI 창의 공간 배치**를 관리한다. Focus는 조작할 창을 고르고, Move는 창의 위치·Workspace를 바꾸며, Layout은 배치 구조를 바꾼다. tmux의 Session·Pane 유지와는 별개다. 위 그림은 **명령 흐름과 관리 대상의 관계**를 구분해 보여준다.
+Workspace는 창을 배치하는 작업 공간이고, **Layout Tree는 컨테이너와 Window의 배치 관계**를 나타낸다. Focus는 조작할 대상을 고르고, Move는 위치를 바꾸며, Join·Layout은 트리 구조·배치 방식에 작용한다. 위 그림은 대표적인 **대상 관계와 명령의 적용 위치**이지 모든 명령의 실행 순서는 아니다. tmux의 세션·프로세스 유지와는 별개다.
 
 ## 1. 탐색과 이동 — Focus · Window · Workspace
 
@@ -53,7 +60,7 @@ AeroSpace는 Workspace 안의 **트리 구조**로 창을 배치한다. 창 선�
 
 | 목적 | AeroSpace 명령 | 대표 키·진입점 |
 |---|---|---|
-| 분할 방향·방식 | `layout tiles horizontal vertical` / `layout accordion horizontal vertical` | `Alt+/` / `Alt+,` |
+| 분할 방향·방식 | `layout tiles horizontal` / `layout accordion vertical` | `Alt+/` / `Alt+,` |
 | 창 위치 변경 | `move left/right/up/down` | `Alt+Shift+H/J/K/L` |
 | 이웃과 묶기 | `join-with left/right/up/down` | 사용자 정의 service 모드 |
 | 크기 조절 | `resize smart -50` / `resize smart +50` | `Alt+-` / `Alt+=` |
@@ -61,22 +68,9 @@ AeroSpace는 Workspace 안의 **트리 구조**로 창을 배치한다. 창 선�
 | 트리 평탄화 | `flatten-workspace-tree` | service 모드 `r` |
 | 플로팅 전환 | `layout floating tiling` | service 모드 `f` |
 
-**Join은 단순한 창 이동이 아니다.** 현재 창과 지정 방향의 이웃 창을 같은 컨테이너로 묶어 배치 트리를 변경한다. `flatten-workspace-tree`는 중첩을 평탄화하지만 Join의 정확한 역연산이나 Undo는 아니다.
+**Join은 단순한 창 이동이 아니다.** 지정 방향의 이웃 창과 함께 묶도록 배치 트리를 재구성한다. `layout`은 `tiles`·`accordion` 같은 방식과 `horizontal`·`vertical` 같은 방향을 선택한다. `flatten-workspace-tree`는 중첩을 평탄화하지만 Join의 정확한 역연산이나 Undo는 아니다.
 
-```text
-기존: Workspace
-      ├─ A
-      ├─ B
-      └─ C
-
-A에서 join-with right
-      ├─ Container
-      │  ├─ A
-      │  └─ B
-      └─ C
-```
-
-위 그림은 **구조 변화의 개념도**이며 실제 화면 배치와 트리 재구성은 기존 레이아웃에 따라 달라진다. 단축키는 기본 설정 예시와 사용자 service 모드 설정이 섞여 있으므로 `~/.aerospace.toml`을 기준으로 확인한다.
+예를 들어 `join-with right`는 현재 창과 오른쪽 이웃을 묶도록 컨테이너 관계를 바꾼다. **실제 생성·재배치되는 컨테이너는 기존 트리와 Layout에 따라 달라지므로**, 단순히 두 창의 위치를 교환하는 `move`와 구분한다. 단축키는 기본 설정과 사용자 service 모드 설정이 섞여 있으므로 `~/.aerospace.toml`을 기준으로 확인한다.
 
 ## 3. 명령어 모드 — Mode · Binding
 
@@ -136,15 +130,7 @@ aerospace workspace 3          # workspace 3으로 전환
 
 `[[on-window-detected]]` 블록으로 앱이 뜰 때 워크스페이스 이동·레이아웃을 자동 적용할 수 있다. `if`는 문자열이 아니라 **테이블**(`if.app-id = '...'`)이고, `if` 생략은 "모든 창 매칭"(catch-all)이다. 규칙은 위에서부터 검사해 첫 매칭에서 멈춘다. 앱별 배치 규칙 작성은 공식 config 문서 참조.
 
-**새 키가 안 먹을 때:** 설정 파일에서 해당 바인딩만 찾지 말고 먼저 `aerospace reload-config`의 파싱 오류를 읽는다. 다른 곳의 잘못된 TOML/필드 타입 때문에 새 설정 전체가 거부되어 이전 유효 설정이 남을 수 있다. 예컨대 `if = 'true'`는 `if`가 테이블이어야 하므로 잘못된 표현이고, 마지막 catch-all 규칙은 `if`를 생략한다:
-
-```toml
-[[on-window-detected]]
-run = ['layout floating']
-```
-
-catch-all은 앞의 구체 규칙 뒤에 둔다. `reload-config`가 오류를 출력하면 해당 블록과 필드를 고친 뒤 다시 로드한다. 파일을 dotfiles 도구로 관리한다면 소스를 변경하고 live 파일 반영과 앱 리로드를 각각 확인한다.
-
+**설정 검증:** `aerospace reload-config`에서 오류를 확인한다. 창 감지 규칙은 위에서부터 평가되며, 일반 규칙보다 구체적인 규칙을 앞에 둔다. 세부 설정·오류 사례는 [공식 설정 문서](https://nikitabobko.github.io/AeroSpace/guide#configuring-aerospace)를 참고한다.
 
 ## 관련 글
 
