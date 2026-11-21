@@ -278,29 +278,15 @@ Remove-Item Alias:curl                 # alias 제거 (현재 세션)
 | 크로스플랫폼 | Windows만 | Windows/Mac/Linux |
 | `$PROFILE` | `Documents\WindowsPowerShell\` | `Documents\PowerShell\` (Win) / `~/.config/powershell/` (Linux) |
 
-### 자주 까먹는 미니 팁
+### 데이터 변환·히스토리
 
-```powershell
-# 명령 결과를 변수와 화면 둘 다
-$x = Get-Process | Tee-Object -Variable procs
-
-# JSON 다루기
-Get-Content data.json | ConvertFrom-Json
-$obj | ConvertTo-Json -Depth 10
-
-# CSV
-Import-Csv data.csv | Where-Object Score -gt 80
-$arr | Export-Csv out.csv -NoTypeInformation
-
-# clipboard
-"hi" | Set-Clipboard
-Get-Clipboard
-
-# 명령 히스토리
-Get-History
-Invoke-History 5                       # 5번 명령 재실행
-(Get-PSReadLineOption).HistorySavePath # 히스토리 파일 경로
-```
+| 목적 | 대표 명령 |
+|---|---|
+| JSON 읽기·쓰기 | `ConvertFrom-Json` / `ConvertTo-Json -Depth 10` |
+| CSV 읽기·쓰기 | `Import-Csv` / `Export-Csv` |
+| 클립보드 | `Get-Clipboard` / `Set-Clipboard` |
+| 명령 이력 | `Get-History` / `Invoke-History` |
+| 출력·변수 동시 저장 | `Tee-Object -Variable name` |
 
 ### Windows 운영 작업과의 경계
 
