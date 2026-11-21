@@ -55,21 +55,21 @@ tmux <command> [options] [arguments]
 
 `-t 1` 같은 단일 숫자는 명령의 target 타입에 따라 해석이 달라진다. 자동화에서는 `:1`, `:.1` 또는 고유 ID로 명시한다. Window 이름도 쓸 수 있다. `work:editor`는 `editor` 창이며, `target-pane`을 받는 명령에서 pane을 생략하면 해당 창의 active Pane을 뜻한다.
 
-<a id="plugin-usage"></a>
+## 확장 기능 — 어떤 작업을 보완하나?
 
-## 플러그인 사용 흐름 — 작업에서 출발하기
+tmux 기본 명령과 플러그인 조작은 구분한다. 플러그인은 **필요한 작업을 기준으로 선택**하며 상세 키맵·설치·옵션은 각 공식 문서를 확인한다.
 
-아래는 **해당 플러그인을 설치한 경우**의 안내다. tmux 기본 기능과 구분하고, 플러그인 선택·중복 판단은 [비교 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md)에 맡긴다.
-
-| 지금 하려는 일 | 사용할 도구·상세 흐름 |
+| 작업 | 대표 확장 |
 |---|---|
-| 출력된 경로·URL·해시를 찾아 복사·삽입 | [extrakto](#plugin-extrakto) |
-| 세션·윈도우·Pane을 찾아 이동·관리 | [tmux-fzf](#plugin-fzf) |
-| Copy Mode에서 괄호·따옴표 안쪽을 정확히 선택 | [tmux-vim-copy](#plugin-vim-copy) |
-| 선택한 파일·URL을 열거나 문구를 검색 | [tmux-open](#plugin-open) |
-| 앞으로 나올 출력 또는 남아 있는 이력을 파일로 보관 | [tmux-logging](#plugin-logging) |
+| 세션·윈도우 검색 | [sessionx](https://github.com/omerxx/tmux-sessionx) |
+| 세션·Pane·키바인딩 등 객체 선택 | [tmux-fzf](https://github.com/sainnhe/tmux-fzf) |
+| 출력의 경로·URL·해시 추출 | [extrakto](https://github.com/laktak/extrakto) |
+| Copy Mode에서 Vim식 텍스트 객체 선택 | [tmux-vim-copy](https://github.com/clang-engineer/tmux-vim-copy) |
+| 선택한 파일·URL 열기 | [tmux-open](https://github.com/tmux-plugins/tmux-open) |
+| Pane 출력·이력 저장 | [tmux-logging](https://github.com/tmux-plugins/tmux-logging) |
+| 세션 상태 저장·자동 복원 | [resurrect](https://github.com/tmux-plugins/tmux-resurrect) · [continuum](https://github.com/tmux-plugins/tmux-continuum) |
 
-**키를 누르는 위치가 다르다.** `Prefix F`는 Prefix를 누르고 뗀 뒤 대문자 `F`를 입력한다는 뜻이다. 팝업을 연 뒤의 검색·확정 키와 Copy Mode 안의 선택·열기 키에는 Prefix를 다시 붙이지 않는다. 아래 기본 키가 동작하지 않으면 `tmux list-keys -T prefix`와 `tmux list-keys -T copy-mode-vi`로 실제 바인딩을 확인한다. OMT 등 설정 배포판은 tmux 기본 키를 바꿀 수 있다.
+전체 목록·대안은 [devkit 리소스 카탈로그](https://github.com/clang-engineer/devkit/blob/main/reference/catalog.json), 선택 기준은 [플러그인 비교 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md) 참고.
 
 ## 1. 작업 유지 — Client와 Session
 
@@ -96,13 +96,7 @@ tmux Server는 Session·Window·Pane의 상태를 관리하고, Client는 Termin
 
 **작업 유지 예시:** `tmux new -s work` → 작업 실행 → `Prefix d` → `tmux attach -t work`. Detach는 프로세스를 종료하지 않지만 tmux Server나 호스트가 종료되면 작업 유지도 보장되지 않는다.
 
-### sessionx — 세션·윈도우 검색 (플러그인)
 
-[tmux-sessionx](https://github.com/omerxx/tmux-sessionx)는 세션·윈도우를 검색·미리보기로 선택한다. 상태 저장·복원 도구는 아니다.
-
-- **시작:** `Prefix O`(대문자) → 검색 → `Enter`로 전환·생성.
-- **팝업 내부:** `Ctrl+w` 윈도우 목록 · `Ctrl+t` 트리 미리보기 · `Ctrl+r` 이름 변경 · `Esc` 닫기. 팝업 키에는 Prefix를 다시 붙이지 않는다.
-- **설치·옵션:** TPM에 `set -g @plugin 'omerxx/tmux-sessionx'` 추가. `fzf` 등 의존성 및 전체 키·옵션은 [공식 README](https://github.com/omerxx/tmux-sessionx) 확인.
 
 ## 2. 화면 구성 — Window·Pane·Layout
 
@@ -170,15 +164,7 @@ Layout은 **Pane을 새로 만드는 기능이 아니라 기존 Pane들의 배�
 
 명령 프롬프트나 셸에서 `resize-pane -D 10` / `-U 10` / `-L 10` / `-R 10`으로 아래/위/왼쪽/오른쪽 방향으로 크기를 조절할 수 있다. 셸에서는 앞에 `tmux`를 붙인다.
 
-<a id="plugin-fzf"></a>
 
-### tmux-fzf — tmux 객체 선택 (플러그인)
-
-[tmux-fzf](https://github.com/sainnhe/tmux-fzf)는 **객체 종류 → 동작 → 대상** 순서로 세션·윈도우·Pane·키바인딩·버퍼를 검색한다. 출력 텍스트 추출용 extrakto와 구분한다.
-
-- **시작:** `Prefix F` → 예: `pane` → `switch` → 대상 선택. 복수 선택은 지원되는 메뉴에서 `Tab`.
-- **주의:** OMT PathPicker도 `Prefix F`를 사용할 수 있으므로 바인딩을 확인한다. `kill`은 작업 종료를 유발할 수 있다.
-- **설치:** `fzf` 및 TPM 선언 `set -g @plugin 'sainnhe/tmux-fzf'`. [전체 동작](https://github.com/sainnhe/tmux-fzf).
 
 ## 3. 출력 탐색 — Copy Mode와 Buffer
 
@@ -205,65 +191,7 @@ Copy Mode는 지나간 출력을 탐색·선택하는 상태이고, Buffer는 �
 
 **복사 흐름:** `Prefix [` → 이동·선택 → 복사 → `Prefix ]`로 붙여넣기. 복사한 내용은 tmux Buffer에 저장되며 OS 클립보드와는 별개다.
 
-<a id="plugin-vim-copy"></a>
 
-### 텍스트 오브젝트 — 커스텀 키 테이블
-
-[tmux-vim-copy](https://github.com/clang-engineer/tmux-vim-copy)는 **기본 tmux Copy Mode에 없는** Vim식 텍스트 오브젝트 선택을 추가한다.
-
-`Prefix [` → 대상 근처로 이동 → `v` → `i`(안쪽) 또는 `a`(구분자 포함) → 대상 키 → `y` 복사.
-
-| 대상 | 안쪽 | 포함 |
-|---|---|---|
-| 단어·WORD | `iw` · `iW` | `aw` · `aW` |
-| 괄호 | `i(` · `i{` · `i[` | `a(` · `a{` · `a[` |
-| 따옴표 | `i"` · `i'` | `a"` · `a'` |
-
-예: `"src/main.py"`에서 `vi"y` → 따옴표를 제외한 경로 복사. `v/V/Ctrl+v`는 문자·줄·블록 선택, `O`는 선택 끝 교환이다. 요구 버전·키 충돌·예외 동작은 [플러그인 문서](https://github.com/clang-engineer/tmux-vim-copy) 참고.
-
-<a id="plugin-extrakto"></a>
-
-### extrakto — 출력 텍스트 추출 (플러그인)
-
-[extrakto](https://github.com/laktak/extrakto)는 Pane 출력에서 경로·URL·해시·문구를 **검색해 삽입하거나 복사**한다.
-
-| 키 | 의미 |
-|---|---|
-| `Prefix Tab` | 후보 검색 시작 |
-| `Ctrl+f` | Filter: 단어·패턴·줄 선택 |
-| `Ctrl+g` | Grab: 현재 Pane/Window와 최근 출력/이력 범위 |
-| `Tab` / `Enter` | 원래 Pane에 삽입 / 복사 |
-| `Ctrl+t` | 클립보드 대상 변경 |
-
-예: 셸에 `git show ` 입력 → `Prefix Tab` → 출력 해시 검색 → `Tab`으로 삽입. 삽입 대상이 셸인지 먼저 확인한다. 필터 기본값·줄 제한은 [공식 도움말](https://github.com/laktak/extrakto/blob/master/HELP.md) 참고.
-
-<a id="plugin-open"></a>
-
-### tmux-open — 선택한 텍스트 열기 (플러그인)
-
-[tmux-open](https://github.com/tmux-plugins/tmux-open)은 **Copy Mode에서 직접 선택한 텍스트**에 동작한다. 후보를 검색하는 extrakto와 구분한다.
-
-| Copy Mode 키 | 동작 |
-|---|---|
-| `o` | 파일·URL을 기본 앱으로 열기 |
-| `Ctrl+o` | 파일을 편집기로 열기 |
-| `S` | 선택 문구로 웹 검색 |
-
-`Prefix [` → 텍스트 선택 → 동작 키. `Ctrl+o`는 원래 Pane에 명령을 입력할 수 있으므로 셸 프롬프트에서 사용한다. `o`는 기본 Copy Mode 키와 충돌할 수 있다. [설정·키 변경](https://github.com/tmux-plugins/tmux-open).
-
-<a id="plugin-logging"></a>
-
-### tmux-logging — 출력 기록·화면 저장 (플러그인)
-
-[tmux-logging](https://github.com/tmux-plugins/tmux-logging)은 **이후 출력의 연속 기록**과 **이미 남은 출력의 일회성 저장**을 구분한다.
-
-| Prefix 키 | 저장 범위 |
-|---|---|
-| `P` | 이후 출력 기록 시작·중지 |
-| `Alt+p` | 현재 보이는 화면 저장 |
-| `Alt+Shift+p` | 화면과 남은 스크롤백 저장 |
-
-이미 사라진 이력은 복구하지 못하며 로그에 토큰·개인정보가 포함될 수 있다. `Prefix P`는 기본 바인딩과 충돌할 수 있다. [설정·저장 경로](https://github.com/tmux-plugins/tmux-logging).
 
 ## 4. 관찰·설정·자동화
 
@@ -329,59 +257,9 @@ set -as terminal-features ",xterm*:RGB"
 
 구버전까지 고려하는 대안은 `set -as terminal-overrides ",xterm*:Tc"`다. `RGB`는 공식 terminfo capability, `Tc`는 tmux 확장이다. 위 `xterm*`은 예시이지 모든 환경의 기본값이 아니다. 내부 `TERM=tmux-256color`만으로 외부 RGB 지원이 보장되거나 `RGB` 항목이 모든 시스템의 해당 terminfo에 내장된 것은 아니다. 근거는 [tmux 공식 FAQ](https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-rgb-colour), OMT 자동 감지의 분석은 [설정 상속 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-12-oh-my-tmux.md)을 참고한다.
 
-### TPM 설치와 플러그인 관리
+### 플러그인 관리
 
-[TPM](https://github.com/tmux-plugins/tpm)은 플러그인을 설치·업데이트·로드한다. tmux 자체의 필수 구성요소는 아니며 플러그인을 직접 실행할 수도 있다. 필요한 도구는 tmux·Git·Bash다.
-
-```sh
-git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-```
-
-아래는 **수제 `.tmux.conf`에서 선택해 쓸 기본 구성**이다. Oh My Tmux는 TPM을 자체 연동하므로 `.tmux.conf.local`에 필요한 플러그인만 선언하고 **TPM 선언·초기화를 중복 추가하지 않는다.**
-
-```tmux
-set -g @plugin 'tmux-plugins/tpm'
-set -g @plugin 'tmux-plugins/tmux-sensible'
-set -g @plugin 'christoomey/vim-tmux-navigator'
-set -g @plugin 'tmux-plugins/tmux-resurrect'
-# 테마 등 status-right를 설정하는 플러그인보다 뒤에 둔다.
-set -g @plugin 'tmux-plugins/tmux-continuum'
-
-set -g @resurrect-capture-pane-contents 'on'
-set -g @continuum-restore 'on'
-
-# 플러그인 선언·설정 다음, 파일 맨 아래에서 초기화
-run '~/.tmux/plugins/tpm/tpm'
-```
-
-`tmux source-file ~/.tmux.conf`로 TPM을 로드한 뒤 `Prefix I`로 설치한다.
-
-| 조작 | 동작 |
-|---|---|
-| `Prefix I` (대문자) | 선언한 미설치 플러그인 설치·로드 |
-| `Prefix U` (대문자) | 플러그인 업데이트 |
-| 선언 제거 후 `Prefix Alt+u` | 목록에서 빠진 플러그인 삭제 |
-| `Prefix Ctrl+s` / `Prefix Ctrl+r` | resurrect 상태 저장 / 복원 |
-
-| 플러그인·설정 | 역할·경계 |
-|---|---|
-| [sensible](https://github.com/tmux-plugins/tmux-sensible) | 여러 기본 옵션을 함께 조정. 이미 직접 관리하는 옵션과 겹치는지 확인 |
-| [resurrect](https://github.com/tmux-plugins/tmux-resurrect) | 세션·창·Pane 배치, 작업 디렉터리와 지원 프로그램을 저장·재실행. 임의 프로세스의 메모리 상태를 체크포인트하는 것은 아님 |
-| `@resurrect-capture-pane-contents on` | Pane 내용도 보관. 화면의 토큰·개인정보 저장 여부에 주의 |
-| [continuum](https://github.com/tmux-plugins/tmux-continuum) | resurrect 기반 자동 저장(공식 기본 간격 15분). `@continuum-restore on`의 자동 복원은 **서버 시작 시** 실행되며 설정 리로드만으로 실행되지 않음 |
-| [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) | `Ctrl+h/j/k/l`로 Vim 창·tmux Pane 간 이동. Vim/Neovim 측 플러그인도 설치해야 양쪽에서 연동 |
-
-continuum 자동 저장은 상태줄을 통해 실행된다. 상태줄을 끄거나 다른 테마가 `status-right`를 덮어쓰면 중단될 수 있어, 공식 안내대로 테마 뒤에 continuum을 로드한다. 재부팅 시 tmux 자체를 자동 시작하는 것은 [별도 설정](https://github.com/tmux-plugins/tmux-continuum/blob/master/docs/automatic_start.md)이다. 저장·복원과 YAML로 새 레이아웃을 선언·생성하는 부트스트랩을 혼동하지 않는다.
-
-기존 themepack 구성을 유지한다면 아래 선언을 **continuum 앞**에 둔다. 상태바·테마는 여러 개를 동시에 적용하기보다 하나를 선택한다.
-
-```tmux
-set -g @plugin 'jimeh/tmux-themepack'
-set -g @themepack 'powerline/default/cyan'
-```
-
-추가 기능은 필요한 선언만 같은 플러그인 목록에 더한다. 화면 추출에는 `set -g @plugin 'laktak/extrakto'`, 시스템 클립보드 브리지가 별도로 필요할 때는 `set -g @plugin 'tmux-plugins/tmux-yank'`를 쓸 수 있다. catppuccin은 [버전별 테마 설정](https://github.com/catppuccin/tmux)을 확인하며, OMT 상태바와 동시에 소유하게 두지 않는다. 각 도구를 더하거나 제외하는 이유는 [플러그인 선택 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-07-11-tmux-plugins-beyond-essentials.md)에 모았다.
-
+[TPM](https://github.com/tmux-plugins/tpm)은 선택적 플러그인 관리자다. `set -g @plugin 'owner/repo'`로 선언하고 TPM 초기화 후 `Prefix I`로 설치한다. Oh My Tmux처럼 TPM을 이미 통합한 설정에서는 초기화를 중복하지 않는다. 상세 설정은 [TPM 문서](https://github.com/tmux-plugins/tpm) 참고.
 
 ### 실제 기본값과 실행 중 서버의 키맵 비교
 
