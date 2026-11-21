@@ -272,39 +272,17 @@ starship prompt                       # 현재 설정과 비교
 
 
 
-### 성능 진단 — 시작·프롬프트·입력 지연 구분
+### 성능 진단
 
-```text
-터미널 체감 지연
-├─ 시작 지연       → 셸 초기화·Completion·외부 명령 실행
-├─ 첫 프롬프트 지연 → 초기화와 프롬프트 표시 시점
-├─ 프롬프트 지연   → Git 상태 조회·동기식 프롬프트 작업
-├─ 입력 지연       → ZLE 위젯·자동 제안·구문 강조
-└─ 화면 지연       → 터미널 에뮬레이터·tmux 렌더링
-```
+| 확인 대상 | 도구·방법 | 구분 |
+|---|---|---|
+| 셸 초기화·종료 | `hyperfine --warmup 3 'zsh -i -c exit'` | 첫 프롬프트·입력 지연과는 다름 |
+| Zsh 함수별 비용 | `zmodload zsh/zprof` → `zprof` | `~/.zshrc` 시작·끝에 임시 배치 |
+| 첫 프롬프트·입력 지연 | [zsh-bench](https://github.com/romkatv/zsh-bench) | 체감 반응성 확인 |
 
-**측정 대상부터 정한다.** `zsh -i -c exit`는 셸의 초기화와 종료 비용을 재는 간편 지표일 뿐 첫 프롬프트 표시나 키 입력 반응을 그대로 나타내지 않는다.
+**점검 대상:** `compinit` · 버전 관리자 초기화 · 플러그인 · 프롬프트의 외부 명령. 캐시·지연 로딩은 측정 후 적용하고, 변경 전후를 비교한다.
 
-```zsh
-hyperfine --warmup 3 'zsh -i -c exit'  # 시작·종료 시간 비교용
-# ~/.zshrc 맨 앞에 임시로 추가
-zmodload zsh/zprof
-# ~/.zshrc 맨 끝에 임시로 추가
-zprof
-```
-
-첫 프롬프트·명령 실행·입력 지연을 나누어 측정하려면 [zsh-bench](https://github.com/romkatv/zsh-bench)를 참고한다. `zprof`는 Zsh 함수의 비용을 찾는 데 도움을 주지만 모든 외부 실행 지연을 자동으로 정확히 분해하지는 않는다. 진단 뒤 임시 프로파일링 설정을 제거한다.
-
-**개선 순서:** 측정 → 느린 초기화(`compinit`, 버전 관리자, `eval "$(tool init zsh)"`) 확인 → 캐시·지연 로딩 검토 → 프롬프트와 입력 위젯 지연 재측정. `compinit -C`는 보안 검사를 생략할 수 있으므로 무조건 적용하지 않고 Completion 디렉터리의 신뢰성과 갱신 정책을 확인한다. 플러그인 관리자가 항상 느린 것은 아니며, 정적 번들 방식도 있다. 비동기 프롬프트나 Instant Prompt는 초기화 총시간과 체감 대기시간을 다르게 만든다.
-
-**최적화의 비용도 비교한다.** 지연 로딩은 초기 비용을 첫 호출로 옮기며, Completion 캐시는 갱신 누락·여러 tmux pane의 동시 초기화 문제를 만들 수 있다. 플러그인을 제거하면 기능을 잃을 수 있고, 비동기 프롬프트는 정보 표시가 늦게 갱신될 수 있다. 따라서 목표는 최저 밀리초 기록이 아니라 **내 작업 흐름에서 체감되는 지연과 유지보수 비용의 균형**이다.
-
-Fish는 기본 자동완성·구문 강조가 편리하지만 Bash/Zsh 스크립트를 그대로 `source`할 수는 없다. 원격 서버에 Fish를 설치할 수 없는 경우도 있으므로, **로컬 대화형 셸 선택**과 **배포·원격 스크립트의 호환성**을 분리해서 판단한다.
-
-**읽을거리 (원문과 정정 글을 함께 확인):**
-- [Life is too short for a slow terminal](https://mijndertstuij.nl/posts/life-is-too-short-for-a-slow-terminal/) — 최소 구성·캐시·지연 로딩 사례
-- [I was wrong about fast terminals](https://mijndertstuij.nl/posts/what-i-got-wrong-about-fast-terminals/) — 측정 방식과 플러그인 관리자·구문 강조에 관한 정정
-- [Lobsters 토론](https://lobste.rs/s/k0sbbv/life_is_too_short_for_slow_terminal) — Fish 기본값, 벤치마크 지표, Completion 캐시·기능 유지 비용에 대한 반론
+참고: [최적화 사례](https://mijndertstuij.nl/posts/life-is-too-short-for-a-slow-terminal/) · [작성자 정정](https://mijndertstuij.nl/posts/what-i-got-wrong-about-fast-terminals/) · [Lobsters 토론](https://lobste.rs/s/k0sbbv/life_is_too_short_for_slow_terminal)
 
 ### Oh My Zsh와 역할 구분
 
