@@ -297,9 +297,14 @@ zprof
 
 **개선 순서:** 측정 → 느린 초기화(`compinit`, 버전 관리자, `eval "$(tool init zsh)"`) 확인 → 캐시·지연 로딩 검토 → 프롬프트와 입력 위젯 지연 재측정. `compinit -C`는 보안 검사를 생략할 수 있으므로 무조건 적용하지 않고 Completion 디렉터리의 신뢰성과 갱신 정책을 확인한다. 플러그인 관리자가 항상 느린 것은 아니며, 정적 번들 방식도 있다. 비동기 프롬프트나 Instant Prompt는 초기화 총시간과 체감 대기시간을 다르게 만든다.
 
+**최적화의 비용도 비교한다.** 지연 로딩은 초기 비용을 첫 호출로 옮기며, Completion 캐시는 갱신 누락·여러 tmux pane의 동시 초기화 문제를 만들 수 있다. 플러그인을 제거하면 기능을 잃을 수 있고, 비동기 프롬프트는 정보 표시가 늦게 갱신될 수 있다. 따라서 목표는 최저 밀리초 기록이 아니라 **내 작업 흐름에서 체감되는 지연과 유지보수 비용의 균형**이다.
+
+Fish는 기본 자동완성·구문 강조가 편리하지만 Bash/Zsh 스크립트를 그대로 `source`할 수는 없다. 원격 서버에 Fish를 설치할 수 없는 경우도 있으므로, **로컬 대화형 셸 선택**과 **배포·원격 스크립트의 호환성**을 분리해서 판단한다.
+
 **읽을거리 (원문과 정정 글을 함께 확인):**
 - [Life is too short for a slow terminal](https://mijndertstuij.nl/posts/life-is-too-short-for-a-slow-terminal/) — 최소 구성·캐시·지연 로딩 사례
 - [I was wrong about fast terminals](https://mijndertstuij.nl/posts/what-i-got-wrong-about-fast-terminals/) — 측정 방식과 플러그인 관리자·구문 강조에 관한 정정
+- [Lobsters 토론](https://lobste.rs/s/k0sbbv/life_is_too_short_for_slow_terminal) — Fish 기본값, 벤치마크 지표, Completion 캐시·기능 유지 비용에 대한 반론
 
 ### Oh My Zsh와 역할 구분
 
