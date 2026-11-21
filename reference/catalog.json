@@ -476,6 +476,115 @@
         ]
       },
       {
+        "id": "terminal-file-managers",
+        "name": "Terminal File Managers",
+        "domain": "domain:files",
+        "why": "터미널에서 파일을 탐색·선택·관리하는 경쟁 TUI의 사용성과 설계 우선순위를 비교한다. GitHub Stars는 저장소에서 최신 값을 확인한다.",
+        "commands": [
+          {
+            "name": "yazi",
+            "description": "Rust 기반 비동기 파일 탐색·미리보기·플러그인을 제공하는 현대적 TUI",
+            "url": "https://github.com/sxyazi/yazi",
+            "tags": [
+              "tui",
+              "file-manager"
+            ]
+          },
+          {
+            "name": "superfile",
+            "description": "Go 기반의 시각적인 터미널 파일 매니저로 직관적인 UI에 중점을 둔다",
+            "url": "https://github.com/yorukot/superfile",
+            "tags": [
+              "tui",
+              "file-manager"
+            ]
+          },
+          {
+            "name": "nnn",
+            "description": "C 기반의 초경량 파일 매니저로 작은 자원 사용량과 빠른 탐색을 지향한다",
+            "url": "https://github.com/jarun/nnn",
+            "tags": [
+              "tui",
+              "file-manager"
+            ]
+          },
+          {
+            "name": "ranger",
+            "description": "Python 기반 3열 탐색기이며 Vim 스타일 키와 확장 가능한 미리보기를 제공한다",
+            "url": "https://github.com/ranger/ranger",
+            "tags": [
+              "tui",
+              "file-manager"
+            ]
+          },
+          {
+            "name": "lf",
+            "description": "Go 기반의 간결한 Vim 스타일 파일 매니저로 셸 연동과 설정이 유연하다",
+            "url": "https://github.com/gokcehan/lf",
+            "tags": [
+              "tui",
+              "file-manager"
+            ]
+          },
+          {
+            "name": "xplr",
+            "description": "Rust 기반 파일 탐색기로 Lua를 통해 동작과 키맵을 깊게 구성할 수 있다",
+            "url": "https://github.com/sayanarijit/xplr",
+            "tags": [
+              "tui",
+              "file-manager"
+            ]
+          }
+        ],
+        "relations": [
+          {
+            "from": "yazi",
+            "to": "superfile",
+            "relation": "alternative",
+            "group": "terminal-file-manager",
+            "why": "Go 기반의 시각적인 터미널 파일 매니저로 직관적인 UI에 중점을 둔다",
+            "boundary": "파일 탐색·관리 목적은 겹치지만 키맵·미리보기·설정·확장 모델이 다르므로 완전 호환 대체재로 취급하지 않는다.",
+            "url": "https://github.com/yorukot/superfile"
+          },
+          {
+            "from": "yazi",
+            "to": "nnn",
+            "relation": "alternative",
+            "group": "terminal-file-manager",
+            "why": "C 기반의 초경량 파일 매니저로 작은 자원 사용량과 빠른 탐색을 지향한다",
+            "boundary": "파일 탐색·관리 목적은 겹치지만 키맵·미리보기·설정·확장 모델이 다르므로 완전 호환 대체재로 취급하지 않는다.",
+            "url": "https://github.com/jarun/nnn"
+          },
+          {
+            "from": "yazi",
+            "to": "ranger",
+            "relation": "alternative",
+            "group": "terminal-file-manager",
+            "why": "Python 기반 3열 탐색기이며 Vim 스타일 키와 확장 가능한 미리보기를 제공한다",
+            "boundary": "파일 탐색·관리 목적은 겹치지만 키맵·미리보기·설정·확장 모델이 다르므로 완전 호환 대체재로 취급하지 않는다.",
+            "url": "https://github.com/ranger/ranger"
+          },
+          {
+            "from": "yazi",
+            "to": "lf",
+            "relation": "alternative",
+            "group": "terminal-file-manager",
+            "why": "Go 기반의 간결한 Vim 스타일 파일 매니저로 셸 연동과 설정이 유연하다",
+            "boundary": "파일 탐색·관리 목적은 겹치지만 키맵·미리보기·설정·확장 모델이 다르므로 완전 호환 대체재로 취급하지 않는다.",
+            "url": "https://github.com/gokcehan/lf"
+          },
+          {
+            "from": "yazi",
+            "to": "xplr",
+            "relation": "alternative",
+            "group": "terminal-file-manager",
+            "why": "Rust 기반 파일 탐색기로 Lua를 통해 동작과 키맵을 깊게 구성할 수 있다",
+            "boundary": "파일 탐색·관리 목적은 겹치지만 키맵·미리보기·설정·확장 모델이 다르므로 완전 호환 대체재로 취급하지 않는다.",
+            "url": "https://github.com/sayanarijit/xplr"
+          }
+        ]
+      },
+      {
         "id": "compression",
         "name": "Compression",
         "domain": "domain:files",
