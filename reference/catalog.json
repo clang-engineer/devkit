@@ -420,7 +420,17 @@
           {
             "name": "yazi",
             "description": "터미널에서 파일을 대화형으로 탐색·관리하는 파일 매니저",
-            "tldr": "yazi"
+            "tldr": "yazi",
+            "links": [
+              {
+                "label": "Yazi 공식 문서",
+                "url": "https://yazi-rs.github.io/docs/quick-start"
+              },
+              {
+                "label": "Yazi 플러그인·연동 자료",
+                "url": "https://yazi-rs.github.io/docs/resources/"
+              }
+            ]
           },
           {
             "name": "select",
@@ -488,6 +498,16 @@
             "tags": [
               "tui",
               "file-manager"
+            ],
+            "links": [
+              {
+                "label": "Yazi 공식 문서",
+                "url": "https://yazi-rs.github.io/docs/quick-start"
+              },
+              {
+                "label": "Yazi 플러그인·연동 자료",
+                "url": "https://yazi-rs.github.io/docs/resources/"
+              }
             ]
           },
           {
@@ -1076,6 +1096,12 @@
             "tldr": "fish",
             "tags": [
               "base"
+            ],
+            "links": [
+              {
+                "label": "Fish 공식 문서",
+                "url": "https://fishshell.com/docs/current/"
+              }
             ]
           },
           {
@@ -1358,6 +1384,16 @@
             "tags": [
               "base",
               "config"
+            ],
+            "links": [
+              {
+                "label": "공식 Neovim 레퍼런스",
+                "url": "https://neovim.io/doc/user/"
+              },
+              {
+                "label": "LazyVim 공식 문서",
+                "url": "https://www.lazyvim.org/"
+              }
             ]
           },
           {
@@ -2840,12 +2876,24 @@
           {
             "name": "git",
             "description": "분산 버전 관리를 위한 표준 CLI",
-            "tldr": "git"
+            "tldr": "git",
+            "links": [
+              {
+                "label": "Git 공식 레퍼런스",
+                "url": "https://git-scm.com/docs"
+              }
+            ]
           },
           {
             "name": "lazygit",
             "description": "Git 작업을 터미널 UI로 수행하는 도구",
-            "tldr": "lazygit"
+            "tldr": "lazygit",
+            "links": [
+              {
+                "label": "Lazygit 연동·설정 레퍼런스",
+                "url": "https://lazygit.dev/resources/"
+              }
+            ]
           },
           {
             "name": "git log",
