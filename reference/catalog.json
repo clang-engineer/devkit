@@ -1020,6 +1020,125 @@
               "plugins"
             ],
             "section": "tmux 플러그인"
+          },
+          {
+            "name": "tmux-sessionx",
+            "description": "세션·윈도우를 검색·미리보기로 선택하는 팝업",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/omerxx/tmux-sessionx"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
+          },
+          {
+            "name": "tmux-fzf",
+            "description": "세션·윈도우·Pane·키바인딩·버퍼를 검색해 전환·관리",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/sainnhe/tmux-fzf"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
+          },
+          {
+            "name": "extrakto",
+            "description": "Pane 출력에서 경로·URL·해시를 찾아 삽입·복사",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/laktak/extrakto"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
+          },
+          {
+            "name": "tmux-vim-copy",
+            "description": "Copy Mode에 Vim식 텍스트 오브젝트 선택 추가",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/clang-engineer/tmux-vim-copy"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
+          },
+          {
+            "name": "tmux-open",
+            "description": "Copy Mode에서 선택한 파일·URL을 열거나 검색",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/tmux-plugins/tmux-open"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
+          },
+          {
+            "name": "tmux-logging",
+            "description": "Pane 출력의 연속 기록·화면·스크롤백 저장",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/tmux-plugins/tmux-logging"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
+          },
+          {
+            "name": "tpm",
+            "description": "tmux 플러그인 설치·업데이트·삭제 관리자",
+            "official": [
+              {
+                "label": "공식 문서",
+                "url": "https://github.com/tmux-plugins/tpm"
+              }
+            ],
+            "hosts": [
+              "tmux"
+            ],
+            "tags": [
+              "plugins"
+            ],
+            "section": "tmux 플러그인"
           }
         ],
         "relations": [
