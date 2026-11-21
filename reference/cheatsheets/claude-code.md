@@ -272,32 +272,11 @@ default → acceptEdits → plan [→ bypassPermissions → auto]
 
 > 함정: ESC를 chord 접두키(`"escape escape"`)로 만들면 화살표·Alt 등 escape 시퀀스가 전부 타임아웃 대기에 걸려 입력이 먹통 → 더블-ESC는 사실상 불가.
 
-### 현재 디렉터리와 브랜치를 status line에 표시
+### Status Line과 Plugin Hook
 
-세션 시작 배너가 스크롤된 뒤에도 위치를 확인하려면 `/statusline`에서 설정하거나 `~/.claude/settings.json`에 스크립트를 등록한다. `jq`가 필요하다.
+`/statusline`은 작업 경로·브랜치 같은 상태 표시를 구성한다. 설정 스크립트와 입력 JSON의 명세는 [공식 Status Line 문서](https://code.claude.com/docs/en/statusline)를 참고한다.
 
-```json
-{
-  "statusLine": { "type": "command", "command": "~/.claude/statusline.sh" }
-}
-```
-
-```bash
-#!/usr/bin/env bash
-# ~/.claude/statusline.sh — Claude Code가 stdin으로 전달하는 JSON을 읽는다.
-dir=$(jq -r '.workspace.current_dir // .cwd // ""')
-[[ -n "$dir" ]] || exit 0
-branch=$(git -C "$dir" branch --show-current 2>/dev/null)
-printf '%s' "${dir/#$HOME/~}"
-[[ -z "$branch" ]] || printf '  (%s)' "$branch"
-printf '\n'
-```
-
-스크립트에 실행 권한(`chmod +x ~/.claude/statusline.sh`)을 주고 현재 세션에서 표시를 확인한다. 공식 문서 기준 설정은 저장 즉시 재로드되고, 스크립트 수정은 다음 업데이트 이벤트 때 반영된다. 렌더마다 재실행하므로 네트워크 조회처럼 무거운 작업을 넣지 않는다. [공식 status line 문서](https://code.claude.com/docs/en/statusline).
-
-### 설치·제거한 플러그인 Hook이 기대대로 동작하지 않을 때
-
-`/plugin`의 설치·활성 상태와 실제 이벤트 발화를 분리한다. 먼저 플러그인 루트의 `hooks/hooks.json` 또는 manifest가 가리키는 Hook 파일에서 이벤트(`SessionStart`, `Stop` 등)와 실행 명령을 확인한다. Hook을 설치·제거한 뒤 오래 열어 둔 세션에서만 증상이 지속되면 새 대화형 세션에서 같은 이벤트를 재현해 **기존 세션의 로드 상태**와 디스크의 현재 설정을 구분한다. `claude -p`에서 `/plugin` UI를 열어 검사하는 방식은 지원되지 않는다. 출력을 다른 도구에 전달하는 Hook이라면 해당 도구의 상태도 별도로 확인하고, 플러그인 스크립트를 직접 실행한 결과만으로 Claude의 이벤트 발화를 증명하지 않는다. [Plugin components](https://code.claude.com/docs/en/plugins/components) · [Plugin troubleshooting](https://code.claude.com/docs/en/plugins/troubleshooting).
+Plugin Hook은 `hooks/hooks.json` 등에서 이벤트와 실행 명령을 등록한다. 설치 상태와 이벤트 실행 여부는 다르다. [Hook 구성](https://code.claude.com/docs/en/plugins/components) · [문제 해결](https://code.claude.com/docs/en/plugins/troubleshooting).
 
 ### Hooks 이벤트 종류
 
