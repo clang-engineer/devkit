@@ -78,6 +78,41 @@ bindkey -e
 **Oh My Zsh 제거 후 달라졌다면:** Oh My Zsh는 [기본 키 설정에서 `bindkey -e`를 실행한다](https://github.com/ohmyzsh/ohmyzsh/blob/master/lib/key-bindings.zsh). 프레임워크만 제거하고 이 설정을 별도로 남기지 않으면 이전과 다른 기본 키맵이 드러날 수 있다. 재설치 대신 필요한 키맵을 명시하면 된다. 키맵이 정상인데도 문제가 남으면 앞 절의 `Ctrl+V` 확인법으로 터미널이 실제 보내는 시퀀스를 확인한다.
 
 
+### 대화형 작업 팁 — 명령줄 편집·임시 보관·파일 작업
+
+ZLE 단축키는 **현재 키맵과 사용자 바인딩에 따라 달라진다.** 아래 기능은 기본 내장 기능, 별도 바인딩, 프레임워크 제공 명령을 구분한다.
+
+| 목적 | 명령 / 위젯 | 준비 |
+|---|---|---|
+| 긴 명령을 에디터에서 편집 | `edit-command-line` | 위젯 등록 및 키 바인딩 |
+| 입력 중인 명령 잠시 치우기 | `push-line` | 키 바인딩; 다음 프롬프트에서 복원 |
+| 디렉터리 생성 후 이동 | `take dir` | Oh My Zsh 제공; 순수 Zsh 기본 명령 아님 |
+| 파일명 일괄 변경 | `zmv` | `autoload -Uz zmv` |
+| 셸 계산기 | `zcalc` | `autoload -Uz zcalc` |
+
+```zsh
+# ~/.zshrc — 필요한 기능만 등록
+autoload -Uz edit-command-line zmv zcalc
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line  # Ctrl+X, Ctrl+E 순서대로
+bindkey '^Q' push-line            # Ctrl+Q: 현재 입력줄을 보관하고 다음 프롬프트에 복원
+```
+
+`push-line`은 단순 토글이 아니다. 입력 중인 줄을 치우고 다른 명령을 **실행한 뒤** 다음 프롬프트에서 원래 줄을 복원한다. 현재 바인딩은 `bindkey '^Q'`로 확인한다. `Ctrl+Q`는 터미널 흐름 제어와 충돌할 수 있으므로 작동하지 않으면 다른 키를 지정한다.
+
+```zsh
+# 파일명 일괄 변경: 먼저 미리보기
+zmv -n '(*).(jpg|jpeg)' 'photo-$1.$2'
+zmv '(*).(jpg|jpeg)' 'photo-$1.$2'
+
+zcalc '10 * (5 + 2)'              # 70
+mkdir -p -- ~/work/demo && cd -- ~/work/demo  # take 없이 같은 작업
+```
+
+`zmv`의 캡처 그룹 `$1`, `$2`는 파일명과 확장자를 재사용한다. 실제 변경 전에 `-n`으로 대상을 확인한다. `take`는 Oh My Zsh의 편의 함수이므로 프레임워크를 쓰지 않는다면 위 `mkdir && cd` 방식으로 충분하다.
+
+참고: [Twilio — Zsh Tricks to Blow Your Mind](https://www.twilio.com/en-us/blog/developers/tutorials/building-blocks/zsh-tricks-to-blow-your-mind).
+
 ### 히스토리 확장 (`!` 시리즈)
 
 bash와 호환되는 csh 스타일 확장. 명령 중간에서도 동작.
