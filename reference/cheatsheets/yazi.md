@@ -122,16 +122,17 @@ show_hidden = true
 
 `ya pkg add <owner/repo:name>`으로 패키지를 추가하고, `ya pkg list` / `ya pkg upgrade` / `ya pkg install`로 조회·업데이트·복원한다. Plugin은 기능, Flavor는 외형을 확장한다. 상세 설치·의존성·버전은 [Yazi 공식 문서](https://yazi-rs.github.io/docs/plugins/overview)를 참고한다.
 
-### 주변 생태계
+### 생태계 (Ecosystem)
 
-| 영역 | 찾아볼 곳 | 역할 |
+| 유형 | 프로젝트 | 역할 |
 |---|---|---|
-| Plugin · Manager | [공식 Plugins](https://yazi-rs.github.io/docs/plugins/overview), `ya pkg` | 기능 확장·패키지 관리 |
+| Plugin | [Yazi Plugins](https://yazi-rs.github.io/docs/plugins/overview) | Lua 기반 기능 확장 |
+| Plugin Manager | [`ya pkg`](https://yazi-rs.github.io/docs/cli#pm) | 확장 패키지 설치·업데이트 |
 | Theme | [Flavors](https://yazi-rs.github.io/docs/flavors/overview) | 색상·외형 구성 |
-| Discovery | [awesome-yazi](https://github.com/AnirudhG07/awesome-yazi) | 커뮤니티 플러그인·테마·연동 탐색 |
-| Integration | [yazi.nvim](https://github.com/mikavilpas/yazi.nvim) | Neovim에서 Yazi 활용 |
+| Awesome | [awesome-yazi](https://github.com/AnirudhG07/awesome-yazi) | 커뮤니티 프로젝트 큐레이션 |
+| Integration | [yazi.nvim](https://github.com/mikavilpas/yazi.nvim) | Neovim 연동 |
 
-이 표는 확장 생태계의 **발견 경로**다. 설치 목록이나 필수 구성은 아니다. 관련 개념은 [도구 확장 생태계 지도](../tool-ecosystem.md)를 참고한다.
+대표적인 발견 경로만 기록한다. 전체 플러그인 목록이나 개인 설치 설정은 복제하지 않는다. [확장 생태계 탐색 지도](../tool-ecosystem.md) 참고.
 
 ### 기타
 
