@@ -232,9 +232,21 @@ hash -r       # 동치
 
 참고: [최적화 사례](https://mijndertstuij.nl/posts/life-is-too-short-for-a-slow-terminal/) · [작성자 정정](https://mijndertstuij.nl/posts/what-i-got-wrong-about-fast-terminals/) · [Lobsters 토론](https://lobste.rs/s/k0sbbv/life_is_too_short_for_slow_terminal)
 
-### Oh My Zsh와 역할 구분
+### 주변 생태계 — 본체와 확장 구분
 
-`Oh My Zsh`는 Zsh 자체가 아니라 설정·플러그인 프레임워크다. ZLE·Glob·History 같은 **셸 내장 기능을 이해하는 데 설치가 필요하지 않다.** 플러그인 설정은 실제 사용 환경의 dotfiles에서 관리한다.
+Zsh의 ZLE·Glob·Completion은 **셸 내장 기능**이다. 아래 프로젝트들은 이를 대체하는 셸이 아니라 설정·확장·발견을 돕는 주변 생태계다.
+
+| 영역 | 대표 프로젝트 | 역할 |
+|---|---|---|
+| Plugin · Manager | [Antidote](https://github.com/mattmc3/antidote), [Zinit](https://github.com/zdharma-continuum/zinit), [zplug](https://github.com/zplug/zplug) | 플러그인 로드·설치·관리 |
+| Framework · 설정 | [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh), [Prezto](https://github.com/sorin-ionescu/prezto) | 플러그인·설정·편의 함수 묶음 |
+| Theme · Prompt | [Powerlevel10k](https://github.com/romkatv/powerlevel10k), [Starship](https://starship.rs/) | 프롬프트 외형·정보 표시 |
+| Awesome · Discovery | [awesome-zsh-plugins](https://github.com/unixorn/awesome-zsh-plugins) | 플러그인·테마·설정 프로젝트 탐색 |
+| Integration | [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide) | 히스토리 검색·디렉터리 이동 연동 |
+
+**선택 기준:** Oh My Zsh는 프레임워크이고 Antidote·Zinit은 플러그인 관리에 초점을 둔다. 두 부류를 무조건 함께 설치할 필요는 없다. Starship은 여러 셸에서 사용하는 프롬프트이고, Powerlevel10k는 Zsh 전용 테마다. Awesome 목록은 설치 관리자가 아니라 관련 프로젝트의 큐레이션이다.
+
+프레임워크 없이 Zsh 기본 기능만 써도 된다. 실제 설치·로딩 순서와 개인 키맵은 dotfiles에 두고, 이 치트시트에는 생태계의 역할과 발견 경로만 남긴다.
 
 ## 참고
 
