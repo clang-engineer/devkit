@@ -123,6 +123,9 @@ Yazi    → ya pkg(Manager) / Flavor(Appearance) / awesome-yazi(Discovery)
 
 ## 관련 문서
 
+- [확장 가능한 코어 설계](extensible-core-design.md) — Extension Point·생명주기·설계 패턴
+- [도구별 플러그인 생태계 사례](tool-plugin-ecosystems.md) — Neovim·tmux·Yazi 등 비교
+
 - [도구 관계 지도](tool-map.md) — 서로 대체·보완하는 도구의 역할
 - [치트시트 작성 원칙](CHEATSHEET_GUIDELINES.md) — 한 도구의 기능과 확장 생태계를 압축해 설명하는 방법
 - [Yazi 치트시트](cheatsheets/yazi.md) · [Zsh 치트시트](cheatsheets/zsh.md) — 개별 도구 사례
