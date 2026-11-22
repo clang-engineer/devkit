@@ -39,6 +39,32 @@
 - **Awesome List는 보통 큐레이션 목록**이다. Plugin Registry나 설치 관리자와 혼동하지 않는다.
 - 모든 영역이 모든 도구에 존재할 필요는 없다. 해당 도구에 중요한 영역만 소개한다.
 
+## 3. 반복되는 생태계 명명 관습
+
+**역할**은 실제 기능이고 **명명 관습**은 발견을 돕는 검색 단서다. 이름만으로 기술적 역할이나 공식성을 확정하지 않는다.
+
+| 탐색 패턴 | 주로 찾는 것 | 확인할 점 |
+|---|---|---|
+| `awesome-<tool>` | 큐레이션 목록 | 설치 관리자가 아닌지 |
+| `oh-my-<tool>` | 설정·확장 묶음 | Framework인지 설정 모음인지 |
+| `<tool>-plugins`, `extensions` | 독립 확장 | 공식 확장 API와 호환성 |
+| `plugin-manager` | 설치·업데이트 관리 | 실제 관리 범위; 이름에 manager가 없을 수도 있음 |
+| `kickstart`, `starter`, `template` | 시작용 구성 | 완성형 배포판과 차이 |
+| `distro`, `distribution` | 통합 배포판 | 구성과 업데이트 방식 |
+| `theme`, `flavor`, `skin` | 외형 | 도구별 용어 |
+| `dotfiles`, `config` | 설정 공유 | 개인 설정인지 공식 예제인지 |
+| `contrib`, `extra`, `community` | 추가·커뮤니티 구성 | 범용 이름이므로 공식성 추정 금지 |
+
+`awesome-*`·`oh-my-*`는 상대적으로 식별력이 높은 이름 관습이고, `community`·`extra`는 넓게 쓰이는 일반 단어다.
+
+```text
+tmux    → TPM(Manager) / Oh My Tmux(Configuration)
+Neovim  → lazy.nvim(Manager) / kickstart.nvim(Starter) / LazyVim(Distribution)
+Yazi    → ya pkg(Manager) / Flavor(Appearance) / awesome-yazi(Discovery)
+```
+
+새 도구는 **공식 문서 → 확장 API → 독립 프로젝트 → Awesome/Manager/Starter → Theme/Integration** 순서로 살펴본다. 검색 결과는 저장소 설명과 유지보수 상태로 검증하며, 존재하지 않는 유형을 억지로 채우지 않는다.
+
 ## 3. 확장 생태계가 형성되는 방식
 
 ```text
