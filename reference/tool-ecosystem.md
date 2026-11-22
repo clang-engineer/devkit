@@ -24,6 +24,24 @@
 
 이 그림은 **관계 지도**이며 필수 발전 단계나 실행 순서가 아니다. 작은 Core라도 안정적인 API·스크립트·프로토콜이 있으면 확장될 수 있다. 반대로 확장 기능이 있다고 해서 반드시 큰 커뮤니티가 형성되는 것은 아니다.
 
+## 확장 구조를 이해하는 세 가지 패턴
+
+| 아키텍처 패턴 | 핵심 | 대표적인 이해 사례 |
+|---|---|---|
+| **Microkernel / Plug-in Architecture** | Core의 확장 API에 플러그인 연결 | Neovim·Yazi 플러그인 |
+| **Ports and Adapters** | Core와 외부 시스템을 Port·Adapter로 분리 | Harlequin DB Adapter |
+| **Pipes and Filters** | 독립 도구의 입출력을 조합 | `rg | fzf` |
+
+```text
+Core Tool
+  ├─ 호스트 확장 경계 → Plugin API / Hook → Plugin
+  └─ 외부 연결 경계   → Port / CLI / Protocol → Adapter / Tool
+```
+
+Microkernel은 **플러그인 호스트**, Ports and Adapters는 **외부 의존성 분리**, Pipes and Filters는 **독립 처리 단계의 조합**에 초점을 둔다. 상호 배타적이지 않고 플러그인이 반드시 호스트와 같은 프로세스에서 실행되는 것도 아니다.
+
+하위 설계 패턴으로 Strategy(동작 교체), Observer(이벤트 구독), Adapter(인터페이스 변환), Dependency Injection(구현 주입)을 연결할 수 있다. GoF Adapter와 Ports and Adapters는 설계 범위가 다르다.
+
 ## 2. 탐색할 다섯 영역
 
 | 영역 | 무엇을 발견하나? | 대표 단서 |
@@ -65,7 +83,7 @@ Yazi    → ya pkg(Manager) / Flavor(Appearance) / awesome-yazi(Discovery)
 
 새 도구는 **공식 문서 → 확장 API → 독립 프로젝트 → Awesome/Manager/Starter → Theme/Integration** 순서로 살펴본다. 검색 결과는 저장소 설명과 유지보수 상태로 검증하며, 존재하지 않는 유형을 억지로 채우지 않는다.
 
-## 3. 확장 생태계가 형성되는 방식
+## 4. 확장 생태계가 형성되는 방식
 
 ```text
 기본 도구
@@ -80,7 +98,7 @@ Yazi    → ya pkg(Manager) / Flavor(Appearance) / awesome-yazi(Discovery)
 
 외부 개발자가 **본체를 수정하지 않고 새로운 동작을 배포**할 수 있는지가 중요한 관찰 지점이다. 다만 관리 도구·커뮤니티 목록은 기술적 필수 구성 요소가 아니라 수요에 따라 등장한다.
 
-## 4. 확장 방식별 실제 사례
+## 5. 확장 방식별 실제 사례
 
 | 도구 | 외부 확장 단위 | 생태계 관찰 포인트 |
 |---|---|---|
@@ -93,7 +111,7 @@ Yazi    → ya pkg(Manager) / Flavor(Appearance) / awesome-yazi(Discovery)
 
 **주의:** 위 사례들은 같은 성숙도를 뜻하지 않는다. Yazi의 플러그인, Harlequin의 어댑터, Television의 채널은 확장 단위가 다르다. Atuin은 확장 가능한 제품으로 발전하는 사례이지, 동일한 수준의 플러그인 생태계가 확인된 사례로 분류하지 않는다.
 
-## 5. 새 도구를 살펴볼 때
+## 6. 새 도구를 살펴볼 때
 
 1. **Core:** 무엇을 해결하며 기본 기능의 경계는 어디인가?
 2. **Extension:** API·플러그인·어댑터·스크립트 등 외부 확장 지점이 있는가?
