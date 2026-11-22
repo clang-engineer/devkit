@@ -232,9 +232,20 @@ hash -r       # 동치
 
 참고: [최적화 사례](https://mijndertstuij.nl/posts/life-is-too-short-for-a-slow-terminal/) · [작성자 정정](https://mijndertstuij.nl/posts/what-i-got-wrong-about-fast-terminals/) · [Lobsters 토론](https://lobste.rs/s/k0sbbv/life_is_too_short_for_slow_terminal)
 
-### Oh My Zsh와 역할 구분
+### 생태계 (Ecosystem)
 
-`Oh My Zsh`는 Zsh 자체가 아니라 설정·플러그인 프레임워크다. ZLE·Glob·History 같은 **셸 내장 기능을 이해하는 데 설치가 필요하지 않다.** 플러그인 설정은 실제 사용 환경의 dotfiles에서 관리한다.
+ZLE·Glob·Completion은 Zsh 내장 기능이고, 아래는 이를 보완하는 외부 프로젝트다.
+
+| 유형 | 프로젝트 | 역할 |
+|---|---|---|
+| Plugin | [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | 입력 제안·구문 강조 |
+| Plugin Manager | [Antidote](https://github.com/mattmc3/antidote), [Zinit](https://github.com/zdharma-continuum/zinit), [zplug](https://github.com/zplug/zplug) | 확장 설치·로드·관리 |
+| Framework | [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh), [Prezto](https://github.com/sorin-ionescu/prezto) | 설정·플러그인·편의 기능 구성 |
+| Theme | [Powerlevel10k](https://github.com/romkatv/powerlevel10k), [Starship](https://starship.rs/) | 프롬프트 표시·외형 |
+| Awesome | [awesome-zsh-plugins](https://github.com/unixorn/awesome-zsh-plugins) | 확장·테마 큐레이션 |
+| Integration | [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide) | 검색·디렉터리 이동 연동 |
+
+Plugin Manager와 Framework는 역할이 겹칠 수 있으며, 함께 설치해야 하는 필수 구성은 아니다. Starship은 여러 셸에서 사용할 수 있는 프롬프트다. 실제 로딩·개인 설정은 dotfiles에 맡긴다. [확장 생태계 탐색 지도](../tool-ecosystem.md) 참고.
 
 ## 참고
 
