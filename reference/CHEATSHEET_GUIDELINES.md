@@ -32,6 +32,35 @@ dotfiles            → 실제 사용 환경의 설정·재현
 
 **거시 → 미시**는 문서의 개수를 늘리라는 뜻이 아니다. 기능을 폭넓게 소개하고, 독자가 더 알아야 할 때만 적절한 하위 자료로 연결한다. 블로그 세부 문서를 반드시 만들 필요는 없으며, 이미 있는 글과 중복되면 링크만 둔다.
 
+## 도구 생태계 탐색 — 새 도구 조사 시
+
+도구의 **기본 기능만 확인하고 끝내지 않는다.** 새 CLI/TUI 도구를 조사할 때 주변 프로젝트의 존재를 먼저 예상하고, 실제로 있는지 확인한다. 모든 도구에 모든 유형이 존재한다고 가정하지 않는다.
+
+| 관점 | 확인 대상 | 검색 단서 |
+|---|---|---|
+| 확장 | Plugin · Extension · API | `<tool> plugins`, 공식 확장 문서 |
+| 관리 | Plugin Manager · Registry | `<tool> plugin manager` |
+| 사전 구성 | Oh My · Framework · Distribution · Starter | `oh my <tool>`, `<tool> distro`, `<tool> starter` |
+| 외형 | Theme · Flavor · Icon · Prompt | `<tool> themes` |
+| 큐레이션 | Awesome · Curated List | `awesome <tool>` |
+| 연동 | Integration · Protocol · Adapter | `<tool> integration` |
+| 설정 공유 | Dotfiles · Preset · Example Config | `<tool> dotfiles` |
+
+```text
+새 도구 발견
+  ├─ Core: 기본 기능·작동 모델
+  ├─ Extension: 플러그인·API·관리자
+  ├─ Experience: Oh My·배포판·Starter·테마
+  ├─ Discovery: Awesome·Registry·Rankings
+  └─ Integration: 연동·프로토콜·공유 설정
+         ↓
+  실제 프로젝트 확인 → 역할 구분 → 대표 자료 연결
+```
+
+**조사 결과는 확인됨 / 미확인 / 대안 있음으로 구분한다.** 검색되지 않았다는 이유만으로 존재하지 않는다고 단정하지 않는다. Oh My는 표준 분류가 아닌 프로젝트 이름 관습이며, Awesome은 설치 가능한 패키지 저장소가 아니라 큐레이션 목록인 경우가 많다. Plugin Manager, Framework, Distribution은 역할이 겹칠 수 있으므로 명칭보다 실제 책임을 기준으로 구분한다.
+
+**문서 반영 원칙:** 치트시트에는 생태계의 주요 범주와 대표 링크만 압축하고, 선택 이유·설계·비교는 기존 블로그 글을 우선 보강한다. 개인 설치 목록은 dotfiles에서 관리한다. 생태계가 작거나 관련성이 낮으면 빈 항목을 억지로 채우지 않는다.
+
 ## 문서의 기본 흐름
 
 ```text
