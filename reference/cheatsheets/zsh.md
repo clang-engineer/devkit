@@ -232,21 +232,20 @@ hash -r       # 동치
 
 참고: [최적화 사례](https://mijndertstuij.nl/posts/life-is-too-short-for-a-slow-terminal/) · [작성자 정정](https://mijndertstuij.nl/posts/what-i-got-wrong-about-fast-terminals/) · [Lobsters 토론](https://lobste.rs/s/k0sbbv/life_is_too_short_for_slow_terminal)
 
-### 주변 생태계 — 본체와 확장 구분
+### 생태계 (Ecosystem)
 
-Zsh의 ZLE·Glob·Completion은 **셸 내장 기능**이다. 아래 프로젝트들은 이를 대체하는 셸이 아니라 설정·확장·발견을 돕는 주변 생태계다.
+ZLE·Glob·Completion은 Zsh 내장 기능이고, 아래는 이를 보완하는 외부 프로젝트다.
 
-| 영역 | 대표 프로젝트 | 역할 |
+| 유형 | 프로젝트 | 역할 |
 |---|---|---|
-| Plugin · Manager | [Antidote](https://github.com/mattmc3/antidote), [Zinit](https://github.com/zdharma-continuum/zinit), [zplug](https://github.com/zplug/zplug) | 플러그인 로드·설치·관리 |
-| Framework · 설정 | [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh), [Prezto](https://github.com/sorin-ionescu/prezto) | 플러그인·설정·편의 함수 묶음 |
-| Theme · Prompt | [Powerlevel10k](https://github.com/romkatv/powerlevel10k), [Starship](https://starship.rs/) | 프롬프트 외형·정보 표시 |
-| Awesome · Discovery | [awesome-zsh-plugins](https://github.com/unixorn/awesome-zsh-plugins) | 플러그인·테마·설정 프로젝트 탐색 |
-| Integration | [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide) | 히스토리 검색·디렉터리 이동 연동 |
+| Plugin | [zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions), [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) | 입력 제안·구문 강조 |
+| Plugin Manager | [Antidote](https://github.com/mattmc3/antidote), [Zinit](https://github.com/zdharma-continuum/zinit), [zplug](https://github.com/zplug/zplug) | 확장 설치·로드·관리 |
+| Framework | [Oh My Zsh](https://github.com/ohmyzsh/ohmyzsh), [Prezto](https://github.com/sorin-ionescu/prezto) | 설정·플러그인·편의 기능 구성 |
+| Theme | [Powerlevel10k](https://github.com/romkatv/powerlevel10k), [Starship](https://starship.rs/) | 프롬프트 표시·외형 |
+| Awesome | [awesome-zsh-plugins](https://github.com/unixorn/awesome-zsh-plugins) | 확장·테마 큐레이션 |
+| Integration | [fzf](https://github.com/junegunn/fzf), [zoxide](https://github.com/ajeetdsouza/zoxide) | 검색·디렉터리 이동 연동 |
 
-**선택 기준:** Oh My Zsh는 프레임워크이고 Antidote·Zinit은 플러그인 관리에 초점을 둔다. 두 부류를 무조건 함께 설치할 필요는 없다. Starship은 여러 셸에서 사용하는 프롬프트이고, Powerlevel10k는 Zsh 전용 테마다. Awesome 목록은 설치 관리자가 아니라 관련 프로젝트의 큐레이션이다.
-
-프레임워크 없이 Zsh 기본 기능만 써도 된다. 실제 설치·로딩 순서와 개인 키맵은 dotfiles에 두고, 이 치트시트에는 생태계의 역할과 발견 경로만 남긴다.
+Plugin Manager와 Framework는 역할이 겹칠 수 있으며, 함께 설치해야 하는 필수 구성은 아니다. Starship은 여러 셸에서 사용할 수 있는 프롬프트다. 실제 로딩·개인 설정은 dotfiles에 맡긴다. [확장 생태계 탐색 지도](../tool-ecosystem.md) 참고.
 
 ## 참고
 
