@@ -1,16 +1,24 @@
 # fzf — 후보 선택과 셸 통합 치트시트
 
-> `fzf`는 **후보를 생성하는 검색 엔진이 아니라, 후보 목록에서 대화형으로 선택하는 인터페이스**다. 선택 결과는 stdout으로 돌려준다.
+> `fzf`는 **임의의 후보 목록을 매칭하고 선택하는 범용 CLI 인터페이스**다. 기본 파일 탐색기도 제공하지만, 외부 후보 생성기나 검색 엔진과 분리해 사용할 수 있다.
 
 ## 전체 작동 모델 — 입력에서 선택까지
 
 ```text
-후보 생성                  대화형 선택                 결과 사용
-fd / rg / git / history ──> fzf ───────────────────> stdout
-                              │                         │
-                              ├─ 입력으로 후보 좁히기      ├─ 명령행에 삽입
-                              ├─ 미리보기(--preview)      ├─ 다른 명령에 전달
-                              └─ 단일·다중 선택(-m)       └─ 파일 열기 등
+Provider (fd / rg / git / history / built-in walker)
+    │ 후보 공급
+    ▼
+fzf
+├─ Input        : 후보 수신·항목 경계·목록 갱신
+├─ Matching     : 필터링·순위
+├─ Presentation : 목록·필드·레이아웃·미리보기
+├─ Interaction  : 키·이벤트 → 액션
+└─ Selection    : 단일·다중 선택
+    │ stdout 반환 또는 액션 실행
+    ▼
+Consumer (shell / editor / git / tmux / ...)
+
+Integration: Shell / tmux / 외부 프로그램
 ```
 
 `fzf`의 입력은 보통 **stdin**, 결과는 **stdout**이다. `|`는 앞 명령의 stdout을 뒤 명령의 stdin으로 연결한다.
@@ -21,7 +29,30 @@ rg -l 'TODO' | fzf                # TODO가 있는 파일 중 선택
 git branch --format='%(refname:short)' | fzf  # 브랜치 후보 중 선택
 ```
 
-## 1. 기본 선택 조작
+## 1. Input · Matching — 후보 공급과 검색
+
+후보 생성과 매칭은 다른 역할이다. 입력이 터미널이면 기본 walker 또는 설정된 기본 명령으로 후보를 만들 수 있고, 파이프로 외부 후보를 공급할 수도 있다.
+
+| 기능 | 대표 옵션·설정 | 존재 이유 |
+|---|---|---|
+| 후보 공급 | stdin / `FZF_DEFAULT_COMMAND` | 탐색 대상 결정 |
+| 항목 경계 | `--read0` | NUL로 구분된 항목 수신 |
+| 스트림 유지 | `--tail` | 지속적으로 들어오는 후보의 보관량 제한 |
+| 매칭 | `--exact`, 검색 문법 | 후보를 좁히기 |
+| 정렬 | `--no-sort` | 입력 순서 유지 |
+| 외부 검색 | `--disabled`, `reload` | 외부 엔진이 검색을 담당 |
+
+```text
+고정 후보: Provider ──> fzf Matching ──> Selection
+
+동적 검색: Query ──> rg ──> fzf List ──> Selection
+              ▲                │
+              └─ change/reload ┘
+```
+
+`rg TODO | fzf`는 이미 검색된 후보를 다시 좁히는 방식이다. 반면 `change:reload`는 검색어가 변할 때 rg를 다시 실행한다. 이때 fzf 내부 매칭을 끌 수 있다.
+
+## 2. Selection — 기본 선택 조작
 
 | 조작 | 의미 |
 |---|---|
@@ -34,7 +65,7 @@ git branch --format='%(refname:short)' | fzf  # 브랜치 후보 중 선택
 
 `fzf`는 후보를 검색해 선택할 뿐, 선택된 파일을 자동으로 열지 않는다. 후속 동작은 셸 통합이나 연결된 명령이 담당한다.
 
-## 2. Preview — 선택 전 내용 확인
+## 3. Presentation — 목록과 미리보기
 
 ```sh
 fd -t f | fzf --preview 'head -80 {}'
@@ -51,9 +82,25 @@ fd -t f | fzf --preview 'bat --color=always -- {}'
 | `--layout` | 후보 목록 배치 |
 | `--nth` | 매칭에 사용할 필드 지정 |
 | `--delimiter` | 필드 구분 기준 |
-| `--bind` | 키에 동작 연결 |
+| `--with-nth` | 표시할 필드 변환 |
 
-## 3. 셸 통합 — 긴 파이프라인 없이 사용
+## 4. Interaction — 이벤트와 액션
+
+```text
+Key / Event (change, focus, ...)
+        │ --bind
+        ▼
+Action
+├─ 상태 변경
+├─ reload         : 후보 목록 갱신
+├─ execute        : 외부 명령 실행
+├─ execute-silent : 화면 전환 없이 명령 실행
+└─ become         : 다른 명령으로 프로세스 교체
+```
+
+`--bind`는 키나 이벤트를 액션에 연결한다. `{q}`는 현재 검색어, `{}`는 현재 강조된 항목, `{+}`는 선택 항목을 참조하는 자리표시자다. Preview는 관련 정보를 보여주고 reload는 후보 자체를 갱신한다. 이벤트와 액션은 내부 매칭 여부와 독립적으로 활용할 수 있다.
+
+## 5. 셸 통합 — 긴 파이프라인 없이 사용
 
 zsh에서 지원되는 fzf 버전은 `source <(fzf --zsh)`로 셸 통합을 활성화할 수 있다. 설치 방식에 따라 이미 활성화되어 있을 수 있다.
 
@@ -109,11 +156,12 @@ macOS 헤더에 `Ctrl-Y: 절대 경로 복사 · Alt-Y: 상대 경로 복사`가
 근거: [공식 셸 통합과 Ctrl-T 예제](https://junegunn.github.io/fzf/shell-integration/#ctrl-t),
 [기본 키 바인딩 소스](https://github.com/junegunn/fzf/blob/master/src/terminal.go).
 
-## 4. 선택 결과와 인자
+## 6. Output — 선택 결과와 인자
 
 ```text
 fzf 결과(stdout) ── $(...) ──> 셸 명령행 인자
-                  └─ | ─────> 다음 명령의 stdin
+                  ├─ | ─────> 다음 명령의 stdin
+                  └─ xargs ─> 후속 명령의 argv
 ```
 
 ```sh
@@ -122,7 +170,7 @@ nvim "$(fd -t f | fzf)"     # 개념 예시: 선택 경로를 하나의 인자�
 
 위 예시는 선택 취소 시 빈 인자가 될 수 있다. 실제 자동화에서는 종료 상태를 확인해야 한다. 복수 선택 결과를 `"$(...)"`로 감싸면 여러 줄이 하나의 인자가 되므로 주의한다. 공백·줄바꿈이 있는 파일명을 안전하게 처리하려면 `--read0`, `--print0` 등 NUL 구분을 사용한다.
 
-## 5. 주변 도구와 역할 구분
+## 7. Integration — 주변 도구와 역할 구분
 
 ```text
 fd      이름·경로로 파일 후보 생성
@@ -132,5 +180,18 @@ zoxide  방문 기록을 기반으로 디렉터리 이동
 ```
 
 LazyVim Picker가 편집기 안의 코드 탐색을 담당한다면, `fzf` 셸 통합은 **터미널 명령행에서 경로·이력·디렉터리를 선택할 때** 특히 유용하다. 개인 alias나 함수 없이도 기본 기능으로 활용할 수 있다.
+
+셸 통합은 명령줄 편집과 현재 셸 상태 변경을 담당하고, tmux 통합은 셸 이외의 pane에서도 선택 UI를 활용할 수 있게 한다. 외부 프로그램은 자식 프로세스로 fzf를 실행해 후보를 공급하고 결과를 소비할 수 있다.
+
+## 개념별 공식 학습 자료
+
+| 학습할 개념 | 공식 가이드 |
+|---|---|
+| 입력·스트림 | [Browsing log streams](https://junegunn.github.io/fzf/tips/browsing-log-streams/), [Processing multi-line items](https://junegunn.github.io/fzf/tips/processing-multi-line-items/) |
+| 외부 검색·이벤트·액션 | [Ripgrep integration](https://junegunn.github.io/fzf/tips/ripgrep-integration/) |
+| 결과 반환·프로세스 통합 | [Using fzf in your program](https://junegunn.github.io/fzf/tips/using-fzf-in-your-program/) |
+| 셸·tmux·응용 사례 | [Shell Integration 및 Examples](https://junegunn.github.io/fzf/) |
+
+세부 구현은 공식 가이드에서 확인한다. 표준 입력과 명령행 인자의 차이는 [Shell 파이프와 xargs](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/shell/2026-11-23-shell-pipe-stdin-argv-xargs.md)를 참고한다.
 
 공식 문서: [fzf 저장소](https://github.com/junegunn/fzf) · [셸 통합](https://junegunn.github.io/fzf/shell-integration/) · `fzf --help`
