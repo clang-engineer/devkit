@@ -87,15 +87,14 @@ cat alias는 [bat 공식 문서의 예](https://github.com/sharkdp/bat#automatic
 
 | 분야 | 추가 검토 대상 |
 |---|---|
-| 파일·용량 | nnn, ncdu |
 | 검색·데이터 | ag, bfs, choose |
-| 모니터링·측정 | bottom, glances, gtop, hyperfine |
+| 모니터링·측정 | bottom, glances, gtop |
 | 기록·파이프라인 | mcfly, up |
-| HTTP | curlie, xh |
+| HTTP | curlie |
 | 편집·도움말 | micro, ManKier, explainshell, cheat.sh |
 | GUI 경계 | baobab, stacer — CLI와 별도 표시할지 검토 |
 
-이미 포함된 bat·eza·lsd·broot·dust·duf·fd·ripgrep·fzf·delta·jq·sd·procs·gping·zoxide 등은 중복 추가보다 관계와 한계를 보강한다.
+이미 포함된 bat·eza·lsd·broot·dust·duf·fd·ripgrep·fzf·delta·jq·sd·procs·gping·zoxide·nnn·hyperfine·ncdu·xh 등은 중복 추가보다 관계와 한계를 보강한다.
 
 [tldr-pages](https://github.com/tldr-pages/tldr)는 예제 중심 자료이며, [tealdeer](https://github.com/tealdeer-rs/tealdeer)는 그 자료를 사용하는 클라이언트 구현이다. 서로를 단순한 명령어 대체 관계로 연결하지 않는다. HTTPie는 프로젝트 이름과 실행 명령 http를 구분해서 검색한다.
 

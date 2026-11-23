@@ -60,6 +60,12 @@
             "tldr": "dust"
           },
           {
+            "name": "ncdu",
+            "description": "텍스트 모드 UI로 디스크 사용량을 분석하고 디렉터리를 대화형으로 탐색하는 도구",
+            "tldr": "ncdu",
+            "url": "https://dev.yorhel.nl/ncdu"
+          },
+          {
             "name": "tree",
             "description": "디렉터리 구조를 트리 형태로 출력하는 도구",
             "tldr": "tree"
@@ -155,6 +161,19 @@
             "tldr": "dust",
             "url": "https://github.com/bootandy/dust",
             "boundary": "디렉토리별 용량 분포를 사람이 살펴보는 작업은 대신할 수 있다. 정렬·표시와 옵션은 du와 달라 수치나 출력 형식을 사용하는 자동화에는 그대로 치환하지 않는다. 기존 du 명령은 유지하고 dust를 별도로 호출한다."
+          },
+          {
+            "from": "du",
+            "to": "ncdu",
+            "why": "용량을 차지하는 경로를 대화형으로 추적하고 싶음",
+            "group": "disk-visual",
+            "problem": "du의 정적 출력만으로는 큰 디렉터리를 오가며 용량의 원인을 좁히기 번거롭다",
+            "solution": "텍스트 모드 UI에서 디렉터리별 사용량을 보고 하위 경로를 탐색한다. GUI가 없는 원격 서버에서 공간을 많이 차지하는 경로를 찾을 때 선택한다.",
+            "relation": "alternative",
+            "boundary": "대화형 용량 분석이 중심이므로 du의 옵션·출력 계약을 사용하는 자동화는 그대로 유지한다. dust의 정적인 트리·막대 출력보다 경로를 직접 오가며 살펴봐야 할 때 ncdu를 선택한다. 파일 삭제 기능도 있으므로 분석만 할 때는 -r로 삭제를 비활성화한다. alias du='ncdu'로 치환하지 않는다.",
+            "install": "brew install ncdu",
+            "tldr": "ncdu",
+            "url": "https://dev.yorhel.nl/ncdu/man"
           },
           {
             "from": "tree",
@@ -2814,6 +2833,12 @@
             "description": "사람이 읽기 쉬운 문법과 출력에 초점을 둔 HTTPie 명령",
             "tldr": "http",
             "tool_id": "httpie"
+          },
+          {
+            "name": "xh",
+            "description": "HTTPie의 요청 문법과 설계를 재구현하며 빠른 실행에 초점을 둔 HTTP 요청 CLI",
+            "tldr": "xh",
+            "url": "https://github.com/ducaale/xh"
           }
         ],
         "relations": [
@@ -2829,6 +2854,19 @@
             "install": "brew install httpie",
             "tldr": "http",
             "url": "https://httpie.io"
+          },
+          {
+            "from": "http",
+            "to": "xh",
+            "why": "HTTPie식 문법으로 빠르게 HTTP 요청을 보내고 싶음",
+            "group": "http-chain",
+            "problem": "HTTPie의 읽기 쉬운 요청 문법을 유지하면서 시작 속도와 단일 바이너리 배포를 중시하는 경우가 있다",
+            "solution": "HTTPie식 요청 항목 문법, JSON·폼 요청, 색상·형식화 출력을 제공한다. 빠른 시작과 간편한 바이너리 배포를 우선할 때 선택하며 --curl로 요청을 curl 명령으로 변환할 수 있다.",
+            "relation": "alternative",
+            "boundary": "HTTP API를 대화형으로 호출하는 대안이지 HTTPie의 모든 기능을 구현한 완전 호환 대체품은 아니다. 플러그인 시스템이 없으며 기본적으로 --check-status가 켜져 있어 오류 HTTP 상태에서 종료 코드가 달라질 수 있다. HTTPie 플러그인이 필요하면 http를 유지하고 기존 스크립트는 옵션·종료 상태를 확인한다. curl의 여러 프로토콜·전송 기능 전체를 대체하지 않는다.",
+            "install": "brew install xh",
+            "tldr": "xh",
+            "url": "https://github.com/ducaale/xh#how-xh-compares-to-httpie"
           }
         ]
       },
