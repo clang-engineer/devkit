@@ -4,6 +4,8 @@
 >
 > **Prefix**는 기본 `Ctrl+b`를 뜻한다. 키 바인딩과 Copy Mode 동작은 tmux 버전·설정에 따라 달라질 수 있다.
 
+**tmux 3.7+ 주요 새 단축키:** [Floating Pane 열기·닫기](#floating-pane) — 타일 배치를 유지하면서 별도 셸을 띄운다.
+
 ## 전체 구조 — 접속·작업·화면
 
 ```text
@@ -117,6 +119,21 @@ Pane은 PTY(의사 터미널)를 통해 Shell·프로그램을 실행하는 영�
 `swap-pane`·`join-pane`은 키 하나로 외우기보다 **Source(`-s`) → Target(`-t`)** 관계로 이해한다. Session 간 이동은 [관련 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md)을 참고한다.
 
 **Pane·Window 이동 패턴:** `join-pane -s <source> -t <target>`은 Pane을 다른 Window로 옮기고, `break-pane`은 Pane을 새 Window로 분리한다. `swap-pane` / `swap-window`는 위치를 교환하고 `move-window`는 Window를 이동한다. 실제 대상 지정과 예시는 [관련 글](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/tmux/2026-10-25-tmux-pane-window-cross-session.md) 참고.
+
+<a id="floating-pane"></a>
+
+### Floating Pane — 떠 있는 셸 (tmux 3.7+)
+
+기존 타일 배치 위에 떠 있는 Pane이다. `display-popup`과 달리 모달이 아니며 일반 Pane처럼 동작한다.
+
+| 목적 | 키·명령 | 동작 |
+|---|---|---|
+| 열기 | `Prefix *` (`Shift+8`) | 기본 바인딩으로 Floating Pane 생성. tmux 안의 셸에서는 `tmux new-pane` |
+| 닫기 | 셸에서 `exit` 또는 빈 프롬프트에서 `Ctrl+d` | 셸이 종료되면서 Floating Pane도 닫힘 |
+
+`Ctrl+d`는 셸이 EOF로 종료하도록 설정된 경우에 동작한다. `remain-on-exit`이 활성화돼 있으면 프로세스 종료 후에도 Pane이 남을 수 있다. 닫기는 숨김이 아니라 셸 종료다.
+
+`Prefix F`는 tmux-fzf 플러그인의 실행 키이며 Floating Pane 생성 키와 다르다. tmux 3.7의 초기 구현에서는 이동·크기 조절이 마우스로 제한된다. [공식 3.7 변경 내역](https://github.com/tmux/tmux/blob/3.7/CHANGES)을 참고한다.
 
 ### Layout — 배치·크기 조절
 
