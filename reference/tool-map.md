@@ -68,6 +68,26 @@ cat alias는 [bat 공식 문서의 예](https://github.com/sharkdp/bat#automatic
 
 [jq](https://github.com/jqlang/jq)는 JSON 구조를 다루는 도구다. 텍스트 치환 도구와 이름만 대응시키기보다, 입력의 구조를 이해하고 원하는 데이터를 추출하는 문제에 초점을 둔다. 새 도구의 가치는 기존 명령어를 없애는 데만 있지 않다.
 
+## 같은 화면에 있어도 책임은 다르다
+
+### 터미널 창·세션·데스크톱 창
+
+[WezTerm](https://wezterm.org/)은 터미널 에뮬레이터이면서 멀티플렉서다. Ghostty·kitty·iTerm2와는 터미널 선택으로, tmux와는 세션 관리 기능의 겹침으로 비교한다. [공식 멀티플렉싱 문서](https://wezterm.org/multiplexing.html)의 domain 설정과 기본 탭·창을 구분해야 한다. SSH domain에는 원격에도 호환되는 WezTerm이 필요하므로 일반 SSH 접속이나 기존 tmux 세션과 같은 설치 조건으로 보지 않는다.
+
+[niri](https://github.com/niri-wm/niri)는 Linux Wayland의 데스크톱 창을 스크롤 가능한 타일로 배치하는 compositor다. 터미널 내부 pane을 나누는 도구가 아니며, macOS 창 관리자와도 실행 환경이 다르다. niri만으로 완전한 데스크톱 환경이 되는 것은 아니므로 알림·portal 등 주변 구성도 선택 비용에 포함한다.
+
+### 셸 구현체·플러그인 관리·입력 피드백
+
+[Fisher](https://github.com/jorgebucaran/fisher)는 Fish의 함수·완성·설정 확장을 설치·갱신하는 플러그인 관리자다. Fish를 대신하는 셸도, Zsh 프레임워크의 호환 대안도 아니다. [zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting)은 Zsh에서 입력 중인 명령줄을 강조하는 확장이다. 프롬프트·자동완성·기록 검색과 별개 책임이며, ZLE widget과 hook의 로드 순서를 확인한다.
+
+### 편집기 선택·편집기 안의 탐색·개발 도구 설치
+
+[micro](https://github.com/micro-editor/micro)는 익숙한 단축키와 기본 기능으로 바로 편집하려는 터미널 에디터다. nano와 간단한 편집 작업을 비교할 수 있지만 nano의 옵션·설정이나 Vim의 modal 편집 체계를 그대로 이어받는 것은 아니다.
+
+[Telescope](https://github.com/nvim-telescope/telescope.nvim)와 [fzf-lua](https://github.com/ibhagwan/fzf-lua)는 Neovim 안에서 파일·버퍼·검색 결과 등을 선택하는 플러그인 대안이다. Telescope는 picker·sorter·previewer 확장 구조를 제공하고, fzf-lua는 외부 fzf 또는 skim 실행 파일을 활용한다. 둘 다 셸의 fzf나 Neovim 자체를 대체하지 않으며 설정·확장을 일괄 치환할 수 없다. Telescope의 fzf-native sorter도 fzf-lua와 다른 확장이다.
+
+[lazy.nvim](https://github.com/folke/lazy.nvim)은 Neovim 플러그인의 설치·의존성·로드 시점·lockfile을, [mason.nvim](https://github.com/mason-org/mason.nvim)은 외부 LSP·DAP 서버와 linter·formatter 실행 파일을 관리한다. 서로 대체하는 패키지 관리자가 아니며, 실행 파일 설치와 편집기의 LSP·디버거 연결 설정도 구분한다.
+
 ## 사용 환경별 선택
 
 아래는 도구 채택률에 대한 통계가 아니라 도입을 판단하는 기준이다.
@@ -91,12 +111,12 @@ cat alias는 [bat 공식 문서의 예](https://github.com/sharkdp/bat#automatic
 | 모니터링·측정 | bottom, glances, gtop |
 | 기록·파이프라인 | mcfly, up |
 | HTTP | curlie |
-| 편집·도움말 | micro, ManKier, explainshell, cheat.sh |
+| 편집·도움말 | ManKier, explainshell, cheat.sh |
 | GUI 경계 | baobab, stacer — CLI와 별도 표시할지 검토 |
 
 이미 포함된 bat·eza·lsd·broot·dust·duf·fd·ripgrep·fzf·delta·jq·sd·procs·gping·zoxide·nnn·hyperfine·ncdu·xh 등은 중복 추가보다 관계와 한계를 보강한다.
 
-[tldr-pages](https://github.com/tldr-pages/tldr)는 예제 중심 자료이며, [tealdeer](https://github.com/tealdeer-rs/tealdeer)는 그 자료를 사용하는 클라이언트 구현이다. 서로를 단순한 명령어 대체 관계로 연결하지 않는다. HTTPie는 프로젝트 이름과 실행 명령 http를 구분해서 검색한다.
+[tldr-pages](https://github.com/tldr-pages/tldr)는 예제 중심 자료이며, [tealdeer](https://github.com/tealdeer-rs/tealdeer)는 `tldr` 명령으로 그 자료를 조회하는 클라이언트 구현이다. 자료 원본과 실행 도구를 단순한 명령어 대체 관계로 연결하지 않는다. 정확한 옵션·제약은 여전히 man과 공식 문서로 확인한다. HTTPie는 프로젝트 이름과 실행 명령 http를 구분해서 검색한다.
 
 ## 지도 항목을 읽고 보강하는 순서
 
@@ -119,12 +139,13 @@ cat alias는 [bat 공식 문서의 예](https://github.com/sharkdp/bat#automatic
 - Shell: 셸 구현체·설정 프레임워크·프롬프트·플러그인. 호스트가 있는 확장은 `hosts`로 묶는다.
 - Command History: history·atuin·fzf를 이용한 기록·검색.
 - Editors: 편집기·설정 배포판·편집 확장. 플러그인을 기반 도구의 대안처럼 연결하지 않는다.
-- Terminal Emulators: Ghostty·kitty·iTerm2 등 터미널 에뮬레이터. 터미널에서 실행하는 모든 프로그램을 뜻하지 않는다.
+- Terminal Emulators: Ghostty·kitty·iTerm2·WezTerm 등 터미널 에뮬레이터. 터미널에서 실행하는 모든 프로그램이나 데스크톱 창 관리자를 뜻하지 않는다.
 - Database: DB별 CLI·독립 클라이언트·에디터 DB 플러그인. 플러그인의 실행 환경은 `hosts`로 구분한다.
+- Kubernetes: kubectl의 명시적 리소스 작업과 k9s의 대화형 탐색·운영. 로컬 컨테이너·이미지 작업과 구분한다.
 - 개발 도구: Task Runners, Build & Compile, Debugging, Code Quality, Runtime & Package Management 등 작업 목적별로 나눈다. Python은 Programming Languages에도 속한다.
 - AI Coding Assistants: 독립 코딩 에이전트와 에디터의 AI 코딩 확장. 실행 환경과 호스트는 별도 메타데이터다.
 - 주제별 자료: 개별 도구가 아닌 비교·작업 절차 문서. `cheatsheets.guides`에서 관리하며 `related_tools`로 관련 도구에 연결한다.
 
 상위 그룹·분류 ID·호스트·태그의 원본 필드는 [Reference 분류 원본](README.md#분류-원본)에 정리한다. 웹과 Go TUI는 같은 목적별 분류를 사용하며, 치트시트 문서 묶음을 도구 분류로 사용하지 않는다.
 
-플러그인 목록은 2026-10-14 dotfiles main의 명시적 설정, LazyVim Extras와 lazy-lock.json을 확인한 목록이다. 실행 중인 개인 머신을 조사한 설치 현황은 아니다. vim/의 이전 설정과 주석 처리된 tmux 후보는 현재 사용 목록에 포함하지 않았다. 각 플러그인의 내 설정 링크가 근거이며 설정이 바뀌면 재검토한다.
+내 설정 링크가 있는 플러그인은 2026-10-14 dotfiles main의 명시적 설정, LazyVim Extras와 lazy-lock.json을 확인한 목록이다. 실행 중인 개인 머신을 조사한 설치 현황은 아니다. vim/의 이전 설정과 주석 처리된 tmux 후보는 현재 사용 목록에 포함하지 않았다. 공식 자료를 근거로 추가한 비교·발견용 항목은 개인 사용을 뜻하지 않으며, 내 설정 링크가 있는 항목만 해당 설정을 근거로 삼는다. 설정이 바뀌면 재검토한다.

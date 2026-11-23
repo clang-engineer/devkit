@@ -91,6 +91,31 @@
           "name": "rip",
           "description": "삭제 대상을 휴지통으로 이동해 복구 가능성을 남기는 도구",
           "tldr": "rip"
+        },
+        {
+          "name": "rsync",
+          "tool_id": "rsync",
+          "kind": "cli",
+          "role": "파일 동기화·전송",
+          "platforms": [
+            "linux",
+            "macos"
+          ],
+          "description": "로컬 또는 원격 경로 사이에서 파일을 복사·동기화하는 CLI다. 변경된 파일을 선별하고 원격 전송에서는 차이만 보내는 알고리즘을 활용한다. 원격 셸 전송은 양쪽에 rsync가 필요하며 소스 경로의 끝 /와 삭제 옵션의 의미를 확인한다.",
+          "usage": "rsync [옵션] 소스/ 대상/ — 먼저 --dry-run으로 변경 예정 항목을 확인한다.",
+          "examples": [
+            "rsync -ani ./src/ ./backup/ — 실제 복사 없이 변경 예정 항목 확인",
+            "rsync -ani -e ssh ./src/ user@host:backup/ — SSH 전송 계획 확인"
+          ],
+          "install": "brew install rsync",
+          "tldr": "rsync",
+          "url": "https://rsync.samba.org/",
+          "official": [
+            {
+              "label": "공식 매뉴얼",
+              "url": "https://download.samba.org/pub/rsync/rsync.1"
+            }
+          ]
         }
       ],
       "relations": [
@@ -210,6 +235,19 @@
           "install": "brew install rm-improved",
           "tldr": "rip",
           "url": "https://github.com/nivekuil/rip"
+        },
+        {
+          "from": "cp",
+          "to": "rsync",
+          "why": "반복 복사에서 변경 파일만 골라 원격 경로까지 동기화하고 싶다",
+          "group": "file-copy",
+          "problem": "단순 복사만으로는 반복 전송의 변경 항목·제외 규칙·원격 동기화를 관리하기 번거롭다.",
+          "solution": "변경 파일 선별, 제외 규칙, 원격 셸 전송과 --dry-run·항목별 변경 출력을 제공한다.",
+          "relation": "specialized",
+          "boundary": "cp와 옵션·링크·메타데이터 처리 계약이 같지 않다. 소스 끝 /는 디렉터리 자체와 내용 복사를 구분하며 --delete는 대상 파일을 삭제할 수 있다. 예시처럼 -n으로 먼저 확인하고 cp alias로 치환하지 않는다. 원격 셸 전송에는 원격에도 rsync가 필요하다.",
+          "install": "brew install rsync",
+          "tldr": "rsync",
+          "url": "https://download.samba.org/pub/rsync/rsync.1"
         }
       ]
     },
@@ -822,6 +860,77 @@
       ]
     },
     {
+      "id": "command-help",
+      "name": "Command Help",
+      "domain": "domain:terminal",
+      "aliases": [],
+      "why": "예시 중심 도움말 자료와 이를 읽는 실행 클라이언트를 구분한다.",
+      "commands": [
+        {
+          "name": "tldr-pages",
+          "tool_id": "tldr-pages",
+          "kind": "resource",
+          "role": "커뮤니티 명령 예제 자료",
+          "description": "자주 쓰는 명령의 짧은 설명과 실용 예제를 모은 커뮤니티 도움말 자료다. tldr-pages/tldr 저장소는 페이지 원본이며 실행 파일이나 tealdeer 패키지가 아니다. 상세 옵션·보안·버전별 동작은 각 명령의 공식 매뉴얼과 함께 확인한다.",
+          "usage": "웹 또는 tldr 호환 클라이언트로 페이지를 읽는다. 이 자료 자체에 실행 명령은 없다.",
+          "examples": [],
+          "url": "https://tldr.sh/",
+          "official": [
+            {
+              "label": "공식 페이지 원본·클라이언트 구분",
+              "url": "https://github.com/tldr-pages/tldr"
+            }
+          ]
+        },
+        {
+          "name": "tldr",
+          "tool_id": "tealdeer",
+          "kind": "cli",
+          "role": "tldr-pages 조회 클라이언트",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "tldr-pages 자료를 내려받아 캐시하고 터미널에서 보여주는 Rust 클라이언트 tealdeer다. 패키지 이름은 tealdeer, 실행 파일은 tldr이며 같은 명령 이름을 쓰는 다른 tldr 클라이언트와 구분한다. 캐시를 받은 뒤 오프라인으로 조회할 수 있다.",
+          "usage": "tldr <명령> — tealdeer의 로컬 캐시에서 짧은 사용 예를 조회한다. 첫 사용 전 캐시 갱신이 필요하다.",
+          "examples": [
+            "tldr tar — tar 사용 예 조회",
+            "tldr git log — git log 사용 예 조회",
+            "tldr --list — 캐시된 명령 목록"
+          ],
+          "install": "brew install tealdeer",
+          "tldr": "tealdeer",
+          "url": "https://docs.tealdeer.org/",
+          "official": [
+            {
+              "label": "공식 프로젝트",
+              "url": "https://github.com/tealdeer-rs/tealdeer"
+            },
+            {
+              "label": "공식 사용법·실행 파일명",
+              "url": "https://docs.tealdeer.org/stable/usage.html"
+            }
+          ]
+        }
+      ],
+      "relations": [
+        {
+          "from": "tldr-pages",
+          "to": "tldr",
+          "why": "예제 자료를 로컬 캐시와 터미널 UI로 조회하고 싶다",
+          "group": "help-client",
+          "problem": "Markdown 자료 저장소만으로는 셸에서 명령 이름을 입력해 빠르게 예제를 조회하기 번거롭다.",
+          "solution": "tealdeer가 tldr-pages를 내려받아 캐시하고 tldr 명령으로 페이지를 표시한다.",
+          "relation": "complement",
+          "boundary": "자료와 클라이언트의 소비 관계이지 경쟁 도구나 계승 관계가 아니다. tldr-pages는 실행 파일이 아니고 tealdeer는 여러 호환 클라이언트 중 하나다. 예제 도움말은 공식 man 페이지의 전체 옵션·버전별 계약을 대체하지 않는다.",
+          "install": "brew install tealdeer",
+          "tldr": "tealdeer",
+          "url": "https://docs.tealdeer.org/stable/usage.html"
+        }
+      ]
+    },
+    {
       "id": "terminal-emulators",
       "name": "Terminal Emulators",
       "domain": "domain:terminal",
@@ -901,6 +1010,42 @@
               "url": "https://codeberg.org/dnkl/foot"
             }
           ]
+        },
+        {
+          "name": "wezterm",
+          "tool_id": "wezterm",
+          "kind": "gui",
+          "role": "터미널 에뮬레이터·통합 멀티플렉싱",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows",
+            "freebsd",
+            "netbsd"
+          ],
+          "description": "Lua 설정과 탭·pane·로컬/원격 멀티플렉싱을 제공하는 크로스플랫폼 터미널 에뮬레이터다. 기본 GUI 탭만으로 tmux식 분리·재연결이 보장되지는 않으며 지속 세션에는 별도 멀티플렉싱 도메인 설정이 필요하다.",
+          "usage": "wezterm — 터미널 실행; wezterm cli list — 실행 중인 창·탭·pane 조회",
+          "examples": [
+            "wezterm cli list — 실행 중인 WezTerm pane 목록",
+            "wezterm cli list --format json — pane 정보를 JSON으로 조회"
+          ],
+          "install": "brew install --cask wezterm",
+          "tldr": "wezterm",
+          "url": "https://wezterm.org/",
+          "official": [
+            {
+              "label": "공식 문서",
+              "url": "https://wezterm.org/index.html"
+            },
+            {
+              "label": "멀티플렉싱 경계",
+              "url": "https://wezterm.org/multiplexing.html"
+            },
+            {
+              "label": "pane 조회 CLI",
+              "url": "https://wezterm.org/cli/cli/list.html"
+            }
+          ]
         }
       ],
       "relations": [
@@ -915,6 +1060,19 @@
           "boundary": "Warp와 Ghostty는 서로 다른 설계 우선순위의 터미널이다. Warp를 Ghostty의 후계나 완전한 대체로 보지 않으며 계정·서비스 기능과 플랫폼 지원을 확인한다.",
           "tldr": "warp",
           "url": "https://www.warp.dev/"
+        },
+        {
+          "from": "ghostty",
+          "to": "wezterm",
+          "why": "터미널 자체의 Lua 설정과 통합 멀티플렉싱을 선택 기준으로 비교한다",
+          "group": "terminal-ui",
+          "problem": "터미널 표시 성능뿐 아니라 탭·pane·원격 세션 구성까지 한 앱에서 관리할지 결정해야 한다.",
+          "solution": "WezTerm은 Lua 구성과 로컬·원격 멀티플렉싱 도메인을 터미널 에뮬레이터에 통합한다.",
+          "relation": "alternative",
+          "boundary": "서로 다른 터미널 선택지이며 설정 파일과 플랫폼 지원은 동일하지 않다. WezTerm의 기본 GUI 탭은 tmux식 지속 세션과 다르다. 분리·재연결에는 도메인 설정이 필요하고 SSH 멀티플렉싱 도메인은 원격에도 호환 WezTerm이 필요하다.",
+          "install": "brew install --cask wezterm",
+          "tldr": "wezterm",
+          "url": "https://wezterm.org/multiplexing.html"
         }
       ],
       "discovery_links": [
@@ -1466,6 +1624,57 @@
           "section": "플러그인"
         },
         {
+          "name": "fisher",
+          "tool_id": "fisher",
+          "kind": "plugin",
+          "role": "Fish 플러그인 관리",
+          "description": "Fish의 함수·완성·키 바인딩·설정 조각을 설치·갱신·제거하는 Fish 전용 플러그인 관리자다. 셸 자체나 Zsh 프레임워크의 대체가 아니며 기본 설치 위치는 Fish 설정 디렉터리다.",
+          "usage": "Fish에서 fisher list로 설치된 플러그인을 조회한다.",
+          "examples": [
+            "fisher list — 설치된 Fish 플러그인 목록"
+          ],
+          "url": "https://github.com/jorgebucaran/fisher",
+          "official": [
+            {
+              "label": "공식 설치·사용법",
+              "url": "https://github.com/jorgebucaran/fisher"
+            }
+          ],
+          "hosts": [
+            "fish"
+          ],
+          "tags": [
+            "plugins"
+          ],
+          "section": "플러그인"
+        },
+        {
+          "name": "zsh-syntax-highlighting",
+          "tool_id": "zsh-syntax-highlighting",
+          "kind": "plugin",
+          "role": "입력 중 명령 구문 강조",
+          "description": "Zsh의 ZLE 입력 버퍼를 구문 강조해 명령을 실행하기 전에 읽기 쉽게 만드는 플러그인이다. 프롬프트·자동 제안·완성 엔진과 역할이 다르며 위젯·입력 버퍼를 수정하는 설정 뒤에 로드한다.",
+          "usage": "Zsh에 플러그인을 로드하면 입력 중인 명령줄에 구문 강조가 적용된다. 독립 실행 명령이 아니다.",
+          "examples": [
+            "print -r -- hello — 로드된 Zsh에서 명령줄 구문 강조를 관찰할 입력 예"
+          ],
+          "install": "brew install zsh-syntax-highlighting",
+          "url": "https://github.com/zsh-users/zsh-syntax-highlighting",
+          "official": [
+            {
+              "label": "공식 문서·로드 순서",
+              "url": "https://github.com/zsh-users/zsh-syntax-highlighting"
+            }
+          ],
+          "hosts": [
+            "zsh"
+          ],
+          "tags": [
+            "plugins"
+          ],
+          "section": "플러그인"
+        },
+        {
           "name": "PowerShell",
           "tool_id": "powershell",
           "description": "Bash와 다른 객체 Pipeline, 서비스 관리, Windows 운영 명령.",
@@ -1577,6 +1786,31 @@
           "tldr": "starship",
           "url": "https://starship.rs/",
           "tag": "prompt"
+        },
+        {
+          "from": "fish",
+          "to": "fisher",
+          "why": "Fish에 추가할 함수·완성·키 바인딩을 반복 가능하게 관리하고 싶다",
+          "group": "shell-plugins",
+          "problem": "Fish 확장 파일을 수동으로 복사하면 설치 목록과 갱신·제거를 추적하기 어렵다.",
+          "solution": "플러그인 설치·갱신·제거와 fish_plugins 목록을 관리한다.",
+          "relation": "complement",
+          "boundary": "Fish 위에서 실행하는 관리자이며 셸이나 Zsh 프레임워크를 대체하지 않는다. 기본 설치는 Fish 설정 디렉터리의 같은 이름 파일을 덮어쓸 수 있으므로 기존 설정과 설치 경로를 확인한다.",
+          "url": "https://github.com/jorgebucaran/fisher",
+          "tag": "plugins"
+        },
+        {
+          "from": "zsh",
+          "to": "zsh-syntax-highlighting",
+          "why": "명령을 실행하기 전에 입력 버퍼의 구문을 시각적으로 구분하고 싶다",
+          "group": "shell-plugins",
+          "problem": "프롬프트 표시나 완성 후보만으로는 현재 입력한 명령줄의 구문을 구분하기 어렵다.",
+          "solution": "ZLE 명령줄에 명령·옵션·문자열 등의 구문 강조를 추가한다.",
+          "relation": "complement",
+          "boundary": "Zsh 입력 UI를 보완하는 플러그인이다. 셸·프롬프트·자동 제안·완성 엔진의 대체가 아니며 위젯과 버퍼 수정 훅을 등록하는 설정 뒤에 로드한다.",
+          "install": "brew install zsh-syntax-highlighting",
+          "url": "https://github.com/zsh-users/zsh-syntax-highlighting",
+          "tag": "plugins"
         }
       ],
       "tags": [
@@ -1720,6 +1954,38 @@
           ]
         },
         {
+          "name": "micro",
+          "tool_id": "micro",
+          "kind": "tui",
+          "role": "비모달 터미널 편집",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows",
+            "freebsd",
+            "openbsd",
+            "netbsd"
+          ],
+          "description": "일반적인 Ctrl 키 조합, 마우스, 분할·탭과 Lua 플러그인을 제공하는 비모달 터미널 텍스트 편집기다. Vim식 모드 전환 없이 파일을 편집하고 싶을 때 비교한다. Linux 시스템 클립보드에는 xclip/xsel 또는 wl-clipboard가 별도로 필요하다.",
+          "usage": "micro [파일] — Ctrl-Q로 종료하며 저장 여부를 확인한다.",
+          "examples": [
+            "micro README.md — 파일 열기; 변경하지 않고 Ctrl-Q로 종료",
+            "micro -version — 버전 정보 확인"
+          ],
+          "install": "brew install micro",
+          "tldr": "micro",
+          "url": "https://micro-editor.github.io/",
+          "official": [
+            {
+              "label": "공식 저장소·사용법",
+              "url": "https://github.com/micro-editor/micro"
+            }
+          ],
+          "tags": [
+            "base"
+          ]
+        },
+        {
           "name": "doom-emacs",
           "description": "Emacs에 모듈과 키맵·패키지 구성을 제공하는 설정 프레임워크다. 독립 편집기 엔진이 아니며 Emacs 위에 설치한다.",
           "tldr": "doom-emacs",
@@ -1748,6 +2014,121 @@
             "config"
           ],
           "section": "설정·배포판"
+        },
+        {
+          "name": "lazy.nvim",
+          "tool_id": "lazy.nvim",
+          "kind": "plugin",
+          "role": "Neovim 플러그인 관리",
+          "description": "Neovim 플러그인의 설치·의존성·지연 로딩과 lazy-lock.json 잠금을 관리하는 플러그인 관리자다. LazyVim 설정 배포판과 이름이 비슷하지만 별개이며 LSP 서버 등 외부 실행 파일을 설치하는 mason.nvim과도 관리 대상이 다르다.",
+          "usage": "Neovim에서 :Lazy로 플러그인 UI를 열고 :Lazy profile로 로딩 정보를 살펴본다.",
+          "examples": [
+            ":Lazy — 설치된 플러그인과 상태 조회",
+            ":Lazy profile — 플러그인 로딩 프로파일 조회"
+          ],
+          "url": "https://lazy.folke.io/",
+          "official": [
+            {
+              "label": "공식 문서",
+              "url": "https://lazy.folke.io/"
+            },
+            {
+              "label": "명령·사용법",
+              "url": "https://lazy.folke.io/usage"
+            }
+          ],
+          "hosts": [
+            "neovim"
+          ],
+          "tags": [
+            "neovim:관리"
+          ],
+          "section": "관리"
+        },
+        {
+          "name": "mason.nvim",
+          "tool_id": "mason.nvim",
+          "kind": "plugin",
+          "role": "외부 언어·디버깅 도구 설치",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "Neovim에서 LSP 서버·DAP 서버·린터·포매터 실행 파일을 설치·관리하는 플러그인이다. 설치한 도구를 Neovim의 PATH에 연결하지만 LSP 클라이언트 활성화나 포매터 연동까지 자동으로 대신하지는 않는다. 플러그인 소스를 관리하는 lazy.nvim과 역할이 다르다.",
+          "usage": "Neovim에서 :Mason으로 외부 도구 목록·설치 상태를 조회한다. 설치·제거는 별도 작업이다.",
+          "examples": [
+            ":Mason — 외부 도구와 설치 상태 조회",
+            ":MasonLog — 설치 관리자 로그 열기"
+          ],
+          "url": "https://github.com/mason-org/mason.nvim",
+          "official": [
+            {
+              "label": "공식 문서",
+              "url": "https://github.com/mason-org/mason.nvim"
+            }
+          ],
+          "hosts": [
+            "neovim"
+          ],
+          "tags": [
+            "neovim:언어·디버깅"
+          ],
+          "section": "언어·디버깅"
+        },
+        {
+          "name": "telescope.nvim",
+          "tool_id": "telescope.nvim",
+          "kind": "plugin",
+          "role": "확장형 picker 프레임워크",
+          "description": "파일·버퍼·도움말·LSP 목록 등을 검색·미리보기·선택하는 확장형 Neovim picker 플러그인이다. plenary.nvim이 필요하고 live_grep에는 ripgrep이 필요하다. fzf 실행 파일을 감싼 독립 CLI가 아니며 telescope-fzf-native는 선택적 정렬 확장이다.",
+          "usage": "Neovim에서 :Telescope <picker>로 목록 검색과 미리보기를 연다.",
+          "examples": [
+            ":Telescope find_files — 프로젝트 파일 검색",
+            ":Telescope buffers — 열린 버퍼 선택",
+            ":Telescope live_grep — ripgrep 기반 내용 검색"
+          ],
+          "url": "https://github.com/nvim-telescope/telescope.nvim",
+          "official": [
+            {
+              "label": "공식 문서·의존성",
+              "url": "https://github.com/nvim-telescope/telescope.nvim"
+            }
+          ],
+          "hosts": [
+            "neovim"
+          ],
+          "tags": [
+            "neovim:탐색"
+          ],
+          "section": "탐색"
+        },
+        {
+          "name": "fzf-lua",
+          "tool_id": "fzf-lua",
+          "kind": "plugin",
+          "role": "fzf 기반 Neovim picker",
+          "description": "fzf 또는 skim 실행 파일을 이용해 파일·버퍼·검색 결과·LSP 목록 등을 선택하는 Neovim 플러그인이다. 외부 fuzzy finder에 편집기별 목록·미리보기·동작을 연결하며 Telescope와는 설정·확장 API가 다른 picker 선택지다.",
+          "usage": "Neovim에서 :FzfLua <picker>를 실행한다. fzf 또는 skim을 별도로 설치한다.",
+          "examples": [
+            ":FzfLua files — 프로젝트 파일 선택",
+            ":FzfLua buffers — 열린 버퍼 선택",
+            ":FzfLua live_grep — 프로젝트 내용 검색"
+          ],
+          "url": "https://github.com/ibhagwan/fzf-lua",
+          "official": [
+            {
+              "label": "공식 문서·의존성",
+              "url": "https://github.com/ibhagwan/fzf-lua"
+            }
+          ],
+          "hosts": [
+            "neovim"
+          ],
+          "tags": [
+            "neovim:탐색"
+          ],
+          "section": "탐색"
         },
         {
           "name": "snacks.nvim",
@@ -2451,6 +2832,56 @@
           "solution": "플러그인 구성·키맵·언어별 Extra를 제공한다.",
           "boundary": "Neovim에 설치하는 설정 배포판이며 Neovim 엔진과 실행 기반을 유지한다.",
           "tag": "config"
+        },
+        {
+          "from": "vim",
+          "to": "micro",
+          "why": "터미널에서 모드 전환 대신 익숙한 Ctrl 키 조합으로 편집하고 싶다",
+          "group": "terminal-editor",
+          "problem": "간단한 파일 수정에도 Vim의 모드·motion·operator 조합을 익혀야 한다.",
+          "solution": "비모달 편집, 일반적인 Ctrl 키 조합, 마우스와 분할·탭을 제공한다.",
+          "relation": "alternative",
+          "boundary": "편집 모델을 선택하는 비교다. micro는 Vim의 키맵·Ex 명령·플러그인·설정 호환 구현이 아니며 nano의 명령행·설정 호환도 전제하지 않는다. Linux 시스템 클립보드는 외부 유틸리티가 필요하다.",
+          "install": "brew install micro",
+          "tldr": "micro",
+          "url": "https://github.com/micro-editor/micro",
+          "tag": "base"
+        },
+        {
+          "from": "neovim",
+          "to": "lazy.nvim",
+          "why": "플러그인 의존성·로딩 시점과 설치 버전을 관리하고 싶다",
+          "group": "editor-plugin-management",
+          "problem": "플러그인을 수동 배치하면 의존성 순서와 지연 로딩·버전 재현을 따로 관리해야 한다.",
+          "solution": "플러그인 명세, 지연 로딩, 관리 UI와 lazy-lock.json을 제공한다.",
+          "relation": "complement",
+          "boundary": "Neovim 위에서 동작하는 플러그인 관리자다. 편집기 엔진이나 LazyVim 설정 배포판이 아니며 mason.nvim이 설치하는 외부 도구와 관리 대상이 다르다.",
+          "url": "https://lazy.folke.io/",
+          "tag": "neovim:관리"
+        },
+        {
+          "from": "nvim-lspconfig",
+          "to": "mason.nvim",
+          "why": "LSP 설정과 별도로 필요한 서버 실행 파일을 관리하고 싶다",
+          "group": "editor-language-tooling",
+          "problem": "언어 서버 설정이 있어도 실제 서버 실행 파일이 설치되지 않았으면 연결할 수 없다.",
+          "solution": "LSP·DAP 서버, 린터와 포매터를 Neovim 데이터 경로에 설치하고 실행 경로를 연결한다.",
+          "relation": "complement",
+          "boundary": "mason.nvim은 외부 도구 설치 관리자이지 LSP 클라이언트나 서버 설정 모음이 아니다. 서버 활성화·클라이언트 설정과 포매터·디버거 연동은 별도로 구성하며 설치에 필요한 시스템 패키지 관리자도 남는다.",
+          "url": "https://github.com/mason-org/mason.nvim",
+          "tag": "neovim:언어·디버깅"
+        },
+        {
+          "from": "telescope.nvim",
+          "to": "fzf-lua",
+          "why": "Neovim의 목록 탐색에서 확장형 picker와 외부 fzf 기반 통합을 비교한다",
+          "group": "editor-picker",
+          "problem": "파일·버퍼·검색 결과를 선택하는 공통 작업에 어떤 picker와 확장 생태계를 사용할지 결정해야 한다.",
+          "solution": "fzf-lua는 외부 fzf 또는 skim에 Neovim의 목록·미리보기·액션을 연결한다.",
+          "relation": "alternative",
+          "boundary": "Neovim 안의 picker 역할을 비교하며 편집기 자체의 대체 관계가 아니다. Telescope의 설정·확장·키맵은 그대로 호환되지 않는다. Telescope의 선택적 telescope-fzf-native 정렬 확장과 fzf-lua의 외부 fuzzy finder 의존성도 구분한다.",
+          "url": "https://github.com/ibhagwan/fzf-lua",
+          "tag": "neovim:탐색"
         }
       ],
       "tags": [
@@ -2466,6 +2897,11 @@
             "Editor Configurations",
             "map-24"
           ]
+        },
+        {
+          "id": "neovim:관리",
+          "name": "관리",
+          "aliases": []
         },
         {
           "id": "neovim:탐색",
@@ -2630,6 +3066,35 @@
           "name": "smem",
           "description": "프로세스별 메모리 사용량을 USS/PSS/RSS 기준으로 분석하는 도구",
           "tldr": "smem"
+        },
+        {
+          "name": "lsof",
+          "tool_id": "lsof",
+          "kind": "cli",
+          "role": "열린 파일·포트 점유 프로세스 추적",
+          "platforms": [
+            "linux",
+            "macos",
+            "freebsd",
+            "netbsd",
+            "openbsd",
+            "solaris"
+          ],
+          "description": "프로세스가 연 파일·디렉터리·소켓을 조회하는 CLI다. 파일을 사용하는 프로세스나 TCP 포트를 점유한 프로세스를 추적할 때 사용한다. 보이는 정보는 운영체제와 실행 권한에 영향을 받으며 프로세스를 종료하는 도구는 아니다.",
+          "usage": "lsof [선택 조건] — 프로세스·파일·네트워크 소켓을 조회한다.",
+          "examples": [
+            "lsof -nP -iTCP:3000 -sTCP:LISTEN — TCP 3000 수신 프로세스 조회",
+            "lsof -p 1234 — PID 1234가 연 파일 조회"
+          ],
+          "install": "brew install lsof",
+          "tldr": "lsof",
+          "url": "https://github.com/lsof-org/lsof",
+          "official": [
+            {
+              "label": "공식 매뉴얼",
+              "url": "https://lsof.readthedocs.io/en/latest/manpage/"
+            }
+          ]
         }
       ],
       "relations": [
@@ -2697,6 +3162,105 @@
           "tldr": "smem",
           "url": "https://www.selenic.com/smem/",
           "boundary": "프로세스별 PSS·USS를 살펴보는 메모리 분석을 보완한다. 시스템 전체 메모리·swap 요약을 확인하는 free와 측정 대상이 다르며 다른 프로세스의 상세 정보는 접근 권한에 영향을 받는다. free를 smem alias로 치환하지 않고 분석 목적에 따라 함께 쓴다."
+        },
+        {
+          "from": "ps",
+          "to": "lsof",
+          "why": "프로세스 상태에서 더 나아가 열린 파일과 점유 포트를 추적하고 싶다",
+          "group": "process-resources",
+          "problem": "프로세스 목록만으로는 특정 파일이나 TCP 수신 포트를 누가 사용하는지 바로 알기 어렵다.",
+          "solution": "PID·파일 경로·소켓 조건으로 열린 파일과 네트워크 연결을 조회한다.",
+          "relation": "complement",
+          "boundary": "프로세스 목록·자원 사용량을 대신하지 않고 파일·소켓과 프로세스의 연결을 조사한다. 정보 가시성은 권한과 OS에 따라 다르며 점유 프로세스 조회를 종료·포트 해제로 오해하지 않는다.",
+          "install": "brew install lsof",
+          "tldr": "lsof",
+          "url": "https://lsof.readthedocs.io/en/latest/manpage/"
+        }
+      ]
+    },
+    {
+      "id": "kubernetes",
+      "name": "Kubernetes",
+      "domain": "domain:operations",
+      "aliases": [],
+      "why": "클러스터 API를 다루는 CLI와 상태·로그를 탐색하는 대화형 UI의 역할을 구분한다.",
+      "commands": [
+        {
+          "name": "kubectl",
+          "tool_id": "kubectl",
+          "kind": "cli",
+          "role": "Kubernetes API 조작·조회",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "Kubernetes API로 클러스터의 리소스를 조회·생성·변경하는 공식 CLI다. kubeconfig의 클러스터·사용자·컨텍스트와 RBAC 권한에 따라 동작하며 로컬 컨테이너 실행 엔진 자체는 아니다.",
+          "usage": "kubectl [명령] [리소스] [이름] [옵션] — 대상 컨텍스트·네임스페이스를 먼저 확인한다.",
+          "examples": [
+            "kubectl config current-context — 현재 대상 컨텍스트 확인",
+            "kubectl get pods -n default — default 네임스페이스의 Pod 조회",
+            "kubectl logs -n default pod-name --tail=100 — Pod의 최근 로그 조회"
+          ],
+          "install": "brew install kubernetes-cli",
+          "tldr": "kubectl",
+          "url": "https://kubernetes.io/docs/reference/kubectl/",
+          "official": [
+            {
+              "label": "공식 CLI 레퍼런스",
+              "url": "https://kubernetes.io/docs/reference/kubectl/"
+            },
+            {
+              "label": "설치·플랫폼 안내",
+              "url": "https://kubernetes.io/docs/tasks/tools/"
+            }
+          ]
+        },
+        {
+          "name": "k9s",
+          "tool_id": "k9s",
+          "kind": "tui",
+          "role": "Kubernetes 상태·로그 탐색",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows",
+            "freebsd"
+          ],
+          "description": "Kubernetes 리소스의 상태 변화를 관찰하고 로그·상세 정보를 탐색하는 터미널 UI다. kubeconfig와 클러스터 권한이 필요하며 kubectl 스크립트나 클러스터 자체를 대체하지 않는다. 조회 중심 사용에는 --readonly로 변경 명령을 비활성화한다.",
+          "usage": "k9s --readonly [--context 컨텍스트] [-n 네임스페이스] — 변경 명령 없이 클러스터 탐색",
+          "examples": [
+            "k9s --readonly -n default — 읽기 전용으로 default 탐색",
+            "k9s --readonly --context dev -c pod — dev 컨텍스트의 Pod 화면"
+          ],
+          "install": "brew install derailed/k9s/k9s",
+          "tldr": "k9s",
+          "url": "https://k9scli.io/",
+          "official": [
+            {
+              "label": "공식 명령·읽기 전용 모드",
+              "url": "https://k9scli.io/topics/commands/"
+            },
+            {
+              "label": "공식 프로젝트·설치",
+              "url": "https://github.com/derailed/k9s"
+            }
+          ]
+        }
+      ],
+      "relations": [
+        {
+          "from": "kubectl",
+          "to": "k9s",
+          "why": "리소스 상태·상세·로그 화면을 반복 명령 없이 오가고 싶다",
+          "group": "kubernetes-observability",
+          "problem": "kubectl 명령을 반복해 리소스·네임스페이스·로그를 오가면 현재 상태의 변화를 추적하기 번거롭다.",
+          "solution": "Kubernetes 리소스를 계속 관찰하면서 상태·상세·로그를 키보드로 탐색하는 TUI를 제공한다.",
+          "relation": "complement",
+          "boundary": "Kubernetes API를 사용하는 대화형 클라이언트이며 kubectl 실행 파일을 감싼 호환 실행기나 클러스터 엔진이 아니다. kubectl 자동화는 유지하고 kubeconfig·RBAC를 확인한다. --readonly는 K9s의 변경 명령을 막는 모드이지 서버 측 읽기 전용 권한을 부여하는 기능이 아니다.",
+          "install": "brew install derailed/k9s/k9s",
+          "tldr": "k9s",
+          "url": "https://k9scli.io/topics/commands/"
         }
       ]
     },
@@ -3244,6 +3808,33 @@
           "name": "jjui",
           "description": "Jujutsu 변경 이력과 작업을 탐색하는 터미널 UI",
           "tldr": "jjui"
+        },
+        {
+          "name": "gh",
+          "tool_id": "github-cli",
+          "kind": "cli",
+          "role": "GitHub PR·이슈·워크플로",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "GitHub의 PR·이슈·저장소·Actions와 API를 터미널과 스크립트에서 다루는 공식 CLI다. 로컬 커밋·브랜치·인덱스를 관리하는 Git을 대체하지 않으며 GitHub 인증과 저장소별 권한이 필요하다.",
+          "usage": "gh <하위 명령> — GitHub 리소스를 조회·관리한다.",
+          "examples": [
+            "gh pr list — 현재 저장소의 PR 목록 조회",
+            "gh issue view 123 — 이슈 상세 조회",
+            "gh run list — Actions 실행 목록 조회"
+          ],
+          "install": "brew install gh",
+          "tldr": "gh",
+          "url": "https://cli.github.com/",
+          "official": [
+            {
+              "label": "공식 CLI 매뉴얼",
+              "url": "https://cli.github.com/manual/"
+            }
+          ]
         }
       ],
       "relations": [
@@ -3311,6 +3902,19 @@
           "install": "brew install jjui",
           "tldr": "jjui",
           "url": "https://github.com/idursun/jjui"
+        },
+        {
+          "from": "git",
+          "to": "gh",
+          "why": "커밋 관리와 GitHub의 PR·이슈·CI 작업을 터미널에서 이어가고 싶다",
+          "group": "github-workflow",
+          "problem": "로컬 Git 명령만으로는 GitHub의 PR·이슈·Actions 리소스를 직접 다룰 수 없다.",
+          "solution": "GitHub 리소스와 API를 명시적인 하위 명령으로 조회·관리한다.",
+          "relation": "complement",
+          "boundary": "GitHub 서비스용 CLI이며 Git 버전 관리 엔진이나 Git 명령 전체를 대체하지 않는다. 인증·호스트·저장소 권한을 확인하고 git alias로 치환하지 않는다.",
+          "install": "brew install gh",
+          "tldr": "gh",
+          "url": "https://cli.github.com/manual/"
         }
       ]
     },
@@ -3342,6 +3946,32 @@
           "name": "yabai",
           "description": "macOS용 BSP 기반 타일링 윈도 매니저",
           "tldr": "yabai"
+        },
+        {
+          "name": "niri",
+          "tool_id": "niri",
+          "kind": "gui",
+          "role": "스크롤 타일링 Wayland 컴포지터",
+          "platforms": [
+            "linux"
+          ],
+          "description": "창을 가로로 스크롤하는 타일링 공간에 배치하는 Linux용 Wayland 컴포지터다. 창을 열어도 기존 창 크기를 유지하는 스크롤 모델을 사용하며 터미널 앱이나 완성형 데스크톱 환경 자체는 아니다.",
+          "usage": "실행 중인 niri 세션에서 niri msg로 상태를 조회한다.",
+          "examples": [
+            "niri msg --help — IPC 명령 목록",
+            "niri msg --json outputs — 디스플레이 상태를 JSON으로 조회"
+          ],
+          "url": "https://github.com/niri-wm/niri",
+          "official": [
+            {
+              "label": "공식 프로젝트",
+              "url": "https://github.com/niri-wm/niri"
+            },
+            {
+              "label": "IPC·상태 조회",
+              "url": "https://niri-wm.github.io/niri/IPC.html"
+            }
+          ]
         }
       ],
       "relations": [
@@ -3382,6 +4012,17 @@
           "install": "brew install koekeishiya/formulae/yabai",
           "tldr": "yabai",
           "url": "https://github.com/koekeishiya/yabai"
+        },
+        {
+          "from": "sway",
+          "to": "niri",
+          "why": "Wayland에서 분할 트리 대신 스크롤 타일링 창 배치를 선택하고 싶다",
+          "group": "linux-tiling",
+          "problem": "화면 안에 창을 계속 분할하기보다 창 크기를 유지하며 가로 공간을 이동하고 싶다.",
+          "solution": "스크롤 가능한 타일링 공간과 모니터별 작업공간을 제공한다.",
+          "relation": "alternative",
+          "boundary": "Linux Wayland 컴포지터 간 창 배치 모델 비교다. Sway/i3 설정·IPC·스크립트와 호환되는 구현이 아니며 macOS용 창 관리자도 아니다. X11 앱 지원은 별도 Xwayland 연동을 확인한다.",
+          "url": "https://github.com/niri-wm/niri"
         }
       ],
       "discovery_links": [
@@ -3732,6 +4373,32 @@
           "name": "lazydocker",
           "description": "Docker 컨테이너·이미지·로그를 터미널 UI로 관리하는 도구",
           "tldr": "lazydocker"
+        },
+        {
+          "name": "dive",
+          "tool_id": "dive",
+          "kind": "tui",
+          "role": "컨테이너 이미지 레이어 분석",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "컨테이너 이미지의 레이어별 파일 변화와 낭비 공간을 탐색하는 분석 도구다. 대화형 파일 트리와 CI 분석을 제공하지만 이미지를 자동으로 최적화하거나 컨테이너를 실행·운영하는 엔진은 아니다. 기본 Docker 소스는 로컬에 없는 이미지를 내려받을 수 있다.",
+          "usage": "dive <이미지> 또는 dive docker-archive://<파일> — 이미지의 레이어와 파일 트리를 분석한다.",
+          "examples": [
+            "dive docker-archive://./image.tar — 기존 이미지 아카이브를 레이어별 분석",
+            "dive --help — 분석 소스·옵션 확인"
+          ],
+          "install": "brew install dive",
+          "tldr": "dive",
+          "url": "https://github.com/wagoodman/dive",
+          "official": [
+            {
+              "label": "공식 문서·이미지 소스",
+              "url": "https://github.com/wagoodman/dive"
+            }
+          ]
         }
       ],
       "relations": [
@@ -3747,6 +4414,19 @@
           "install": "brew install lazydocker",
           "tldr": "lazydocker",
           "url": "https://github.com/jesseduffield/lazydocker"
+        },
+        {
+          "from": "docker",
+          "to": "dive",
+          "why": "실행 중 컨테이너 상태와 별개로 이미지가 커진 레이어·파일을 추적하고 싶다",
+          "group": "image-analysis",
+          "problem": "이미지 전체 크기나 레이어 목록만으로는 중복·삭제된 파일이 남긴 낭비 공간을 찾기 어렵다.",
+          "solution": "이미지의 레이어별 파일 변경과 낭비 공간 추정치를 대화형으로 탐색한다.",
+          "relation": "complement",
+          "boundary": "Docker의 이미지 생성·컨테이너 실행을 대체하지 않는 분석기다. 낭비 공간 지표는 추정치이며 수정은 Dockerfile·빌드 과정에서 수행한다. 기본 소스는 Docker 엔진을 사용하고 없는 이미지를 pull할 수 있어 조회만 필요하면 기존 아카이브를 명시한다.",
+          "install": "brew install dive",
+          "tldr": "dive",
+          "url": "https://github.com/wagoodman/dive"
         }
       ],
       "discovery_links": [
@@ -3819,7 +4499,7 @@
         "Neovim Plugins · AI",
         "map-30"
       ],
-      "why": "Neovim 안에서 AI 완성과 대화를 제공한다.",
+      "why": "독립 터미널 에이전트와 편집기 안의 AI 완성·대화 플러그인을 구분한다.",
       "commands": [
         {
           "name": "copilot.lua",
@@ -3902,9 +4582,104 @@
           "tags": [
             "base"
           ]
+        },
+        {
+          "name": "codex",
+          "tool_id": "codex-cli",
+          "kind": "cli",
+          "role": "Codex CLI · 터미널 코딩 에이전트",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "로컬 작업 디렉터리에서 코드를 읽고 수정하며 명령을 실행하는 OpenAI의 Codex CLI다. 대화형 UI와 비대화형 exec를 제공한다. Codex 웹·데스크톱 앱·IDE 확장과 구분하며 모델 이용에는 지원 계정 또는 API 인증이 필요하다.",
+          "usage": "codex [프롬프트] — 대화형 실행; codex exec [프롬프트] — 비대화형 실행. 승인과 sandbox 정책을 먼저 선택한다.",
+          "examples": [
+            "codex --sandbox read-only \"README.md를 설명하고 파일은 변경하지 마\" — 읽기 전용 조사",
+            "codex exec --sandbox read-only \"이 저장소의 진입점을 설명해\" — 비대화형 코드 조사"
+          ],
+          "install": "npm install -g @openai/codex",
+          "url": "https://github.com/openai/codex",
+          "official": [
+            {
+              "label": "공식 프로젝트·설치·인증",
+              "url": "https://github.com/openai/codex"
+            },
+            {
+              "label": "CLI 명령·sandbox 정책",
+              "url": "https://developers.openai.com/codex/cli/reference/"
+            }
+          ],
+          "tags": [
+            "base"
+          ]
+        },
+        {
+          "name": "gemini",
+          "tool_id": "gemini-cli",
+          "kind": "cli",
+          "role": "Gemini CLI · 터미널 코딩 에이전트",
+          "platforms": [
+            "linux",
+            "macos",
+            "windows"
+          ],
+          "description": "코드 조사·편집·명령 실행과 MCP 연동을 제공하는 Google의 Gemini CLI다. 현재 공식 안내는 기업 Code Assist 워크플로와 기존 유료 API·Vertex 인증 사용을 구분한다. 무료 개인·Google AI Pro/Ultra 사용자는 Antigravity CLI로 전환되었으므로 설치 전에 이용 자격을 확인한다.",
+          "usage": "gemini [프롬프트] — 대화형 실행; gemini -p <프롬프트> — 비대화형 실행. 조사에는 plan 승인 모드를 선택할 수 있다.",
+          "examples": [
+            "gemini --approval-mode=plan -p \"README.md를 읽고 프로젝트 구조를 설명해\" — 계획 모드로 코드 조사",
+            "gemini --list-sessions — 현재 프로젝트의 저장된 세션 목록"
+          ],
+          "install": "npm install -g @google/gemini-cli",
+          "url": "https://github.com/google-gemini/gemini-cli",
+          "official": [
+            {
+              "label": "공식 프로젝트·현재 이용 범위",
+              "url": "https://github.com/google-gemini/gemini-cli"
+            },
+            {
+              "label": "공식 CLI 옵션",
+              "url": "https://geminicli.com/docs/cli/cli-reference/"
+            },
+            {
+              "label": "계획 모드와 허용 도구",
+              "url": "https://geminicli.com/docs/cli/plan-mode/"
+            }
+          ],
+          "tags": [
+            "base"
+          ]
         }
       ],
-      "relations": [],
+      "relations": [
+        {
+          "from": "Claude Code",
+          "to": "codex",
+          "why": "터미널 코딩 에이전트를 모델·인증·실행 정책 기준으로 비교하고 싶다",
+          "group": "terminal-agents",
+          "problem": "코드를 읽고 편집하는 공통 작업에도 계정·모델·승인·sandbox·설정 파일의 계약이 다르다.",
+          "solution": "Codex CLI는 대화형 UI와 exec 실행, 명시적인 sandbox 정책을 제공한다.",
+          "relation": "alternative",
+          "boundary": "독립 코딩 에이전트의 선택지이지 CLI 옵션·프로젝트 설정·세션·구독의 호환 대체가 아니다. OpenAI 계정 또는 API 인증·요금을 별도로 확인한다. 작업 디렉터리에서 실행되는 클라이언트라는 뜻이지 모델 추론이 항상 로컬이라는 뜻은 아니다.",
+          "install": "npm install -g @openai/codex",
+          "url": "https://github.com/openai/codex",
+          "tag": "base"
+        },
+        {
+          "from": "codex",
+          "to": "gemini",
+          "why": "서로 다른 모델·계정·조직 환경에서 터미널 에이전트를 선택하고 싶다",
+          "group": "terminal-agents",
+          "problem": "유사한 코드 조사·편집 작업이라도 서비스 이용 자격과 승인·도구 정책을 그대로 옮길 수 없다.",
+          "solution": "Gemini CLI는 기업 Code Assist 및 지원 인증 환경에서 대화형·비대화형 실행과 MCP 연동을 제공한다.",
+          "relation": "alternative",
+          "boundary": "모델·인증·세션·설정·승인 정책은 별개이며 명령 이름을 alias로 치환하지 않는다. Gemini CLI의 현재 이용 대상은 기업 Code Assist와 기존 유료 API·Vertex 사용자 등을 확인해야 하며 무료 개인·Google AI Pro/Ultra용 도구와 혼동하지 않는다. 계획 모드는 프로젝트 조사 중심이지만 별도 계획 파일을 만들 수 있다.",
+          "install": "npm install -g @google/gemini-cli",
+          "url": "https://github.com/google-gemini/gemini-cli",
+          "tag": "base"
+        }
+      ],
       "tags": [
         {
           "id": "base",
