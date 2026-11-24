@@ -53,6 +53,7 @@
 |------|------|
 | [shell.md](shell.md) | Bash 명령 해석·확장·실행·작업 제어 |
 | [zsh.md](zsh.md) | Zsh ZLE·History·Glob·환경의 관계 |
+| [fish.md](fish.md) | Fish 자동 제안·Tab 목록 검색·리스트 문법·설정과 키 바인딩 |
 | [atuin.md](atuin.md) | Atuin 구조화 shell history 검색 |
 | [fzf.md](fzf.md) | fzf 범용 fuzzy finder |
 | [zoxide.md](zoxide.md) | zoxide 방문 기반 디렉터리 점프 |
