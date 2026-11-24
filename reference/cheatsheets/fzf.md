@@ -52,6 +52,27 @@ git branch --format='%(refname:short)' | fzf  # 브랜치 후보 중 선택
 
 `rg TODO | fzf`는 이미 검색된 후보를 다시 좁히는 방식이다. 반면 `change:reload`는 검색어가 변할 때 rg를 다시 실행한다. 이때 fzf 내부 매칭을 끌 수 있다.
 
+### 검색 방식 선택
+
+| 방식 | 검색 주체 | 활용 |
+|---|---|---|
+| `rg TODO` / `fd main` | rg / fd | 결과 확인만 필요할 때 |
+| `rg TODO \| fzf` | rg 후 fzf | 고정 후보를 추가 필터링 |
+| Live Grep | rg | 검색어 변경 때마다 재검색 |
+| 2단계 검색 | rg → fzf | 외부 검색 결과를 고정하고 내부 매칭으로 전환 |
+
+Live Grep의 최소 형태:
+
+```sh
+fzf --disabled --ansi \\
+  --bind 'start:reload:rg --column --color=always --smart-case -- {q} || :' \\
+  --bind 'change:reload:rg --column --color=always --smart-case -- {q} || :'
+```
+
+start는 초기 후보를 채우고 change는 검색어가 달라질 때 후보를 갱신한다. Enter는 기본적으로 선택 결과를 출력한다. 미리보기와 에디터 열기, 다중 선택은 [공식 Ripgrep integration](https://junegunn.github.io/fzf/tips/ripgrep-integration/)을 참고한다. 내부 검색 전환 예제는 [ADVANCED.md](https://github.com/junegunn/fzf/blob/master/ADVANCED.md)를 참고한다.
+
+파일 전용 Ctrl-T 설정과 본문 검색 옵션을 전역 옵션에 혼합하지 않는다. 별도 Picker가 필요하다면 독립 스크립트나 이미 제공되는 확장을 선택한다. [확장 생태계 비교](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/shell/2026-11-22-developer-tool-extension-ecosystems.md)는 도입 판단과 Television 대안을 다룬다.
+
 ## 2. Selection — 기본 선택 조작
 
 | 조작 | 의미 |
