@@ -133,6 +133,8 @@ zsh에서 지원되는 fzf 버전은 `source <(fzf --zsh)`로 셸 통합을 활�
 
 예를 들어 셸에 `nvim `을 입력한 뒤 `Ctrl-T`로 파일을 선택하면 경로가 명령행에 들어간다. 별도 `fd | fzf | xargs`를 매번 작성할 필요가 없다. 다른 히스토리 도구(예: Atuin)가 `Ctrl-R`을 사용한다면 키 바인딩 충돌을 확인한다.
 
+Fish의 **`ssh `·`kill ` 입력 후 `Shift-Tab`**은 파일 선택용 Ctrl-T가 아니라 명령 문맥 완성이다. fzf 0.74.4 공식 통합에서 확인했으며, 초기화·호스트/PID 선택·기본 Tab과의 차이는 [Fish 치트시트의 Shift-Tab 절](fish.md#shift-tab-명령-문맥의-후보를-fzf로-선택)을 참고한다.
+
 ### Ctrl-T 사용 전제
 
 아래 사용법은 터미널 pane 전체를 쓰는 Ctrl-T 화면과 오른쪽 50% `bat` 미리보기, `Ctrl-/` 위치 전환,

@@ -43,6 +43,56 @@
 
 **자동 제안은 아직 입력하지 않은 뒷부분**, **완성은 현재 명령 문맥의 후보**, **히스토리는 과거 명령**이다. 목록 검색 UI가 있어도 서로 같은 데이터는 아니다. Vi 모드에서는 pager 검색 키가 `/`이며 다른 편집 키도 달라진다.
 
+### Shift-Tab: 명령 문맥의 후보를 fzf로 선택
+
+**Fish 4.9.3 + fzf 0.74.4의 공식 통합에서 확인한 기능**이다. 별도 완성 플러그인 없이 `fzf --fish | source`가 `Shift-Tab`을 `fzf_complete`에 연결한다. 일반 `Tab`은 Fish 기본 완성으로 남는다. 구버전이나 다른 플러그인에서는 바인딩이 다를 수 있다.
+
+```fish
+# ~/.config/fish/config.fish — 이미 초기화했다면 중복 추가하지 않는다.
+if status is-interactive
+    fzf --fish | source
+end
+
+# 현재 키의 소유자 확인
+bind shift-tab
+# 기대: bind shift-tab fzf_complete
+```
+
+**`ssh`·`kill` 전용 기능이 아니다. Fish가 제공하는 명령·인자·옵션 후보를 fzf로 고른다.** 아래 공백으로 끝나는 예시는 뒤 공백까지, `git --`는 공백 없이 입력한 뒤 Enter 대신 `Shift-Tab`을 누른다. Bash/Zsh의 `**` 트리거는 필요 없다.
+
+| 입력 중인 명령줄 | fzf에 표시할 후보 | 선택 후 삽입할 값 |
+|---|---|---|
+| `ssh ` | Fish SSH 완성이 제공하는 호스트 | 호스트 이름·별칭 |
+| `kill ` | 실행 중인 프로세스 PID와 이름 설명 | PID |
+| `git switch ` | Fish Git 완성이 제공하는 브랜치 | 브랜치 이름 |
+| `git checkout ` | 현재 문맥의 브랜치·파일 등 | 브랜치 이름·경로 |
+| `git add ` | 추가할 파일·경로 | 경로 |
+| `cd ` | 디렉터리 | 디렉터리 경로 |
+| `nvim ` / `cat ` | 파일·경로 | 경로 |
+| `git --` | Git 전역 옵션 | 옵션 이름 |
+| `docker exec ` | 컨테이너 — Docker 완성 정의와 접근 가능한 daemon 필요 | 컨테이너 이름·ID |
+| `kubectl get ` | 리소스 종류 — kubectl 완성 정의와 클러스터 접근 등 필요 | 리소스 종류 |
+| `systemctl restart ` | 서비스·유닛 — systemd 환경과 해당 완성 정의 필요 | 유닛 이름 |
+
+Git 예시는 저장소 안에서 사용한다. 후보는 도구 설치 여부·완성 정의·현재 상태에 따라 달라진다. Docker·kubectl·systemctl 예시는 해당 환경에서 사용할 패턴이며, 위 버전 확인이 외부 서비스까지 검증했다는 뜻은 아니다.
+
+1. fzf 창에서 검색어를 입력해 후보를 좁힌다. 프로세스 이름은 **`kill ` 뒤가 아니라 fzf 검색창에** 입력한다.
+2. `↑` / `↓`로 이동하고 `Enter`로 명령줄에 삽입한다. `Tab` / `Shift-Tab`은 창 안에서는 복수 선택·해제와 이동을 담당한다. `ssh`의 목적지처럼 하나만 필요한 인자는 하나만 고른다.
+3. 완성된 명령을 확인한 뒤 셸에서 다시 `Enter`를 눌러 실행한다. **PID 선택만으로 프로세스가 종료되지는 않는다.** `Esc` / `Ctrl-C`로 선택을 취소할 수 있다.
+
+후보는 fzf가 새로 수집하는 것이 아니라 Fish의 `complete -C` 결과다. 원하는 후보가 없으면 먼저 아래처럼 공급 결과를 확인한다. **파일 경로만 나온다고 컨테이너·리소스·유닛 완성이 동작하는 것은 아니다.** 명령별 완성 정의가 없을 때 일반 파일 완성이 나타날 수 있다.
+
+```fish
+complete -C 'ssh '
+complete -C 'kill '
+complete -C 'git switch '
+complete -C 'docker exec '
+```
+
+이미 기본 Tab pager가 열려 있으면 `Shift-Tab`은 fzf를 열지 않고 Fish 완성을 처리하므로, pager를 닫고 명령줄에서 시작한다.
+
+근거: [fzf 0.74.4 공식 Fish 완성 구현](https://github.com/junegunn/fzf/blob/v0.74.4/shell/completion.fish). 파일 선택용 `Ctrl-T`와 다른 기능이며, 공통 선택 조작은 [fzf 치트시트](fzf.md)를 참고한다.
+
 ```fish
 bind ctrl-s           # 현재 적용되는 바인딩 조회
 bind --preset ctrl-s # 기본 제공 바인딩 조회
@@ -196,7 +246,7 @@ complete -e -c demo    # 예제 완성 제거
 
 | 통합 | 범위 | 주의 |
 |---|---|---|
-| fzf 공식 Fish 통합 | `fzf --fish \| source`; 파일·디렉터리·히스토리 위젯 | 일반 Tab 완성을 대체하지 않음 |
+| fzf 공식 Fish 통합 | `fzf --fish \| source`; 파일·디렉터리·히스토리 위젯, 0.74.4에서 확인한 Shift-Tab 문맥 완성 | 일반 Tab은 유지; Shift-Tab으로 Fish 후보를 fzf에서 선택 |
 | Atuin | `atuin init fish \| source`; 이력 검색 | Ctrl-R을 맡길 때 fzf 뒤에 초기화 |
 | 사용자 검색 함수 | 예: 파일 내용 검색 후 경로 삽입 | 기본 Ctrl-F를 덮으면 제안 수락은 → 사용 |
 
