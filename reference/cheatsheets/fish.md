@@ -280,4 +280,4 @@ complete -e -c demo    # 예제 완성 제거
 - [공식 Language](https://fishshell.com/docs/current/language.html), [`set`](https://fishshell.com/docs/current/cmds/set.html), [`bind`](https://fishshell.com/docs/current/cmds/bind.html), [`complete`](https://fishshell.com/docs/current/cmds/complete.html): 상세 명세
 - [Shell](shell.md) / [Zsh](zsh.md): 셸 공통 개념과 문법 차이
 - [fzf](fzf.md) / [Atuin](atuin.md) / [zoxide](zoxide.md): 선택·이력·디렉터리 점프
-- [블로그 — Zsh 완성과 fzf-tab, Fish 이식 경계](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/shell/2026-11-19-zsh-completion-and-fzf-tab.md): 완성 후보 제공·검색 UI·명령줄 편집을 분리한 사례
+- [블로그 — Zsh·Fish 자동완성과 fzf의 연결 구조](https://github.com/clang-engineer/clang-engineer.github.io/blob/main/_posts/shell/2026-11-19-shell-completion-and-fzf.md): 후보 제공·키 바인딩·검색 UI를 분리하고 전용 바인딩을 제거한 사례
