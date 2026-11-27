@@ -35,10 +35,30 @@ Git 밖에 보관: 개인키·KMS 접근 권한
 | age 개인키 (`AGE-SECRET-KEY-...`) | 데이터 키를 복호화 | Git 밖에 보관 |
 | SOPS 데이터 키 | 파일의 값을 암호화 | recipient로 보호해 파일 메타데이터에 저장 |
 
-SOPS는 파일마다 데이터 키를 만들고, age recipient로 그 키를 보호한다.
-recipient를 추가하면 같은 파일을 열 수 있는 사람이 늘어난다. `.sops.yaml` 변경은
-기존 암호문에 자동 반영되지 않는다. 자세한 원리: [SOPS 보안 모델](https://getsops.io/docs/security/) ·
-[age 파일 형식 명세](https://c2sp.org/age).
+**파일마다 SOPS 데이터 키 하나로 본문 값을 암호화하고, age 공개키로 그 데이터 키를 보호한다.**
+복호화할 때는 대응하는 age 개인키로 데이터 키를 얻어 본문 값을 연다.
+YAML 파일의 예시 구조 (`<…>`와 `…`는 자리표시자):
+
+```yaml
+database:
+  password: ENC[AES256_GCM,data:…,iv:…,tag:…,type:str] # 데이터 키로 암호화한 값
+sops:
+  age:
+    - recipient: age1… # enc를 보호할 때 사용한 공개키 (열 때는 대응하는 개인키 필요)
+      enc: |            # age로 보호한 데이터 키
+        -----BEGIN AGE ENCRYPTED FILE-----
+        …
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "…"                # SOPS 파일 수정 시각
+  mac: ENC[AES256_GCM,…]           # 내용 무결성 검증
+  unencrypted_suffix: _unencrypted # 이 접미사의 필드 값은 암호화하지 않음
+  version: "…"                     # SOPS 버전
+```
+
+`database.password`는 예시 필드이며 SOPS 공통 필드가 아니다. `ENC[...]`의
+`data`는 암호문, `iv`는 nonce, `tag`는 인증 태그, `type`은 원래 자료형이다.
+`.sops.yaml` 변경은 기존 암호문에 자동 반영되지 않는다. 자세한 원리:
+[SOPS 보안 모델](https://getsops.io/docs/security/) · [age 파일 형식 명세](https://c2sp.org/age).
 
 ## 1. 키 준비 — 설치와 age
 
