@@ -235,9 +235,9 @@ secret을 이미 읽었을 가능성이 있으면 실제 credential도 함께 �
 
 ## 참고
 
+- [age — 파일 전체 암호화·복호화와 키 준비](age.md)
 - [SOPS 공식 저장소](https://github.com/getsops/sops)
 - [SOPS 공식 문서](https://getsops.io/)
-- [age 공식 저장소](https://github.com/FiloSottile/age)
 
 ## 관련 글
 
