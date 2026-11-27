@@ -4715,12 +4715,25 @@
       "why": "",
       "commands": [
         {
+          "name": "age",
+          "tool_id": "age",
+          "description": "공개 recipient로 파일 전체를 암호화하고 개인키로 복호화한다."
+        },
+        {
           "name": "SOPS",
           "tool_id": "sops",
           "description": "age와 함께 설정 파일을 암호화해 Git에서 관리한다."
         }
       ],
-      "relations": [],
+      "relations": [
+        {
+          "from": "age",
+          "to": "SOPS",
+          "relation": "complement",
+          "why": "암호화된 설정 파일을 자주 편집하고 싶다",
+          "boundary": "age는 파일 전체 암호화 도구다. SOPS는 age를 recipient로 사용해 구조화된 설정 파일의 편집·키 관리를 돕는다."
+        }
+      ],
       "discovery_links": [
         {
           "label": "GitHub · 분야별 인기 프로젝트",

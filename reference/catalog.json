@@ -5114,6 +5114,24 @@
             "file": "git.md"
           },
           {
+            "slug": "gh",
+            "name": "GitHub CLI (gh)",
+            "desc": "GitHub 저장소·이슈·PR·Actions·릴리스를 터미널에서 조회하고 관리.",
+            "tldr": "common/gh",
+            "official": [
+              {
+                "label": "GitHub CLI manual",
+                "url": "https://cli.github.com/manual/"
+              }
+            ],
+            "custom": {
+              "label": "gh — 저장소 브라우저·PR·Actions",
+              "url": "https://github.com/clang-engineer/devkit/blob/main/reference/cheatsheets/gh.md"
+            },
+            "file": "gh.md",
+            "tool_id": "github-cli"
+          },
+          {
             "slug": "jj",
             "name": "Jujutsu (jj)",
             "desc": "Change ID, working-copy commit, operation log 및 Git 백엔드 기반의 버전 관리.",

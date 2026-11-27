@@ -109,7 +109,7 @@ Gemini CLI의 공식 안내(2026-11-23 확인)는 기업 Code Assist 워크플�
 
 - [Shell](cheatsheets/shell.md) / [Zsh](cheatsheets/zsh.md) / [Fish](cheatsheets/fish.md) / [PowerShell](cheatsheets/powershell.md): 명령 해석·확장·파이프라인
 - [fzf](cheatsheets/fzf.md) / [zoxide](cheatsheets/zoxide.md) / [Atuin](cheatsheets/atuin.md): 탐색·선택·이력
-- [Git](cheatsheets/git.md) / [jj](cheatsheets/jj.md) / [git-delta](https://github.com/dandavison/delta): 변경 관리·출력
+- [Git](cheatsheets/git.md) / [gh](cheatsheets/gh.md) / [jj](cheatsheets/jj.md) / [git-delta](https://github.com/dandavison/delta): 로컬 변경·GitHub 협업·출력
 - [uv](cheatsheets/uv.md) / [mise](cheatsheets/mise.md) / [chezmoi](cheatsheets/chezmoi.md) / [SOPS](cheatsheets/sops.md): 환경 재현
 - [systemd](cheatsheets/systemd.md) / [SSH](cheatsheets/ssh.md): 운영·접속·도구 선택
 

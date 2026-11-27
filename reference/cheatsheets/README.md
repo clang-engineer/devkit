@@ -92,6 +92,7 @@
 | 파일 | 설명 |
 |------|------|
 | [git.md](git.md) | Git Working Tree·Index·Repository 상태 변화 |
+| [gh.md](gh.md) | GitHub CLI — 저장소 브라우저 열기·PR·이슈·Actions·릴리스 |
 | [jj.md](jj.md) | Jujutsu(jj) — change, revision, operation log 및 Git 원격 연동 |
 | [chezmoi.md](chezmoi.md) | chezmoi — dotfiles 관리 |
 
