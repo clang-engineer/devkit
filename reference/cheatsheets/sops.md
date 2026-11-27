@@ -1,13 +1,12 @@
 # SOPS Cheatsheet
 
-SOPS(Secrets OPerationS)는 YAML, JSON, dotenv, INI, binary 파일의 값을 암호화한 채
-Git으로 관리할 수 있게 해주는 도구다. 파일을 통째로 알아볼 수 없게 만드는 대신 구조와
-key 이름은 유지하고 값만 암호화하므로 diff와 코드 리뷰가 가능하다.
+SOPS는 설정 파일을 암호화해 Git에서 관리한다. YAML·JSON·dotenv·INI 파일은
+값을 암호화하고 키 이름과 구조는 남긴다. binary 파일은 구조를 유지하지 않는다.
 
-SOPS는 password manager나 runtime secret server가 아니다. 사람이 자동 완성으로
-비밀번호를 쓰려면 1Password나 Bitwarden이, 애플리케이션에 중앙에서 secret을 공급하려면
-Vault나 cloud secret manager가 더 적합하다. 설정 파일을 Git에 안전하게 보관하고 배포하는
-용도에는 SOPS가 잘 맞는다.
+**흐름:** age 키 준비 → 파일 암호화 → 암호화 상태 확인 → Git에 저장 →
+SOPS로 편집·복호화 → 필요할 때 recipient 갱신·키 회전.
+비밀번호 자동 완성은 password manager, 실행 중인 서비스에 중앙에서 비밀을 공급하는 일은
+secret manager의 역할이다.
 
 ## 키와 파일의 관계
 
@@ -26,28 +25,22 @@ Vault나 cloud secret manager가 더 적합하다. 설정 파일을 Git에 안�
 Git에 저장: 암호문 + 메타데이터
 Git 밖에 보관: 개인키·KMS 접근 권한
 ```
-SOPS는 파일별 Data Key로 값을 암호화하고, recipient의 age 공개키나 KMS 키로 Data Key를 보호한다. **암호화한 파일을 저장하는 것과 복호화 권한을 배포하는 것은 별도 작업**이다. 파일명·필드 이름·구조는 기본적으로 노출될 수 있다. **recipient 변경과 데이터 키 교체는 다른 작업**이므로 아래 회전 절차를 구분한다.
+파일명·필드 이름·구조는 노출될 수 있다. 암호화한 파일과 복호화 권한은 따로 관리한다.
 
-### 대칭키와 공개키·개인키의 역할
+### 공개키와 개인키
 
-| 구분 | 암호화에 쓰는 것 | 복호화에 쓰는 것 | SOPS+age에서 보호하는 대상 |
-|---|---|---|---|
-| 대칭키 암호화 | 비밀인 데이터 키 | 같은 데이터 키 | 설정값 |
-| 공개키 암호화 | recipient의 공개키 (`age1...`) | 대응하는 개인키 (`AGE-SECRET-KEY-...`, 일반 X25519 키 기준) | SOPS 데이터 키 |
+| 대상 | 역할 | 보관 |
+|---|---|---|
+| age 공개 recipient (`age1...`) | 새 파일의 데이터 키를 암호화 | `.sops.yaml`에 기록 가능 |
+| age 개인키 (`AGE-SECRET-KEY-...`) | 데이터 키를 복호화 | Git 밖에 보관 |
+| SOPS 데이터 키 | 파일의 값을 암호화 | recipient로 보호해 파일 메타데이터에 저장 |
 
-공개키는 암호화할 사람이나 시스템에 전달할 수 있다. 예를 들어 배포 담당자가 운영팀 공개키를 받아 설정 파일을 암호화하면, 운영팀은 대응하는 개인키로 복호화할 수 있다. recipient 변경으로 이후 암호화본을 열 수 있는 사람이 달라지므로 `.sops.yaml`의 recipient 변경도 리뷰한다.
+SOPS는 파일마다 데이터 키를 만들고, age recipient로 그 키를 보호한다.
+recipient를 추가하면 같은 파일을 열 수 있는 사람이 늘어난다. `.sops.yaml` 변경은
+기존 암호문에 자동 반영되지 않는다. 자세한 원리: [SOPS 보안 모델](https://getsops.io/docs/security/) ·
+[age 파일 형식 명세](https://c2sp.org/age).
 
-### 암호화부터 복호화까지
-
-1. **SOPS가 파일을 암호화한다.** 새 파일에 무작위 256비트 데이터 키를 만들고, YAML·JSON의 암호화 대상 값을 AES-256-GCM으로 보호한다. GCM은 복호화할 때 암호문의 변조도 검증하는 인증 암호화 방식이다.
-2. **age가 데이터 키를 보호한다.** SOPS는 데이터 키를 age에 입력하고, age 암호문을 SOPS 메타데이터에 기록한다. 일반 X25519 recipient를 쓰면 age는 임시 개인키와 recipient 공개키로 공유 비밀을 계산한다. 여기서 유도한 대칭키로 age 내부의 파일 키를 보호하고, age의 암호화 본문에 SOPS 데이터 키를 담는다. age 내부 파일 키와 SOPS 데이터 키는 별개의 값이다.
-3. **복호화는 키부터 푼다.** age는 recipient 개인키와 암호문에 포함된 임시 공개키로 같은 공유 비밀을 계산해 내부 파일 키를 얻는다. age가 SOPS 데이터 키를 복원하면 SOPS가 그 키로 값을 복호화하고 무결성을 검증한다.
-
-이처럼 데이터는 대칭키로 암호화하고, 그 키를 별도 수단으로 보호하는 구성을 봉투 암호화(envelope encryption)라고 한다. 기본 SOPS 구성에서 age recipient를 추가하면 같은 SOPS 데이터 키를 열 수 있는 경로가 하나 더 생긴다. 각 recipient에 대해 설정값 전체를 다시 암호화할 필요는 없다. AWS KMS나 Vault Transit을 쓰는 경우에는 서비스 API가 데이터 키를 보호하며, 해당 서비스의 복호화 권한으로 파일을 열 수 있다. [SOPS 보안 모델](https://getsops.io/docs/security/) · [age 파일 형식 명세](https://c2sp.org/age)
-
-## 1. 키 준비 — 설치와 Age
-
-**SOPS는 데이터를 암호화하고, Age·KMS 등의 Recipient는 Data Key를 보호한다.** 키를 준비하는 단계와 암호화 파일을 만드는 단계는 구분한다.
+## 1. 키 준비 — 설치와 age
 
 ### 설치
 
@@ -91,27 +84,14 @@ Git에 commit하지 않는다. 개인키를 잃으면 파일을 복구할 수 �
 
 ### .sops.yaml
 
-저장소 root에 암호화 규칙을 둔다. SOPS는 대상 경로와 처음 일치하는 `creation_rules`를
-새 파일 암호화에 사용한다.
+저장소 root에 규칙을 둔다. `age-keygen -y` 출력으로 아래 예시 recipient를 교체한다.
+SOPS는 대상 경로와 처음 일치하는 `creation_rules`를 새 파일 암호화에 사용한다.
 
 ```yaml
 creation_rules:
   - path_regex: '(^|/)secrets/.*\.sops\.ya?ml$'
     age: age1example_public_recipient
 ```
-
-여러 사람이 각자 복호화해야 한다면 recipient를 여러 개 지정한다.
-
-```yaml
-creation_rules:
-  - path_regex: '(^|/)secrets/.*\.sops\.ya?ml$'
-    age:
-      - age1alice_public_recipient
-      - age1bob_public_recipient
-```
-
-기본 구성에서는 등록된 개인키 중 하나만 있어도 data key를 복호화할 수 있다. 여러 키를
-동시에 요구하는 정책이 필요하면 SOPS key group과 Shamir threshold를 별도로 구성한다.
 
 ### 파일 만들기
 
@@ -130,11 +110,36 @@ sops filestatus secrets/app.sops.yaml
 # {"encrypted":true}
 ```
 
-`--in-place`를 빼면 암호화 결과를 stdout으로 출력한다.
+### 커밋 전 확인
 
 ```sh
-sops encrypt plain.yaml > secrets/app.sops.yaml
+# 암호화된 파일과 규칙만 stage한 뒤 실제로 커밋할 내용 확인
+git add -- .sops.yaml secrets/app.sops.yaml
+git diff --cached -- .sops.yaml secrets/app.sops.yaml
+git status --short
 ```
+
+`filestatus`는 지정한 파일의 암호화 여부만 확인한다. diff와 staged 파일 목록에서
+평문 파일·개인키가 포함되지 않았는지도 확인한다. 이전에 평문을 커밋했다면 이 단계로
+Git 이력이 사라지지 않으므로 해당 credential을 교체해야 한다.
+
+Git에는 `.sops.yaml`과 암호화 결과만 저장한다. age 개인키, 편집 중 생성된 평문,
+`sops decrypt ... > plain.yaml`의 출력은 저장하지 않는다.
+
+### 여러 recipient
+
+여러 사람이 각자 복호화해야 한다면 recipient를 여러 개 지정한다.
+
+```yaml
+creation_rules:
+  - path_regex: '(^|/)secrets/.*\.sops\.ya?ml$'
+    age:
+      - age1alice_public_recipient
+      - age1bob_public_recipient
+```
+
+기본 구성에서는 등록된 개인키 중 하나만 있어도 data key를 복호화할 수 있다. 여러 키를
+동시에 요구하는 정책이 필요하면 SOPS key group과 Shamir threshold를 별도로 구성한다.
 
 ## 3. 암호화 파일 사용 — 편집·조회·전달
 
@@ -169,9 +174,6 @@ sops decrypt secrets/app.sops.yaml
 sops decrypt \
   --extract '["database"]["password"]' \
   secrets/app.sops.yaml
-
-# 복호화하지 않고 암호화 상태만 검사
-sops filestatus secrets/app.sops.yaml
 ```
 
 stdout 출력은 terminal scrollback, pipe 대상, CI log에 남을 수 있다. 필요한 값만
@@ -220,31 +222,7 @@ sops rotate --in-place secrets/app.sops.yaml
 secret을 이미 읽었을 가능성이 있으면 실제 credential도 함께 교체한다. 암호화 키 변경만으로
 과거에 노출된 비밀번호가 무효화되지는 않는다.
 
-## 5. 검증과 진단
-
-### Git에서 확인할 것
-
-```sh
-# 암호화 상태 확인
-sops filestatus secrets/app.sops.yaml
-
-# 평문 placeholder나 실제 secret이 남았는지 검색
-rg 'CHANGE_ME|known-secret-fragment' secrets
-
-# commit 전 diff 확인
-git diff -- secrets .sops.yaml
-```
-
-다음 파일만 Git으로 관리한다.
-
-- `.sops.yaml`
-- `*.sops.yaml` 같은 암호화 결과
-
-다음 항목은 관리하지 않는다.
-
-- age 개인키
-- 복호화해 만든 임시 평문 파일
-- `sops decrypt ... > plain.yaml`로 생성한 출력
+## 5. 진단
 
 ### 흔한 문제 — 원인별 확인
 
