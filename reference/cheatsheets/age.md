@@ -41,22 +41,26 @@ age-keygen -y "$HOME/.config/age/keys.txt" > recipients.txt
 
 ## 2. 파일 암호화·복호화
 
-```sh
-# -R: 공개 recipient 목록, -o: 결과 파일 (생략하면 stdout)
-age -R recipients.txt -o data.bin.age data.bin
+아래 `<...>`는 파일 경로를 나타내는 설명용 자리표시자다. 셸에 그대로 입력하지 말고
+실제 경로로 바꿔 실행한다.
 
-# -d: 복호화, -i: 개인키, -o: 복호화 파일 경로
-age -d -i "$HOME/.config/age/keys.txt" -o data.bin.restored data.bin.age
+```sh
+# -R: 공개 recipient 목록 파일, -o: 암호문 파일 (생략하면 stdout)
+age -R <공개키_목록_경로> -o <암호문_파일_경로> <원문_파일_경로>
+
+# -d: 복호화, -i: 개인키 파일, -o: 복원본 파일
+age -d -i <개인키_파일_경로> -o <복원본_파일_경로> <암호문_파일_경로>
 ```
 
-`data.bin.age`는 암호문이고 `data.bin.restored`는 **평문**이다. 후자를 Git에 추가하지 않는다.
-암호화가 기존 `data.bin`을 자동 삭제하지도 않는다. 암호문과 개인키만으로 복원되는지
-확인한 뒤 평문 파일의 보관·삭제를 결정한다. `rm`은 안전한 완전 삭제를 보장하지 않는다.
+`<암호문_파일_경로>`는 암호화 결과, `<복원본_파일_경로>`는 **평문**이다.
+복원본을 Git에 추가하지 않는다. 암호화가 원문 파일을 자동 삭제하지도 않는다.
+암호문과 개인키만으로 복원되는지 확인한 뒤 평문 파일의 보관·삭제를 결정한다.
+`rm`은 안전한 완전 삭제를 보장하지 않는다.
 
 ### 파일을 수정할 때
 
 age 단독에는 편집 명령이 없다. 복호화 → 편집 → **새 암호문 생성·확인** 순서다.
-`data.bin.restored`를 편집했다면:
+예를 들어 `data.bin.restored`를 편집했다면:
 
 ```sh
 age -R recipients.txt -o data.bin.age.next data.bin.restored
